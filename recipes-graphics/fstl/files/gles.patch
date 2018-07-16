@@ -1,0 +1,80 @@
+diff --git a/gl/mesh.frag b/gl/mesh.frag
+index d7a54d5..5dc0d8f 100644
+--- a/gl/mesh.frag
++++ b/gl/mesh.frag
+@@ -1,5 +1,7 @@
+-#version 120
++#version 100 es
++#extension GL_OES_standard_derivatives : enable
+ 
++precision mediump float;
+ uniform float zoom;
+ 
+ varying vec3 ec_pos;
+@@ -16,6 +18,6 @@ void main() {
+     float a = dot(ec_normal, vec3(0.0, 0.0, 1.0));
+     float b = dot(ec_normal, vec3(-0.57, -0.57, 0.57));
+ 
+-    gl_FragColor = vec4((a*base2 + (1-a)*base00)*0.5 +
+-                        (b*base3 + (1-b)*base00)*0.5, 1.0);
++    gl_FragColor = vec4((a * base2 + (1.0 - a) * base00) * 0.5 +
++                        (b * base3 + (1.09 - b) * base00) * 0.5, 1.0);
+ }
+diff --git a/gl/mesh.vert b/gl/mesh.vert
+index e60e76b..29d9e21 100644
+--- a/gl/mesh.vert
++++ b/gl/mesh.vert
+@@ -1,4 +1,6 @@
+-#version 120
++#version 100 es
++
++precision mediump float;
+ attribute vec3 vertex_position;
+ 
+ uniform mat4 transform_matrix;
+diff --git a/gl/quad.frag b/gl/quad.frag
+index 1c02e1b..a40a8af 100644
+--- a/gl/quad.frag
++++ b/gl/quad.frag
+@@ -1,5 +1,6 @@
+-#version 120
++#version 100 es
+ 
++precision mediump float;
+ varying vec3 frag_color;
+ 
+ void main() {
+diff --git a/gl/quad.vert b/gl/quad.vert
+index 6698297..0b100de 100644
+--- a/gl/quad.vert
++++ b/gl/quad.vert
+@@ -1,4 +1,6 @@
+-#version 120
++#version 100 es
++precision mediump float;
++
+ attribute vec2 vertex_position;
+ attribute vec3 vertex_color;
+ 
+diff --git a/src/window.cpp b/src/window.cpp
+index 631832c..9f56910 100644
+--- a/src/window.cpp
++++ b/src/window.cpp
+@@ -27,8 +27,6 @@ Window::Window(QWidget *parent) :
+     QSurfaceFormat format;
+ 	format.setDepthBufferSize(24);
+ 	format.setStencilBufferSize(8);
+-	format.setVersion(2, 1);
+-	format.setProfile(QSurfaceFormat::CoreProfile);
+ 
+ 	QSurfaceFormat::setDefaultFormat(format);
+ 	
+@@ -92,8 +90,6 @@ Window::Window(QWidget *parent) :
+ 
+     auto help_menu = menuBar()->addMenu("Help");
+     help_menu->addAction(about_action);
+-
+-    resize(600, 400);
+ }
+ 
+ void Window::on_open()
