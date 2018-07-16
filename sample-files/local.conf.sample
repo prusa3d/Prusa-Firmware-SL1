@@ -1,0 +1,28 @@
+# CONF_VERSION is increased each time build/conf/ changes incompatibly
+CONF_VERSION = "1"
+
+MACHINE = "lime-a64-mainline"
+DL_DIR = "${OEBASE}/downloads"
+SSTATE_DIR = "${OEBASE}/build/sstate-cache"
+TMPDIR = "${OEBASE}/build/tmp"
+PATCHRESOLVE = "noop"
+
+BB_NUMBER_THREADS = "4"
+PARALLEL_MAKE = "-j 4"
+DISTRO   = "prusa"
+
+TERMCMD = "${XTERM_TERMCMD}"
+TERMCMDRUN = "${XTERM_TERMCMDRUN}"
+
+# Don't generate the mirror tarball for SCM repos, the snapshot is enough
+BB_GENERATE_MIRROR_TARBALLS = "0"
+
+# Keep one set of images by default
+RM_OLD_IMAGE = "1"
+
+# Enable local PR service for binary feeds
+PRSERV_HOST = "localhost:0"
+
+# It is recommended to activate "buildhistory" for testing the PR service
+INHERIT += "buildhistory"
+BUILDHISTORY_COMMIT = "1"
