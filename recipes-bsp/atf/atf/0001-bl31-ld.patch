@@ -1,0 +1,22 @@
+diff --git a/bl31/bl31.ld.S b/bl31/bl31.ld.S
+index c53cd66e..6a292f6d 100644
+--- a/bl31/bl31.ld.S
++++ b/bl31/bl31.ld.S
+@@ -73,7 +73,7 @@ SECTIONS
+          * executable.  No RW data from the next section must creep in.
+          * Ensure the rest of the current memory page is unused.
+          */
+-        . = NEXT(4096);
++        . = ALIGN(4096);
+         __RO_END__ = .;
+     } >RAM
+ 
+@@ -131,7 +131,7 @@ SECTIONS
+          * as device memory.  No other unexpected data must creep in.
+          * Ensure the rest of the current memory page is unused.
+          */
+-        . = NEXT(4096);
++        . = ALIGN(4096);
+         __COHERENT_RAM_END__ = .;
+     } >RAM
+ 
