@@ -1,7 +1,7 @@
 IMAGE_INSTALL = "\
 	packagegroup-core-boot packagegroup-self-hosted \
 	packagegroup-prusa-base packagegroup-qt5-toolchain-target \
-	kernel-dev kernel-devsrc connman connman-plugin-ethernet "
+	kernel-dev connman connman-plugin-ethernet "
 
 IMAGE_FEATURES += "\
 	dev-pkgs x11 \
@@ -14,7 +14,7 @@ IMAGE_FEATURES += "\
 	post-install-logging \
 "
 
-IMAGE_LINGUAS = "en_US"
+IMAGE_LINGUAS = "en-us"
 
 SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs perf "
 
