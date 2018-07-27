@@ -1,0 +1,21 @@
+diff --git a/configure.ac b/configure.ac
+index abe5daf..01a4d6b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -242,10 +242,13 @@ LDFLAGS="$prev_LDFLAGS"
+ 
+ #
+ # See if Linux procfs is present. This is used to get extra
+-# information about running processes.
++# information about running processes. (Not when cross-
++# compiling, though)
+ #
+-
+-AC_CHECK_FILES([/proc/self/stat])
++if test "$cross_compiling" != "yes"
++then
++	AC_CHECK_FILES([/proc/self/stat])
++fi
+ 
+ # Disable curses macros that conflict with the STL
+ AC_DEFINE([NCURSES_NOMACROS], [1], [Define to 1 to disable ncurses macros that conflict with the STL])
