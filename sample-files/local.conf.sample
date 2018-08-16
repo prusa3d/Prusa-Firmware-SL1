@@ -17,9 +17,6 @@ TERMCMDRUN = "${XTERM_TERMCMDRUN}"
 # Don't generate the mirror tarball for SCM repos, the snapshot is enough
 BB_GENERATE_MIRROR_TARBALLS = "0"
 
-# Keep one set of images by default
-RM_OLD_IMAGE = "1"
-
 # Enable local PR service for binary feeds
 PRSERV_HOST = "localhost:0"
 
