@@ -1,0 +1,12 @@
+[Unit]
+Description=Mount boot partition
+DefaultDependencies=yes
+
+[Mount]
+What=/dev/mmcblk0p1
+Where=/boot
+Type=vfat
+Options=default
+
+[Install]
+WantedBy=local-fs.target

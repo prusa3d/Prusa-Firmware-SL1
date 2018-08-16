@@ -1,0 +1,36 @@
+# /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+# and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+
+EDITOR="nano"
+PAGER="less"
+[ "$TERM" ] || TERM="xterm-color"
+
+umask 022
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias ls='ls --color=auto'
+alias la='ls -A'
+alias l='ls -CF'
+
+if [ -n "${BASH_VERSION-}" ] ; then
+	if [ -f /etc/bash/bashrc ] ; then
+		. /etc/bash/bashrc
+        else
+		PS1='\u@\h \w \$ '
+	fi
+else
+        PS1="${USER:-$(whoami 2>/dev/null)}@$(uname -n 2>/dev/null) \$ "
+fi
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+for sh in /etc/profile.d/*.sh ; do
+        [ -r "$sh" ] && . "$sh"
+done
+unset sh
+
+if command -v resize >/dev/null && command -v tty >/dev/null; then
+	resize >/dev/null
+fi
+
+
+
