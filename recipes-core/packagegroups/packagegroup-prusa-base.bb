@@ -16,7 +16,7 @@ TZDATA = "\
 "
 
 RDEPENDS_${PN} = "\
-	readline time iputils-ping dhcp-client curl ell vim nano \
+	readline time iputils-ping dhcp-client curl vim nano \
 	bash \
 	kernel-modules iw wpa-supplicant linux-firmware-rtl8723 \
 	${OPENSSH} ${TZDATA} \
