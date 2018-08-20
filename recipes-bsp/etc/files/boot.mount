@@ -3,7 +3,7 @@ Description=Mount boot partition
 DefaultDependencies=yes
 
 [Mount]
-What=/dev/mmcblk0p1
+What=/dev/disk/by-path/platform-1c0f000.mmc-part1
 Where=/boot
 Type=vfat
 
