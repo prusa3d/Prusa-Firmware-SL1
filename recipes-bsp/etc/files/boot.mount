@@ -6,7 +6,6 @@ DefaultDependencies=yes
 What=/dev/mmcblk0p1
 Where=/boot
 Type=vfat
-Options=default
 
 [Install]
 WantedBy=local-fs.target
