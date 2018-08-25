@@ -2,7 +2,7 @@ DESCRIPTION="Upstream's U-boot configured for sunxi devices"
 
 require recipes-bsp/u-boot/u-boot.inc
 
-DEPENDS += " bc-native dtc-native swig-native python3-native "
+DEPENDS += " bc-native bison-native dtc-native flex-native swig-native python3-native "
 DEPENDS_append_sun50i = " atf-sunxi "
 
 LICENSE = "GPLv2+"
