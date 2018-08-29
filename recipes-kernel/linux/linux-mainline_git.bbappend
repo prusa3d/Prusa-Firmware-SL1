@@ -1,11 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-mainline:"
 
 SRC_URI="\
-	git://git@github.com/zavorka/linux-sunxi.git;protocol=ssh;branch=a64-de2-v3.1 \
+	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/linux.git;protocol=ssh;branch=master \
 	file://defconfig \
-"
-SRC_URI += "\
-	file://001-ft5x06-dts-node.patch \
 "
 
 SRCREV_pn-${PN} = "bea88ac941e9b1cd42f07588f0f8f142540fa65b"
