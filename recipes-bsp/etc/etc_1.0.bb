@@ -3,6 +3,7 @@ LICENSE = "CLOSED"
 SRC_URI = " \
 	file://20-etc.preset			\
 	file://10-wlan.network			\
+	file://20-eth.network			\	
 	file://bashrc				\
 	file://boot.mount			\
 	file://profile				\
@@ -13,6 +14,7 @@ CONFFILES = "							\
 	${sysconfdir}/profile					\
 	${sysconfdir}/bash/bashrc				\
 	${sysconfdir}/systemd/network/10-wlan.network		\
+	${sysconfdir}/systemd/network/20-eth.network		\
 	${sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf	\
 "
 
@@ -20,6 +22,7 @@ FILES_${PN} = "							\
 	${sysconfdir}/profile					\
 	${sysconfdir}/bash/bashrc				\
 	${sysconfdir}/systemd/network/10-wlan.network		\
+	${sysconfdir}/systemd/network/20-eth.network		\
 	${sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf	\
 	${systemd_unitdir}/system-preset/20-etc.preset		\
 "
@@ -31,6 +34,7 @@ do_install() {
 	install -m 644 ${WORKDIR}/bashrc			${D}${sysconfdir}/bash/
 	install -d ${D}${sysconfdir}/systemd/network
 	install -m 644 ${WORKDIR}/10-wlan.network		${D}${sysconfdir}/systemd/network/
+	install -m 644 ${WORKDIR}/20-eth.network		${D}${sysconfdir}/systemd/network/
 	install -d ${D}${sysconfdir}/wpa_supplicant
 	install -m 644 ${WORKDIR}/wpa_supplicant-wlan0.conf	${D}${sysconfdir}/wpa_supplicant/
 	install -d ${D}${systemd_unitdir}/system-preset
