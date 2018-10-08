@@ -10,5 +10,5 @@ RDEPENDS_packagegroup-prusa-sla = "nginx redis gunicorn python rsync \
 	sla-edid etc zsh samba \
 	python-flask python-gevent python-pyroute2 python-redis \
 	python-pygame python-jrpc python-flask-sse python-pyserial \
-	python-pip \
+	python-pip python-numpy python-six \
 	"
