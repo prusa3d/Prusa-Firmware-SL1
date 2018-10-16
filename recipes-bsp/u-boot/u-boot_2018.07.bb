@@ -18,7 +18,8 @@ DEFAULT_PREFERENCE_sun50i="1"
 
 SRC_URI = "git://git.denx.de/u-boot.git;branch=master \
            file://boot.cmd \
-           "
+           file://dts-ddr3-voltage.patch \
+"
 
 SRCREV = "8c5d4fd0ec222701598a27b26ab7265d4cee45a3"
 

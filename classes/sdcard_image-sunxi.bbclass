@@ -13,6 +13,7 @@ inherit image_types
 #
 #
 
+
 # This image depends on the rootfs image
 IMAGE_TYPEDEP_sunxi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
@@ -112,24 +113,30 @@ IMAGE_CMD_sunxi-sdimg () {
 	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}/image-version-info ::
 
 	# Burn Partitions
-	dd if=${WORKDIR}/boot.img of=${SDIMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
+	dd if=${WORKDIR}/boot.img oflag=direct iflag=direct of=${SDIMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
 	# If SDIMG_ROOTFS_TYPE is a .xz file use xzcat
 	if echo "${SDIMG_ROOTFS_TYPE}" | egrep -q "*\.xz"
 	then
 		xzcat ${SDIMG_ROOTFS} | dd of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
 	else
-		dd if=${SDIMG_ROOTFS} of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
+		if test -e ${SDIMG_ROOTFS}; then
+			dd if=${SDIMG_ROOTFS} of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
+		else
+			echo  dd if="${IMGDEPLOYDIR}/sla-image-${MACHINE}.ext4" of=${SDIMG} oflag=direct iflag=direct conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024)
+			dd if="${IMGDEPLOYDIR}/sla-image-${MACHINE}.ext4" of=${SDIMG} oflag=direct iflag=direct conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
+		fi			
 	fi
 
 	# write u-boot-spl at the begining of sdcard in one shot
 	SPL_FILE=$(basename ${SPL_BINARY})
-	dd if=${DEPLOY_DIR_IMAGE}/${SPL_FILE} of=${SDIMG} bs=1024 seek=8 conv=notrunc
+	dd if=${DEPLOY_DIR_IMAGE}/${SPL_FILE} oflag=direct iflag=direct of=${SDIMG} bs=1024 seek=8 conv=notrunc
 }
 
 # write uboot.itb for arm64 boards
 IMAGE_CMD_sunxi-sdimg_append_sun50i () {
 	if [ -e "${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY}" ]
 	then
-		dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY} of=${SDIMG} bs=1024 seek=40 conv=notrunc
+		dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY} of=${SDIMG} oflag=direct iflag=direct bs=1024 seek=40 conv=notrunc
 	fi
 }
+

@@ -3,6 +3,7 @@ LICENSE = "CLOSED"
 inherit cmake_qt5 qmake5_base
 
 DEPENDS += "qtbase qt3d qtdeclarative qttools"
+#qt3d
 
 SRC_URI = "git://github.com/mkeeter/${BPN}.git;protocol=git;branch=master \
 	file://cmake.patch \
