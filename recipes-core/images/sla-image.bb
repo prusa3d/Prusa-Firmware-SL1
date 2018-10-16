@@ -1,3 +1,4 @@
+inherit populate_sdk_qt5
 IMAGE_INSTALL = "\
 	packagegroup-core-boot \
 	packagegroup-base \
@@ -5,6 +6,8 @@ IMAGE_INSTALL = "\
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
 	packagegroup-prusa-sla \
+	packagegroup-prusa-qt \
+	packagegroup-prusa-framebuffer \
 "
 
 IMAGE_FEATURES += "\
@@ -19,7 +22,12 @@ IMAGE_FEATURES += "\
 
 IMAGE_LINGUAS = "en-us"
 
-SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs "
+SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
+"
+
+TOOLCHAIN_HOST_TASK_append = "\
+	nativesdk-qtdeclarative \
+"
 
 LICENSE = "MIT"
 
