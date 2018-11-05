@@ -14,6 +14,7 @@ IMAGE_FEATURES += "\
 	package-management \
 	ssh-server-openssh \
 	tools-debug tools-sdk \
+	dev-pkgs \
 	nfs-server nfs-client \
 	allow-empty-password \
 	empty-root-password \
