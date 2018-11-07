@@ -19,5 +19,6 @@ RDEPENDS_${PN} = "\
 	readline time iputils-ping dhcp-client curl vim nano \
 	bash \
 	kernel-modules iw wpa-supplicant linux-firmware-rtl8723 \
-	${OPENSSH} ${TZDATA} root-ssh-keys \
+	${OPENSSH} ${TZDATA} \
+	mpv root-ssh-keys \
 "
