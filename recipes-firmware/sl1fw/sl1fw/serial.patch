@@ -1,0 +1,11 @@
+--- a/firmware/home/root/sl1fw/defines.py	2018-11-06 17:37:32.981326285 +0100
++++ b/firmware/home/root/sl1fw/defines.py	2018-11-07 17:48:04.927737147 +0100
+@@ -32,6 +32,6 @@
+ 
+ webDisplayPort = 16384
+ 
+-nextionDevice = "/dev/ttyS2"
++nextionDevice = "/dev/ttyUSB0"
+ 
+-motionControlDevice = "/dev/ttyS3"
++motionControlDevice = "/dev/ttyS2"
