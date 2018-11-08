@@ -30,7 +30,7 @@ UBOOT_ENV_SUFFIX = "scr"
 UBOOT_ENV = "boot"
 
 EXTRA_OEMAKE += ' HOSTLDSHARED="${BUILD_CC} -shared ${BUILD_LDFLAGS} ${BUILD_CFLAGS}" '
-EXTRA_OEMAKE_append_sun50i = " BL31=${DEPLOY_DIR_IMAGE}/bl31.bin "
+EXTRA_OEMAKE_append_sun50i = " BL31=${IMGDEPLOYDIR}/bl31.bin "
 
 do_compile_sun50i[depends] += "atf-sunxi:do_deploy"
 
