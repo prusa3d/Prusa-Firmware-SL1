@@ -1,0 +1,11 @@
+[Unit]
+Description=Update rootfs mount
+
+[Mount]
+What=/dev/sda2
+Where=/home/root/rootfs
+Type=ext4
+Options=defaults,ro,noatime,noauto 
+
+[Install]
+WantedBy=multi-user.target
