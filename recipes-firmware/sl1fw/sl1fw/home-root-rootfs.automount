@@ -1,0 +1,9 @@
+[Unit]
+Description=Automount update rootfs
+
+[Automount]
+Where=/home/root/rootfs
+TimeoutIdleSec=1
+
+[Install]
+WantedBy=multi-user.target 

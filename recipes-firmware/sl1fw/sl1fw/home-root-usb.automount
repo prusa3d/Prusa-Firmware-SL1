@@ -1,0 +1,9 @@
+[Unit]
+Description=Automount user flashdisk
+
+[Automount]
+Where=/home/root/usb
+TimeoutIdleSec=1
+
+[Install]
+WantedBy=multi-user.target

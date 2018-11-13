@@ -1,0 +1,11 @@
+[Unit]
+Description=Printing tmpfs mount
+
+[Mount]
+What=none
+Where=/home/root/ramdisk
+Type=tmpfs
+Options=defaults
+
+[Install]
+WantedBy=multi-user.target
