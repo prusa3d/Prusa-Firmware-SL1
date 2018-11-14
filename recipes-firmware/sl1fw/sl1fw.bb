@@ -10,6 +10,7 @@ file://home-root-rootfs.mount \
 file://home-root-rootfs.automount \
 file://home-root-usb.mount \
 file://home-root-usb.automount \
+file://sl1fw.service \
 "
 SRCREV_pn-${PN} = "5fc55dcdbb70f0fdd91d8c72ef301d82869d4aad"
 

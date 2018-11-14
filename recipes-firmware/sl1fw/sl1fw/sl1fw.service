@@ -1,0 +1,14 @@
+[Unit]
+Description=SL1 firmware
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+WorkingDirectory=/home/root/sl1fw/
+ExecStart=/usr/bin/nohup /usr/bin/python2 main.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
