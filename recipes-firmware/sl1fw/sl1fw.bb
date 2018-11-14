@@ -29,9 +29,6 @@ FILES_${PN} = "\
 	/etc/systemd/system/home-root-usb.mount\
 	/etc/systemd/system/home-root-usb.automount\
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
-	/etc/systemd/system/multi-user.target.wants/home-root-ramdisk.mount\
-	/etc/systemd/system/multi-user.target.wants/home-root-rootfs.automount\
-	/etc/systemd/system/multi-user.target.wants/home-root-usb.automount\
 	/etc/tmpfiles.d/gunicorn.conf\
 	/etc/tmpfiles.d/redis-server.conf\
 	/home/root/sl1fw\
@@ -55,12 +52,9 @@ do_install () {
 	install ${S}/home-root-usb.mount ${D}/etc/systemd/system/home-root-usb.mount
 	install ${S}/home-root-usb.automount ${D}/etc/systemd/system/home-root-usb.automount
 	
-	# Enable sl1fw service and mounts
+	# Enable sl1fw service
 	install -d ${D}/etc/systemd/system/multi-user.target.wants	
 	ln -s /etc/systemd/system/sl1fw.service ${D}/etc/systemd/system/multi-user.target.wants/sl1fw.service
-	ln -s /etc/systemd/system/home-root-ramdisk.mount ${D}/etc/systemd/system/multi-user.target.wants/home-root-ramdisk.mount
-	ln -s /etc/systemd/system/home-root-usb.automount ${D}/etc/systemd/system/multi-user.target.wants/home-root-usb.automount
-	ln -s /etc/systemd/system/home-root-rootfs.automount ${D}/etc/systemd/system/multi-user.target.wants/home-root-rootfs.automount
 	
 	# Tmpfiles
 	install -d ${D}/etc/tmpfiles.d

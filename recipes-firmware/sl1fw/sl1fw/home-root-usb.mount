@@ -8,4 +8,4 @@ Type=auto
 Options=defaults,ro,noatime,noauto,fmask=0333,dmask=0222,codepage=852,iocharset=utf8
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=local-fs.target
