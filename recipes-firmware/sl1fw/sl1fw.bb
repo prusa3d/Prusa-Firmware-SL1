@@ -12,6 +12,7 @@ file://home-root-usb.mount \
 file://home-root-usb.automount \
 file://50-device-timeout.conf \
 file://sl1fw.service \
+file://redis.service \
 "
 SRCREV_pn-${PN} = "e3d6dd2941f4abba3facbf5e8f0fb048d1971aa5"
 
@@ -22,7 +23,7 @@ RDEPENDS_${PN} = "bash"
 FILES_${PN} = "\
 	/etc/systemd/system/sl1fw.service\
 	/etc/systemd/system/gunicorn.service\
-	/etc/systemd/system/redis-server.service\
+	/etc/systemd/system/redis.service\
 	/etc/systemd/system/gunicorn.socket\
 	/etc/systemd/system/home-root-ramdisk.mount\
 	/etc/systemd/system/home-root-rootfs.mount\
@@ -33,7 +34,7 @@ FILES_${PN} = "\
 	/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
 	/etc/tmpfiles.d/gunicorn.conf\
-	/etc/tmpfiles.d/redis-server.conf\
+	/etc/tmpfiles.d/redis.conf\
 	/home/root/sl1fw\
 	/home/root/rootfs\
 	/home/root/ramdisk\
@@ -48,7 +49,7 @@ do_install () {
 	install ${S}/git/firmware/etc/systemd/system/sl1fw.service ${D}/etc/systemd/system/sl1fw.service
 	install ${S}/git/firmware/etc/systemd/system/gunicorn.service ${D}/etc/systemd/system/gunicorn.service
 	install ${S}/git/firmware/etc/systemd/system/gunicorn.socket ${D}/etc/systemd/system/gunicorn.socket
-	install ${S}/git/firmware/etc/systemd/system/redis-server.service ${D}/etc/systemd/system/redis-server.service
+	install ${S}/redis.service ${D}/etc/systemd/system/redis.service
 	install ${S}/home-root-ramdisk.mount ${D}/etc/systemd/system/home-root-ramdisk.mount
 	install ${S}/home-root-rootfs.mount ${D}/etc/systemd/system/home-root-rootfs.mount
 	install ${S}/home-root-rootfs.automount ${D}/etc/systemd/system/home-root-rootfs.automount
@@ -63,7 +64,7 @@ do_install () {
 	
 	# Tmpfiles
 	install -d ${D}/etc/tmpfiles.d
-	install ${S}/git/firmware/etc/tmpfiles.d/redis-server.conf ${D}/etc/tmpfiles.d/redis-server.conf
+	install ${S}/git/firmware/etc/tmpfiles.d/redis-server.conf ${D}/etc/tmpfiles.d/redis.conf
 	install ${S}/git/firmware/etc/tmpfiles.d/gunicorn.conf ${D}/etc/tmpfiles.d/gunicorn.conf
 	
 	# Firmware application
