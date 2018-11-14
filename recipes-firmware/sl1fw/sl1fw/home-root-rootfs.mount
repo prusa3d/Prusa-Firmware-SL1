@@ -8,4 +8,4 @@ Type=ext4
 Options=defaults,ro,noatime,noauto 
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=local-fs.target

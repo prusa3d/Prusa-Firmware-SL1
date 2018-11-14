@@ -6,4 +6,4 @@ Where=/home/root/rootfs
 TimeoutIdleSec=1
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=local-fs.target
