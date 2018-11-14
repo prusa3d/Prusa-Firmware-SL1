@@ -5,7 +5,7 @@ Description=Update rootfs mount
 What=/dev/sda2
 Where=/home/root/rootfs
 Type=ext4
-Options=defaults,ro,noatime,noauto 
+Options=defaults,ro,noatime,noauto
 
 [Install]
 WantedBy=local-fs.target
