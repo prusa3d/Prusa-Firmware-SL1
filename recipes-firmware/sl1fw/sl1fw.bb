@@ -35,6 +35,9 @@ FILES_${PN} = "\
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
 	/etc/tmpfiles.d/gunicorn.conf\
 	/etc/tmpfiles.d/redis.conf\
+	/etc/nginx/nginx.conf\
+	/etc/nginx/sites-available/default\
+	/etc/nginx/sites-enabled/default\
 	/home/root/sl1fw\
 	/home/root/rootfs\
 	/home/root/ramdisk\
@@ -66,6 +69,11 @@ do_install () {
 	install -d ${D}/etc/tmpfiles.d
 	install ${S}/git/firmware/etc/tmpfiles.d/redis-server.conf ${D}/etc/tmpfiles.d/redis.conf
 	install ${S}/git/firmware/etc/tmpfiles.d/gunicorn.conf ${D}/etc/tmpfiles.d/gunicorn.conf
+	
+	# Nginx configuration
+	install ${S}/git/firmware/etc/nginx/nginx.conf ${D}/etc/nginx/nginx.conf
+	install ${S}/git/firmware/etc/nginx/sites-available/default ${D}/etc/nginx/sites-available/default
+	ln -s /etc/nginx/sites-available/default ${D}/etc/nginx/sites-enabled/default
 	
 	# Firmware application
 	install -d ${D}/home/root/sl1fw
