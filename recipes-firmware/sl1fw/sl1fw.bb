@@ -10,6 +10,7 @@ file://home-root-rootfs.mount \
 file://home-root-rootfs.automount \
 file://home-root-usb.mount \
 file://home-root-usb.automount \
+file://50-device-timeout.conf \
 file://sl1fw.service \
 "
 SRCREV_pn-${PN} = "e3d6dd2941f4abba3facbf5e8f0fb048d1971aa5"
@@ -28,6 +29,8 @@ FILES_${PN} = "\
 	/etc/systemd/system/home-root-rootfs.automount\
 	/etc/systemd/system/home-root-usb.mount\
 	/etc/systemd/system/home-root-usb.automount\
+	/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
+	/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
 	/etc/tmpfiles.d/gunicorn.conf\
 	/etc/tmpfiles.d/redis-server.conf\
@@ -51,6 +54,8 @@ do_install () {
 	install ${S}/home-root-rootfs.automount ${D}/etc/systemd/system/home-root-rootfs.automount
 	install ${S}/home-root-usb.mount ${D}/etc/systemd/system/home-root-usb.mount
 	install ${S}/home-root-usb.automount ${D}/etc/systemd/system/home-root-usb.automount
+	install ${S}/50-device-timeout.conf ${D}/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf
+	install ${S}/50-device-timeout.conf ${D}/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf
 	
 	# Enable sl1fw service
 	install -d ${D}/etc/systemd/system/multi-user.target.wants	
