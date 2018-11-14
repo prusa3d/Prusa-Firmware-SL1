@@ -1,6 +1,6 @@
 [Unit]
 Description=SL1 firmware
-Requires=gunicorn.socket home-root-ramdisk.mount home-root-usb.automount home-root-rootfs.automount
+Requires=gunicorn.socket redis.service home-root-ramdisk.mount home-root-usb.automount home-root-rootfs.automount
 After=network.target
 
 [Service]
