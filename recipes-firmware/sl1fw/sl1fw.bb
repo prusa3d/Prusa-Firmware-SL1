@@ -3,7 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-git://git@github.com/FUTUR3D/DWARF3.git;protocol=ssh;branch=work \
+git://git@github.com/FUTUR3D/DWARF3.git;protocol=ssh \
 file://serial.patch \
 file://home-root-ramdisk.mount \
 file://home-root-rootfs.mount \
@@ -12,7 +12,7 @@ file://home-root-usb.mount \
 file://home-root-usb.automount \
 file://sl1fw.service \
 "
-SRCREV_pn-${PN} = "5fc55dcdbb70f0fdd91d8c72ef301d82869d4aad"
+SRCREV_pn-${PN} = "e3d6dd2941f4abba3facbf5e8f0fb048d1971aa5"
 
 PACKAGES = "${PN}"
 
