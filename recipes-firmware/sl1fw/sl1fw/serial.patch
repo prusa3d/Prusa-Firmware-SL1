@@ -4,8 +4,7 @@
  
  webDisplayPort = 16384
  
--nextionDevice = "/dev/ttyS2"
-+nextionDevice = "/dev/ttyUSB0"
+ nextionDevice = "/dev/ttyUSB0"
  
--motionControlDevice = "/dev/ttyS3"
+-motionControlDevice = "/dev/serial0"
 +motionControlDevice = "/dev/ttyS2"
