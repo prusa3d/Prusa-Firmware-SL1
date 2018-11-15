@@ -7,7 +7,7 @@ Documentation=http://redis.io/documentation, man:redis-server(1)
 Type=simple
 ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
 PIDFile=/var/run/redis/redis-server.pid
-#Restart=always
+Restart=always
 User=redis
 Group=redis
 

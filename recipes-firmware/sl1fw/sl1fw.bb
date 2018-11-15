@@ -12,7 +12,6 @@ file://home-root-usb.mount \
 file://home-root-usb.automount \
 file://50-device-timeout.conf \
 file://sl1fw.service \
-file://redis.service \
 "
 SRCREV_pn-${PN} = "e3d6dd2941f4abba3facbf5e8f0fb048d1971aa5"
 
@@ -22,7 +21,6 @@ RDEPENDS_${PN} = "bash"
 
 FILES_${PN} = "\
 	/etc/systemd/system/sl1fw.service\
-	/etc/systemd/system/redis.service\
 	/etc/systemd/system/home-root-ramdisk.mount\
 	/etc/systemd/system/home-root-rootfs.mount\
 	/etc/systemd/system/home-root-rootfs.automount\
@@ -31,7 +29,6 @@ FILES_${PN} = "\
 	/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
 	/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
-	/etc/tmpfiles.d/redis.conf\
 	/etc/nginx/nginx.conf\
 	/etc/nginx/sites-available/default\
 	/etc/nginx/sites-enabled/default\
@@ -47,7 +44,6 @@ do_install () {
 	# Systemd files
 	install -d ${D}/etc/systemd/system
 	install ${S}/git/firmware/etc/systemd/system/sl1fw.service ${D}/etc/systemd/system/sl1fw.service
-	install ${S}/redis.service ${D}/etc/systemd/system/redis.service
 	install ${S}/home-root-ramdisk.mount ${D}/etc/systemd/system/home-root-ramdisk.mount
 	install ${S}/home-root-rootfs.mount ${D}/etc/systemd/system/home-root-rootfs.mount
 	install ${S}/home-root-rootfs.automount ${D}/etc/systemd/system/home-root-rootfs.automount
@@ -61,11 +57,7 @@ do_install () {
 	# Enable sl1fw service
 	install -d ${D}/etc/systemd/system/multi-user.target.wants	
 	ln -s /etc/systemd/system/sl1fw.service ${D}/etc/systemd/system/multi-user.target.wants/sl1fw.service
-	
-	# Tmpfiles
-	install -d ${D}/etc/tmpfiles.d
-	install ${S}/git/firmware/etc/tmpfiles.d/redis-server.conf ${D}/etc/tmpfiles.d/redis.conf
-	
+		
 	# Nginx configuration
 	install -d ${D}/etc/nginx
 	install -d ${D}/etc/nginx/sites-available
