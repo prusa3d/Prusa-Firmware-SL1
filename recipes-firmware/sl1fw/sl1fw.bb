@@ -6,10 +6,11 @@ SRC_URI = "\
 git://git@github.com/FUTUR3D/DWARF3.git;protocol=ssh \
 file://serial.patch \
 file://ramdisk.patch \
-file://home-root-rootfs.mount \
-file://home-root-rootfs.automount \
-file://home-root-usb.mount \
-file://home-root-usb.automount \
+file://mounts.patch \
+file://mnt-rootfs.mount \
+file://mnt-rootfs.automount \
+file://mnt-usb.mount \
+file://mnt-usb.automount \
 file://50-device-timeout.conf \
 file://sl1fw-tmpfiles.conf \
 file://sl1fw.service \
@@ -25,50 +26,55 @@ RDEPENDS_${PN} = "bash"
 
 FILES_${PN} = "\
 	${sysconfdir}/systemd/system/sl1fw.service\
-	${sysconfdir}/systemd/system/home-root-rootfs.mount\
-	${sysconfdir}/systemd/system/home-root-rootfs.automount\
-	${sysconfdir}/systemd/system/home-root-usb.mount\
-	${sysconfdir}/systemd/system/home-root-usb.automount\
-	${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
-	${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
+	${sysconfdir}/systemd/system/mnt-rootfs.mount\
+	${sysconfdir}/systemd/system/mnt-rootfs.automount\
+	${sysconfdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount\
+	${sysconfdir}/systemd/system/mnt-usb.mount\
+	${sysconfdir}/systemd/system/mnt-usb.automount\
+	${sysconfdir}/systemd/system/local-fs.target.wants/mnt-usb.automount\
+	${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf\
+	${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf\
 	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
 	${sysconfdir}/tmpfiles.d/sl1fw.conf\
 	/home/root/sl1fw\
-	/home/root/rootfs\
-	/home/root/usb\
+	/mnt/rootfs\
+	/mnt/usb\
 	/srv/http/intranet\
 "
 
 S="${WORKDIR}/git"
 
 do_install () {
-	# Systemd files
+	# Systemd units
 	install -d ${D}${sysconfdir}/systemd/system
 	install ${S}/firmware/etc/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/sl1fw.service
-	install ${WORKDIR}/home-root-rootfs.mount ${D}${sysconfdir}/systemd/system/home-root-rootfs.mount
-	install ${WORKDIR}/home-root-rootfs.automount ${D}${sysconfdir}/systemd/system/home-root-rootfs.automount
-	install ${WORKDIR}/home-root-usb.mount ${D}${sysconfdir}/systemd/system/home-root-usb.mount
-	install ${WORKDIR}/home-root-usb.automount ${D}${sysconfdir}/systemd/system/home-root-usb.automount
+	install ${WORKDIR}/mnt-rootfs.mount ${D}${sysconfdir}/systemd/system/mnt-rootfs.mount
+	install ${WORKDIR}/mnt-rootfs.automount ${D}${sysconfdir}/systemd/system/mnt-rootfs.automount
+	install ${WORKDIR}/mnt-usb.mount ${D}${sysconfdir}/systemd/system/mnt-usb.mount
+	install ${WORKDIR}/mnt-usb.automount ${D}${sysconfdir}/systemd/system/mnt-usb.automount
 	install -d ${D}${sysconfdir}/systemd/system/dev-sda1.device.d
 	install ${WORKDIR}/50-device-timeout.conf ${D}${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf
 	install -d ${D}${sysconfdir}/systemd/system/dev-sda2.device.d
 	install ${WORKDIR}/50-device-timeout.conf ${D}${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf
 	
-	# Enable sl1fw service
+	# Enable sl1fw service and mounts
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants	
-	ln -s /${sysconfdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
+	ln -s ${sysconfdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
+	install -d ${D}${sysconfdir}/systemd/system/local-fs.target.wants
+	ln -s ${sysconfdir}/systemd/system/mnt-rootfs.automount ${D}${sysconfdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount
+	ln -s ${sysconfdir}/systemd/system/mnt-usb.automount ${D}${sysconfdir}/systemd/system/local-fs.target.wants/mnt-usb.automount
 	
 	# Nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-available
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
 	install ${WORKDIR}/sl1fw ${D}${sysconfdir}/nginx/sites-available/sl1fw
-	ln -s /${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
+	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
 	
 	# Firmware mount points
-	install -d ${D}/home/root/rootfs
-	install -d ${D}/home/root/usb
+	install -d ${D}/mnt/rootfs
+	install -d ${D}/mnt/usb
 	
 	# Firmware tmpfiles
 	install -d ${D}${sysconfdir}/tmpfiles.d

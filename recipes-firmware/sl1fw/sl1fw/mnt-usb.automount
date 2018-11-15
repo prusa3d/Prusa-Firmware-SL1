@@ -1,8 +1,8 @@
 [Unit]
-Description=Automount update rootfs
+Description=Automount user flashdisk
 
 [Automount]
-Where=/home/root/rootfs
+Where=/mnt/usb
 TimeoutIdleSec=1
 
 [Install]
