@@ -7,5 +7,5 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS_${PN} = "\
-    fbida \
+    fbida tslib\
 "
