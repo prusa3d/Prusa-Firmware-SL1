@@ -8,7 +8,7 @@ PIDFile=/run/gunicorn/pid
 User=www-data
 Group=www-data
 RuntimeDirectory=gunicorn
-WorkingDirectory=/home/root/sl1fw/intranet
+WorkingDirectory=/srv/http/intranet
 ExecStart=/usr/bin/gunicorn --pid /run/gunicorn/pid \
         --bind unix:/run/gunicorn/socket            \
         --worker-class gevent                       \
