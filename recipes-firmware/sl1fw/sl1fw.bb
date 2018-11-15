@@ -29,9 +29,8 @@ FILES_${PN} = "\
 	/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
 	/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
 	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
-	/etc/nginx/nginx.conf\
-	/etc/nginx/sites-available/default\
-	/etc/nginx/sites-enabled/default\
+	/etc/nginx/sites-available/sl1fw\
+	/etc/nginx/sites-enabled/sl1fw\
 	/home/root/sl1fw\
 	/home/root/rootfs\
 	/home/root/ramdisk\
@@ -57,14 +56,12 @@ do_install () {
 	# Enable sl1fw service
 	install -d ${D}/etc/systemd/system/multi-user.target.wants	
 	ln -s /etc/systemd/system/sl1fw.service ${D}/etc/systemd/system/multi-user.target.wants/sl1fw.service
-		
-	# Nginx configuration
-	install -d ${D}/etc/nginx
+	
+	# Nginx site
 	install -d ${D}/etc/nginx/sites-available
 	install -d ${D}/etc/nginx/sites-enabled
-	install ${S}/git/firmware/etc/nginx/nginx.conf ${D}/etc/nginx/nginx.conf
-	install ${S}/git/firmware/etc/nginx/sites-available/default ${D}/etc/nginx/sites-available/default
-	ln -s /etc/nginx/sites-available/default ${D}/etc/nginx/sites-enabled/default
+	install ${S}/git/firmware/etc/nginx/sites-available/default ${D}/etc/nginx/sites-available/sl1fw
+	ln -s /etc/nginx/sites-available/sl1fw ${D}/etc/nginx/sites-enabled/sl1fw
 	
 	# Firmware application
 	install -d ${D}/home/root/sl1fw
