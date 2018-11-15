@@ -5,12 +5,13 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 git://git@github.com/FUTUR3D/DWARF3.git;protocol=ssh \
 file://serial.patch \
-file://home-root-ramdisk.mount \
+file://ramdisk.patch \
 file://home-root-rootfs.mount \
 file://home-root-rootfs.automount \
 file://home-root-usb.mount \
 file://home-root-usb.automount \
 file://50-device-timeout.conf \
+file://sl1fw-tmpfiles.conf \
 file://sl1fw.service \
 file://sl1fw \
 "
@@ -23,20 +24,19 @@ DEPENDS = "nginx"
 RDEPENDS_${PN} = "bash"
 
 FILES_${PN} = "\
-	/etc/systemd/system/sl1fw.service\
-	/etc/systemd/system/home-root-ramdisk.mount\
-	/etc/systemd/system/home-root-rootfs.mount\
-	/etc/systemd/system/home-root-rootfs.automount\
-	/etc/systemd/system/home-root-usb.mount\
-	/etc/systemd/system/home-root-usb.automount\
-	/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
-	/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
-	/etc/systemd/system/multi-user.target.wants/sl1fw.service\
-	/etc/nginx/sites-available/sl1fw\
-	/etc/nginx/sites-enabled/sl1fw\
+	${sysconfdir}/systemd/system/sl1fw.service\
+	${sysconfdir}/systemd/system/home-root-rootfs.mount\
+	${sysconfdir}/systemd/system/home-root-rootfs.automount\
+	${sysconfdir}/systemd/system/home-root-usb.mount\
+	${sysconfdir}/systemd/system/home-root-usb.automount\
+	${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf \
+	${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf \
+	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
+	${sysconfdir}/nginx/sites-available/sl1fw\
+	${sysconfdir}/nginx/sites-enabled/sl1fw\
+	${sysconfdir}/tmpfiles.d/sl1fw.conf\
 	/home/root/sl1fw\
 	/home/root/rootfs\
-	/home/root/ramdisk\
 	/home/root/usb\
 	/srv/http/intranet\
 "
@@ -47,7 +47,6 @@ do_install () {
 	# Systemd files
 	install -d ${D}${sysconfdir}/systemd/system
 	install ${S}/firmware/etc/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/sl1fw.service
-	install ${WORKDIR}/home-root-ramdisk.mount ${D}${sysconfdir}/systemd/system/home-root-ramdisk.mount
 	install ${WORKDIR}/home-root-rootfs.mount ${D}${sysconfdir}/systemd/system/home-root-rootfs.mount
 	install ${WORKDIR}/home-root-rootfs.automount ${D}${sysconfdir}/systemd/system/home-root-rootfs.automount
 	install ${WORKDIR}/home-root-usb.mount ${D}${sysconfdir}/systemd/system/home-root-usb.mount
@@ -68,9 +67,12 @@ do_install () {
 	ln -s /${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
 	
 	# Firmware mount points
-	install -d ${D}/home/root/ramdisk
 	install -d ${D}/home/root/rootfs
 	install -d ${D}/home/root/usb
+	
+	# Firmware tmpfiles
+	install -d ${D}${sysconfdir}/tmpfiles.d
+	install ${WORKDIR}/sl1fw-tmpfiles.conf ${D}${sysconfdir}/tmpfiles.d/sl1fw.conf
 	
 	# Firmware application
 	install -d ${D}/home/root/sl1fw
@@ -92,7 +94,6 @@ do_install () {
 	install ${S}/firmware/home/root/sl1fw/test_pygame.py ${D}/home/root/sl1fw/test_pygame.py
 	install ${S}/firmware/home/root/sl1fw/test_tinyled.py ${D}/home/root/sl1fw/test_tinyled.py
 	install ${S}/firmware/home/root/sl1fw/test_web.py ${D}/home/root/sl1fw/test_web.py
-
 	install -d ${D}/home/root/sl1fw/data
 	install ${S}/firmware/home/root/sl1fw/data/mrizka8_1440x2560.png ${D}/home/root/sl1fw/data/mrizka8_1440x2560.png
 	install ${S}/firmware/home/root/sl1fw/data/NX4827T043_011R-prusa-rot.tft ${D}/home/root/sl1fw/data/NX4827T043_011R-prusa-rot.tft
@@ -110,7 +111,7 @@ do_install () {
 	
 	# Firmware intranet
 	install --owner www-data --group www-data -d ${D}/srv/http/intranet
-	install --owner www-data --group www-data  -d ${D}/srv/http/intranet/static
+	install --owner www-data --group www-data -d ${D}/srv/http/intranet/static
 	install --owner www-data --group www-data  ${S}/firmware/home/root/sl1fw/intranet/static/SB_dwarf3_network.svg ${D}/srv/http/intranet/static/SB_dwarf3_network.svg
 	install --owner www-data --group www-data  ${S}/firmware/home/root/sl1fw/intranet/static/SB_dwarf3_back.svg ${D}/srv/http/intranet/static/SB_dwarf3_back.svg
 	install --owner www-data --group www-data  ${S}/firmware/home/root/sl1fw/intranet/static/favicon_dwarf3.ico ${D}/srv/http/intranet/static/favicon_dwarf3.ico
