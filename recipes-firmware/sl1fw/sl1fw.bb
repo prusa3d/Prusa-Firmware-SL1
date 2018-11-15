@@ -58,7 +58,9 @@ do_install () {
 	install ${S}/home-root-rootfs.automount ${D}/etc/systemd/system/home-root-rootfs.automount
 	install ${S}/home-root-usb.mount ${D}/etc/systemd/system/home-root-usb.mount
 	install ${S}/home-root-usb.automount ${D}/etc/systemd/system/home-root-usb.automount
+	install -d ${D}/etc/systemd/system/dev-sda1.device.d
 	install ${S}/50-device-timeout.conf ${D}/etc/systemd/system/dev-sda1.device.d/50-device-timeout.conf
+	install -d ${D}/etc/systemd/system/dev-sda2.device.d
 	install ${S}/50-device-timeout.conf ${D}/etc/systemd/system/dev-sda2.device.d/50-device-timeout.conf
 	
 	# Enable sl1fw service
@@ -71,6 +73,9 @@ do_install () {
 	install ${S}/git/firmware/etc/tmpfiles.d/gunicorn.conf ${D}/etc/tmpfiles.d/gunicorn.conf
 	
 	# Nginx configuration
+	install -d ${D}/etc/nginx
+	install -d ${D}/etc/nginx/sites-available
+	install -d ${D}/etc/nginx/sites-enabled
 	install ${S}/git/firmware/etc/nginx/nginx.conf ${D}/etc/nginx/nginx.conf
 	install ${S}/git/firmware/etc/nginx/sites-available/default ${D}/etc/nginx/sites-available/default
 	ln -s /etc/nginx/sites-available/default ${D}/etc/nginx/sites-enabled/default
