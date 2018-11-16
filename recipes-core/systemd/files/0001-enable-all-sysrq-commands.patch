@@ -1,0 +1,13 @@
+diff --git a/sysctl.d/50-default.conf b/sysctl.d/50-default.conf
+index b67ae87ca6..a79ddb660b 100644
+--- a/sysctl.d/50-default.conf
++++ b/sysctl.d/50-default.conf
+@@ -16,7 +16,7 @@
+ # Use kernel.sysrq = 1 to allow all keys.
+ # See https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html for a list
+ # of values and keys.
+-kernel.sysrq = 16
++kernel.sysrq = 1
+ 
+ # Append the PID to the core filename
+ kernel.core_uses_pid = 1
