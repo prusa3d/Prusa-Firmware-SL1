@@ -16,7 +16,8 @@ file://sl1fw-tmpfiles.conf \
 file://sl1fw.service \
 file://sl1fw \
 "
-SRCREV_pn-${PN} = "e3d6dd2941f4abba3facbf5e8f0fb048d1971aa5"
+SRCREV_pn-${PN} = "0e45afbaa73894058d4e274ed199940fab3e34b3"
+
 
 PACKAGES = "${PN}"
 
