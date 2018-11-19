@@ -1,14 +1,15 @@
 [Unit]
 Description=SL1 firmware
-Requires=gunicorn.socket redis.service home-root-ramdisk.mount home-root-usb.automount home-root-rootfs.automount
+Requires=gunicorn.socket redis.service mnt-usb.automount mnt-rootfs.automount
 After=network.target
 
 [Service]
-WorkingDirectory=/home/root/sl1fw/
-ExecStart=/usr/bin/nohup /usr/bin/python2 main.py
+WorkingDirectory=/home/root/
+ExecStart=/usr/bin/nohup /usr/bin/main.py
 Restart=on-failure
 RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
+
 
