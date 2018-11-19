@@ -1,0 +1,11 @@
+--- /dev/null	2018-11-06 09:37:53.734554355 +0100
++++ a/setup.py	2018-11-16 13:28:51.468151684 +0100
+@@ -0,0 +1,8 @@
++from setuptools import setup, find_packages
++
++setup(
++    name="sl1fw",
++    version="0.1",
++    packages=find_packages(),
++    scripts=['sl1fw/main.py'],
++)

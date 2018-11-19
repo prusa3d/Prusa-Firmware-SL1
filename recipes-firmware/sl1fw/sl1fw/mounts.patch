@@ -1,5 +1,5 @@
---- a/firmware/home/root/sl1fw/defines.py      2018-11-15 16:43:44.586882741 +0100
-+++ a/firmware/home/root/sl1fw/defines.py  2018-11-15 16:45:21.625282429 +0100
+--- a/sl1fw/defines.py  2018-11-15 16:43:44.586882741 +0100
++++ a/sl1fw/defines.py  2018-11-15 16:45:21.625282429 +0100
 @@ -9,7 +9,7 @@
  home = "/home/root"
  
