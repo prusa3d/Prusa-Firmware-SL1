@@ -4,7 +4,6 @@ Requires=gunicorn.socket redis.service mnt-usb.automount mnt-rootfs.automount
 After=network.target
 
 [Service]
-WorkingDirectory=/home/root/
 ExecStart=/usr/bin/nohup /usr/bin/main.py
 Restart=on-failure
 RestartSec=10
