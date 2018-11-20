@@ -12,5 +12,5 @@ RDEPENDS_${PN} = "\
     iotop htop minicom file i2c-tools tree jq wget dash fish \
     bash-completion bash-completion-extra \
     systemd-extra-utils systemd-bash-completion systemd-analyze \
-    ethtool \
+    ethtool avrdude \
 "
