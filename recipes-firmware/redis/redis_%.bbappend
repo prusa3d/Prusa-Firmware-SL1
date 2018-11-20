@@ -7,11 +7,11 @@ file://redis-tmpfiles.conf \
 "
 
 FILES_${PN} += "\
-/etc/tmpfiles.d/redis.conf\
+${libdir}/tmpfiles.d/redis.conf\
 "
 
 do_install_append () {
 	# tmpfiles.d
-	install -d ${D}/etc/tmpfiles.d
-	install ${WORKDIR}/redis-tmpfiles.conf ${D}/etc/tmpfiles.d/redis.conf
+	install -d ${D}${libdir}/tmpfiles.d
+	install ${WORKDIR}/redis-tmpfiles.conf ${D}${libdir}/tmpfiles.d/redis.conf
 }

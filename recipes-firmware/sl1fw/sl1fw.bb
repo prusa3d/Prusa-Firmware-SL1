@@ -29,19 +29,19 @@ DEPENDS = "nginx"
 RDEPENDS_${PN} = "bash"
 
 FILES_${PN} = "\
-	${sysconfdir}/systemd/system/sl1fw.service\
-	${sysconfdir}/systemd/system/mnt-rootfs.mount\
-	${sysconfdir}/systemd/system/mnt-rootfs.automount\
-	${sysconfdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount\
-	${sysconfdir}/systemd/system/mnt-usb.mount\
-	${sysconfdir}/systemd/system/mnt-usb.automount\
-	${sysconfdir}/systemd/system/local-fs.target.wants/mnt-usb.automount\
-	${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf\
-	${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf\
-	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
+	${libdir}/systemd/system/sl1fw.service\
+	${libdir}/systemd/system/mnt-rootfs.mount\
+	${libdir}/systemd/system/mnt-rootfs.automount\
+	${libdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount\
+	${libdir}/systemd/system/mnt-usb.mount\
+	${libdir}/systemd/system/mnt-usb.automount\
+	${libdir}/systemd/system/local-fs.target.wants/mnt-usb.automount\
+	${libdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf\
+	${libdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf\
+	${libdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
-	${sysconfdir}/tmpfiles.d/sl1fw.conf\
+	${libdir}/tmpfiles.d/sl1fw.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
 	/usr/bin/main.py\
 	/mnt/rootfs\
@@ -56,23 +56,23 @@ inherit setuptools
 
 do_install_append () {
 	# Systemd units
-	install -d ${D}${sysconfdir}/systemd/system
-	install ${WORKDIR}/sl1fw.service ${D}${sysconfdir}/systemd/system/sl1fw.service
-	install ${WORKDIR}/mnt-rootfs.mount ${D}${sysconfdir}/systemd/system/mnt-rootfs.mount
-	install ${WORKDIR}/mnt-rootfs.automount ${D}${sysconfdir}/systemd/system/mnt-rootfs.automount
-	install ${WORKDIR}/mnt-usb.mount ${D}${sysconfdir}/systemd/system/mnt-usb.mount
-	install ${WORKDIR}/mnt-usb.automount ${D}${sysconfdir}/systemd/system/mnt-usb.automount
-	install -d ${D}${sysconfdir}/systemd/system/dev-sda1.device.d
-	install ${WORKDIR}/50-device-timeout.conf ${D}${sysconfdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf
-	install -d ${D}${sysconfdir}/systemd/system/dev-sda2.device.d
-	install ${WORKDIR}/50-device-timeout.conf ${D}${sysconfdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf
+	install -d ${D}${libdir}/systemd/system
+	install ${WORKDIR}/sl1fw.service ${D}${libdir}/systemd/system/sl1fw.service
+	install ${WORKDIR}/mnt-rootfs.mount ${D}${libdir}/systemd/system/mnt-rootfs.mount
+	install ${WORKDIR}/mnt-rootfs.automount ${D}${libdir}/systemd/system/mnt-rootfs.automount
+	install ${WORKDIR}/mnt-usb.mount ${D}${libdir}/systemd/system/mnt-usb.mount
+	install ${WORKDIR}/mnt-usb.automount ${D}${libdir}/systemd/system/mnt-usb.automount
+	install -d ${D}${libdir}/systemd/system/dev-sda1.device.d
+	install ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf
+	install -d ${D}${libdir}/systemd/system/dev-sda2.device.d
+	install ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf
 	
 	# Enable sl1fw service and mounts
-	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants	
-	ln -s ${sysconfdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
-	install -d ${D}${sysconfdir}/systemd/system/local-fs.target.wants
-	ln -s ${sysconfdir}/systemd/system/mnt-rootfs.automount ${D}${sysconfdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount
-	ln -s ${sysconfdir}/systemd/system/mnt-usb.automount ${D}${sysconfdir}/systemd/system/local-fs.target.wants/mnt-usb.automount
+	install -d ${D}${libdir}/systemd/system/multi-user.target.wants	
+	ln -s ${libdir}/systemd/system/sl1fw.service ${D}${libdir}/systemd/system/multi-user.target.wants/sl1fw.service
+	install -d ${D}${libdir}/systemd/system/local-fs.target.wants
+	ln -s ${libdir}/systemd/system/mnt-rootfs.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount
+	ln -s ${libdir}/systemd/system/mnt-usb.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-usb.automount
 	
 	# Nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-available
@@ -85,8 +85,8 @@ do_install_append () {
 	install -d ${D}/mnt/usb
 	
 	# Firmware tmpfiles
-	install -d ${D}${sysconfdir}/tmpfiles.d
-	install ${WORKDIR}/sl1fw-tmpfiles.conf ${D}${sysconfdir}/tmpfiles.d/sl1fw.conf
+	install -d ${D}${libdir}/tmpfiles.d
+	install ${WORKDIR}/sl1fw-tmpfiles.conf ${D}${libdir}/tmpfiles.d/sl1fw.conf
 	
 	# Firmware application configuration
 	install -d ${D}${sysconfdir}/sl1fw
