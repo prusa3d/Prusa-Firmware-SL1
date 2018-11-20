@@ -1,0 +1,14 @@
+[Unit]
+Description=SL1 firmware
+Requires=gunicorn.socket redis.service mnt-usb.automount mnt-rootfs.automount
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/nohup /usr/bin/main.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+

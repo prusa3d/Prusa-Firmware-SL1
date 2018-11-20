@@ -1,0 +1,11 @@
+[Unit]
+Description=Update rootfs mount
+
+[Mount]
+What=/dev/sda2
+Where=/mnt/rootfs
+Type=ext4
+Options=defaults,ro,noatime,noauto
+
+[Install]
+WantedBy=local-fs.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=Automount user flashdisk
+
+[Automount]
+Where=/mnt/usb
+TimeoutIdleSec=1
+
+[Install]
+WantedBy=local-fs.target
