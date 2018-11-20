@@ -1,0 +1,9 @@
+[Unit]
+Description=Automount update rootfs
+
+[Automount]
+Where=/mnt/rootfs
+TimeoutIdleSec=1
+
+[Install]
+WantedBy=local-fs.target

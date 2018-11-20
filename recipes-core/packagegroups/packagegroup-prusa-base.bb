@@ -20,5 +20,5 @@ RDEPENDS_${PN} = "\
 	bash \
 	kernel-modules iw wpa-supplicant linux-firmware-rtl8723 \
 	${OPENSSH} ${TZDATA} \
-	mpv \
+	mpv root-ssh-keys \
 "

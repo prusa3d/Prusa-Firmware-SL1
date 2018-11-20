@@ -1,0 +1,20 @@
+--- a/sl1fw/defines.py  2018-11-15 16:43:44.586882741 +0100
++++ a/sl1fw/defines.py  2018-11-15 16:45:21.625282429 +0100
+@@ -9,7 +9,7 @@
+ home = "/home/root"
+ 
+ swPath = os.path.join(home, "sl1fw")
+-usbPath = os.path.join(home, "usb")
++usbPath = "/mnt/usb"
+ #usbPath = os.path.join(home, "project")
+ ramdiskPath = "/run/sl1fw"
+ printerlog = os.path.join(ramdiskPath, "sl1fw.log")
+@@ -21,7 +21,7 @@
+ sysWiFiConfig = "/etc/wpa_supplicant/wpa_supplicant.conf"
+ 
+ scriptDir = os.path.join(swPath, "scripts")
+-usbUpdatePath = os.path.join(home, "rootfs")
++usbUpdatePath = "/mnt/rootfs"
+ usbUpdateCommand = os.path.join(scriptDir, "rsync_usb.sh")
+ netUpdateCommand = os.path.join(scriptDir, "rsync_net.sh")
+ netUpdateVersionURL = "http://cloud.3dwarf.net/3dwarfsoftware/sl1fw.txt"
