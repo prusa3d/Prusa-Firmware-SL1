@@ -1,0 +1,11 @@
+--- a/sl1fw/libWebDisplay.py
++++ b/sl1fw/libWebDisplay.py
+@@ -15,7 +15,7 @@ class WebDisplayServer(SocketServer):
+     def __init__(self, port, commands, events):
+         self.logger = logging.getLogger(__name__)
+         super(WebDisplayServer, self).__init__(port, commands, events)
+-        self.jinja = jinja2.Environment(loader = jinja2.FileSystemLoader('intranet/templates'))
++        self.jinja = jinja2.Environment(loader = jinja2.FileSystemLoader('/srv/http/intranet/templates'))
+     #enddef
+ 
+ 
