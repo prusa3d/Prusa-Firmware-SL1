@@ -1,8 +1,8 @@
 --- a/sl1fw/defines.py	2018-11-06 17:37:32.981326285 +0100
 +++ b/sl1fw/defines.py	2018-11-07 17:48:04.927737147 +0100
-@@ -32,6 +32,6 @@
- 
+@@ -30,6 +30,6 @@ hostnameCommand = os.path.join(scriptDir, "set_hostname.sh")
  webDisplayPort = 16384
+ qtDisplayPort = 32768
  
 -nextionDevice = "/dev/ttyUSB0"
 +nextionDevice = "/dev/ttyS1"
