@@ -19,7 +19,7 @@ DEFAULT_PREFERENCE_sun50i="1"
 SRC_URI = "git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/u-boot.git;protocol=ssh;branch=master \
            file://boot.cmd \
            "
-SRCREV = "f50d83f864b5d5b9d6abdb47fc222eedc6f11b59"
+SRCREV = "c8649dc32e03ec33255d916151deedb129a41928"
 
 PV = "v2018.11-rc1+git${SRCPV}"
 PE = "2"
@@ -30,7 +30,7 @@ UBOOT_ENV_SUFFIX = "scr"
 UBOOT_ENV = "boot"
 
 EXTRA_OEMAKE += ' HOSTLDSHARED="${BUILD_CC} -shared ${BUILD_LDFLAGS} ${BUILD_CFLAGS}" '
-EXTRA_OEMAKE_append_sun50i = " BL31=${IMGDEPLOYDIR}/bl31.bin "
+EXTRA_OEMAKE_append_sun50i = " BL31=${DEPLOY_DIR_IMAGE}/bl31.bin "
 
 do_compile_sun50i[depends] += "atf-sunxi:do_deploy"
 
