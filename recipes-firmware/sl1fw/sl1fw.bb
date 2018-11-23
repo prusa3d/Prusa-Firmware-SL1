@@ -48,7 +48,9 @@ FILES_${PN} = "\
 	/mnt/rootfs\
 	/mnt/usb\
 	/srv/http/intranet\
+	/usr/share/sl1fw\
 "
+
 
 S="${WORKDIR}/git/firmware/home/root"
 INTRANET=""
@@ -92,6 +94,10 @@ do_install_append () {
 	# Firmware application configuration
 	install -d ${D}${sysconfdir}/sl1fw
 	install ${S}/sl1fw/hardware.cfg ${D}${sysconfdir}/sl1fw/hardware.cfg
+	
+	# Firmware data
+	install -d ${D}/usr/share/sl1fw
+	cp -r ${S}/sl1fw/data ${D}/usr/share/sl1fw/data
 	
 	# Firmware intranet
 	install -d ${D}/srv/http
