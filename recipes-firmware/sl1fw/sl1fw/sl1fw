@@ -52,7 +52,7 @@ server {
 
 	location /log {
 		default_type "text/plain";
-		alias /home/root/ramdisk/sl1fw.log;
+		alias /run/sl1fw/sl1fw.log;
 	}
 }
 
