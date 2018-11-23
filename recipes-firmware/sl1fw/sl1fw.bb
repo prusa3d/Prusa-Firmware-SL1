@@ -40,7 +40,7 @@ FILES_${PN} = "\
 	${libdir}/systemd/system/local-fs.target.wants/mnt-usb.automount\
 	${libdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf\
 	${libdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf\
-	${libdir}/systemd/system/multi-user.target.wants/sl1fw.service\
+	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
 	${libdir}/tmpfiles.d/sl1fw.conf\
@@ -62,19 +62,19 @@ inherit setuptools
 do_install_append () {
 	# Systemd units
 	install -d ${D}${libdir}/systemd/system
-	install ${WORKDIR}/sl1fw.service ${D}${libdir}/systemd/system/sl1fw.service
-	install ${WORKDIR}/mnt-rootfs.mount ${D}${libdir}/systemd/system/mnt-rootfs.mount
-	install ${WORKDIR}/mnt-rootfs.automount ${D}${libdir}/systemd/system/mnt-rootfs.automount
-	install ${WORKDIR}/mnt-usb.mount ${D}${libdir}/systemd/system/mnt-usb.mount
-	install ${WORKDIR}/mnt-usb.automount ${D}${libdir}/systemd/system/mnt-usb.automount
+	install --mode 644 ${WORKDIR}/sl1fw.service ${D}${libdir}/systemd/system/sl1fw.service
+	install --mode 644 ${WORKDIR}/mnt-rootfs.mount ${D}${libdir}/systemd/system/mnt-rootfs.mount
+	install --mode 644 ${WORKDIR}/mnt-rootfs.automount ${D}${libdir}/systemd/system/mnt-rootfs.automount
+	install --mode 644 ${WORKDIR}/mnt-usb.mount ${D}${libdir}/systemd/system/mnt-usb.mount
+	install --mode 644 ${WORKDIR}/mnt-usb.automount ${D}${libdir}/systemd/system/mnt-usb.automount
 	install -d ${D}${libdir}/systemd/system/dev-sda1.device.d
-	install ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf
+	install --mode 644 ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda1.device.d/50-device-timeout.conf
 	install -d ${D}${libdir}/systemd/system/dev-sda2.device.d
-	install ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf
+	install --mode 644 ${WORKDIR}/50-device-timeout.conf ${D}${libdir}/systemd/system/dev-sda2.device.d/50-device-timeout.conf
 	
 	# Enable sl1fw service and mounts
-	install -d ${D}${libdir}/systemd/system/multi-user.target.wants	
-	ln -s ${libdir}/systemd/system/sl1fw.service ${D}${libdir}/systemd/system/multi-user.target.wants/sl1fw.service
+	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants	
+	ln -s ${libdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
 	install -d ${D}${libdir}/systemd/system/local-fs.target.wants
 	ln -s ${libdir}/systemd/system/mnt-rootfs.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount
 	ln -s ${libdir}/systemd/system/mnt-usb.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-usb.automount
