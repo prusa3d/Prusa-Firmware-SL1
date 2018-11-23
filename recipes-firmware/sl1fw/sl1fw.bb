@@ -3,7 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-git://git@github.com/FUTUR3D/DWARF3.git;protocol=ssh \
+git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh \
 file://serial.patch \
 file://ramdisk.patch \
 file://mounts.patch \
