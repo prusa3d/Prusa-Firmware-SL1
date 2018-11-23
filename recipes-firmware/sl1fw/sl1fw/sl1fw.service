@@ -4,6 +4,8 @@ Requires=mnt-usb.automount mnt-rootfs.automount
 After=network.target
 
 [Service]
+WorkingDirectory=/home/root
+ExecStartPre=/usr/bin/sh -c "/usr/bin/echo 0 > /sys/class/vtconsole/vtcon1/bind"
 ExecStart=/usr/bin/nohup /usr/bin/main.py
 Restart=on-failure
 RestartSec=10
