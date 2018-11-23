@@ -1,0 +1,12 @@
+diff --git a/setup.py b/setup.py
+index 5d1f77c..5920d9e 100755
+--- a/setup.py
++++ b/setup.py
+@@ -125,7 +125,6 @@ cython("pygame_sdl2.image", source=[ "src/write_jpeg.c", "src/write_png.c" ], li
+ cython("pygame_sdl2.transform", source=[ "src/SDL2_rotozoom.c" ], libs=sdl_libs)
+ cython("pygame_sdl2.gfxdraw", source=[ "src/SDL_gfxPrimitives.c" ], libs=sdl_libs)
+ cython("pygame_sdl2.draw", libs=sdl_libs)
+-cython("pygame_sdl2.font", libs=['SDL2_ttf'] + sdl_libs)
+ cython("pygame_sdl2.mixer", libs=['SDL2_mixer'] + sdl_libs)
+ cython("pygame_sdl2.mixer_music", libs=['SDL2_mixer'] + sdl_libs)
+ cython("pygame_sdl2.scrap", libs=sdl_libs)
