@@ -1,0 +1,13 @@
+mode "1440x2560-0"
+        geometry 1440 2560 1440 2560 32
+        timings 0 0 0 0 0 0 0
+        accel true
+        rgba 8/16,8/8,8/0,0/0
+endmode
+
+mode "480x800-0"
+        geometry 1440 2560 480 800 32
+        timings 0 0 0 0 0 0 0
+        accel true
+        rgba 8/16,8/8,8/0,0/0
+endmode

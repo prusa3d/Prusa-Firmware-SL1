@@ -19,6 +19,7 @@ file://50-device-timeout.conf \
 file://sl1fw-tmpfiles.conf \
 file://sl1fw.service \
 file://sl1fw \
+file://fb.modes \
 "
 SRCREV_pn-${PN} = "dbed5c9f0269195f55e24142888967c94c59ce59"
 
@@ -49,6 +50,7 @@ FILES_${PN} = "\
 	/mnt/usb\
 	/srv/http/intranet\
 	/usr/share/sl1fw\
+	${sysconfdir}/fb.modes\
 "
 
 
@@ -103,4 +105,8 @@ do_install_append () {
 	install -d ${D}/srv/http
 	cp -r ${S}/sl1fw/intranet ${D}/srv/http/intranet
 	chown www-data:www-data ${D}/srv/http/intranet
+	
+	# Framebuffer configuration
+	install -d ${D}${sysconfdir}
+	install ${WORKDIR}/fb.modes ${D}${sysconfdir}/fb.modes
 }
