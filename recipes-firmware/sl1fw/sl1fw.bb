@@ -3,14 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh \
-file://serial.patch \
-file://ramdisk.patch \
-file://mounts.patch \
-file://setup.py.patch \
-file://main-setuputils.patch \
-file://package.patch \
-file://templates-path.patch \
+git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=deploy \
 file://mnt-rootfs.mount \
 file://mnt-rootfs.automount \
 file://mnt-usb.mount \
@@ -21,7 +14,7 @@ file://sl1fw.service \
 file://sl1fw \
 file://fb.modes \
 "
-SRCREV_pn-${PN} = "e78f68a884e3514bd5c76153245adcaa22bf0068"
+SRCREV_pn-${PN} = "689071d3d29e85faefc3a1154398b622c5477588"
 
 
 PACKAGES = "${PN}"
