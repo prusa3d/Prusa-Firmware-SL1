@@ -21,7 +21,7 @@ file://sl1fw.service \
 file://sl1fw \
 file://fb.modes \
 "
-SRCREV_pn-${PN} = "dbed5c9f0269195f55e24142888967c94c59ce59"
+SRCREV_pn-${PN} = "e78f68a884e3514bd5c76153245adcaa22bf0068"
 
 
 PACKAGES = "${PN}"
