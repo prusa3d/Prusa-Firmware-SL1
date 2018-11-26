@@ -4,7 +4,7 @@ Requires=mnt-usb.automount mnt-rootfs.automount
 After=network.target
 
 [Service]
-WorkingDirectory=/usr/share/sl1fw
+WorkingDirectory=/lib/python2.7/site-packages/sl1fw
 ExecStartPre=/usr/sbin/fbset -fb /dev/fb0 1440x2560-0
 ExecStartPre=/usr/bin/sh -c "/usr/bin/echo 0 > /sys/class/vtconsole/vtcon1/bind"
 ExecStart=/usr/bin/nohup /usr/bin/main.py
