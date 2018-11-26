@@ -49,7 +49,8 @@ FILES_${PN} = "\
 	/mnt/rootfs\
 	/mnt/usb\
 	/srv/http/intranet\
-	/usr/share/sl1fw\
+	/usr/share/scripts\
+	${sysconfdir}/sl1fw/hardware.cfg\
 	${sysconfdir}/fb.modes\
 "
 
@@ -94,17 +95,17 @@ do_install_append () {
 	install ${WORKDIR}/sl1fw-tmpfiles.conf ${D}${libdir}/tmpfiles.d/sl1fw.conf
 	
 	# Firmware application configuration
-	install -d ${D}${sysconfdir}/sl1fw
-	install ${S}/sl1fw/hardware.cfg ${D}${sysconfdir}/sl1fw/hardware.cfg
+	#install -d ${D}${sysconfdir}/sl1fw
+	#install ${S}/sl1fw/hardware.cfg ${D}${sysconfdir}/sl1fw/hardware.cfg
 	
 	# Firmware data
-	install -d ${D}/usr/share/sl1fw
-	cp -r ${S}/sl1fw/data ${D}/usr/share/sl1fw/data
+	#install -d ${D}/usr/share/sl1fw
+	#cp -r ${S}/sl1fw/data ${D}/usr/share/sl1fw/data
 	
 	# Firmware intranet
-	install -d ${D}/srv/http
-	cp -r ${S}/sl1fw/intranet ${D}/srv/http/intranet
-	chown www-data:www-data ${D}/srv/http/intranet
+	#install -d ${D}/srv/http
+	#cp -r ${S}/sl1fw/intranet ${D}/srv/http/intranet
+	#chown www-data:www-data ${D}/srv/http/intranet
 	
 	# Framebuffer configuration
 	install -d ${D}${sysconfdir}
