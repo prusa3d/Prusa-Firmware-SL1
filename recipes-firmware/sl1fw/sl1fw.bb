@@ -13,6 +13,7 @@ file://sl1fw-tmpfiles.conf \
 file://sl1fw.service \
 file://sl1fw \
 file://fb.modes \
+file://fbmanual.patch \
 "
 SRCREV_pn-${PN} = "a284b280608316ce7a4602f0dc4252b49594df21"
 
