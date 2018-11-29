@@ -9,13 +9,10 @@ file://mnt-rootfs.automount \
 file://mnt-usb.mount \
 file://mnt-usb.automount \
 file://50-device-timeout.conf \
-file://sl1fw-tmpfiles.conf \
-file://sl1fw.service \
-file://sl1fw \
 file://fb.modes \
 file://fbmanual.patch \
 "
-SRCREV_pn-${PN} = "a284b280608316ce7a4602f0dc4252b49594df21"
+SRCREV_pn-${PN} = "bbdc7dd3e7e8c4f139208f3119e6761c276ca290"
 
 
 PACKAGES = "${PN}"
@@ -76,10 +73,8 @@ do_install_append () {
 	ln -s ${libdir}/systemd/system/mnt-rootfs.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-rootfs.automount
 	ln -s ${libdir}/systemd/system/mnt-usb.automount ${D}${libdir}/systemd/system/local-fs.target.wants/mnt-usb.automount
 	
-	# Nginx site
-	install -d ${D}${sysconfdir}/nginx/sites-available
+	# Enable nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
-	install ${WORKDIR}/sl1fw ${D}${sysconfdir}/nginx/sites-available/sl1fw
 	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
 	
 	# Framebuffer configuration
