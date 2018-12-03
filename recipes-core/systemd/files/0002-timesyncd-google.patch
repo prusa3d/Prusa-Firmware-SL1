@@ -1,0 +1,13 @@
+diff --git a/src/timesync/timesyncd.conf.in b/src/timesync/timesyncd.conf.in
+index f91c034a0..ca2972771 100644
+--- a/src/timesync/timesyncd.conf.in
++++ b/src/timesync/timesyncd.conf.in
+@@ -12,7 +12,7 @@
+ # See timesyncd.conf(5) for details.
+ 
+ [Time]
+-#NTP=
++NTP=time.google.com
+ #FallbackNTP=@NTP_SERVERS@
+ #RootDistanceMaxSec=5
+ #PollIntervalMinSec=32
