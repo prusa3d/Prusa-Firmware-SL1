@@ -12,7 +12,7 @@ file://50-device-timeout.conf \
 file://fb.modes \
 file://fbmanual.patch \
 "
-SRCREV_pn-${PN} = "bbdc7dd3e7e8c4f139208f3119e6761c276ca290"
+SRCREV_pn-${PN} = "bb139757b4c6484e6e0a4389376288fa48d40f74"
 
 
 PACKAGES = "${PN}"
@@ -43,7 +43,7 @@ FILES_${PN} += "\
 "
 
 
-S="${WORKDIR}/git/firmware/home/root"
+S="${WORKDIR}/git/firmware"
 INTRANET=""
 
 inherit setuptools
