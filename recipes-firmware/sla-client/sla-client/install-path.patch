@@ -1,0 +1,13 @@
+diff --git a/SLAGUI.pro b/SLAGUI.pro
+index 24dce07..04893d3 100644
+--- a/SLAGUI.pro
++++ b/SLAGUI.pro
+@@ -29,6 +29,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
+ else: unix:!android: target.path = /opt/$${TARGET}/bin
+ !isEmpty(target.path): INSTALLS += target
+ 
++target.path = /usr/bin/
++
+ DISTFILES += \
+     resources/calibration.svg \
+     resources/cancel.svg \
