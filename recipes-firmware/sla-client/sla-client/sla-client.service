@@ -1,0 +1,11 @@
+[Unit]
+Description=SL1 Client
+After=sl1fw.service
+
+[Service]
+ExecStart=/usr/bin/SLAGUI -platform eglfs
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
