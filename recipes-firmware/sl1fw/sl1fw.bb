@@ -12,12 +12,12 @@ file://50-device-timeout.conf \
 file://fb.modes \
 file://fbmanual.patch \
 "
-SRCREV_pn-${PN} = "7917a3c2fd106d9d31f2a45954553234878fdc6b"
+SRCREV_pn-${PN} = "b0c38bfb4c67e830041e231228ca761100bdfe66"
 
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
