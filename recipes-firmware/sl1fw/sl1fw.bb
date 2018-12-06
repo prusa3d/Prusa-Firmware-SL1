@@ -12,7 +12,7 @@ file://50-device-timeout.conf \
 file://fb.modes \
 file://fbmanual.patch \
 "
-SRCREV_pn-${PN} = "b0c38bfb4c67e830041e231228ca761100bdfe66"
+SRCREV_pn-${PN} = "757d0c9c4cdc34c6dc48ded1d92abdba49a8ac92"
 
 
 PACKAGES = "${PN}"
