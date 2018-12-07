@@ -3,7 +3,8 @@ Description=SL1 Client
 After=sl1fw.service
 
 [Service]
-ExecStart=/usr/bin/SLAGUI -platform eglfs
+ExecStartPre=/usr/sbin/fbset -fb /dev/fb0 480x800-0
+ExecStart=/usr/bin/SLAGUI -platform linuxfb
 Restart=on-failure
 RestartSec=3
 
