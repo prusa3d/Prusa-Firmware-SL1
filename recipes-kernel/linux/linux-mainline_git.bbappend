@@ -3,8 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-mainline:"
 SRC_URI="\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/linux.git;protocol=ssh;branch=master \
 	file://defconfig \
-	file://edt-touch-release-hotfix.patch \
 "
 
-SRCREV_pn-${PN} = "debb47ecc392224d39d2cd03a0cc7c6235e4afb9"
+SRCREV_pn-${PN} = "d8be83b4eb316408ed5ce3ac1ea9c42c69016619"
 PV = "v4.18.0-rc6+git${SRCPV}"
