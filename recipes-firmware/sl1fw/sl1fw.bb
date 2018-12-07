@@ -10,10 +10,8 @@ file://mnt-usb.mount \
 file://mnt-usb.automount \
 file://50-device-timeout.conf \
 file://fb.modes \
-file://drm.patch \
-file://no-fbset.patch \
 "
-SRCREV_pn-${PN} = "9536c71af9f43a2856f133f18f418b7e53f79ab0"
+SRCREV_pn-${PN} = "bc43bd06e873fabbcdb0be531efb89acbef090f2"
 
 
 PACKAGES = "${PN}"
