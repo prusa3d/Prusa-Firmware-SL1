@@ -1,0 +1,12 @@
+diff --git a/firmware/systemd/sl1fw.service b/firmware/systemd/sl1fw.service
+index ee50f28..c4ac4f7 100755
+--- a/systemd/sl1fw.service
++++ b/systemd/sl1fw.service
+@@ -4,7 +4,6 @@ Requires=mnt-usb.automount mnt-rootfs.automount
+ 
+ [Service]
+ WorkingDirectory=/lib/python2.7/site-packages/sl1fw
+-ExecStartPre=/usr/sbin/fbset -fb /dev/fb0 1440x2560-0
+ ExecStartPre=/usr/bin/sh -c "/usr/bin/echo 0 > /sys/class/vtconsole/vtcon1/bind"
+ ExecStart=/usr/bin/nohup /usr/bin/main.py
+ Restart=on-failure
