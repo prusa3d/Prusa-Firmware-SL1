@@ -3,3 +3,5 @@ Name=eth0
 
 [Network]
 DHCP=ipv4
+RequiredForOnline=no
+
