@@ -10,14 +10,15 @@ file://mnt-usb.mount \
 file://mnt-usb.automount \
 file://50-device-timeout.conf \
 file://fb.modes \
-file://fbmanual.patch \
+file://drm.patch \
+file://no-fbset.patch \
 "
-SRCREV_pn-${PN} = "757d0c9c4cdc34c6dc48ded1d92abdba49a8ac92"
+SRCREV_pn-${PN} = "9536c71af9f43a2856f133f18f418b7e53f79ab0"
 
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
