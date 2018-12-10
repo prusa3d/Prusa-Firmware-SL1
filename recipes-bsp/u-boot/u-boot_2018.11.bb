@@ -19,7 +19,7 @@ DEFAULT_PREFERENCE_sun50i="1"
 SRC_URI = "git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/u-boot.git;protocol=ssh;branch=master \
            file://boot.cmd \
            "
-SRCREV = "4afea07836014c059915aece17a63d8096737241"
+SRCREV = "b6adad1461840603295282293262b7c8d0c4a0c6"
 
 PV = "v2018.11-rc1+git${SRCPV}"
 PE = "2"
