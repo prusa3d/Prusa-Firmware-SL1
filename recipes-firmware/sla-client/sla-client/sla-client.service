@@ -3,6 +3,7 @@ Description=SL1 Client
 After=sl1fw.service
 
 [Service]
+WorkingDirectory=/var/run/sl1fw
 ExecStartPre=/usr/sbin/fbset -fb /dev/fb0 480x800-0
 ExecStart=/usr/bin/SLAGUI -platform linuxfb
 Restart=on-failure
