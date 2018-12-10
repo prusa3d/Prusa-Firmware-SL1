@@ -16,7 +16,7 @@ SRCREV_pn-${PN} = "bc43bd06e873fabbcdb0be531efb89acbef090f2"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
