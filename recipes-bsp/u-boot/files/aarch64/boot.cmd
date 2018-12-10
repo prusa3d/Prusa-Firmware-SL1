@@ -1,6 +1,6 @@
 # Default to (primary) SD
 rootdev=mmcblk0p2
-if itest.b *0x28 == 0x02 ; then
+if itest.b *0x10028 == 0x02 ; then
 	# U-Boot loaded from eMMC or secondary SD so use it for rootfs too
 	echo "U-boot loaded from eMMC or secondary SD"
 	rootdev=mmcblk2p2
