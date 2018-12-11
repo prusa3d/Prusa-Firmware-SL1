@@ -1,0 +1,20 @@
+diff --git a/plat/allwinner/sun50i_a64/sunxi_power.c b/plat/allwinner/sun50i_a64/sunxi_power.c
+index 59feed78..df42eadf 100644
+--- a/plat/allwinner/sun50i_a64/sunxi_power.c
++++ b/plat/allwinner/sun50i_a64/sunxi_power.c
+@@ -230,10 +230,14 @@ static void setup_axp803_rails(const void *fdt)
+ 		return;
+ 	}
+ 
++	/* set N_VBUSEN as an output pin */
++	axp_clrbits(0x8f, BIT(4));
+ 	if (fdt_getprop(fdt, node, "x-powers,drive-vbus-en", NULL)) {
+-		axp_clrbits(0x8f, BIT(4));
+ 		axp_setbits(0x30, BIT(2));
+ 		INFO("PMIC: AXP803: Enabling DRIVEVBUS\n");
++	} else {
++		axp_clrbits(0x30, BIT(2));
++		INFO("PMIC: AXP803: Disabling DRIVEVBUS\n");
+ 	}
+ 
+ 	/* descend into the "regulators" subnode */
