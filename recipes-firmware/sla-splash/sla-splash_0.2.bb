@@ -7,7 +7,7 @@ SRC_URI = "\
 
 inherit systemd
 
-DEPENDS += "bash"
+DEPENDS += "bash xz"
 
 FILES_${PN} = "${datadir}/splash"
 
