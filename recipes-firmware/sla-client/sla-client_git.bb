@@ -15,7 +15,7 @@ S="${WORKDIR}/git"
 
 do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/
-	install ${WORKDIR}/sla-client.service ${D}${systemd_system_unitdir}/
+	install --mode 644 ${WORKDIR}/sla-client.service ${D}${systemd_system_unitdir}/
 }
 
 SYSTEMD_SERVICE_${PN} = "sla-client.service"
