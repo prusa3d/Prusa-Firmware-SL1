@@ -5,7 +5,7 @@ if itest.b *0x10028 == 0x02 ; then
 	echo "U-boot loaded from eMMC or secondary SD"
 	rootdev=mmcblk2p2
 fi
-setenv bootargs console=${console} console=tty1 root=/dev/${rootdev} rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin ${extra}
+setenv bootargs console=${console} root=/dev/${rootdev} rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin ${extra} logo.nologo vt.global_cursor_default=0
 
 if fatsize mmc ${mmc_bootdev}:1 update_over_otg
 then
