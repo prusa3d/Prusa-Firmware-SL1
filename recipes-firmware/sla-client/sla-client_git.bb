@@ -6,7 +6,7 @@ SRC_URI = "\
 	file://sla-client.service \
 	file://install-path.patch \
 "
-SRCREV = "5b5c49bd407541098d91210b52cc55f49ae8adb5"
+SRCREV = "2776263927c2f488c4cd7edb728b0b85cc33d3fe"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 inherit qmake5 systemd
