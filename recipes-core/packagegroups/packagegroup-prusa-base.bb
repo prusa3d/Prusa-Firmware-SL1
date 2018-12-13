@@ -18,7 +18,7 @@ TZDATA = "\
 RDEPENDS_${PN} = "\
 	readline time iputils-ping dhcp-client curl vim nano \
 	bash \
-	kernel-modules iw wpa-supplicant linux-firmware-rtl8723 \
+	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
 	${OPENSSH} ${TZDATA} \
 	mpv root-ssh-keys haveged\
 "
