@@ -11,7 +11,7 @@ SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 inherit qmake5 systemd
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard"
 
 S="${WORKDIR}/git"
 
