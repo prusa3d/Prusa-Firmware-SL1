@@ -9,5 +9,5 @@ index 24dce07..04893d3 100644
 +target.path = /usr/bin/
 +
  DISTFILES += \
+     resources/about_us_color.svg \
      resources/calibration.svg \
-     resources/cancel.svg \
