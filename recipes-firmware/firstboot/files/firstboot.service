@@ -1,0 +1,9 @@
+[Unit]
+Description=start initscript upon first boot
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c '/usr/sbin/firstboot.sh'
+
+[Install]
+WantedBy=multi-user.target
