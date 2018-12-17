@@ -6,12 +6,12 @@ SRC_URI = "\
 	file://sla-client.service \
 	file://install-path.patch \
 "
-SRCREV = "2776263927c2f488c4cd7edb728b0b85cc33d3fe"
+SRCREV = "b00ea8445668d4c53d808007e5b6285d1104b48a"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 inherit qmake5 systemd
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard"
 
 S="${WORKDIR}/git"
 
