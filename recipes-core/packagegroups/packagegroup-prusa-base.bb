@@ -20,5 +20,5 @@ RDEPENDS_${PN} = "\
 	bash \
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
 	${OPENSSH} ${TZDATA} \
-	mpv root-ssh-keys haveged mali-blobs\
+	mpv root-ssh-keys haveged mali-blobs firstboot \
 "
