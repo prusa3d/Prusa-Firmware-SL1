@@ -1,0 +1,9 @@
+{
+  "device": "/dev/dri/card0",
+  "hwcursor": false,
+  "output": [
+    { "name": "DSI1", "mode": "480x800", "format": "argb8888", "physicalWidth": 56, "physicalHeight": 94 },
+    { "name": "HDMI1", "mode": "off" }
+  ]
+}
+ 
