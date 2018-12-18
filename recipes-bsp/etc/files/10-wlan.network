@@ -1,6 +1,8 @@
 [Match]
 Name=wlan0
 
+[Link]
+RequiredForOnline=no
+
 [Network]
 DHCP=ipv4
-RequiredForOnline=no
