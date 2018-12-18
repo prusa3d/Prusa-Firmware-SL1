@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 
 SRC_URI = "\
 git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "bfbec58ed0f560b4f7b3527114e6698fb6dbc050"
+SRCREV_pn-${PN} = "0bf8d1d750b20523d7fe0fba7c484be95b8f22ac"
 
 PACKAGES = "${PN}"
 
@@ -14,4 +14,4 @@ S="${WORKDIR}/git"
 
 inherit setuptools systemd
 
-SYSTEMD_SERVICE_${PN} = "hostapd-keygen.service captive-portal.service"
+SYSTEMD_SERVICE_${PN} = "captive-portal.target"
