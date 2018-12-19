@@ -1,0 +1,11 @@
+[Unit]
+Description=Synchronise Hardware Clock to System Clock
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/hwclock --systohc
+
+[Install]
+WantedBy=reboot.target halt.target poweroff.target
