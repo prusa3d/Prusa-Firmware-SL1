@@ -4,7 +4,11 @@ After=sl1fw.service
 
 [Service]
 WorkingDirectory=/var/run/sl1fw
-ExecStart=/usr/bin/SLAGUI -platform linuxfb
+Environment="QT_QPA_PLATFORM=eglfs"
+Environment="QT_QPA_EGLFS_KMS_CONFIG=config.json"
+Environment="EGLFS_DEVICE_INTEGRATION=eglfs_kms"
+Environment="QT_QPA_EGLFS_INTEGRATION=eglfs_kms"
+ExecStart=/usr/bin/SLAGUI
 Restart=on-failure
 RestartSec=3
 
