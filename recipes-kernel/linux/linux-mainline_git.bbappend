@@ -5,5 +5,5 @@ SRC_URI="\
 	file://defconfig \
 "
 
-SRCREV_pn-${PN} = "6f43002d79eeec5223d6d11e5b148e0d0ecad663"
+SRCREV_pn-${PN} = "34e5cbec92dd87cd336e79f3440fc95596dc4c04"
 PV = "v4.18.0-rc6+git${SRCPV}"
