@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+<service-group>
+  <name replace-wildcards="yes">OctoPrint instance "Prusa 3D LED printer %h"</name>
+  <service>
+    <type>_http._tcp</type>
+    <port>8000</port>
+  </service>
+  <service>
+    <type>_octoprint._tcp</type>
+    <port>8000</port>
+  </service>
+</service-group>
