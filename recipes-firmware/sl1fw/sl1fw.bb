@@ -16,7 +16,7 @@ SRCREV_pn-${PN} = "910d0a8be90ad2ef585a0ff67afb1b7625d18b7b"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow avahi-daemon avahi-restarter"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\

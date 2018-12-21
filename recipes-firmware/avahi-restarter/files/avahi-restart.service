@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart avahi
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart avahi-daemon
