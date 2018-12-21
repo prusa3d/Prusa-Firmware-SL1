@@ -2,10 +2,17 @@
 Description=Prusa SLA splash screen
 DefaultDependencies=no
 
+Conflicts=shutdown.target
+
 [Service]
-ExecStart=/usr/bin/sh -c "lzcat /usr/share/splash/prusa-sla-splash.fbimg.lzma > /dev/fb0"
-ExecStartPost=/usr/bin/sh -c "echo 362 > /sys/class/gpio/export && echo out > /sys/class/gpio/gpio362/direction && echo 1 > /sys/class/gpio/gpio362/value"
 Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/sh -c "lzcat /usr/share/splash/prusa-sla-splash.fbimg.lzma > /dev/fb0"
+ExecStartPost=/usr/bin/sh -c "echo 362 > /sys/class/gpio/export"
+ExecStartPost=/usr/bin/sh -c "echo out > /sys/class/gpio/gpio362/direction"
+ExecStartPost=/usr/bin/sh -c "echo 1 > /sys/class/gpio/gpio362/value"
+ExecStop=/usr/bin/sh -c "lzcat /usr/share/splash/prusa-sla-splash.fbimg.lzma > /dev/fb0"
+
 
 [Install]
 WantedBy=sysinit.target
