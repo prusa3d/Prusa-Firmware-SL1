@@ -1,5 +1,5 @@
 diff --git a/octo-uploadd/octo-uploadd.py b/octo-uploadd/octo-uploadd.py
-index 3ac3b79..1787f3c 100644
+index 3ac3b79..9a10fd0 100644
 --- a/octo-uploadd/octo-uploadd.py
 +++ b/octo-uploadd/octo-uploadd.py
 @@ -30,7 +30,10 @@ import os
@@ -7,7 +7,7 @@ index 3ac3b79..1787f3c 100644
  FILE_STORAGE="/var/run/sl1fw"
  SERVICE_SIGNATURE=""" "text": "Prusa SLA SL1 1.0.5" """
 -API_KEY = "asdf"
-+API_KEY_FILE = "/etc/sla/slicer-upload-api.key"
++API_KEY_FILE = "/etc/sl1fw/slicer-upload-api.key"
 +
 +with open(API_KEY_FILE, "r") as api_key_file:
 +	API_KEY = api_key_file.read();

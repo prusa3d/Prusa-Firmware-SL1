@@ -14,10 +14,6 @@ inherit systemd setuptools
 DEPENDS += "python python-setuptools"
 RDEPENDS_${PN} += "avahi-daemon"
 
-FILES_${PN} += "\
-	${sysconfdir}/sla \
-"
-
 S="${WORKDIR}/git"
 
 do_install_append () {
@@ -33,7 +29,7 @@ do_install_append () {
 	install --mode 644 ${WORKDIR}/avahi/octoprint.service ${D}${sysconfdir}/avahi/services/octoprint.service
 	
 	# Ensure key dir exists
-	install -d ${D}${sysconfdir}/sla
+	install -d ${D}${sysconfdir}/sl1fw
 	
 	# Remove ununsed dir
 	rmdir ${D}/usr/share
