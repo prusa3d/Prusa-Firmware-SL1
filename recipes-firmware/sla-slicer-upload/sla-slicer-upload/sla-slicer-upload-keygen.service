@@ -5,7 +5,9 @@ ConditionPathExists=!/etc/sl1fw/slicer-upload-api.key
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/sh -c "/usr/bin/base64 /dev/random | /usr/bin/head -c 8 > /etc/sl1fw/slicer-upload-api.key"
+#ExecStart=/usr/bin/sh -c "/usr/bin/base64 /dev/random | /usr/bin/head -c 8 > /etc/sl1fw/slicer-upload-api.key"
+ExecStart=/usr/bin/sh -c "echo -n asdf > /etc/sl1fw/slicer-upload-api.key"
+
  
 [Install]
 WantedBy=multi-user.target
