@@ -1,6 +1,7 @@
 [Unit]
 Description=Octoprint-like file upload service (for uploading files from slic3r)
-After=sl1fw.service
+After=sl1fw.service sla-slicer-upload-keygen.service
+Wants=sla-slicer-upload-keygen.service
 
 [Service]
 WorkingDirectory=/var/run/sl1fw
