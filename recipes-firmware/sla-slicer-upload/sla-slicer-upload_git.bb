@@ -12,7 +12,7 @@ SRCREV = "28a4c8deb896a520f58f54420dd9dab7b9627364"
 inherit systemd setuptools
 
 DEPENDS += "python python-setuptools"
-RDEPENDS_${PN} += "avahi-daemon"
+RDEPENDS_${PN} += "avahi-daemon avahi-restarter"
 
 S="${WORKDIR}/git"
 
