@@ -11,12 +11,12 @@ file://mnt-usb.automount \
 file://50-device-timeout.conf \
 file://fb.modes \
 "
-SRCREV_pn-${PN} = "910d0a8be90ad2ef585a0ff67afb1b7625d18b7b"
+SRCREV_pn-${PN} = "2f825beaae284b5d5060ec3b985633f41a7279e5"
 
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow avahi-daemon avahi-restarter"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow avahi-daemon avahi-restarter python-lazy-import"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
