@@ -9,6 +9,7 @@ SRC_URI = " \
 	file://profile				\
 	file://wpa_supplicant-wlan0.conf	\
 	file://sshd_config	\
+	file://base-feeds.conf \
 "
 
 CONFFILES = "							\
@@ -18,6 +19,7 @@ CONFFILES = "							\
 	${sysconfdir}/systemd/network/20-eth.network		\
 	${sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf	\
 	${sysconfdir}/ssh/sshd_config	\
+	${sysconfdir}/opkg/base-feeds.conf \
 "
 
 FILES_${PN} = "							\
@@ -28,6 +30,7 @@ FILES_${PN} = "							\
 	${sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf	\
 	${systemd_unitdir}/system-preset/20-etc.preset		\
 	${sysconfdir}/ssh/sshd_config	\
+	${sysconfdir}/opkg/base-feeds.conf \
 "
 
 do_install() {
@@ -46,6 +49,8 @@ do_install() {
 	install -m 644 ${WORKDIR}/boot.mount			${D}${systemd_system_unitdir}/
 	install -d ${D}${sysconfdir}/ssh
 	install -m 644 ${WORKDIR}/sshd_config			${D}${sysconfdir}/ssh/
+	install -d ${D}${sysconfdir}/opkg
+	install -m 644 ${WORKDIR}/base-feeds.conf 		${D}${sysconfdir}/opkg/
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
