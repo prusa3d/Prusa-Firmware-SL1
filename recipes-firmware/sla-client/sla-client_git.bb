@@ -6,9 +6,8 @@ SRC_URI = "\
 	file://sla-client.service \
 	file://sla-client-config.json \
 	file://000-install-path.patch \
-	file://001-transition-animations.patch \
 "
-SRCREV = "b00ea8445668d4c53d808007e5b6285d1104b48a"
+SRCREV = "0f801d4813c974159586cf1dc2cebedcfb00b08b"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 inherit qmake5 systemd
