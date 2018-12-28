@@ -1,0 +1,11 @@
+[Unit]
+Description=API key generator for octoprint upload service
+ConditionPathExists=!/etc/sl1fw/api.key
+Before=nginx.service sla-slicer-upload.service sl1fw.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/api-keygen.sh
+ 
+[Install]
+WantedBy=multi-user.target
