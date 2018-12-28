@@ -3,13 +3,13 @@ SUMMARY = "web config - captive cportal for wireless configuration"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master"
+	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
+"
 SRCREV_pn-${PN} = "dc14e94de79e3e9783563e4576e165f8408f641a"
 
 PACKAGES = "${PN}"
 
-DEPENDS = "cherrypy python-dbus" 
-RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter"
+RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-dbus"
 
 S="${WORKDIR}/git"
 
