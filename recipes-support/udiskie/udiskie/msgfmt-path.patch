@@ -1,0 +1,13 @@
+diff --git a/setup.py b/setup.py
+index 915ba54..0f1f04e 100644
+--- a/setup.py
++++ b/setup.py
+@@ -105,7 +105,7 @@ class build_mo(Command):
+     def make_mo(self, po_filename, mo_filename):
+         """Create a machine object (.mo) from a portable object (.po) file."""
+         try:
+-            call(['msgfmt', po_filename, '-o', mo_filename])
++            call(['/usr/bin/msgfmt', po_filename, '-o', mo_filename])
+         except OSError as e:
+             # ignore failures since i18n support is optional:
+             logging.warn(e)

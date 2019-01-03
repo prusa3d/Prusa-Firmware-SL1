@@ -16,7 +16,7 @@ SRCREV_pn-${PN} = "c839ba14c7e1015ef88e3104a29406bd20136eaa"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow avahi-daemon avahi-restarter python-lazy-import api-keygen"
+RDEPENDS_${PN} = "bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio python-pydrm python-pillow avahi-daemon avahi-restarter python-lazy-import api-keygen udiskie"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\

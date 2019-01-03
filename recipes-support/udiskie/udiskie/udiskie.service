@@ -1,0 +1,8 @@
+[Unit]
+Description=Udiskie automount
+
+[Service]
+ExecStart=/usr/bin/udiskie -c /etc/udiskie.yaml
+
+[Install]
+WantedBy=multi-user.target
