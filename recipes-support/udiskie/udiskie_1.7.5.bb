@@ -2,7 +2,7 @@ SUMMARY = "Automounter for removable media"
 
 LICENSE = "MIT"
 
-DEPENDS = "asciidoc gettext"
+DEPENDS = "asciidoc-native gettext-native"
 RDEPENDS_${PN} = "udisks2 python-pyyaml pyxdg python-pygobject python-docopt"
 
 inherit setuptools systemd
@@ -10,7 +10,6 @@ inherit setuptools systemd
 SRC_URI = " \
 	https://files.pythonhosted.org/packages/e0/5f/ab915ec251dfdc27f852204196976cb14e74cfb04a5dd58b7e7678592def/udiskie-1.7.5.tar.gz \
 	file://udiskie.service \
-	file://msgfmt-path.patch \
 	file://udiskie.yaml \
 "
 SRC_URI[md5sum] = "ddfb4225062577c7f11461308dd6b82b"
