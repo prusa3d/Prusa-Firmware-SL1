@@ -5,6 +5,8 @@ SRC_URI = "\
 	file://sla-slicer-upload.service \
 	file://avahi/octoprint.service \
 	file://use_generated_key.patch \
+	file://listen-localhost.patch \
+	file://nginx/octoprint \
 "
 SRCREV = "28a4c8deb896a520f58f54420dd9dab7b9627364"
 
@@ -25,7 +27,13 @@ do_install_append () {
 	# Avahi service definition
 	install -d ${D}${sysconfdir}/avahi/services
 	install --mode 644 ${WORKDIR}/avahi/octoprint.service ${D}${sysconfdir}/avahi/services/octoprint.service
-		
+	
+	# Nginx site
+	install -d ${D}${sysconfdir}/nginx/sites-available
+	install ${WORKDIR}/nginx/octoprint ${D}${sysconfdir}/nginx/sites-available/octoprint
+	install -d ${D}${sysconfdir}/nginx/sites-enabled
+	ln -s ${sysconfdir}/nginx/sites-available/octoprint ${D}${sysconfdir}/nginx/sites-enabled/octoprint
+	
 	# Remove ununsed dir
 	rmdir ${D}/usr/share
 }
