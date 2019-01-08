@@ -127,9 +127,10 @@ IMAGE_CMD_sunxi-sdimg () {
 		fi			
 	fi
 
-	# write u-boot-spl at the begining of sdcard in one shot
+	# write sunxi-spl.bin at the begining of sdcard in one shot
+	# (or SPL portion of the u-boot-sunxi-with-spl.bin)
 	SPL_FILE=$(basename ${SPL_BINARY})
-	dd if=${DEPLOY_DIR_IMAGE}/${SPL_FILE} oflag=direct iflag=direct of=${SDIMG} bs=1024 seek=8 conv=notrunc
+	dd if=${DEPLOY_DIR_IMAGE}/${SPL_FILE} oflag=direct iflag=direct of=${SDIMG} bs=1024 seek=8 count=32 conv=notrunc
 }
 
 # write uboot.itb for arm64 boards
