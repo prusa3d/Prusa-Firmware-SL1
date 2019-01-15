@@ -10,8 +10,8 @@ SRC_URI += "\
     file://0001-build-always-disable-platform-guessing.patch \
 "
 
-SRC_URI[md5sum] = "85cdf851973755e5aea8c942f68f53e7"
-SRC_URI[sha256sum] = "d233c2e63414535281c572d2b4debd7de8a205b341ffc7db0f48f3f4d199fbc0"
+SRC_URI[md5sum] = "f7d0ce066fc7ea7a685739227887aeaf"
+SRC_URI[sha256sum] = "5233664eadfa342c639b9b9977190d64ad7aca4edc51a966394d7e08e7f38a9f"
 
 PYPI_PACKAGE = "Pillow"
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/Pillow"
