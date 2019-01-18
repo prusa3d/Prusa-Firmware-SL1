@@ -5,7 +5,7 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "75ef60c54a63d947098dc9958af14504003e2ff2"
+SRCREV_pn-${PN} = "5b132effca05c80633c1fc1787ac459583c44091"
 
 PACKAGES = "${PN}"
 
@@ -28,3 +28,5 @@ do_install_append () {
 	# Remove empty /usr/share
 	rmdir ${D}/usr/share
 }
+
+SYSTEMD_SERVICE_${PN} = "wifi-config.service"
