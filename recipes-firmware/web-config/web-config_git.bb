@@ -5,11 +5,11 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "5b132effca05c80633c1fc1787ac459583c44091"
+SRCREV_pn-${PN} = "fa76daa7ab364fde263383089406e7494f785161"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-dbus"
+RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-pydbus"
 
 S="${WORKDIR}/git"
 
