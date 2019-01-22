@@ -7,7 +7,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS_packagegroup-prusa-sla = "nginx python rsync \
-	sla-edid etc zsh python-pip sl1fw sla-client \
+	sla-edid etc zsh sl1fw sla-client \
 	sla-splash sla-slicer-upload web-config\
 	"
 
