@@ -14,6 +14,8 @@ inherit qmake5 systemd
 
 DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard"
 
+RDEPENDS_${PN} += "qtvirtualkeyboard-plugins qtvirtualkeyboard-qmlplugins qtvirtualkeyboard"
+
 FILES_${PN} += "\
 	/usr/share/sla-client-config.json \
 "
