@@ -10,9 +10,7 @@ inherit packagegroup
 RDEPENDS_packagegroup-prusa-qt = "\
     qtquickcontrols-qmlplugins qttools-plugins \
     qtquickcontrols2\
-    qtquickcontrols2-dev\
     qtquickcontrols\
-    qtquickcontrols-dev\
     qtsvg\
     qtwebsockets-qmlplugins\
     qtwebsockets\
