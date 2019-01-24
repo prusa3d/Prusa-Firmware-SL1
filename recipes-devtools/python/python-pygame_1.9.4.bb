@@ -1,7 +1,7 @@
 DESCRIPTION = "Python libSDL Bindings"
 SECTION = "devel/python"
 HOMEPAGE = "http://www.pygame.org"
-LICENSE = "LGPL"
+LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LGPL;md5=7fbc338309ac38fefcd64b04bb903e34"
 DEPENDS = "virtual/libsdl libsdl-image libsdl-mixer libsdl-ttf python-numeric freetype"
 RDEPENDS_${PN} = "python-numeric "
