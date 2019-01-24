@@ -6,7 +6,6 @@ IMAGE_INSTALL = "\
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
 	packagegroup-prusa-sla \
-	packagegroup-prusa-qt \
 	packagegroup-prusa-framebuffer \
 "
 

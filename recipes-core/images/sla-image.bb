@@ -3,11 +3,9 @@ IMAGE_INSTALL = "\
 	packagegroup-base \
 	packagegroup-prusa-base \
 	packagegroup-prusa-sla \
-	packagegroup-prusa-qt \
 "
 
 IMAGE_FEATURES += "\
-	package-management \
 	ssh-server-openssh \
 	allow-empty-password \
 	empty-root-password \

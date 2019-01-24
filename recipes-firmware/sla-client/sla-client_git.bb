@@ -13,8 +13,9 @@ SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 inherit qmake5 systemd
 
 DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard"
+# qtquickcontrols2 qttools-plugins
 
-RDEPENDS_${PN} += "qtvirtualkeyboard-plugins qtvirtualkeyboard-qmlplugins qtvirtualkeyboard"
+RDEPENDS_${PN} += "qtquickcontrols-qmlplugins qtquickcontrols2-qmlplugins qtwebsockets-qmlplugins qtvirtualkeyboard-plugins qtvirtualkeyboard-qmlplugins qtvirtualkeyboard"
 
 FILES_${PN} += "\
 	/usr/share/sla-client-config.json \
