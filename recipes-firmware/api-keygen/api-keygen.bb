@@ -7,7 +7,7 @@ SRC_URI = "\
 
 inherit systemd
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS_${PN} += "bash coreutils"
 
 do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/

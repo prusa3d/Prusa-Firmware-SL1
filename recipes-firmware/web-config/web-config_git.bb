@@ -5,11 +5,11 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "75ef60c54a63d947098dc9958af14504003e2ff2"
+SRCREV_pn-${PN} = "fa76daa7ab364fde263383089406e7494f785161"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-dbus"
+RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-pydbus iw"
 
 S="${WORKDIR}/git"
 
@@ -28,3 +28,5 @@ do_install_append () {
 	# Remove empty /usr/share
 	rmdir ${D}/usr/share
 }
+
+SYSTEMD_SERVICE_${PN} = "wifi-config.service"

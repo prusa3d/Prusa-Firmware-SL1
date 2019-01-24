@@ -9,4 +9,6 @@ SRC_URI[sha256sum] = "9fb86a31c759c9dfdff54de3bb170354cd7ab968b009732d656e8049c5
 
 inherit setuptools
 
+RDEPENDS_${PN} = "python-debugger"
+
 S="${WORKDIR}/gpio-0.2.0"
