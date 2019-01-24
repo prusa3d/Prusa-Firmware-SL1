@@ -1,5 +1,4 @@
 IMAGE_INSTALL = "\
-	packagegroup-core-boot \
 	packagegroup-base \
 	packagegroup-prusa-base \
 	packagegroup-prusa-sla \
@@ -11,6 +10,8 @@ IMAGE_FEATURES += "\
 	empty-root-password \
 	post-install-logging \
 "
+IMAGE_FEATURES_remove = "package-management"
+
 
 IMAGE_LINGUAS = "en-us"
 
