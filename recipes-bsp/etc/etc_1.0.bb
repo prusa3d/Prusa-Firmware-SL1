@@ -6,7 +6,6 @@ SRC_URI = " \
 	file://20-eth.network			\
 	file://25-eth.link \
 	file://bashrc				\
-	file://boot.mount			\
 	file://profile				\
 	file://wpa_supplicant-wlan0.conf	\
 	file://sshd_config	\
@@ -48,8 +47,6 @@ do_install() {
 	install -m 644 ${WORKDIR}/wpa_supplicant-wlan0.conf	${D}${sysconfdir}/wpa_supplicant/
 	install -d ${D}${systemd_unitdir}/system-preset
 	install -m 644 ${WORKDIR}/20-etc.preset			${D}${systemd_unitdir}/system-preset/
-	install -d ${D}${systemd_system_unitdir}/
-	install -m 644 ${WORKDIR}/boot.mount			${D}${systemd_system_unitdir}/
 	install -d ${D}${sysconfdir}/ssh
 	install -m 644 ${WORKDIR}/sshd_config			${D}${sysconfdir}/ssh/
 	install -d ${D}${sysconfdir}/opkg
@@ -69,6 +66,3 @@ pkg_postinst_${PN} () {
 
 	sed 's,/root:/bin/sh,/root:/bin/bash,' -i $D${sysconfdir}/passwd
 }
-
-inherit systemd
-SYSTEMD_SERVICE_${PN} = "boot.mount"
