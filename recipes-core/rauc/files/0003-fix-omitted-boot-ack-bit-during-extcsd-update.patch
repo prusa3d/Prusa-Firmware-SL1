@@ -1,0 +1,13 @@
+diff --git a/src/emmc.c b/src/emmc.c
+index 7d7c536..baa2533 100644
+--- a/src/emmc.c
++++ b/src/emmc.c
+@@ -111,6 +111,8 @@ gboolean r_emmc_write_bootpart(const gchar *device, gint bootpart_active, GError
+ 	else if (bootpart_active == 1)
+ 		value = 0x10;
+ 
++        value |= (1 << 6); /* dirty fix: unconditionally enable BOOT_ACK */
++
+ 	ret = r_emmc_write_extcsd(fd, EXT_CSD_PART_CONFIG, value);
+ 	if (ret) {
+                 /* wait */
