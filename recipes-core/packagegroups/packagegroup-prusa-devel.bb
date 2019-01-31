@@ -9,4 +9,4 @@ inherit packagegroup
 RDEPENDS_packagegroup-prusa-devel = "\
     cscope ctags cmake gcc quilt m4 meson git binutils ninja \
     gdb patch patchelf elfutils diffutils \
-    evtest parted vim python-pip"
+    evtest parted vim python-pip zsh"
