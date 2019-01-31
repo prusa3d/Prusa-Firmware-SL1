@@ -7,6 +7,7 @@ meta-prusa,ssh://git@gitlab.webdev.prusa3d.com:22443/hw/a64/meta-prusa.git,maste
 meta-sunxi,git://github.com/linux-sunxi/meta-sunxi.git,master,HEAD,layers=
 meta-qt5,git://github.com/meta-qt5/meta-qt5.git,master,HEAD,layers=
 meta-openembedded,git://git.openembedded.org/meta-openembedded,master,HEAD,layers=meta-networking:meta-python:meta-webserver:meta-oe
+meta-rauc,git://github.com/rauc/meta-rauc.git,master,HEAD,layers=
 oe-core,git://git.openembedded.org/openembedded-core,master,HEAD,layers=meta
 OECORELAYERCONF=./sample-files/bblayers.conf.sample
 OECORELOCALCONF=./sample-files/local.conf.sample
