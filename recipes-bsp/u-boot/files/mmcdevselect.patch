@@ -1,0 +1,14 @@
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index a8a8223187..529a72dc51 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -499,7 +499,9 @@ extern int soft_i2c_gpio_scl;
+ 
+ #define BOOTCMD_PRUSA_EMMC \
+ 	"bootcmd_prusa_emmc=" \
++		"mmc dev 1 0; " \
+ 		"run update_active_rootfs_slot; " \
++		"mmc dev 1 0; " \
+ 		"run scan_dev_for_fdt; " \
+ 		"setenv bootargs console=${console} root=/dev/mmcblk2p${rootpart} rootwait " \
+ 			"panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
