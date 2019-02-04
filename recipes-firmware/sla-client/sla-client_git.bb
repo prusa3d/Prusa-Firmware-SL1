@@ -1,13 +1,13 @@
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/new-sla-client-application.git;protocol=ssh \
+	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/new-sla-client-application.git;protocol=ssh;branch=master \
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/qrcode-generator\
 	file://sla-client.service \
 	file://sla-client-config.json \
 	file://000-install-path.patch \
 "
-SRCREV = "914870afa60563777927de325bd82cb670b0180d"
+SRCREV = "b2bccf5e83d075d590dea39537897e8e3dcd5fbc"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 inherit qmake5 systemd
