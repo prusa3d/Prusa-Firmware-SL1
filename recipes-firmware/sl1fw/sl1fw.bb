@@ -3,7 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=new_layout \
+git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=master \
 file://mnt-rootfs.mount \
 file://mnt-rootfs.automount \
 file://mnt-usb.mount \
