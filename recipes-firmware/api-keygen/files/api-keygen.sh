@@ -6,7 +6,7 @@ USER=maker
 
 while true; do
 	KEY=$(/usr/bin/base64 /dev/random | /usr/bin/head -c 8)
-	if echo ${KEY} | grep --quiet -v -e O -e 0 -e l -e I; then
+	if echo ${KEY} | grep -q -v -e O -e 0 -e l -e I; then
 		break;
 	fi;
 done
