@@ -8,12 +8,14 @@ case "$1" in
                 cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/etc/							|| true
                 cp -av /etc/ssh/ssh_host_{ecdsa,ed25519,rsa}_key{,.pub} ${RAUC_SLOT_MOUNT_POINT}/etc/ssh/	|| true
                 cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/wpa_supplicant/wpa_supplicant-wlan0.secrets.json		|| true
-                cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/.updated							|| true
+                cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/wpa_supplicant/wpa_supplicant-wlan0.conf			|| true
                 cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/hostapd.secrets.json					|| true
+                cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/hostapd.conf						|| true
+                cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/.updated							|| true
+                cp -av {,${RAUC_SLOT_MOUNT_POINT}}/etc/machine-id						|| true
                 ;;
         *)
                 exit 1
                 ;;
 esac
-
-exit 0 
+exit 0
