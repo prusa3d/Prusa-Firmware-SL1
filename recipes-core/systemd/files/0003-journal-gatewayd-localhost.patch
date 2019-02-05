@@ -1,0 +1,13 @@
+diff --git a/units/systemd-journal-gatewayd.socket b/units/systemd-journal-gatewayd.socket
+index 7c3632b32..c294af764 100644
+--- a/units/systemd-journal-gatewayd.socket
++++ b/units/systemd-journal-gatewayd.socket
+@@ -12,7 +12,7 @@ Description=Journal Gateway Service Socket
+ Documentation=man:systemd-journal-gatewayd(8)
+ 
+ [Socket]
+-ListenStream=19531
++ListenStream=127.0.0.1:19531
+ 
+ [Install]
+ WantedBy=sockets.target
