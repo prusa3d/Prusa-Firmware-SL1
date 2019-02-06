@@ -1,11 +1,19 @@
 inherit bundle
 
+SRC_URI += " \
+	file://trivial-sl1fw-migrator.sh \
+"
+
+LICENSE = "CLOSED"
+
 UBOOT_WITH_SPL="padded-u-boot-with-spl.bin"
 
 #RAUC_BUNDLE_COMPATIBLE = "prusa64-sl1"
 RAUC_BUNDLE_SLOTS = "rootfs bootloader"
+RAUC_BUNDLE_HOOKS[file] ?= "trivial-sl1fw-migrator.sh"
 RAUC_SLOT_rootfs = "sla-image"
 RAUC_SLOT_rootfs[fstype] = "ext4"
+RAUC_SLOT_rootfs[hooks] = "post-install"
 RAUC_SLOT_bootloader = "u-boot"
 RAUC_SLOT_bootloader[type] = "boot"
 RAUC_SLOT_bootloader[file] = "${UBOOT_WITH_SPL}"
