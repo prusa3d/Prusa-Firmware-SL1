@@ -20,7 +20,7 @@ SPL_BINARY = "spl/sunxi-spl.bin"
 
 do_compile_sun50i[depends] += "atf-sunxi:do_deploy"
 
-PACKAGES += "${PN}-fw-utils"
+PACKAGES_prepend = "${PN}-fw-utils "
 FILES_${PN}-fw-utils = "		\
 	${base_sbindir}/fw_printenv	\
 	${base_sbindir}/fw_setenv	\
