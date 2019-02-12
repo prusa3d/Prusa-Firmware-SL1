@@ -18,6 +18,7 @@
 
 server {
 	listen 8000 default_server;
+	client_max_body_size 512M;
 
 	location / {
 		proxy_pass http://127.0.0.1:7999;
