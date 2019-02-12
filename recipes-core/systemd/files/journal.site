@@ -1,15 +1,9 @@
 server {
 	listen 19532 default_server;
 
-	auth_digest_user_file /etc/sl1fw/htdigest.passwd;
-	auth_digest_shm_size 4m; # the storage space allocated for tracking active sessions
-	auth_digest_timeout 60s; # allow users to wait 1 minute between receiving the challenge and hitting send in the browser dialog box
-	auth_digest_expires 10s; # after a successful challenge/response, let the client continue to use the same nonce for additional requests for 10 seconds before generating a new challenge 
-	auth_digest_replays 20;  # also generate a new challenge if the client uses the  same nonce more than 20 times before the expire time limit
-	auth_digest 'prusa-sl1';
+	include /etc/nginx/prusa-auth.conf;
 
 	location / {
 		proxy_pass http://127.0.0.1:19531;
 	}
 }
-
