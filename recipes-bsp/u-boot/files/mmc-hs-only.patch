@@ -1,0 +1,17 @@
+diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
+index 9f426661c4..e000eaa3b5 100644
+--- a/drivers/mmc/sunxi_mmc.c
++++ b/drivers/mmc/sunxi_mmc.c
+@@ -624,7 +624,11 @@ static int sunxi_mmc_probe(struct udevice *dev)
+ 		cfg->host_caps |= MMC_MODE_8BIT;
+ 	if (bus_width >= 4)
+ 		cfg->host_caps |= MMC_MODE_4BIT;
+-	cfg->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
++	
++	// This change seems to improve prusa-sl1 mmc stability
++	//cfg->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
++	cfg->host_caps |= MMC_MODE_HS;
++	
+ 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
+ 
+ 	cfg->f_min = 400000;
