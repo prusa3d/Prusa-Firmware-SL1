@@ -17,7 +17,7 @@ KBRANCH ?= "master"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "a86fded1996a5fd46944d03e9c352d0f1e7011ec"
+SRCREV_pn-${PN} = "9ed743ee50a670b149cc7ab6ede965af6f658973"
 PV = "v4.18.0-rc6+git${SRCPV}"
 
 SRC_URI="\
