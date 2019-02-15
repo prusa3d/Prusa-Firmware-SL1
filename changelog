@@ -1,0 +1,41 @@
+# Version 0.9.3-rc2
+- Read eth0 MAC from fuses
+- Disable MAC randomization
+- Disable kernel locking selftest
+
+# Version 0.9.3-rc1
+- Calibration v2
+- Fix calibration text overflow
+- Fix virtual keyboard text size
+
+# Version 0.9.3-rc0
+- Fix: MC reset call
+- Fix default fans speed
+- MC communication in separate object
+- Fix firmware update exception processing
+- Fix warning while printing octoprint uploaded project
+- wifi: signal and connected ssid
+- Uboot 2019.1, mmc@26MHz, no boot delay
+- Custom VirtualKeyboard style
+- Fixes in Qt GUI
+- Up&down and final move is to tower top (no homing)
+- Resin stirring with fast tilt move
+- Feedme button in homeprint (manual resin fill)
+- Fix max octoprint API upload size
+- Added socat utility
+
+# Version 0.9.2-rc1
+- sl1fw code cleanup
+- Patch u-boot environment on update (fixes setups with old environment)
+- Replace mmc dev select u-boot walkaround by boot delay
+
+# Version 0.9.2-rc0
+- Calibration UI fixes
+- Support for rev04 and rev05 MC boards
+- Halfauto calibration + infinity test   
+- Search for tilt homing profiles and tuning tilt while printing
+- Fixed log access
+- Added new UI screens (network, printing, support, ...)
+- Updated uboot, memtest support
+- Basic persistent configuration
+- Journald web access on port 19532
