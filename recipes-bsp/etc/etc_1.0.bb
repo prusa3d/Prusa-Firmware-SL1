@@ -4,7 +4,6 @@ SRC_URI = " \
 	file://20-etc.preset			\
 	file://10-wlan.network			\
 	file://20-eth.network			\
-	file://25-eth.link \
 	file://bashrc				\
 	file://profile				\
 	file://wpa_supplicant-wlan0.conf	\
@@ -27,7 +26,6 @@ FILES_${PN} = "							\
 	${sysconfdir}/bash/bashrc				\
 	${sysconfdir}/systemd/network/10-wlan.network		\
 	${sysconfdir}/systemd/network/20-eth.network		\
-	${sysconfdir}/systemd/network/25-eth.link \
 	${sysconfdir}/wpa_supplicant/wpa_supplicant-wlan0.conf	\
 	${systemd_unitdir}/system-preset/20-etc.preset		\
 	${sysconfdir}/ssh/sshd_config	\
@@ -42,7 +40,6 @@ do_install() {
 	install -d ${D}${sysconfdir}/systemd/network
 	install -m 644 ${WORKDIR}/10-wlan.network		${D}${sysconfdir}/systemd/network/
 	install -m 644 ${WORKDIR}/20-eth.network		${D}${sysconfdir}/systemd/network/
-	install -m 644 ${WORKDIR}/25-eth.link ${D}${sysconfdir}/systemd/network/
 	install -d ${D}${sysconfdir}/wpa_supplicant
 	install -m 644 ${WORKDIR}/wpa_supplicant-wlan0.conf	${D}${sysconfdir}/wpa_supplicant/
 	install -d ${D}${systemd_unitdir}/system-preset
