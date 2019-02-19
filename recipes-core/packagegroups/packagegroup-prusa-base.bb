@@ -29,7 +29,7 @@ RDEPENDS_${PN} = "\
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
 	${OPENSSH} ${TZDATA} \
 	haveged mali-blobs hwclock \
-	rauc systemd-journal-gatewayd \
+	rauc systemd-journal-gatewayd powerpanic\
 "
 
 RRECOMMENDS_${PN} = ${MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS} \
