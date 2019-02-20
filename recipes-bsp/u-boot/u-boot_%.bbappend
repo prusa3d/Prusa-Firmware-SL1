@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI_append = " \
-	file://mmc-hs-only.patch \
+	file://mmc-legacy-only.patch \
+	file://mmc-delay-1500.patch \
 "
