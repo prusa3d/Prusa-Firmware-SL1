@@ -1,0 +1,15 @@
+diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
+index 9f426661c4..5217bb12e0 100644
+--- a/drivers/mmc/sunxi_mmc.c
++++ b/drivers/mmc/sunxi_mmc.c
+@@ -624,7 +624,9 @@ static int sunxi_mmc_probe(struct udevice *dev)
+ 		cfg->host_caps |= MMC_MODE_8BIT;
+ 	if (bus_width >= 4)
+ 		cfg->host_caps |= MMC_MODE_4BIT;
+-	cfg->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
++	//cfg->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
++	//cfg->host_caps |= MMC_MODE_HS;
++	cfg->host_caps |= MMC_CAP(MMC_LEGACY);
+ 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
+ 
+ 	cfg->f_min = 400000;
