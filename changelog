@@ -1,3 +1,8 @@
+# Version 0.9.3-rc4
+- Fixed missing mmap
+- Admin in print menu
+- Live preview backend
+
 # Version 0.9.3-rc3
 - u-boot: mmc delay, legacy mmc mode
 - PWM backlight
