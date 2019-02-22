@@ -11,7 +11,7 @@ file://mnt-usb.automount \
 file://50-device-timeout.conf \
 file://fb.modes \
 "
-SRCREV_pn-${PN} = "fcbd33c293fe0b22b7244dd362a5cc9606d3dbeb"
+SRCREV_pn-${PN} = "93b72902d1e84922a402aeea9361a36167f7ad0c"
 
 
 PACKAGES = "${PN}"
