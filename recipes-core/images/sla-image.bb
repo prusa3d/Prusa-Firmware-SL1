@@ -1,8 +1,7 @@
 IMAGE_INSTALL = "\
-	packagegroup-core-boot \
-	packagegroup-base \
 	packagegroup-prusa-base \
 	packagegroup-prusa-sla \
+	packagegroup-prusa-tools \
 "
 
 IMAGE_FEATURES += "\

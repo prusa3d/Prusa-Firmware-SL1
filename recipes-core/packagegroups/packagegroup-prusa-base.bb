@@ -7,10 +7,12 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 #
-# Set by the machine configuration with packages essential for device bootup
+# packages essential for device bootup
 #
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS ?= ""
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS ?= ""
+DISTRO_ESSENTIAL_EXTRA_RDEPENDS ?= ""
+DISTRO_ESSENTIAL_EXTRA_RRECOMMENDS ?= ""
 
 OPENSSH = "\
     openssh-scp openssh-ssh openssh-sftp openssh-sftp-server \
@@ -21,15 +23,34 @@ TZDATA = "\
 	tzdata tzdata-europe tzdata-americas tzdata-posix \
 "
 
+DEPENDS_${PN} = "\
+	${MACHINE_EXTRA_DEPENDS} \
+	${DISTRO_EXTRA_DEPENDS} \
+"
+
 RDEPENDS_${PN} = "\
-	base-files base-passwd netbase \
 	${MACHINE_ESSENTIAL_EXTRA_RDEPENDS} \
+	${MACHINE_EXTRA_RDEPENDS} \
+	${DISTRO_ESSENTIAL_EXTRA_RDEPENDS} \
+	${DISTRO_EXTRA_RDEPENDS} \
+	${VIRTUAL-RUNTIME_base-utils} \
+	${VIRTUAL-RUNTIME_login_manager} \
+	${VIRTUAL-RUNTIME_init_manager} \
+	${VIRTUAL-RUNTIME_dev_manager} \
+	${VIRTUAL-RUNTIME_update-alternatives} \
+	base-files base-passwd netbase findutils \
+	keymaps lrzsz setserial \
 	readline time iputils-ping dhcp-client curl vim-tiny nano \
-	bash \
+	bash e2fsprogs-mke2fs dosfstools util-linux-blkid \
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
 	${OPENSSH} ${TZDATA} \
 	haveged mali-blobs hwclock \
 	rauc systemd-journal-gatewayd powerpanic\
 "
 
-RRECOMMENDS_${PN} = ${MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS} \
+RRECOMMENDS_${PN} = "\
+	${MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS} \
+        ${MACHINE_EXTRA_RRECOMMENDS} \
+        ${DISTRO_ESSENTIAL_EXTRA_RRECOMMENDS} \
+        ${DISTRO_EXTRA_RRECOMMENDS} \
+"
