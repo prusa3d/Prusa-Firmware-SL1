@@ -18,3 +18,5 @@ IMAGE_LINGUAS = "en-us"
 LICENSE = "MIT"
 
 inherit core-image
+
+IMAGE_NAME_SUFFIX = ""
