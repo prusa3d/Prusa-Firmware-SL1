@@ -39,7 +39,7 @@ RDEPENDS_${PN} = "\
 	${VIRTUAL-RUNTIME_dev_manager} \
 	${VIRTUAL-RUNTIME_update-alternatives} \
 	base-files base-passwd netbase findutils \
-	keymaps lrzsz setserial \
+	keymaps lrzsz setserial iproute2 gzip \
 	readline time iputils-ping dhcp-client curl vim-tiny nano \
 	bash e2fsprogs-mke2fs dosfstools util-linux-blkid \
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
