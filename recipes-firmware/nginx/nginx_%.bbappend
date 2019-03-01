@@ -9,3 +9,8 @@ SRCREV = "cd8641886c873cf543255aeda20d23e4cd603d05"
 DIGEST_PATH = "${WORKDIR}/git/digest"
 
 EXTRA_OECONF += " --add-module=${DIGEST_PATH}"
+
+
+do_install_append() {
+	rm ${D}${sysconfdir}/nginx/sites-enabled/default_server
+}
