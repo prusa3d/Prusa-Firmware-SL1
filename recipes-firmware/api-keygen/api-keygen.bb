@@ -8,7 +8,7 @@ SRC_URI = "\
 
 inherit systemd
 
-RDEPENDS_${PN} += "bash coreutils"
+RDEPENDS_${PN} += "bash coreutils grep"
 
 do_install_append () {
 	# Keygen service
