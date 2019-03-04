@@ -12,5 +12,5 @@ EXTRA_OECONF += " --add-module=${DIGEST_PATH}"
 
 
 do_install_append() {
-	rm ${D}${sysconfdir}/nginx/sites-enabled/default_server
+	rm -f ${D}${sysconfdir}/nginx/sites-enabled/default_server
 }
