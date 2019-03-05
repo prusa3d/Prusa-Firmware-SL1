@@ -14,6 +14,9 @@ inherit image_types
 #
 
 
+# Custom image version
+IMAGE_VERSION_SUFFIX = "-${DISTRO_VERSION}-${DATETIME}"
+
 # This image depends on the rootfs image
 IMAGE_TYPEDEP_sunxi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
