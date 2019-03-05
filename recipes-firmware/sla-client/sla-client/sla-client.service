@@ -6,7 +6,7 @@ After=sl1fw.service
 WorkingDirectory=/var/run/sl1fw
 Environment="HOME=/var/run/sl1fw"
 Environment="QT_QPA_PLATFORM=eglfs"
-Environment="QT_QPA_EGLFS_KMS_CONFIG=config.json"
+Environment="QT_QPA_EGLFS_KMS_CONFIG=/usr/share/sla-client-config.json"
 Environment="EGLFS_DEVICE_INTEGRATION=eglfs_kms"
 Environment="QT_QPA_EGLFS_INTEGRATION=eglfs_kms"
 ExecStart=/usr/bin/SLAGUI
