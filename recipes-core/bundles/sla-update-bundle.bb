@@ -6,6 +6,8 @@ SRC_URI += " \
 
 LICENSE = "CLOSED"
 
+BUNDLE_NAME = "${BUNDLE_BASENAME}-${MACHINE}-${DISTRO_VERSION}-${DATETIME}"
+
 UBOOT_WITH_SPL="padded-u-boot-with-spl.bin"
 
 #RAUC_BUNDLE_COMPATIBLE = "prusa64-sl1"
