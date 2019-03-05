@@ -27,9 +27,6 @@ do_install_append () {
 	
 	# Remove empty /usr/share
 	rmdir ${D}/usr/share
-	
-	# Ensure configuration directories exists
-	install -d ${D}${sysconfdir}/wpa_supplicant
 }
 
 SYSTEMD_SERVICE_${PN} = "wifi-config.service"
