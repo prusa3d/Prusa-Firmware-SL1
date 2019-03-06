@@ -1,3 +1,30 @@
+# Version 0.9.4-rc0
+- tiltWithStallDetection
+- Fixed print cancel
+- Layer preview is loaded asynchronously
+- Fixed time
+- Return to the main after 20s
+- Fix api-keygen on firstboot
+- Removed default project image
+- Fixed sysinfo page
+- .dwz .sl1 project extension support
+- Live preview
+- Per partes exposure
+- Switching buttons, visibility of the indicator on the confirm page
+- Cosmetic changes, temporarily removed unavailable items from the settings page
+- Using some of the new pictograms
+- Calibration vs Move pages, PrintPage menu, new pictures
+- Tower & Tilt move screens are now separate from the CalibrationMove & Tilt
+- PrintPage + Estimated End
+- New progressbar
+- Print - swipable, settings flickable
+- Calibration v3
+- Backed support for time, timezone, hostname, laguage
+- Provide page data also as raw values where possible
+- A64 and MC serial numbers
+- cp210x serial support
+- admin in print menu
+
 # Version 0.9.3-rc4
 - Fixed missing mmap
 - Admin in print menu
