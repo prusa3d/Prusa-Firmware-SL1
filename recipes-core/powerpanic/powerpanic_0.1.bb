@@ -24,7 +24,7 @@ do_install() {
 
 	# Service
 	install -d ${D}${systemd_system_unitdir}
-	install ${WORKDIR}/panic.service ${D}${systemd_system_unitdir}/panic.service
+	install --mode 644 ${WORKDIR}/panic.service ${D}${systemd_system_unitdir}/panic.service
 }
 
 SYSTEMD_SERVICE_${PN} = "panic.service"
