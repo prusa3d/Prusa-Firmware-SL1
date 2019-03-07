@@ -28,4 +28,12 @@ TOOLCHAIN_HOST_TASK_append = "\
 
 LICENSE = "MIT"
 
+DEPENDS += "systemd-systemctl-native"
+
+rootfs_enable_ssh () {
+	systemctl --root=$D enable ssh.socket
+}
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_enable_ssh ; "
+
 inherit core-image
+
