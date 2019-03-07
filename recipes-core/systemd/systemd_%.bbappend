@@ -15,6 +15,11 @@ FILES_${PN}-journal-gatewayd += " \
 "
 
 do_install_append() {
+	if ! ${@bb.utils.contains('PACKAGECONFIG', 'resolved', 'true', 'false', d)}; then
+		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../run/systemd/resolve/stub-resolv.conf%g" \
+			${D}${exec_prefix}/lib/tmpfiles.d/etc.conf
+	fi
+
 	# nginx journal-gatewayd reverse proxy site
 	install -d ${D}${sysconfdir}/nginx/sites-available
 	install ${WORKDIR}/journal.site ${D}${sysconfdir}/nginx/sites-available/journal
