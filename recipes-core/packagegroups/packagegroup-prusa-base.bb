@@ -40,10 +40,10 @@ RDEPENDS_${PN} = "\
 	${VIRTUAL-RUNTIME_update-alternatives} \
 	base-files base-passwd netbase findutils \
 	keymaps lrzsz setserial iproute2 gzip ncurses-tools \
-	readline time iputils-ping dhcp-client curl vim nano \
+	readline time iputils-ping curl vim nano \
 	bash e2fsprogs-mke2fs dosfstools util-linux-blkid \
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
-	${OPENSSH} ${TZDATA} \
+	${TZDATA} \
 	haveged mali-blobs hwclock \
 	rauc systemd-journal-gatewayd powerpanic\
 "
