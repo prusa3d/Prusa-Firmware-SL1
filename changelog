@@ -1,3 +1,16 @@
+# Version v0.9.4-rc1
+- Adjustable tilt
+- Backed project sorting
+- Fixed dir listing when using multiple sources
+- Pictogram for PageSupport, header, indicating page
+- Sorting of project on the SourceSelect page
+- Removing unused pages
+- Better PageChange layout
+- Working strength indicator for all wifi networks
+- Generated images maned acording to system version
+- System version based on the most recent tag
+- Fixed panic service executable bit
+
 # Version 0.9.4-rc0
 - tiltWithStallDetection
 - Fixed print cancel
