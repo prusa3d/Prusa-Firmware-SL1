@@ -1,3 +1,6 @@
+# Version v0.10.0-r0
+- Initramdisk, separate etc, var partitions
+
 # Version v0.9.4-rc1
 - Adjustable tilt
 - Backed project sorting
