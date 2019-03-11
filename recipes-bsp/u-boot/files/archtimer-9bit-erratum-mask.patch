@@ -1,0 +1,17 @@
+diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
+index c1706dcec1..0e33aea5c4 100644
+--- a/arch/arm/cpu/armv8/generic_timer.c
++++ b/arch/arm/cpu/armv8/generic_timer.c
+@@ -66,10 +66,11 @@ unsigned long timer_read_counter(void)
+ 	isb();
+ 	do {
+ 		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
+-	} while (((cntpct + 1) & GENMASK(10, 0)) <= 1);
++	} while (((cntpct + 1) & GENMASK(9, 0)) <= 1);
+ 
+ 	return cntpct;
+ }
++
+ #else
+ /*
+  * timer_read_counter() using the Arm Generic Timer (aka arch timer).
