@@ -5,7 +5,7 @@ first 'init' program more efficiently. core-image-tiny-initramfs doesn't \
 actually generate an image but rather generates boot and rootfs artifacts \
 that can subsequently be picked up by external image generation tools such as wic."
 
-PACKAGE_INSTALL = "initramfs-ab-slots busybox e2fsprogs-e2fsck"
+PACKAGE_INSTALL = "initramfs-ab-slots busybox e2fsprogs-e2fsck e2fsprogs-mke2fs"
 # ${ROOTFS_BOOTSTRAP_INSTALL}
 
 
