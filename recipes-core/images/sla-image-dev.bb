@@ -1,7 +1,5 @@
 inherit populate_sdk_qt5
 IMAGE_INSTALL = "\
-	packagegroup-core-boot \
-	packagegroup-base \
 	packagegroup-prusa-base \
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
