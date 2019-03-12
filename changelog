@@ -1,3 +1,19 @@
+# Version v0.10.1-r0
+- text lines on page start
+- random fixes
+- set time
+- new network page
+- fix: too long project filenames
+- setup split, exposure setup
+- fix print buttons on web
+- new network configuration
+- global fw update
+- prerelase UI changes
+- page start with fill resin,...
+- fix: do not display projects with invalid name
+- manual, videos, about URLs 
+- u-boot patch for arch timer erratum
+
 # Version v0.10.0-r0
 - Initramdisk, separate etc, var partitions
 
