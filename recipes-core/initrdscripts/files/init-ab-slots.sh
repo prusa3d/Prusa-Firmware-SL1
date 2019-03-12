@@ -41,7 +41,7 @@ fsck.ext4 -pv $part_etc
 fsck.ext4 -pv $part_var
 if [ $? -eq 4 -o $? -eq 8 ]
 then
-	mkfs.ext4 $part_var
+	mkfs.ext4 -F $part_var
 fi
 
 mount $part_root /mnt/root
