@@ -13,7 +13,7 @@ IMAGE_FEATURES += "\
 IMAGE_FEATURES_remove = "package-management"
 
 
-IMAGE_LINGUAS = "en-us"
+IMAGE_LINGUAS = ""
 
 LICENSE = "MIT"
 
