@@ -4,7 +4,7 @@ function prepare_fs() {
 	fsck.ext4 -pv $1
 	if [ $? -eq 4 -o $? -eq 8 ]
 	then
-		mkfs.ext4 $1
+		mkfs.ext4 -F $1
 	fi
 }
 
