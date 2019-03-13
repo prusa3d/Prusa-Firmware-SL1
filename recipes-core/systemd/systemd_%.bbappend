@@ -9,6 +9,8 @@ SRC_URI_append = "\
 
 PACKAGECONFIG_append = " microhttpd"
 
+RDEPENDS_${PN}_remove = "volatile-binds"
+
 FILES_${PN}-journal-gatewayd += " \
 	${sysconfdir}/nginx/sites-enabled/journal \
 	${sysconfdir}/nginx/sites-available/journal \
