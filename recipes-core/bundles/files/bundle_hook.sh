@@ -24,6 +24,7 @@ slot-post-install)
 		mkdir -p ${RAUC_MOUNT_PREFIX}/etc
 		mount ${etc_dev} ${RAUC_MOUNT_PREFIX}/etc
 		rsync --archive --delete --verbose /etc/ ${RAUC_MOUNT_PREFIX}/etc/
+		rm -f ${RAUC_MOUNT_PREFIX}/etc/dnsmasq.conf
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var

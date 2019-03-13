@@ -5,7 +5,7 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "516f3a0a2d697c4b386a3e656938a039287f7b12"
+SRCREV_pn-${PN} = "9f4944fce87d405dbc1976b225316b43c40c7da6"
 
 PACKAGES = "${PN}"
 
