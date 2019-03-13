@@ -44,7 +44,7 @@ RDEPENDS_${PN} = "\
 	bash e2fsprogs-mke2fs dosfstools util-linux-blkid \
 	kernel-modules iw wpa-supplicant linux-firmware-bcm43362 \
 	${TZDATA} \
-	haveged mali-blobs hwclock \
+	haveged mali-blobs \
 	rauc systemd-journal-gatewayd powerpanic\
 "
 
