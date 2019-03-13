@@ -28,8 +28,7 @@ do_unpack[depends] += "u-boot:do_deploy"
 compose_uboot() {
 	UBOOT_FILE=${DEPLOY_DIR_IMAGE}/${UBOOT_WITH_SPL}
 	dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${UBOOT_FILE} bs=1K
-	dd if=/dev/zero of=${UBOOT_FILE} bs=1K count=8 oflag=append conv=notrunc
-	dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY} of=${UBOOT_FILE} bs=1K oflag=append conv=notrunc
+	dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY} of=${UBOOT_FILE} bs=1K seek=160 oflag=append conv=notrunc
 }
 
 do_unpack[prefuncs] += "compose_uboot"
