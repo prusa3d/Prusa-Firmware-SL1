@@ -38,7 +38,7 @@ TOOLCHAIN_HOST_TASK_append = "\
 DEPENDS += "systemd-systemctl-native"
 
 rootfs_enable_ssh () {
-	systemctl --root=$D enable ssh.socket
+	systemctl --root=$D enable sshd.socket
 }
 ROOTFS_POSTPROCESS_COMMAND += "rootfs_enable_ssh ; "
 
