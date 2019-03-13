@@ -22,7 +22,7 @@ IMAGE_FEATURES += "\
 
 IMAGE_LINGUAS = "en-us"
 
-IMAGE_FSTYPES = "wic"
+IMAGE_FSTYPES = "wic wic.bmap"
 WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
 WKS_FILE_DEPENDS = "virtual/bootloader e2fsprogs-native bmap-tools-native"
 WKS_FILE = "sunxi-sd.wks"
