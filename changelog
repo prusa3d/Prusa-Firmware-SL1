@@ -1,3 +1,8 @@
+# Version v0.10.1-r5
+- A bit more proper hotspot mode fix
+- Removing Admin and Network button from the About page, no longer supported
+- Smoother swiping in PagePrint
+
 # Version v0.10.1-r4
 - Hot-fixed hotspot mode
 
