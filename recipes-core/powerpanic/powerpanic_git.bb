@@ -5,26 +5,24 @@ DEPENDS = "libgpiod"
 inherit systemd
 
 SRC_URI = "\
-	file://panic.cpp \
-	file://panic.service \
+	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/powerpanic.git;protocol=ssh;branch=master \
 "
+SRCREV = "f757156dd4789ff5d21af70b2acea3cb886e9abf"
 
 FILES_${PN} = "\
   ${bindir}/panic \
 "
 
-do_compile() {
-	${CXX} ${CXXFLAGS} ${LDFLAGS} ${WORKDIR}/panic.cpp -o panic -lgpiod
-}
+S = "${WORKDIR}/git"
 
 do_install() {
 	# Panic
 	install -d ${D}${bindir}
-	install panic ${D}${bindir}/panic
+	install ${S}/panic ${D}${bindir}/panic
 
 	# Service
 	install -d ${D}${systemd_system_unitdir}
-	install --mode 644 ${WORKDIR}/panic.service ${D}${systemd_system_unitdir}/panic.service
+	install --mode 644 ${S}/systemd/panic.service ${D}${systemd_system_unitdir}/panic.service
 }
 
 SYSTEMD_SERVICE_${PN} = "panic.service"
