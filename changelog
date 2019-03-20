@@ -1,3 +1,16 @@
+# Version v0.10.2-r0
+- Freescale arch timer fix (Linux and uboot)
+- Firmware downloads on separate page
+- Resize of live preview
+- Fix calib overlay + new overlay autoplace
+- Fix crash on flash drive remove
+- .. directory sorting, fixes
+- Small progressbar to indicate exposition
+- Removed image version
+- Corrected QRCode size
+- Fixed timedprogress
+- Centered qrcode on video page
+
 # Version v0.10.1-r8
 - UI fixes, directory sorting
 
