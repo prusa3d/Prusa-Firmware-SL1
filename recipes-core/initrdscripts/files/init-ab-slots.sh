@@ -59,7 +59,11 @@ then
 fi
 
 mount $part_root /sysroot
-mount $part_etc /sysroot/etc
-mount $part_var /sysroot/var
+
+if test ! -e /sysroot/skip-mounts
+then
+	mount $part_etc /sysroot/etc
+	mount $part_var /sysroot/var
+fi
 
 enter_init
