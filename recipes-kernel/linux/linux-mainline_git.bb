@@ -47,4 +47,4 @@ do_install_append() {
 
 
 deltask bundle_initramfs 
-addtask bundle_initramfs after do_compile before do_install
+addtask bundle_initramfs after do_compile_kernelmodules before do_install
