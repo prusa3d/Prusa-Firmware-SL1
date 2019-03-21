@@ -1,3 +1,14 @@
+# Version v0.10.3-r0
+- Initramfs v2
+- wic based development images
+- revised security
+- Calibration fixes
+- Fix timezone refresh
+- Fix undefined values among the file attributes
+- Confirm Page, photo is temporarily pulled to the right
+- Conditional admin button
+- openssl 1.1.1b - fixes random crashes on fw, examples download
+
 # Version v0.10.2-r0
 - Freescale arch timer fix (Linux and uboot)
 - Firmware downloads on separate page
