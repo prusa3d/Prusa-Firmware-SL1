@@ -10,7 +10,7 @@ file://mnt-usb.mount \
 file://mnt-usb.automount \
 file://50-device-timeout.conf \
 "
-SRCREV_pn-${PN} = "1cab60266d026bc5ed65de4279089311393bb78b"
+SRCREV_pn-${PN} = "dd34bf083140d42b72e2a03e3c5ce57fe572e4d4"
 
 
 PACKAGES = "${PN}"
