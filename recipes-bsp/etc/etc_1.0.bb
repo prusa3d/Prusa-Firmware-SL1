@@ -47,16 +47,12 @@ do_install() {
 	install -d ${D}${sysconfdir}/ssh
 	install -m 644 ${WORKDIR}/sshd_config			${D}${sysconfdir}/ssh/
 	install -d ${D}${sysconfdir}/opkg
-	install -m 644 ${WORKDIR}/base-feeds.conf 		${D}${sysconfdir}/opkg/
+	install -m 644 ${WORKDIR}/base-feeds.conf		${D}${sysconfdir}/opkg/
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
 
 pkg_postinst_${PN} () {
-	if [ -n "$D" ]; then
-		OPTS="--root=$D"
-	fi
-	systemctl $OPTS enable sshd.socket
 	install -d $D${sysconfdir}/systemd/system/multi-user.target.wants
 	ln -sf ${systemd_system_unitdir}/wpa_supplicant@.service  \
 		$D${sysconfdir}/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service

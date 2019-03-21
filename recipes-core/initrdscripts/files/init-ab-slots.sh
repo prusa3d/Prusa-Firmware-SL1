@@ -17,10 +17,24 @@ panic() {
         fi
 }
 
-mkdir -p /dev /mnt/root /proc /sys
+enter_init() {
+	umount /sys /dev /proc
+	exec switch_root /sysroot /lib/systemd/systemd
+}
+
+mkdir -p /dev /sysroot /proc /sys
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev
+
+root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
+root_devnum=$(echo ${root_dev} | sed -e 's#^/dev/mmcblk\([02]\)p.$#\1#')
+
+if test ${root_devnum} -eq 0
+then
+	mount ${root_dev} /sysroot
+	enter_init
+fi
 
 slot=$(grep -oe 'rauc\.slot=[AB]' /proc/cmdline | cut -d'=' -f2)
 case $slot in
@@ -37,12 +51,19 @@ part_var=/dev/mmcblk2p6
 
 fsck.ext4 -pv $part_root
 fsck.ext4 -pv $part_etc
+
 fsck.ext4 -pv $part_var
+if [ $? -eq 4 -o $? -eq 8 ]
+then
+	mkfs.ext4 -F $part_var
+fi
 
-mount $part_root /mnt/root
-mount $part_etc /mnt/root/etc
-mount $part_var /mnt/root/var
+mount $part_root /sysroot
 
-umount /sys /dev /proc
+if test ! -e /sysroot/skip-mounts
+then
+	mount $part_etc /sysroot/etc
+	mount $part_var /sysroot/var
+fi
 
-exec switch_root /mnt/root /lib/systemd/systemd
+enter_init
