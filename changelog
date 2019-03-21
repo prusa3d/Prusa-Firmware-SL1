@@ -1,3 +1,6 @@
+# Version v0.10.3-r1
+- Fixed admin enable
+
 # Version v0.10.3-r0
 - Initramfs v2
 - wic based development images
