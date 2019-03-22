@@ -5,6 +5,6 @@ Name=eth0
 RequiredForOnline=no
 
 [Network]
-DHCP=ipv4
+DHCP=yes
 
 

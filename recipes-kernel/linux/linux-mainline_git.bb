@@ -21,6 +21,7 @@ PV = "v4.18.0-rc6+git${SRCPV}"
 SRC_URI="\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/linux.git;protocol=ssh;branch=${KBRANCH} \
 	file://defconfig \
+	file://freescale_timer_fix.patch \
 "
 
 S="${WORKDIR}/git"
@@ -46,4 +47,4 @@ do_install_append() {
 
 
 deltask bundle_initramfs 
-addtask bundle_initramfs after do_compile before do_install
+addtask bundle_initramfs after do_compile_kernelmodules before do_install

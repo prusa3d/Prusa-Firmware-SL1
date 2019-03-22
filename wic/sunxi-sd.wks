@@ -1,0 +1,20 @@
+# short-description: Create SD card image with a boot partition
+# long-description:
+# Create an image that can be written onto a SD card using dd for use
+# with Allwinner A64 SoC.
+# It uses SPL and u-boot
+#
+# The disk layout used is:
+#  ----- ----- --------- --------------
+# | GPT | SPL | u-boot  |    rootfs    |
+#  ----- ----- --------- --------------
+# ^     ^     ^         ^              ^
+# |     |     |         |              |
+# 0     128k  160kiB   4MiB         16MiB + rootfs + IMAGE_EXTRA_SPACE (default 10MiB)
+#
+
+part SPL --source rawcopy --sourceparams="file=sunxi-spl.bin" --ondisk mmcblk --no-table --align 128
+part u-boot --source rawcopy --sourceparams="file=u-boot.itb" --ondisk mmcblk --no-table --align 160
+part / --source rootfs --ondisk mmcblk --fstype=ext4 --label root --align 4096
+
+bootloader --ptable gpt
