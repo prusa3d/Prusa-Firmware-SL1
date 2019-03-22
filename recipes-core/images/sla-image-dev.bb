@@ -1,7 +1,8 @@
-inherit populate_sdk_qt5
-IMAGE_INSTALL = "\
-	packagegroup-core-boot \
-	packagegroup-base \
+LICENSE = "MIT"
+
+inherit core-image populate_sdk_qt5
+
+IMAGE_INSTALL += "\
 	packagegroup-prusa-base \
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
@@ -21,6 +22,11 @@ IMAGE_FEATURES += "\
 
 IMAGE_LINGUAS = "en-us"
 
+IMAGE_FSTYPES = "wic wic.bmap"
+WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
+WKS_FILE_DEPENDS = "virtual/bootloader e2fsprogs-native bmap-tools-native"
+WKS_FILE = "sunxi-sd.wks"
+
 SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
 "
 
@@ -28,6 +34,12 @@ TOOLCHAIN_HOST_TASK_append = "\
 	nativesdk-qtdeclarative \
 "
 
-LICENSE = "MIT"
 
-inherit core-image
+DEPENDS += "systemd-systemctl-native"
+
+rootfs_enable_ssh () {
+	systemctl --root=$D enable sshd.socket
+}
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_enable_ssh ; "
+
+

@@ -1,3 +1,52 @@
+# Version v0.10.3-r1
+- Fixed admin enable
+
+# Version v0.10.3-r0
+- Initramfs v2
+- wic based development images
+- revised security
+- Calibration fixes
+- Fix timezone refresh
+- Fix undefined values among the file attributes
+- Confirm Page, photo is temporarily pulled to the right
+- Conditional admin button
+- openssl 1.1.1b - fixes random crashes on fw, examples download
+
+# Version v0.10.2-r0
+- Freescale arch timer fix (Linux and uboot)
+- Firmware downloads on separate page
+- Resize of live preview
+- Fix calib overlay + new overlay autoplace
+- Fix crash on flash drive remove
+- .. directory sorting, fixes
+- Small progressbar to indicate exposition
+- Removed image version
+- Corrected QRCode size
+- Fixed timedprogress
+- Centered qrcode on video page
+
+# Version v0.10.1-r8
+- UI fixes, directory sorting
+
+# Version v0.10.1-r7
+- Admin examples download
+
+# Version v0.10.1-r6
+- Updated MC firmware
+
+# Version v0.10.1-r5
+- A bit more proper hotspot mode fix
+- Removing Admin and Network button from the About page, no longer supported
+- Smoother swiping in PagePrint
+
+# Version v0.10.1-r4
+- Hot-fixed hotspot mode
+
+# Version v0.10.1-r3
+- Advanced settings icons
+- MC firmare update
+- fixes
+
 # Version v0.10.1-r2
 - Fixed videos, handbook page items
 - Added SetHostname, SetTimezone page
