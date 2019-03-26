@@ -6,11 +6,9 @@ SRC_URI = "\
 	file://sla-slicer-upload-restarter.service \
 	file://sla-slicer-upload-restarter.path \
 	file://avahi/octoprint.service \
-	file://use_generated_key.patch \
-	file://listen-localhost.patch \
 	file://nginx/octoprint \
 "
-SRCREV = "28a4c8deb896a520f58f54420dd9dab7b9627364"
+SRCREV = "1f8b6260bc85db9bd0f72cdb9f8af0b26a490d36"
 
 inherit systemd setuptools
 
