@@ -3,6 +3,8 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/octo-api-upload-service.git;protocol=ssh\
 	file://sla-slicer-upload.service \
+	file://sla-slicer-upload-restarter.service \
+	file://sla-slicer-upload-restarter.path \
 	file://avahi/octoprint.service \
 	file://use_generated_key.patch \
 	file://listen-localhost.patch \
@@ -20,9 +22,8 @@ S="${WORKDIR}/git"
 do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/sla-slicer-upload.service ${D}${systemd_system_unitdir}/
-#	install -d ${D}${bindir}
-#	#install --mode 755 ${S}/octo-uploadd.py ${D}${bindir}
-#	oe_runmake DESTDIR=${D}${bindir} install
+	install --mode 644 ${WORKDIR}/sla-slicer-upload-restarter.service ${D}${systemd_system_unitdir}/
+	install --mode 644 ${WORKDIR}/sla-slicer-upload-restarter.path ${D}${systemd_system_unitdir}/
 
 	# Avahi service definition
 	install -d ${D}${sysconfdir}/avahi/services
@@ -38,5 +39,4 @@ do_install_append () {
 	rmdir ${D}/usr/share
 }
 
-SYSTEMD_SERVICE_${PN} = "sla-slicer-upload.service"
-
+SYSTEMD_SERVICE_${PN} = "sla-slicer-upload.service sla-slicer-upload-restarter.path"
