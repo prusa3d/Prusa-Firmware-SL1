@@ -1,3 +1,17 @@
+# Version v0.10.4-r0
+- Wizard
+- Screenshots
+- FeedmePage in main
+- Reduce web to print page only
+- Wizard
+- Slicer-upload, correct response codes
+- Time layout changes
+- Sysinfo hw info merged
+- Apikey change in  admin -> networking
+- New kernel config
+- Banned \/ from apikey
+- Removed hwclock service
+
 # Version v0.10.3-r1
 - Fixed admin enable
 
