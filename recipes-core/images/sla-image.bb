@@ -20,7 +20,7 @@ IMAGE_LINGUAS = ""
 
 DEPENDS += "systemd-systemctl-native"
 rootfs_disable_ssh () {
-        systemctl --root=$D disable sshd.socket
+        systemctl --root=$D mask sshd.socket
 }
 ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; "
 
