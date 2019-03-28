@@ -29,7 +29,7 @@ slot-post-install)
 		rm -f ${RAUC_MOUNT_PREFIX}/etc/dnsmasq.conf
 		sed -i 's/#DNSStubListener=udp/DNSStubListener=no/' ${RAUC_MOUNT_PREFIX}/etc/systemd/resolved.conf
 		rm -f ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sockets.target.wants/sshd.socket
-		ln -s /dev/null ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sshd.socket
+		ln -sf /dev/null ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sshd.socket
 
 		umount ${etc_dev}
 
