@@ -11,6 +11,7 @@
 - New kernel config
 - Banned \/ from apikey
 - Removed hwclock service
+- i18n support in sl1fw
 
 # Version v0.10.3-r1
 - Fixed admin enable
