@@ -53,9 +53,5 @@ do_install() {
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
 
 pkg_postinst_${PN} () {
-	install -d $D${sysconfdir}/systemd/system/multi-user.target.wants
-	ln -sf ${systemd_system_unitdir}/wpa_supplicant@.service  \
-		$D${sysconfdir}/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
-
 	sed 's,/root:/bin/sh,/root:/bin/bash,' -i $D${sysconfdir}/passwd
 }
