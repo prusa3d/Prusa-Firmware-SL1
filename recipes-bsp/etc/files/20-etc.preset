@@ -1,3 +1,2 @@
-enable wpa_supplicant@wlan0.service
 enable systemd-networkd.socket
 enable sshd.socket
