@@ -21,8 +21,6 @@ do_install_append () {
 	rm -rf ${D}/${datadir}/zoneinfo/ROC
 	rm -rf ${D}/${datadir}/zoneinfo/ROK
 	rm -rf ${D}/${datadir}/zoneinfo/UCT
-	rm -rf ${D}/${datadir}/zoneinfo/UTC
-	rm -rf ${D}/${datadir}/zoneinfo/Universal
 	rm -rf ${D}/${datadir}/zoneinfo/W-SU
 	rm -rf ${D}/${datadir}/zoneinfo/WET
 	rm -rf ${D}/${datadir}/zoneinfo/Zulu
