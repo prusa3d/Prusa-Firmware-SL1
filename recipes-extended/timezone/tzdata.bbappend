@@ -1,4 +1,5 @@
 do_install_append () {
+	# Remove unnneded zones (keep universal, UTC)
 	rm -rf ${D}/${datadir}/zoneinfo/CET
 	rm -rf ${D}/${datadir}/zoneinfo/CST6CDT
 	rm -rf ${D}/${datadir}/zoneinfo/EET
@@ -28,11 +29,38 @@ do_install_append () {
 	rm -rf ${D}/${datadir}/zoneinfo/zone1970.tab
 	rm -rf ${D}/${datadir}/zoneinfo/iso3166.tab
 	rm -rf ${D}/${datadir}/zoneinfo/Etc
+
+	# Flatten zone structure
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Buenos_Aires ${D}/${datadir}/zoneinfo/America/Buenos_Aires
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Catamarca ${D}/${datadir}/zoneinfo/America/Catamarca
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Cordoba ${D}/${datadir}/zoneinfo/America/Cordoba
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Jujuy ${D}/${datadir}/zoneinfo/America/Jujuy
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/La_Rioja ${D}/${datadir}/zoneinfo/America/La_Rioja
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Mendoza ${D}/${datadir}/zoneinfo/America/Mendoza
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Rio_Gallegos ${D}/${datadir}/zoneinfo/America/Rio_Gallegos
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/San_Juan ${D}/${datadir}/zoneinfo/America/San_Juan
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Tucuman ${D}/${datadir}/zoneinfo/America/Tucuman
+	mv ${D}/${datadir}/zoneinfo/America/Argentina/Ushuaia ${D}/${datadir}/zoneinfo/America/Ushuaia
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Indianapolis ${D}/${datadir}/zoneinfo/America/Indianapolis
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Knox ${D}/${datadir}/zoneinfo/America/Knox
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Marengo ${D}/${datadir}/zoneinfo/America/Marengo
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Petersburg ${D}/${datadir}/zoneinfo/America/Petersburg
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Vevay ${D}/${datadir}/zoneinfo/America/Vevay
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Vincennes ${D}/${datadir}/zoneinfo/America/Vincennes
+	mv ${D}/${datadir}/zoneinfo/America/Indiana/Winamac ${D}/${datadir}/zoneinfo/America/Winamac
+	mv ${D}/${datadir}/zoneinfo/America/Kentucky/Louisville ${D}/${datadir}/zoneinfo/America/Louisville
+	mv ${D}/${datadir}/zoneinfo/America/Kentucky/Monticello ${D}/${datadir}/zoneinfo/America/Monticello
+	mv ${D}/${datadir}/zoneinfo/America/North_Dakota/Center ${D}/${datadir}/zoneinfo/America/Center
+	mv ${D}/${datadir}/zoneinfo/America/North_Dakota/New_Salem ${D}/${datadir}/zoneinfo/America/New_Salem
 }
 
+# Include chosen zones in main tzdata package
 FILES_${PN} = " \
 	${sysconfdir}/localtime \
 	${sysconfdir}/timezone \
+	\
+	${datadir}/zoneinfo/UTC \
+	${datadir}/zoneinfo/Universal \
 	\
 	${datadir}/zoneinfo/Africa/Abidjan \
 	${datadir}/zoneinfo/Africa/Accra \
