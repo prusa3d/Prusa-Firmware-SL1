@@ -31,6 +31,9 @@ slot-post-install)
 		rm -f ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sockets.target.wants/sshd.socket
 		ln -sf /dev/null ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sshd.socket
 
+		sed -i 's/#Storage=auto/Storage=persistent/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
+		sed -i 's/#SystemMaxUse=/SystemMaxUse=1G/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
+
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var
