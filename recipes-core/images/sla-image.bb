@@ -22,6 +22,13 @@ DEPENDS += "systemd-systemctl-native"
 rootfs_disable_ssh () {
         systemctl --root=$D mask sshd.socket
 }
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; "
 
-IMAGE_NAME_SUFFIX = ""
+rootfs_persistent_journal () {
+	ls -al ${IMAGE_ROOTFS}
+	sed -i 's/#Storage=auto/Storage=persistent/' $D/etc/systemd/journald.conf
+	sed -i 's/#SystemMaxUse=/SystemMaxUse=1G/' $D/etc/systemd/journald.conf
+}
+
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_persistent_journal ; "
+
+IMAGEE_NAME_SUFFIX = ""
