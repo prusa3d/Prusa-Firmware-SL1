@@ -1,3 +1,16 @@
+# Version v0.10.4-r1
+- Better SysInfo page
+- Repaired pages Error & FeedMe
+- Fixed confirm page swiping
+- New calendar color scheme
+- Cover check
+- autooff settings
+- wizard pictures
+- "close cover" text on start page
+- Wifi off by default
+- Extended timezone data
+- Fixed firewall, switch to nftables
+
 # Version v0.10.4-r0
 - Wizard
 - Screenshots
