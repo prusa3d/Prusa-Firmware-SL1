@@ -28,7 +28,7 @@ mount -t sysfs none /sys
 mount -t devtmpfs none /dev
 
 root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
-root_devnum=$(echo ${root_dev} | sed -e 's#^/dev/mmcblk\([02]\)p.$#\1#')
+root_devnum=$(echo ${root_dev} | sed -e 's#^/dev/mmcblk\([02]\)p.$#\1#' | sed 's"/dev/vda1"0"')
 
 if test ${root_devnum} -eq 0
 then
