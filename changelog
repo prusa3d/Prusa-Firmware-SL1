@@ -1,3 +1,16 @@
+# Version v0.10.4-r3
+- Fix LED, Temp & Fan names
+- Keyboard Prusa Style
+- Fix textFields positions when keyboard is pulled up
+- Fix reseting date to 30.3.2019
+- TurnOff -> Cancel
+- Added rear fan check
+- Fixed wizard
+- Fixed project file sorting
+- Fixed invalid project loading
+- Fixed layer progress in resin calibrate mode
+- Fixed feedme texts
+
 # Version v0.10.4-r2
 - Fixed date setting
 
