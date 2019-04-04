@@ -1,13 +1,11 @@
 # This file takes repo entries in the format
 # repo name,repo uri,repo branch,repo commit[,layers=layer1:layer2...:layern]
 
-#bitbake,git://git.openembedded.org/bitbake,master,5463c16e3619d324aed137f47f93f0997a227d29,layers=
-#bitbake,git://git.openembedded.org/bitbake,master,HEAD,layers=
 meta-prusa,ssh://git@gitlab.webdev.prusa3d.com:22443/hw/a64/meta-prusa.git,master,HEAD,layers=
-meta-sunxi,git://github.com/linux-sunxi/meta-sunxi.git,master,HEAD,layers=
-meta-qt5,git://github.com/meta-qt5/meta-qt5.git,master,HEAD,layers=
-meta-openembedded,git://git.openembedded.org/meta-openembedded,master,HEAD,layers=meta-networking:meta-python:meta-webserver:meta-oe
-meta-rauc,git://github.com/rauc/meta-rauc.git,master,HEAD,layers=
-oe-core,git://git.openembedded.org/openembedded-core,master,HEAD,layers=meta
+meta-sunxi,git://github.com/linux-sunxi/meta-sunxi.git,thud,HEAD,layers=
+meta-qt5,git://github.com/meta-qt5/meta-qt5.git,thud,HEAD,layers=
+meta-openembedded,git://git.openembedded.org/meta-openembedded,thud,HEAD,layers=meta-networking:meta-python:meta-webserver:meta-oe
+meta-rauc,git://github.com/rauc/meta-rauc.git,thud,HEAD,layers=
+oe-core,git://git.openembedded.org/openembedded-core,thud,HEAD,layers=meta
 OECORELAYERCONF=./sample-files/bblayers.conf.sample
 OECORELOCALCONF=./sample-files/local.conf.sample
