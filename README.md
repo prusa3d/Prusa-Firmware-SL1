@@ -7,6 +7,8 @@ cd oe
 
 ./oe-layertool-setup.sh
 
+git -C sources clone --single-branch --branch 1.40 git://git.openembedded.org/bitbake
+
 cd build
 
 source conf/setenv
