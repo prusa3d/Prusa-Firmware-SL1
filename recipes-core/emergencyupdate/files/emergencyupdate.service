@@ -1,0 +1,9 @@
+[Unit]
+Description=Emergency update service
+
+[Service]
+Environment=EMERGENCY_PATH=/run/media/root/**/sla-emergency-update.raucb
+ExecStart=/usr/bin/sh -c "while true; do sleep 5; if [ -f ${EMERGENCY_PATH} ]; then rauc install ${EMERGENCY_PATH} && systemctl reboot; fi; done"
+ 
+[Install]
+WantedBy=multi-user.target
