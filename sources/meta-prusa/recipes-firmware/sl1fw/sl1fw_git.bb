@@ -3,14 +3,14 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "f9c988a09ca987d409dab4f5254e2580cd3fd7e5"
+SRCREV_pn-${PN} = "7df46baac80eae04cac314aeec2e53d6dea717c9"
 
 PACKAGES = "${PN}"
 
-DEPENDS += "python gettext"
+DEPENDS += "python3 gettext"
 
 RDEPENDS_${PN} += " \
-	python \
+	python3 \
 	rsync \
 	bash \
 	nginx \
@@ -22,25 +22,25 @@ RDEPENDS_${PN} += " \
 	udev-usbmount \
 	web-config \
 	fbset \
-	python-websocket-server \
-	python-pygame \
-	python-pyserial \
-	python-pyroute2 \
-	python-numpy \
-	python-six \
-	python-jinja2 \
-	python-gpio \
-	python-lazy-import \
-	python-pydbus \
-	python-misc \
-	python-pygobject \
-	python-systemd \
-	python-bitstring \
-	python-logging \
-	python-future \
-	python-paho-mqtt \
-	python-toml \
-	python-pyalsaaudio \
+	python3-websocket-server \
+	python3-pygame \
+	python3-pyserial \
+	python3-pyroute2 \
+	python3-numpy \
+	python3-six \
+	python3-jinja2 \
+	python3-gpio \
+	python3-lazy-import \
+	python3-pydbus \
+	python3-misc \
+	python3-pygobject \
+	python3-systemd \
+	python3-bitstring \
+	python3-logging \
+	python3-future \
+	python3-paho-mqtt \
+	python3-toml \
+	python3-pyalsaaudio \
 "
 
 FILES_${PN} += "\
@@ -59,7 +59,7 @@ FILES_${PN} += "\
 S="${WORKDIR}/git/firmware"
 INTRANET=""
 
-inherit setuptools
+inherit setuptools3
 
 do_install_append () {
 	# Enable sl1fw
