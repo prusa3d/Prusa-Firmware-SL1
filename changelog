@@ -1,3 +1,28 @@
+# Version v0.10.5-r0
+- Persistent storage for Slic3r uploads
+- New look of FirmwareUpdate Page
+- Fixed button pictures on Control Page
+- Added icon on FeedMe Page
+- Removed white square after start
+- Added project deletion
+- Net update list downloaded from server
+- Fixed crash on settings change during print
+- Removed beeping during swipe
+- Tank reset changed to use release algorithm
+- Improved texts in wizard and calibration
+- Added fan check before print
+- Error reporting for missing USB drive when saving/importing settings
+- Fixed number of directory items in project selection
+- Fixed USB drive remove before failed homing
+- Fixed crash when deleting a project twice
+- Fix LED emergency stop
+- Added admin menu for saving logs to USB
+- Unified firmware and examples download code
+- Platform lifted on resin sensor failure
+- Motion controller firmware 389a
+- Fixed wizard to show only once per boot
+
+
 # Version v0.10.4-r3
 - Fix LED, Temp & Fan names
 - Keyboard Prusa Style
