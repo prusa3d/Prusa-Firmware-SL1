@@ -9,7 +9,7 @@ SRCREV_pn-${PN} = "aa3738bff0fae0a9dc3647eddd59b6409e257d0d"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-pydbus iw nftables"
+RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-pydbus iw nftables python-logging python-jinja2"
 
 S="${WORKDIR}/git"
 

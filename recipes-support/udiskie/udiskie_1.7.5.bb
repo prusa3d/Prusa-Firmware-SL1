@@ -3,7 +3,7 @@ SUMMARY = "Automounter for removable media"
 LICENSE = "MIT"
 
 DEPENDS = "asciidoc-native gettext-native"
-RDEPENDS_${PN} = "udisks2 python-pyyaml pyxdg python-pygobject python-docopt"
+RDEPENDS_${PN} = "udisks2 python-pyyaml pyxdg python-pygobject python-docopt python-logging"
 
 inherit setuptools systemd
 
