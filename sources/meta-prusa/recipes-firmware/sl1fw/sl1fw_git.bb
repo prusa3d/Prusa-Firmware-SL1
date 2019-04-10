@@ -2,13 +2,12 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 
 LICENSE = "CLOSED"
 
-SRC_URI = "git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "0b8c3cb1fa055ef2b382645e1d7359a0af046142"
+SRC_URI = "git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/SLA_fw.git;protocol=ssh;branch=py3_compatibility"
+SRCREV_pn-${PN} = "189fb9532a3f10b3bf85157bad89b303c61b9d38"
 
 PACKAGES = "${PN}"
 
-
-RDEPENDS_${PN} += "python rsync bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio avahi-daemon avahi-restarter python-lazy-import api-keygen udev-usbmount web-config avrdude python-pydbus python-misc python-pygobject python-systemd socat python-bitstring fbset python-logging python-future python-paho-mqtt python-toml python-pyalsaaudio"
+RDEPENDS_${PN} += "python3 rsync bash nginx python3-websocket-server python3-pygame python3-pyserial python3-pyroute2 python3-numpy python3-six python3-numpy python3-jinja2 python3-gpio avahi-daemon avahi-restarter python3-lazy-import api-keygen udev-usbmount web-config avrdude python3-pydbus python3-misc python3-pygobject python3-systemd socat python3-bitstring fbset python3-logging python3-future python3-paho-mqtt python3-toml python3-pyalsaaudio"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
@@ -25,7 +24,7 @@ FILES_${PN} += "\
 S="${WORKDIR}/git/firmware"
 INTRANET=""
 
-inherit setuptools
+inherit setuptools3
 
 do_install_append () {
 	# Enable sl1fw
