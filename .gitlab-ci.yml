@@ -1,0 +1,34 @@
+image: yocto-build
+
+stages:
+  - build
+#  - deploy
+
+build:
+  stage: build
+  script: 
+    - rm -rf /work/oe/sources/meta-prusa && ln -sf /builds/hw/a64/meta-prusa /work/oe/sources/meta-prusa
+    - cd /work/oe/build && source conf/setenv && bitbake sla-update-bundle sla-image-dev 
+    - mkdir -p /builds/hw/a64/meta-prusa/prusa64-sl1
+    - mv /work/oe/build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - mv /work/oe/build/tmp/deploy/images/prusa64-sl1/padded-u-boot-with-spl.bin /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - mv /work/oe/build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4 /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - mv /work/oe/build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - mv /work/oe/build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.bmap /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - cp /builds/hw/a64/meta-prusa/changelog /builds/hw/a64/meta-prusa/prusa64-sl1/changelog.txt
+    - xz -T0 --verbose /builds/hw/a64/meta-prusa/prusa64-sl1/*.wic
+    - chmod a+rw -R /builds/hw/a64/meta-prusa/prusa64-sl1/
+    - cp -av /builds/hw/a64/meta-prusa/prusa64-sl1 /deploy/$(git -C /builds/hw/a64/meta-prusa describe --dirty)
+
+#  artifacts:
+#    paths:
+#      - prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb
+#      - prusa64-sl1/padded-u-boot-with-spl.bin
+#      - prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4
+#      - prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.xz
+#      - prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.bmap
+
+#deploy:
+#  stage: build
+#  script: git describe --dirty && ls -l && ls -ld /deploy/ && cp -av /builds/hw/a64/meta-prusa/prusa64-sl1 /deploy/
+
