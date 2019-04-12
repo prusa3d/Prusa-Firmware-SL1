@@ -1,0 +1,21 @@
+[submodule "sources/meta-prusa"]
+	path = sources/meta-prusa
+	url = ../meta-prusa.git
+[submodule "sources/oe-core"]
+	path = sources/oe-core
+	url = git://git.openembedded.org/openembedded-core
+[submodule "sources/bitbake"]
+	path = sources/bitbake
+	url = git://git.openembedded.org/bitbake
+[submodule "sources/meta-openembedded"]
+	path = sources/meta-openembedded
+	url = git://git.openembedded.org/meta-openembedded
+[submodule "sources/meta-sunxi"]
+	path = sources/meta-sunxi
+	url = https://github.com/linux-sunxi/meta-sunxi.git
+[submodule "sources/meta-qt5"]
+	path = sources/meta-qt5
+	url = https://github.com/meta-qt5/meta-qt5.git
+[submodule "sources/meta-rauc"]
+	path = sources/meta-rauc
+	url = https://github.com/rauc/meta-rauc.git

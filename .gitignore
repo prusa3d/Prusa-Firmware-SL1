@@ -1,6 +1,5 @@
 build
 conf
-sources
 downloads
 bitbake.lock
 pseudodone
