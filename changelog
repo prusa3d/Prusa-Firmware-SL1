@@ -1,3 +1,8 @@
+# Version v0.10.5-r1
+- QT App Translation support
+- Confirm page swipe away fix
+- MC firmware 389b, fixes in wizard and calibration
+
 # Version v0.10.5-r0
 - Persistent storage for Slic3r uploads
 - New look of FirmwareUpdate Page
@@ -21,7 +26,6 @@
 - Platform lifted on resin sensor failure
 - Motion controller firmware 389a
 - Fixed wizard to show only once per boot
-
 
 # Version v0.10.4-r3
 - Fix LED, Temp & Fan names
