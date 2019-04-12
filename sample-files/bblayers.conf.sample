@@ -7,3 +7,16 @@ LCONF_VERSION = "5"
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/sources/meta-prusa \
+  ##OEROOT##/sources/meta-rauc \
+  ##OEROOT##/sources/meta-sunxi \
+  ##OEROOT##/sources/meta-qt5 \
+  ##OEROOT##/sources/meta-openembedded/meta-initramfs \
+  ##OEROOT##/sources/meta-openembedded/meta-oe \
+  ##OEROOT##/sources/meta-openembedded/meta-webserver \
+  ##OEROOT##/sources/meta-openembedded/meta-networking \
+  ##OEROOT##/sources/meta-openembedded/meta-python \
+  ##OEROOT##/sources/oe-core/meta \
+  "
