@@ -32,3 +32,5 @@ rootfs_persistent_journal () {
 ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_persistent_journal ; "
 
 IMAGEE_NAME_SUFFIX = ""
+
+IMAGE_FSTYPES = "etc root"
