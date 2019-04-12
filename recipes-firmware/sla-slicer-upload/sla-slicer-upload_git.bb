@@ -10,10 +10,10 @@ SRC_URI = "\
 "
 SRCREV = "4558b42907bd0dd7822a158e7be1063865227f30"
 
-inherit systemd setuptools
+inherit systemd setuptools3
 
-DEPENDS += "python python-setuptools"
-RDEPENDS_${PN} += "avahi-daemon avahi-restarter api-keygen python-json"
+DEPENDS += "python3 python3-setuptools"
+RDEPENDS_${PN} += "avahi-daemon avahi-restarter api-keygen python3-json"
 
 S="${WORKDIR}/git"
 
