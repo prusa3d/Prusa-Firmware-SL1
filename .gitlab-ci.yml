@@ -1,0 +1,29 @@
+image: yocto-build
+
+stages:
+  - build
+  - deploy
+
+variables:
+  GIT_SUBMODULE_STRATEGY: "normal"
+
+build:
+  stage: build
+  script: 
+    - cd /builds/hw/a64/oe
+    - source oe-init-build-env
+    - bitbake sla-update-bundle sla-image-dev
+    - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
+
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb
+      - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4
+      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.xz
+      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.bmap
+      - build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1.manifest
+      - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1.manifest
+      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.manifest
+
