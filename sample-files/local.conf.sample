@@ -2,17 +2,10 @@
 CONF_VERSION = "1"
 
 MACHINE = "prusa64-sl1"
-DL_DIR = "${OEBASE}/downloads"
-SSTATE_DIR = "${OEBASE}/build/sstate-cache"
-TMPDIR = "${OEBASE}/build/tmp"
 PATCHRESOLVE = "noop"
 
-#common buildserver variables
-DL_DIR = "/usr/share/oe-downloads"
-SSTATE_DIR = "/var/sstate-cache"
-
-BB_NUMBER_THREADS = "4"
-PARALLEL_MAKE = "-j 4"
+BB_NUMBER_THREADS ?= "4"
+PARALLEL_MAKE ?= "-j 4"
 DISTRO   = "prusa"
 
 TERMCMD = "${XTERM_TERMCMD}"
@@ -22,7 +15,7 @@ TERMCMDRUN = "${XTERM_TERMCMDRUN}"
 BB_GENERATE_MIRROR_TARBALLS = "0"
 
 # Enable local PR service for binary feeds
-PRSERV_HOST = "localhost:0"
+PRSERV_HOST ?= "localhost:0"
 
 # It is recommended to activate "buildhistory" for testing the PR service
 INHERIT += "buildhistory"
