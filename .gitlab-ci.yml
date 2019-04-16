@@ -26,4 +26,5 @@ build:
       - build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1.manifest
       - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1.manifest
       - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.manifest
+      - changelog.txt
 
