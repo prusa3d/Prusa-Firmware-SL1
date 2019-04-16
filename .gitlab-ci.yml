@@ -28,3 +28,16 @@ build:
       - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.manifest
       - changelog.txt
 
+deploy:
+  stage: deploy
+  when: manual
+  script:
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ./
+    - BASE=$(ls sla-update-bundle-prusa64-sl1-*.raucb | sed 's/sla-update-bundle-prusa64-sl1-\(v.*\)-[0-9]*.raucb/\1/')
+    - echo ${BASE}
+    - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
+    - mv changelog.txt ${BASE}.changelog.txt
+    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O deploy ${BASE}.raucb; put -O deploy ${BASE}.changelog.txt"
+
+  dependencies:
+    - build
