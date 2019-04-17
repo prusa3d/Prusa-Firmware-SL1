@@ -2,8 +2,11 @@
 Description=Emergency update service
 
 [Service]
-Environment=EMERGENCY_PATH=/run/media/root/**/sla-emergency-update.raucb
-ExecStart=/usr/bin/sh -c "while true; do sleep 5; if [ -f ${EMERGENCY_PATH} ]; then rauc install ${EMERGENCY_PATH} && systemctl reboot; fi; done"
+Type=oneshot
+Environment=EMERGENCY_PATTERN="/dev/.* /run/media/root/.*"
+Environment=EMERGENCY_FILE="/run/media/root/**/sla-emergency-update.raucb"
+ExecStart=/usr/bin/sh -c 'while ! cat /proc/mounts | grep -q "${EMERGENCY_PATTERN}" ; do sleep 5; done;'
+ExecStart=/usr/bin/sh -c 'if [ -f ${EMERGENCY_FILE} ]; then rauc install ${EMERGENCY_FILE} && systemctl reboot; fi;'
  
 [Install]
 WantedBy=multi-user.target
