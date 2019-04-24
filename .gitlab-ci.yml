@@ -7,6 +7,13 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: "normal"
 
+before_script:
+   - eval $(ssh-agent -s)
+   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+   - mkdir -p ~/.ssh
+   - chmod 700 ~/.ssh
+   - ssh-keyscan -p 22443 gitlab.webdev.prusa3d.com >> ~/.ssh/known_hosts
+
 build:
   stage: build
   script: 
