@@ -40,13 +40,16 @@ deploy:
   when: manual
   script:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ./
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ./
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.bmap ./
     - BASE=$(ls sla-update-bundle-prusa64-sl1-*.raucb | sed 's/sla-update-bundle-prusa64-sl1-\(v.*\)-[0-9]*.raucb/\1/')
     - echo ${BASE}
     - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
     - mv changelog.txt ${BASE}.changelog.txt
     - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.wic.xz
     - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.wic.bmap
-    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O deploy ${BASE}.raucb; put -O deploy ${BASE}.changelog.txt; put -O deploy ${BASE}.wic.xz; put -O deploy ${BASE}.wic.bmap"
+    - DEST=images/testing
+    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O ${DEST} ${BASE}.raucb; put -O ${DEST} ${BASE}.changelog.txt; put -O ${DEST} ${BASE}.wic.xz; put -O ${DEST} ${BASE}.wic.bmap"
 
   dependencies:
     - build
