@@ -1,3 +1,6 @@
+# Version v0.10.7-r1
+- Fix on fan&leds back button recover values from actual hwconfig
+
 # Version v0.10.7-r0
 - Language and formating fixes
 - New firmware download URLs
