@@ -15,7 +15,7 @@ before_script:
 build:
   stage: build
   script:
-    - mkdir /downloads/temp
+    - mkdir -p /downloads/temp
     - echo "DL_DIR = \"/downloads/temp/\"" >> /builds/hw/a64/oe/build/conf/auto.conf
     - cd /builds/hw/a64/oe
     - source oe-init-build-env
