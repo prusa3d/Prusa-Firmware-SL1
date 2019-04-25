@@ -1,3 +1,19 @@
+# Version v0.10.6-r0
+- Layer Height -> Thickness
+- ApiKey -> credentials fixes
+- Client code cleanup
+- Preset password for wifi
+- Translations support
+- New advanced settings page
+- Unboxing guide improved
+- Upload wizard data on MQTT broker
+- Motor sensitivity tuning
+- Updated network info page
+- Filtered MC logging
+- Partial /var fill mitigation
+- Fixed apikey refresh
+- Progress pages for network firmware download
+
 # Version v0.10.5-r1
 - QT App Translation support
 - Confirm page swipe away fix
