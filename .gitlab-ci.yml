@@ -14,7 +14,9 @@ before_script:
 
 build:
   stage: build
-  script: 
+  script:
+    - mkdir /downloads/temp
+    - echo "DL_DIR = \"/downloads/temp/\"" >> /builds/hw/a64/oe/build/conf/auto.conf
     - cd /builds/hw/a64/oe
     - source oe-init-build-env
     - bitbake sla-update-bundle sla-image-dev
