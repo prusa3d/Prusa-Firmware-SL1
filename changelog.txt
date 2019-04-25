@@ -1,3 +1,15 @@
+# Version v0.10.7-r0
+- Language and formating fixes
+- New firmware download URLs
+- Report serial and version while downloading firmware
+- Entering admin protected by we request
+- New admin behaviour (Off after factory reset, off on start)
+- New MC firmware
+- Fixed layer profile for successfull start print.
+- UV led counter and system/user EEPROM space.
+- Fans off by default
+- Wizard in advanced settings
+
 # Version v0.10.6-r0
 - Layer Height -> Thickness
 - ApiKey -> credentials fixes
