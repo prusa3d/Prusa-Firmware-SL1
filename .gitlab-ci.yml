@@ -8,11 +8,9 @@ variables:
   GIT_SUBMODULE_STRATEGY: "normal"
 
 before_script:
-   - eval $(ssh-agent -s)
-   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-   - mkdir -p ~/.ssh
-   - chmod 700 ~/.ssh
-   - ssh-keyscan -p 22443 gitlab.webdev.prusa3d.com >> ~/.ssh/known_hosts
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - cat ~/.ssh/known_hosts
 
 build:
   stage: build
@@ -44,7 +42,9 @@ deploy:
     - echo ${BASE}
     - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
     - mv changelog.txt ${BASE}.changelog.txt
-    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O deploy ${BASE}.raucb; put -O deploy ${BASE}.changelog.txt"
+    - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.wic.xz
+    - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.wic.bmap
+    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O deploy ${BASE}.raucb; put -O deploy ${BASE}.changelog.txt; put -O deploy ${BASE}.wic.xz; put -O deploy ${BASE}.wic.bmap"
 
   dependencies:
     - build
