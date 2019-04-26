@@ -1,3 +1,10 @@
+# Version v0.10.7-r3
+- Fix wizard button in advanced settings
+- Language fixes
+
+# Version v0.10.7-r2
+- CI build changes
+
 # Version v0.10.7-r1
 - Fix on fan&leds back button recover values from actual hwconfig
 
