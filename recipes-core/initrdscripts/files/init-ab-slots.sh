@@ -18,6 +18,7 @@ panic() {
 }
 
 enter_init() {
+	grep -w initramfs_shell /proc/cmdline > /dev/null 2>&1 && panic
 	umount /sys /dev /proc
 	exec switch_root /sysroot /lib/systemd/systemd
 }
@@ -28,9 +29,7 @@ mount -t sysfs none /sys
 mount -t devtmpfs none /dev
 
 root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
-root_devnum=$(echo ${root_dev} | sed -e 's#^/dev/mmcblk\([02]\)p.$#\1#')
-
-if test ${root_devnum} -eq 0
+if ! grep 'rauc\.slot=[AB]' /proc/cmdline > /dev/null 2>&1
 then
 	mount ${root_dev} /sysroot
 	enter_init
@@ -48,6 +47,7 @@ B)
 	;;
 esac
 part_var=/dev/mmcblk2p6
+part_factory=/dev/mmcblk2p7
 
 fsck.ext4 -pv $part_root
 fsck.ext4 -pv $part_etc
@@ -56,6 +56,15 @@ fsck.ext4 -pv $part_var
 if [ $? -eq 4 -o $? -eq 8 ]
 then
 	mkfs.ext4 -F $part_var
+fi
+
+if test ! -b $part_factory
+then
+	fsck.ext4 -pv $part_factory
+	if [ $? -eq 4 -o $? -eq 8 ]
+	then
+		mkfs.ext4 -F $part_factory
+	fi
 fi
 
 mount $part_root /sysroot
