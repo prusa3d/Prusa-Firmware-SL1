@@ -1,8 +1,0 @@
-program_options:
-        tray: false
-        automount: true
-        notify: false
-
-device_config:
-        - device_file: /dev/mmc*
-          ignore: true
