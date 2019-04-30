@@ -1,0 +1,11 @@
+[Unit]
+Description=Rauc Good-marking Service
+After=sl1fw.service sla-client.service
+Requires=sl1fw.service sla-client.service
+
+[Service]
+ExecStart=@BINDIR@/rauc status mark-good
+
+[Install]
+WantedBy=multi-user.target
+
