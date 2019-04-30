@@ -9,6 +9,7 @@ SRC_URI = " \
 	file://wpa_supplicant-wlan0.conf	\
 	file://sshd_config	\
 	file://base-feeds.conf \
+	file://usr-share-factory-defaults.mount \
 "
 
 CONFFILES = "							\
@@ -30,6 +31,9 @@ FILES_${PN} = "							\
 	${systemd_unitdir}/system-preset/20-etc.preset		\
 	${sysconfdir}/ssh/sshd_config	\
 	${sysconfdir}/opkg/base-feeds.conf \
+	${systemd_unitdir}/system/usr-share-factory-defaults.mount \
+	${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount \
+	/usr/share/factory/defaults \
 "
 
 do_install() {
@@ -48,6 +52,11 @@ do_install() {
 	install -m 644 ${WORKDIR}/sshd_config			${D}${sysconfdir}/ssh/
 	install -d ${D}${sysconfdir}/opkg
 	install -m 644 ${WORKDIR}/base-feeds.conf		${D}${sysconfdir}/opkg/
+	install -d ${D}${systemd_unitdir}/system
+	install -m 644 ${WORKDIR}/usr-share-factory-defaults.mount	${D}${systemd_unitdir}/system
+	install -d ${D}${systemd_unitdir}/system/local-fs.target.wants
+	ln -s ${systemd_unitdir}/system/usr-share-factory-defaults.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount
+	install -d ${D}/usr/share/factory/defaults
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"

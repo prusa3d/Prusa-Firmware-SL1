@@ -58,7 +58,7 @@ then
 	mkfs.ext4 -F $part_var
 fi
 
-if test ! -b $part_factory
+if test -b $part_factory
 then
 	fsck.ext4 -pv $part_factory
 	if [ $? -eq 4 -o $? -eq 8 ]
