@@ -21,20 +21,19 @@ automount_systemd() {
     mount_point="/run/media/root/${name}"
     [ -d ${mount_point} ] || mkdir -p ${mount_point}
 
-    MOUNT="$MOUNT -o ro"
+    case $ID_FS_TYPE in
+    vfat|fat)
+        # If filesystemtype is vfat, change the ownership group to 'disk', and
+        # grant it with  w/r/x permissions.
+        #MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' @sysconfdir@/group`"
+        # TODO
+        MOUNT="$MOUNT -o utf8"
+        ;;
+    *)
+        ;;
+    esac
 
-    # If filesystemtype is vfat, change the ownership group to 'disk', and
-    # grant it with  w/r/x permissions.
-    #case $ID_FS_TYPE in
-    #vfat|fat)
-    #    MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' @sysconfdir@/group`"
-    #    ;;
-    ## TODO
-    #*)
-    #    ;;
-    #esac
-
-    if ! $MOUNT --no-block -t auto $DEVNAME ${mount_point}
+    if ! $MOUNT --no-block -t auto --automount=yes --timeout-idle-sec=1s $DEVNAME ${mount_point}
     then
         rm_dir ${mount_point}
     else
