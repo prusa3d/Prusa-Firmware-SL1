@@ -1,3 +1,4 @@
+# Version v1.0.0-r0
 - Reworked error page
 - Page print and page print preview uses raw data
 - +/- buttons have fixed swpe protection
