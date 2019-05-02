@@ -1,3 +1,49 @@
+- Reworked error page
+- Page print and page print preview uses raw data
+- +/- buttons have fixed swpe protection
+- Fix flash mounted detection
+- Fixes for wizard and calibration
+- Redesigned ambient temperature sensor check
+- Unboxing guide, wizard and calibration can be skipped
+- New MC firmware (0.9.9-409)
+- Wizard check serial numbers
+- Changed error page UI
+- New admin controls (mute, stirring moves, stirring delay)
+- Improved tilt time average
+- Warm up before print start no longer supported
+- Support for setting first layer height
+- Print start checks(ambient temperature, fans, project data, resin)
+- Limited re-homing
+- Print checks(tilt position, stuck, cover open)
+- Improved and fixed page Feed Me
+- Fixed print UI (percentage, restartrt/cancel/end of print)
+- Exact time estimation (needs proper Slicer setup)
+- Slow and fast tilting times for Slicer in SysInfo page
+- Fans running only when needed
+- Holding power button for 3 secs invoke power off/cancel print dialog
+- Holding power button for 8 secs does hard power off
+- Fancheck, covercheck, fans check and UV LED check added where needed
+- Page callbacks
+- Tilt sync can be called nonblocking
+- Support for beeps in confirm page
+- Fix missed leave confirm in advanced settings page
+- Store led and fan defaults on factory partition
+- Add option to reset fans and leds to default
+- Project size included in backend data
+- Printer serial number in exported log filename
+- SysInfo - new look
+- Changing size of items to achieve subtle 3D effect
+- Reliable rolling of time and timezone
+- Calendar font fix
+- Removed "locale" from the space_key on the keyboard
+- Disabled AutoUppercase for all TextFields
+- Bigger QRCode on Videos and Manual page
+- NetInfo QRCode is centered again
+- New pictograms for wizard, motor sensitivity
+- New storage layout, factory partition
+- New USB mounting script
+- Improved good boot detection
+
 # Version v0.10.7-r3
 - Fix wizard button in advanced settings
 - Language fixes
