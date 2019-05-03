@@ -1,3 +1,11 @@
+# Version v1.0.0-r1
+- Fix crash on empty SN
+- Fix usb update
+- Updated texts in calibration
+- Fix stirring (do not verify positions when stirring but sync after every move)
+- Notify user when last boot failed
+- Correct YesNo labels
+
 # Version v1.0.0-r0
 - Reworked error page
 - Page print and page print preview uses raw data
