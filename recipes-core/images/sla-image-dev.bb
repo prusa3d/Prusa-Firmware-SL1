@@ -34,12 +34,27 @@ TOOLCHAIN_HOST_TASK_append = "\
 	nativesdk-qtdeclarative \
 "
 
+DEPENDS += "systemd-systemctl-native coreutils-native"
 
-DEPENDS += "systemd-systemctl-native"
+rootfs_set_api_key () {
+	user=maker
+	realm=prusa-sl1
+	key=developer
+	dir=$D${sysconfdir}/sl1fw
+
+	install -d ${dir}
+
+	echo ${key} > ${dir}/api.key
+	echo -n ${key} > ${dir}/slicer-upload-api.key
+
+	hash=$(echo -n "${user}:${realm}:${key}" | md5sum | sed 's/ -$//')
+	echo "${user}:${realm}:${hash}" > ${dir}/htdigest.passwd
+
+	systemctl --root=$D disable api-keygen.service
+}
 
 rootfs_enable_ssh () {
 	systemctl --root=$D enable sshd.socket
 }
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_enable_ssh ; "
 
-
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_set_api_key ; rootfs_enable_ssh ; "
