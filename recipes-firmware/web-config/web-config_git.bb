@@ -5,11 +5,11 @@ LICENSE = "CLOSED"
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "aa3738bff0fae0a9dc3647eddd59b6409e257d0d"
+SRCREV_pn-${PN} = "a36324294dcdb4ebb76a8ff03a4a203042b5383a"
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter cherrypy python-pydbus iw nftables python-logging python-jinja2"
+RDEPENDS_${PN} = "dnsmasq hostapd iptables avahi-daemon avahi-restarter python3-cherrypy python3-pydbus iw nftables python3-logging python3-jinja2"
 
 S="${WORKDIR}/git"
 
@@ -18,7 +18,7 @@ FILES_${PN} += "\
 	${sysconfdir}/nginx/sites-enabled/webconfig \
 "
 
-inherit setuptools systemd
+inherit setuptools3 systemd
 
 do_install_append () {
 	# Enable nginx site
