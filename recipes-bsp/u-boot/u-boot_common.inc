@@ -12,7 +12,7 @@ SRC_URI_append = " file://fw_env.config "
 
 DEFAULT_PREFERENCE_sun50i="1"
 
-PACKAGECONFIG[atf] = "ATF=${STAGING_DIR_HOST}/boot/bl31.bin,,arm-trusted-firmware"
+PACKAGECONFIG[atf] = "BL31=${STAGING_DIR_HOST}/boot/bl31.bin,,arm-trusted-firmware"
 PACKAGECONFIG_append_sun50i = " atf"
 
 S = "${WORKDIR}/git"
