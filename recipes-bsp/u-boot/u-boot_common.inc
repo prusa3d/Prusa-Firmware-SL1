@@ -4,7 +4,6 @@ inherit pythonnative
 require recipes-bsp/u-boot/u-boot.inc
 
 DEPENDS += " bc-native bison-native dtc-native flex-native swig-native "
-DEPENDS_append_sun50i = " atf-sunxi "
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=30503fd321432fc713238f582193b78e"
@@ -13,10 +12,13 @@ SRC_URI_append = " file://fw_env.config "
 
 DEFAULT_PREFERENCE_sun50i="1"
 
+PACKAGECONFIG[atf] = "BL31=${STAGING_DIR_HOST}/boot/bl31.bin,,arm-trusted-firmware"
+PACKAGECONFIG_append_sun50i = " atf"
+
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE += ' HOSTLDSHARED="${BUILD_CC} -shared ${BUILD_LDFLAGS} ${BUILD_CFLAGS}" '
-EXTRA_OEMAKE_append_sun50i = " BL31=${DEPLOY_DIR_IMAGE}/bl31.bin "
+EXTRA_OEMAKE += ' HOSTLDSHARED="${BUILD_CC} -shared ${BUILD_LDFLAGS} ${BUILD_CFLAGS}"'
+EXTRA_OEMAKE += " ${PACKAGECONFIG_CONFARGS}"
 
 SPL_BINARY = "spl/sunxi-spl.bin"
 
