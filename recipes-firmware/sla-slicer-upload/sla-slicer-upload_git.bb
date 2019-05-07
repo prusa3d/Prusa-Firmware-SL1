@@ -8,7 +8,7 @@ SRC_URI = "\
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
 "
-SRCREV = "6b000634a8d691efad242f77b25a30f5a0e275fd"
+SRCREV = "4558b42907bd0dd7822a158e7be1063865227f30"
 
 inherit systemd setuptools
 
