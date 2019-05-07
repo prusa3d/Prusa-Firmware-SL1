@@ -1,3 +1,7 @@
+- Less strict MC serial number check
+- Language fixes
+- Motion controller FW version 0.9.9-417
+- Slicer upload free size limit
 - Fixed debug web
 - Fix/cleanup tower profiles settings
 - More tolerant fan limits, averages in wizard
