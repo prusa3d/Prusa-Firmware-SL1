@@ -1,3 +1,21 @@
+- Fixed debug web
+- Fix/cleanup tower profiles settings
+- More tolerant fan limits, averages in wizard
+- Fix confirm lockup in factory reset
+- Fix display test use yes/no page layout
+- Fix UI being acessible after ended/canceled print
+- Add warning for resin sensor and cover check to advaced settings
+- Wizard texts updated, added images to unboxing wizard
+- Motion controller FW bump to 0.9.9-409-rc0
+- Continuous checks the A64 temperature. Starts fans or shutdown if needed.
+- Extended factory reset (wifi, hostname, apikey, timezone, config)
+- Fix time constant estimation for tower move
+- Show tilt time results on calibration end
+- YesNo <-- Confirm
+- Shuffled rows on SysInfo Page
+- Wificonfig uses python3 and suopports unicode ssids
+- New arm trusted firmware
+
 # Version v1.0.0-r1
 - Fix crash on empty SN
 - Fix usb update
