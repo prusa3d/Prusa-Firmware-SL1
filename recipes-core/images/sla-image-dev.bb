@@ -47,7 +47,7 @@ rootfs_set_api_key () {
 	echo ${key} > ${dir}/api.key
 	echo -n ${key} > ${dir}/slicer-upload-api.key
 
-	hash=$(echo -n "${user}:${realm}:${key}" | md5sum | sed 's/ -$//')
+	hash=$(echo -n "${user}:${realm}:${key}" | md5sum | sed 's/  -$//')
 	echo "${user}:${realm}:${hash}" > ${dir}/htdigest.passwd
 
 	systemctl --root=$D disable api-keygen.service
