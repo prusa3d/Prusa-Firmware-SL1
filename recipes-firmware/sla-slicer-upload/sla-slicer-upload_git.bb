@@ -7,6 +7,7 @@ SRC_URI = "\
 	file://sla-slicer-upload-restarter.path \
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
+	file://py3.patch \
 "
 SRCREV = "4558b42907bd0dd7822a158e7be1063865227f30"
 
