@@ -1,3 +1,4 @@
+# Version 1.0.2
 - Fixed wizard step 4 cancel message display
 - Fixed wizard back in steps 4 and 5
 - Less strict MC serial number check
