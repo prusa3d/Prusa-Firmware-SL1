@@ -42,7 +42,7 @@ deploy:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ./
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ./
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.bmap ./
-    - BASE=$(ls sla-update-bundle-prusa64-sl1-*.raucb | sed 's/sla-update-bundle-prusa64-sl1-\(v.*\)-[0-9]*.raucb/\1/')
+    - BASE=$(ls sla-update-bundle-prusa64-sl1-*.raucb | sed 's/sla-update-bundle-prusa64-sl1-\(.*\)-[0-9]*.raucb/\1/')
     - echo ${BASE}
     - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
     - mv changelog.txt ${BASE}.changelog.txt
