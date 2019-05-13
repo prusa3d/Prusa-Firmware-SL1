@@ -1,6 +1,3 @@
-[submodule "sources/meta-prusa"]
-	path = sources/meta-prusa
-	url = ../meta-prusa.git
 [submodule "sources/oe-core"]
 	path = sources/oe-core
 	url = git://git.openembedded.org/openembedded-core

@@ -15,9 +15,7 @@ before_script:
 build:
   stage: build
   script:
-    - mkdir -p /downloads/temp
-    - echo "DL_DIR = \"/downloads/temp/\"" >> /builds/hw/a64/oe/build/conf/auto.conf
-    - cd /builds/hw/a64/oe
+    - cat build/conf/auto.conf
     - source oe-init-build-env
     - bitbake sla-update-bundle sla-image-dev
     - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
@@ -48,8 +46,15 @@ deploy:
     - mv changelog.txt ${BASE}.changelog.txt
     - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.wic.xz
     - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.wic.bmap
-    - DEST=images/testing
-    - lftp -c "set ssl:verify-certificate 06:02:1F:B9:B1:FD:7E:6E:B6:39:97:69:EF:A2:02:46:D0:19:BB:88; open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST}; put -O ${DEST} ${BASE}.raucb; put -O ${DEST} ${BASE}.changelog.txt; put -O ${DEST} ${BASE}.wic.xz; put -O ${DEST} ${BASE}.wic.bmap"
+    - >
+        lftp -c "
+        set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
+        open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
+        put -O ${DEST} ${BASE}.raucb;
+        put -O ${DEST} ${BASE}.changelog.txt;
+        put -O ${DEST} ${BASE}.wic.xz;
+        put -O ${DEST} ${BASE}.wic.bmap;
+        "
 
   dependencies:
     - build
