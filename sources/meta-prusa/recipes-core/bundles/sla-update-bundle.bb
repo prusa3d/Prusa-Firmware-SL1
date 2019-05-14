@@ -24,6 +24,7 @@ RAUC_KEY_FILE = "${THISDIR}/../../files/ca.key.pem"
 RAUC_CERT_FILE = "${THISDIR}/../../files/ca.cert.pem"
 
 do_unpack[depends] += "u-boot:do_deploy"
+do_bundle[depends] += "u-boot:do_deploy"
 
 compose_uboot() {
 	UBOOT_FILE=${DEPLOY_DIR_IMAGE}/${UBOOT_WITH_SPL}
@@ -32,3 +33,7 @@ compose_uboot() {
 }
 
 do_unpack[prefuncs] += "compose_uboot"
+
+do_bundle_prepend() {
+	install -m 644 ${DEPLOY_DIR_IMAGE}/setenv.scr ${BUNDLE_DIR}/
+}

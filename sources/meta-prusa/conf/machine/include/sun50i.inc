@@ -9,7 +9,7 @@ KERNEL_IMAGETYPE ?= "Image"
 UBOOT_BINARY ?= "u-boot.itb"
 SPL_BINARY ?= "sunxi-spl.bin"
 
-PREFERRED_VERSION_u-boot = "v2019.01%"
+PREFERRED_VERSION_u-boot = "v2019.04%"
 PREFERRED_VERSION_linux-mainline = "v4.18%"
 
 PREFERRED_PROVIDER_virtual/libgles1 = "mali-blobs"
@@ -30,3 +30,4 @@ INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"
 
 IMAGE_CLASSES += "prusa-image"
+IMAGE_FSTYPES += "etc root"
