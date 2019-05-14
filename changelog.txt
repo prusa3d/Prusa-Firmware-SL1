@@ -1,3 +1,11 @@
+# Version 1.0.5
+- Increased factory mount timeout
+- Disabled serial port
+- Bootstrap build target
+
+# Version 1.0.4
+- Fixed wifi driver
+
 # Version 1.0.3
 - Changed minimal current for UV led in wizard
 - Changed UV led fan pwm
