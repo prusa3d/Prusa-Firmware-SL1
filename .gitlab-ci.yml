@@ -14,6 +14,12 @@ before_script:
 
 build:
   stage: build
+
+  only: 
+    - tags
+    - merge_requests
+    - web
+
   script:
     - cat build/conf/auto.conf
     - source oe-init-build-env
@@ -36,6 +42,12 @@ build:
 deploy:
   stage: deploy
   when: manual
+
+  only:
+    - tags
+    - merge_requests
+    - web
+
   script:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ./
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ./
