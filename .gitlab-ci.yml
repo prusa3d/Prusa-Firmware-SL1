@@ -2,6 +2,7 @@ image: prusa/oe
 
 stages:
   - build
+  - bootstrap
   - deploy
 
 variables:
@@ -39,9 +40,36 @@ build:
       - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.manifest
       - changelog.txt
 
+bootstrap:
+  stage: bootstrap
+  when: manual
+
+  dependencies: []    
+
+  only:
+    - tags
+    - merge_requests
+    - web
+
+  script:
+    - cat build/conf/auto.conf
+    - source oe-init-build-env
+    - bitbake sla-bootstrap
+    - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
+
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz
+      - build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap
+
 deploy:
   stage: deploy
   when: manual
+  
+  dependencies:
+    - build
 
   only:
     - tags
@@ -56,17 +84,14 @@ deploy:
     - echo ${BASE}
     - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
     - mv changelog.txt ${BASE}.changelog.txt
-    - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.wic.xz
-    - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.wic.bmap
+    - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.devsd.xz
+    - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.devsd.bmap
     - >
         lftp -c "
         set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
         put -O ${DEST} ${BASE}.raucb;
         put -O ${DEST} ${BASE}.changelog.txt;
-        put -O ${DEST} ${BASE}.wic.xz;
-        put -O ${DEST} ${BASE}.wic.bmap;
+        put -O ${DEST} ${BASE}.devsd.xz;
+        put -O ${DEST} ${BASE}.devsd.bmap;
         "
-
-  dependencies:
-    - build
