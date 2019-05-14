@@ -55,7 +55,7 @@ fsck.ext4 -pv $part_etc
 fsck.ext4 -pv $part_var
 if [ $? -eq 4 -o $? -eq 8 ]
 then
-	mkfs.ext4 -F $part_var
+	mkfs.ext4 -F $part_var -E lazy_itable_init=0
 fi
 
 if test -b $part_factory
@@ -63,7 +63,7 @@ then
 	fsck.ext4 -pv $part_factory
 	if [ $? -eq 4 -o $? -eq 8 ]
 	then
-		mkfs.ext4 -F $part_factory
+		mkfs.ext4 -F $part_factory -E lazy_itable_init=0
 	fi
 fi
 
