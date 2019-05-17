@@ -2,7 +2,11 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 
 LICENSE = "CLOSED"
 
-SRC_URI = "git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master"
+SRC_URI = " \
+	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master \
+	file://projects-tmpfiles.conf \
+	file://sl1fw.conf \
+"
 SRCREV_pn-${PN} = "83264ccaea456b9ae04f53f04fec6d72cca494c2"
 
 PACKAGES = "${PN}-dev ${PN}"
@@ -52,12 +56,14 @@ FILES_${PN} += "\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
 	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
+	${libdir}/tmpfiles.d/projects-tmpfiles.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
 	/usr/bin/main.py\
 	/srv/http/intranet\
 	/usr/share/scripts\
 	/usr/share/factory/defaults\
 	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.printer0.conf\
+	/usr/lib/sysusers.d/sl1fw.conf\
 "
 FILES_${PN}_remove = "${sysconfdir}/sl1fw/loggerConfig.json"
 FILES_${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
@@ -75,4 +81,13 @@ do_install_append () {
 	# Enable nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
 	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
+
+	# Install projects tmpfiles
+	install -d ${D}${libdir}/tmpfiles.d
+	install --mode 644 ${WORKDIR}/projects-tmpfiles.conf ${D}${libdir}/tmpfiles.d/projects.conf
+
+	# Install projects group
+	install -d ${D}${libdir}/sysusers.d/
+	install --mode 644 ${WORKDIR}/sl1fw.conf ${D}${libdir}/sysusers.d/sl1fw.conf
 }
+
