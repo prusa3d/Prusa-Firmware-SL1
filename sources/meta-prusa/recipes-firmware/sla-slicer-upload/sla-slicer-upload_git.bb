@@ -4,6 +4,7 @@ SRC_URI = "\
 	file://sla-slicer-upload.service \
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
+	file://slicer-upload.conf \
 "
 LIC_FILES_CHKSUM = "\
         file://LICENSE;md5=5b4473596678d62d9d83096273422c8c \
@@ -12,7 +13,8 @@ LIC_FILES_CHKSUM = "\
 SRCREV = "33fd23abaa2e782d778a06370c4d2da0c3e403cf"
 inherit systemd setuptools3
 
-RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen python3-pydbus"
+DEPENDS += "sl1fw"
+RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen sl1fw python3-pydbus"
 
 S="${WORKDIR}/git"
 
@@ -33,6 +35,10 @@ do_install_append () {
 	# Enable services
 	install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
 	ln -s ${systemd_system_unitdir}/sla-slicer-upload.service ${D}${systemd_system_unitdir}/multi-user.target.wants/
+
+	# Install projects group
+	install -d ${D}${libdir}/sysusers.d/
+	install --mode 644 ${WORKDIR}/slicer-upload.conf ${D}${libdir}/sysusers.d/slicer-upload.conf
 
 	# Remove ununsed dir
 	rmdir ${D}/usr/share

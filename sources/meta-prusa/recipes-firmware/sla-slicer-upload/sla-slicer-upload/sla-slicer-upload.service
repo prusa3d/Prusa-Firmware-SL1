@@ -1,11 +1,15 @@
 [Unit]
 Description=Octoprint-like file upload service (for uploading files from slic3r)
-After=sl1fw.service api-keygen.service
+After=sl1fw.service api-keygen.service systemd-tmpfiles-setup.service
 Wants=api-keygen.service
 
 [Service]
-WorkingDirectory=/var/run/sl1fw
+ProtectSystem=strict
+WorkingDirectory=/var/sl1fw/projects
+ReadWritePaths=/var/sl1fw/projects
 ExecStart=/usr/bin/octo-uploadd.py
+User=slicerupload
+Group=slicerupload
 Restart=on-failure
 RestartSec=3
 
