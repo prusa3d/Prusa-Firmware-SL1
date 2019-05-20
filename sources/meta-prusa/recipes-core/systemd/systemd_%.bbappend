@@ -10,6 +10,7 @@ SRC_URI_append = "\
 "
 
 PACKAGECONFIG_append = " microhttpd"
+PACKAGECONFIG_remove = "networkd"
 
 RDEPENDS_${PN}_remove = "volatile-binds"
 
