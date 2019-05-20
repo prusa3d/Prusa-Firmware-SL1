@@ -34,8 +34,8 @@ slot-post-install)
 		# Now default is set in /usr/lib/systemd/journald.conf.d/max_use.conf
 		sed -i 's/SystemMaxUse=.*/#SystemMaxUse=/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
 
-		grep 'RouteMetric=10' ${RAUC_MOUNT_PREFIX}/etc/systemd/network/20-eth.network || echo -e '[DHCP]\nRouteMetric=10\n' >> ${RAUC_MOUNT_PREFIX}/etc/systemd/network/20-eth.network
-		grep 'RouteMetric-20' ${RAUC_MOUNT_PREFIX}/etc/systemd/network/10-wlan.network || echo -e '[DHCP]\nRouteMetric=20\n' >> ${RAUC_MOUNT_PREFIX}/etc/systemd/network/10-wlan.network
+		# Now we use NetworkManager, do not start networkd
+		systemdctl --root ${RAUC_MOUNT_PREFIX} disable systemd-networkd
 
 		umount ${etc_dev}
 
