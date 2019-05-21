@@ -8,5 +8,5 @@ inherit packagegroup
 
 RDEPENDS_packagegroup-prusa-devel = "\
     cscope ctags cmake gcc quilt m4 meson git binutils ninja \
-    gdb patch patchelf elfutils diffutils \
+    gdb patch patchelf elfutils diffutils e2fsprogs-resize2fs \
     evtest parted vim python-pip zsh alsa-utils"
