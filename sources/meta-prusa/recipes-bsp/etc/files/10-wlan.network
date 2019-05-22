@@ -6,3 +6,6 @@ RequiredForOnline=no
 
 [Network]
 DHCP=yes
+
+[DHCP]
+RouteMetric=20
