@@ -3,7 +3,7 @@ Description=Mount factory partition
 DefaultDependencies=yes
 
 [Mount]
-What=/dev/disk/by-partlabel/factory
+What=PARTLABEL=factory
 Where=/usr/share/factory/defaults
 Type=ext4
 Options=ro

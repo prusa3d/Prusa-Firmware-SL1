@@ -10,7 +10,6 @@ SRC_URI = " \
 	file://sshd_config	\
 	file://base-feeds.conf \
 	file://usr-share-factory-defaults.mount \
-	file://50-device-timeout.conf \
 "
 
 CONFFILES = "							\
@@ -34,7 +33,6 @@ FILES_${PN} = "							\
 	${sysconfdir}/opkg/base-feeds.conf \
 	${systemd_unitdir}/system/usr-share-factory-defaults.mount \
 	${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount \
-	${systemd_unitdir}/system/dev-disk-by\x2dpartlabel-factory.device.d/50-device-timeout.conf \
 	/usr/share/factory/defaults \
 "
 
@@ -59,8 +57,6 @@ do_install() {
 	install -d ${D}${systemd_unitdir}/system/local-fs.target.wants
 	ln -s ${systemd_unitdir}/system/usr-share-factory-defaults.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount
 	install -d ${D}/usr/share/factory/defaults
-	install -d ${D}${systemd_unitdir}/system/dev-disk-by\\x2dpartlabel-factory.device.d
-	install -m 644 ${WORKDIR}/50-device-timeout.conf ${D}${systemd_unitdir}/system/dev-disk-by\\x2dpartlabel-factory.device.d/50-device-timeout.conf
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
