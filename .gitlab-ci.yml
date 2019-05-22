@@ -11,6 +11,8 @@ before_script:
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - cat ~/.ssh/known_hosts
+  - sed -i -e '/BB_NUMBER_THREADS/d' -e '/PARALLEL_MAKE/d' -e '/SSTATE_DIR/d' -e '/PRSERV_HOST/d' build/conf/auto.conf
+  - echo 'SSTATE_DIR = "/sstate-cache/noprserv"' >> build/conf/auto.conf
 
 build:
   stage: build
@@ -51,7 +53,6 @@ bootstrap:
     - web
 
   script:
-    - cat build/conf/auto.conf
     - source oe-init-build-env
     - bitbake sla-bootstrap
     - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic

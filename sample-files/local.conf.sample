@@ -1,23 +1,14 @@
 # CONF_VERSION is increased each time build/conf/ changes incompatibly
 CONF_VERSION = "1"
 
+DISTRO   = "prusa"
 MACHINE = "prusa64-sl1"
 PATCHRESOLVE = "noop"
 
-BB_NUMBER_THREADS ?= "4"
-PARALLEL_MAKE ?= "-j 4"
-DISTRO   = "prusa"
-
-TERMCMD = "${XTERM_TERMCMD}"
-TERMCMDRUN = "${XTERM_TERMCMDRUN}"
+BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()} -l ${@oe.utils.cpu_count() - 1}"
 
 # Don't generate the mirror tarball for SCM repos, the snapshot is enough
 BB_GENERATE_MIRROR_TARBALLS = "0"
 
-# Enable local PR service for binary feeds
-PRSERV_HOST ?= "localhost:0"
-
-# It is recommended to activate "buildhistory" for testing the PR service
-INHERIT += "buildhistory"
 INHERIT += "rm_work"
-BUILDHISTORY_COMMIT = "1"
