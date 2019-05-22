@@ -34,6 +34,9 @@ slot-post-install)
 		sed -i 's/#Storage=auto/Storage=persistent/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
 		sed -i 's/#SystemMaxUse=/SystemMaxUse=1G/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
 
+		grep 'RouteMetric=10' ${RAUC_MOUNT_PREFIX}/etc/systemd/network/20-eth.network || echo -e '[DHCP]\nRouteMetric=10\n' >> ${RAUC_MOUNT_PREFIX}/etc/systemd/network/20-eth.network
+		grep 'RouteMetric-20' ${RAUC_MOUNT_PREFIX}/etc/systemd/network/10-wlan.network || echo -e '[DHCP]\nRouteMetric=20\n' >> ${RAUC_MOUNT_PREFIX}/etc/systemd/network/10-wlan.network
+
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var
