@@ -1,5 +1,6 @@
 ETC_PART_SIZE_MB ?= "16"
 ROOTFS_PART_SIZE_MB ?= "768"
+FACTORY_PART_SIZE_MB ?= "64"
 
 python do_prepare_mountpoints() {
     import logging
@@ -17,7 +18,7 @@ python do_prepare_mountpoints() {
         shutil.rmtree(os.path.join(new_rootfs))
 
     copyhardlinktree(rootfs_dir, new_rootfs)
-    mountpoints = ['etc', 'var']
+    mountpoints = ['etc', 'var', 'usr/share/factory/defaults']
     for m in mountpoints:
         full_path = os.path.realpath(os.path.join(new_rootfs, m))
         for entry in os.listdir(full_path):
@@ -51,11 +52,20 @@ IMAGE_CMD_etc() {
 	ln -sfn "${IMAGE_NAME}.etc.ext4" "${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.etc.ext4"
 }
 
+IMAGE_CMD_factory() {
+	dd if=/dev/zero of="${WORKDIR}/factory.ext4" count=0 bs=1M seek=${FACTORY_PART_SIZE_MB}
+	mkfs.ext4 -F "${WORKDIR}/factory.ext4" -d "${IMAGE_ROOTFS}/usr/share/factory/defaults" -L factory
+	install -m 0644 "${WORKDIR}/factory.ext4" "${IMGDEPLOYDIR}/${IMAGE_NAME}.factory.ext4"
+	ln -sfn "${IMAGE_NAME}.factory.ext4" "${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.factory.ext4"
+}
+
 
 addtask do_prepare_mountpoints after do_image before do_image_root
 
 do_image_root[depends] += "e2fsprogs-native:do_populate_sysroot"
 do_image_etc[depends] += "e2fsprogs-native:do_populate_sysroot"
+do_image_factory[depends] += "e2fsprogs-native:do_populate_sysroot"
 
 do_image_root[respect_exclude_path] = "0"
 do_image_etc[respect_exclude_path] = "0"
+do_image_factory[respect_exclude_path] = "0"

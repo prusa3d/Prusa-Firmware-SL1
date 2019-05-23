@@ -19,6 +19,7 @@ var_blkoffset=0x342000
 rootimg_buf_offset=0x50000000
 bootimg_buf_offset=0x4ff00000
 etcimg_buf_offset=0x4ef00000
+factoryimg_buf_offset=0x4af00000
 #
 uuid_gpt_system=b921b045-1df0-41c3-af44-4c6f280d3fae
 uuid_gpt_other=0fc63daf-8483-4772-8e79-3d69d8477de4
@@ -29,6 +30,7 @@ setenv partitions "name=environment,start=512K,size=512K,type=${uuid_gpt_environ
 setenv load_bootimg 'echo "load_bootimg"; fatload mmc ${mmc_partition} ${bootimg_buf_offset} boot.img'
 setenv load_rootimg 'echo "load_rootimg"; fatload mmc ${mmc_partition} ${rootimg_buf_offset} root.img'
 setenv load_etcimg 'echo "load_etcimg"; fatload mmc ${mmc_partition} ${etcimg_buf_offset} etc.img'
+setenv load_factoryimg 'echo "load_factoryimg"; fatload mmc ${mmc_partition} ${factoryimg_buf_offset} factory.img'
 setenv write_default_gpt 'echo "write_default_gpt"; gpt write mmc 1 $partitions'
 setenv erase_environment 'echo "erase_environment"; mmc dev 1 0; mmc erase ${env_blkoffset} ${env_blkcount}'
 setenv write_boot0 'echo "write_boot0"; mmc dev 1 1; mmc write ${bootimg_buf_offset} 0 ${bootimg_blkcount}'
@@ -38,6 +40,7 @@ setenv write_rootfs1 'echo "write_rootfs1"; mmc dev 1 0; mmc write ${rootimg_buf
 
 setenv write_etcfs0 'echo "write_etcfs0"; mmc dev 1 0; mmc write ${etcimg_buf_offset} ${etcfs0_blkoffset} ${etcimg_blkcount}'
 setenv write_etcfs1 'echo "write_etcfs1"; mmc dev 1 0; mmc write ${etcimg_buf_offset} ${etcfs1_blkoffset} ${etcimg_blkcount}'
+setenv write_factory 'echo "write_factory"; mmc dev 1 0; mmc write ${factoryimg_buf_offset} ${factory_blkoffset} ${factory_blkcount}'
 
 setenv erase_var 'echo "erase var"; mmc dev 1 0; mmc erase ${var_blkoffset} ${var_blkcount}'
 setenv erase_all 'echo "chip erase"; mmc dev 1; mmc erase 0 ${chip_blkcount}'
@@ -49,6 +52,7 @@ echo "START"
 run load_bootimg 
 run load_etcimg
 run load_rootimg
+run load_factoryimg
 gpio set PE17
 run erase_all
 run write_default_gpt 
@@ -57,6 +61,7 @@ run write_boot0
 run write_boot1
 run write_etcfs0
 run write_etcfs1
+run write_factory
 run write_rootfs0
 run write_rootfs1
 run setup_bootbus

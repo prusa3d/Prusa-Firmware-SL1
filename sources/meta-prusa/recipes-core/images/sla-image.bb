@@ -37,4 +37,4 @@ ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_disable_serial ; root
 
 IMAGEE_NAME_SUFFIX = ""
 
-IMAGE_FSTYPES = "etc root"
+IMAGE_FSTYPES = "factory etc root"

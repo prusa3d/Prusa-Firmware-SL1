@@ -29,6 +29,7 @@ do_rootfs() {
 
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.root.ext4 ${IMAGE_ROOTFS}/root.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.etc.ext4 ${IMAGE_ROOTFS}/etc.img
+	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.factory.ext4 ${IMAGE_ROOTFS}/factory.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/uboot.env ${IMAGE_ROOTFS}/uboot.env
 
 	mkimage -C none -A arm -T script -d ${UBOOT_ENV} ${IMAGE_ROOTFS}/boot.scr;
