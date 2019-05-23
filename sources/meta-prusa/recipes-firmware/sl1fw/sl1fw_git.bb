@@ -20,6 +20,7 @@ FILES_${PN} += "\
 	/usr/bin/main.py\
 	/srv/http/intranet\
 	/usr/share/scripts\
+	/usr/share/factory/defaults\
 "
 
 S="${WORKDIR}/git/firmware"

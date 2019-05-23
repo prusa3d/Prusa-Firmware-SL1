@@ -30,4 +30,4 @@ INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"
 
 IMAGE_CLASSES += "prusa-image"
-IMAGE_FSTYPES += "etc root"
+IMAGE_FSTYPES += "etc factory root"
