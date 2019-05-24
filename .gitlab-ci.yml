@@ -11,6 +11,7 @@ before_script:
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - cat ~/.ssh/known_hosts
+  - mkdir -p build/conf && touch build/conf/auto.conf
   - sed -i -e '/BB_NUMBER_THREADS/d' -e '/PARALLEL_MAKE/d' -e '/SSTATE_DIR/d' -e '/PRSERV_HOST/d' build/conf/auto.conf
   - echo 'SSTATE_DIR = "/sstate-cache/noprserv"' >> build/conf/auto.conf
 
