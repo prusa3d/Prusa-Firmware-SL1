@@ -1,3 +1,5 @@
+- Fixed hard crash on invalid hostnmae
+
 # Version 1.0.5
 - Increased factory mount timeout
 - Disabled serial port
