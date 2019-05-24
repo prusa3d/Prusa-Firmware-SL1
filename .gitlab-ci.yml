@@ -2,7 +2,6 @@ image: prusa/oe
 
 stages:
   - build
-  - bootstrap
   - deploy
 
 variables:
@@ -41,7 +40,7 @@ build:
       - changelog.txt
 
 bootstrap:
-  stage: bootstrap
+  stage: build
   when: manual
 
   dependencies: []    
