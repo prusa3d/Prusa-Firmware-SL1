@@ -1,4 +1,11 @@
-- Fixed hard crash on invalid hostnmae
+- Fixed web preview load on start
+- Fixed web ui time formatting
+- Fixed missing values on  print web
+- Default tower offset +0.05 mm
+- Resin senzor check less strict limits
+- Added error injection to admin menu
+- Better exception page, poweroff using button
+- Fixed hard crash on invalid hostname
 
 # Version 1.0.5
 - Increased factory mount timeout
