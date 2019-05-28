@@ -1,3 +1,6 @@
+- Hostname restricted to [a-zA-Z0-9-_]+ in the UI
+- Fixed wrong carry in calculating the end of print time
+- Fixed variable picture on the PicturePage
 - Fixed web preview load on start
 - Fixed web ui time formatting
 - Fixed missing values on  print web
