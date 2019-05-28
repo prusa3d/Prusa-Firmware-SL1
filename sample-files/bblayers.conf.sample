@@ -11,7 +11,6 @@ BBFILES ?= ""
 BBLAYERS ?= " \
   ##OEROOT##/sources/meta-prusa \
   ##OEROOT##/sources/meta-rauc \
-  ##OEROOT##/sources/meta-sunxi \
   ##OEROOT##/sources/meta-qt5 \
   ##OEROOT##/sources/meta-openembedded/meta-initramfs \
   ##OEROOT##/sources/meta-openembedded/meta-oe \
