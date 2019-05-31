@@ -1,3 +1,22 @@
+- Differentiate factory reset for factor mode and normal mode
+- Factory mode inidcator
+- New MC software
+- Fixed infinite test
+- Updated photos and texts for calibration
+- Fixed web UI ??? values
+- Fix web UI live preview load
+- Default tower offset +0.05 mm
+- Resin sensor check less strict limits
+- Error injection in admin menu
+- Improved hard error page
+- Display soft error page on hostname change error
+- Automatic UV LED current calibration with uvledmeter
+- Check content length when downloading
+- Code cleanup, partial Python 3 compatibility
+- Fix flse positive changed detection in advanced settings
+- Unitests in tests package
+- Fixed crash on failed examples download
+- Warn user whan there are no factory defaults
 - UV LED Power Counter & UV LED Time Counter
 - Stop user from setting invalid hostname, restrict to [a-zA-Z0-9-_]+
 - Fixed wrong carry in calculating the end of print time
