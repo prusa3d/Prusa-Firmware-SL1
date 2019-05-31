@@ -1,3 +1,8 @@
+- UV LED Power Counter & UV LED Time Counter
+- Stop user from setting invalid hostname, restrict to [a-zA-Z0-9-_]+
+- Fixed wrong carry in calculating the end of print time
+- Fixed variable picture on the PicturePage
+
 # Version 1.0.5
 - Increased factory mount timeout
 - Disabled serial port
