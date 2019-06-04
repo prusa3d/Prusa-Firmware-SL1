@@ -1,28 +1,29 @@
-- Collect 'generic' data right before send + check calibration is done +
-success confirm in Factory mode wizard
+- MQTT: collect 'generic' data right before send
+- MQTT: check calibration is done
+- MQTT: success confirm in Factory mode wizard
 - Test the black display throughput at the end of UV calibration 
-- Do not ask 'show calibration data?' as the end of UV Calibration
-- Differentiate factory reset for factor mode and normal mode
-- Factory mode inidcator
+- Do not ask whenever to show calibration data at the end of UV Calibration process
+- Differentiated factory reset for factor mode and normal mode
+- Factory mode indication
 - New MC software
-- Fixed infinite test
+- Fixed the infinite test
 - Updated photos and texts for calibration
-- Fixed web UI ??? values
-- Fix web UI live preview load
+- Fixed the web UI ??? values
+- Fixed the web UI live preview loading
 - Default tower offset +0.05 mm
-- Resin sensor check less strict limits
-- Error injection in admin menu
+- Less strict limits in resin sensor check
+- Error injection action in admin menu
 - Improved hard error page
 - Display soft error page on hostname change error
 - Automatic UV LED current calibration with uvledmeter
 - Check content length when downloading
 - Code cleanup, partial Python 3 compatibility
-- Fix flse positive changed detection in advanced settings
-- Unitests in tests package
-- Fixed crash on failed examples download
-- Warn user whan there are no factory defaults
+- Fixed false-positive change check in advanced settings
+- Unittests in tests package
+- Fixed crash on failed download of the examples
+- Warn user that there are no factory defaults
 - UV LED Power Counter & UV LED Time Counter
-- Stop user from setting invalid hostname, restrict to [a-zA-Z0-9-_]+
+- Prevent user from setting an invalid hostname, restricted to [a-zA-Z0-9-_]+
 - Fixed wrong carry in calculating the end of print time
 - Fixed variable picture on the PicturePage
 
@@ -36,7 +37,7 @@ success confirm in Factory mode wizard
 
 # Version 1.0.3
 - Changed minimal current for UV led in wizard
-- Changed UV led fan pwm
+- Changed UV LED and fan PWMs
 
 # Version 1.0.2
 - Fixed wizard step 4 cancel message display
@@ -50,8 +51,8 @@ success confirm in Factory mode wizard
 - More tolerant fan limits, averages in wizard
 - Fix confirm lockup in factory reset
 - Fix display test use yes/no page layout
-- Fix UI being acessible after ended/canceled print
-- Add warning for resin sensor and cover check to advaced settings
+- Fix UI being accessible after ended/canceled print
+- Add warning for resin sensor and cover check to advanced settings
 - Wizard texts updated, added images to unboxing wizard
 - Motion controller FW bump to 0.9.9-409-rc0
 - Continuous checks the A64 temperature. Starts fans or shutdown if needed.
@@ -60,12 +61,12 @@ success confirm in Factory mode wizard
 - Show tilt time results on calibration end
 - YesNo <-- Confirm
 - Shuffled rows on SysInfo Page
-- Wificonfig uses python3 and suopports unicode ssids
+- Wificonfig uses python3 and supports unicode SSIDs
 - New arm trusted firmware
 
 # Version v1.0.0-r1
 - Fix crash on empty SN
-- Fix usb update
+- Fix USB update
 - Updated texts in calibration
 - Fix stirring (do not verify positions when stirring but sync after every move)
 - Notify user when last boot failed
@@ -74,7 +75,7 @@ success confirm in Factory mode wizard
 # Version v1.0.0-r0
 - Reworked error page
 - Page print and page print preview uses raw data
-- +/- buttons have fixed swpe protection
+- +/- buttons have fixed swipe protection
 - Fix flash mounted detection
 - Fixes for wizard and calibration
 - Redesigned ambient temperature sensor check
@@ -90,19 +91,19 @@ success confirm in Factory mode wizard
 - Limited re-homing
 - Print checks(tilt position, stuck, cover open)
 - Improved and fixed page Feed Me
-- Fixed print UI (percentage, restartrt/cancel/end of print)
+- Fixed print UI (percentage, restart/cancel/end of print)
 - Exact time estimation (needs proper Slicer setup)
 - Slow and fast tilting times for Slicer in SysInfo page
 - Fans running only when needed
 - Holding power button for 3 secs invoke power off/cancel print dialog
 - Holding power button for 8 secs does hard power off
-- Fancheck, covercheck, fans check and UV LED check added where needed
+- Fan check, cover check, fans check and UV LED check added where needed
 - Page callbacks
-- Tilt sync can be called nonblocking
+- Tilt sync can be called non-blocking
 - Support for beeps in confirm page
 - Fix missed leave confirm in advanced settings page
 - Store led and fan defaults on factory partition
-- Add option to reset fans and leds to default
+- Add option to reset fans and LEDs to default
 - Project size included in backend data
 - Printer serial number in exported log filename
 - SysInfo - new look
@@ -126,16 +127,16 @@ success confirm in Factory mode wizard
 - CI build changes
 
 # Version v0.10.7-r1
-- Fix on fan&leds back button recover values from actual hwconfig
+- Fix on fan&LEDs back button recover values from actual hwconfig
 
 # Version v0.10.7-r0
-- Language and formating fixes
+- Language and formatting fixes
 - New firmware download URLs
 - Report serial and version while downloading firmware
 - Entering admin protected by we request
-- New admin behaviour (Off after factory reset, off on start)
+- New admin behavior (Off after factory reset, off on start)
 - New MC firmware
-- Fixed layer profile for successfull start print.
+- Fixed layer profile for success full start print.
 - UV led counter and system/user EEPROM space.
 - Fans off by default
 - Wizard in advanced settings
@@ -163,7 +164,7 @@ success confirm in Factory mode wizard
 
 # Version v0.10.5-r0
 - Persistent storage for Slic3r uploads
-- New look of FirmwareUpdate Page
+- New look of Firmware update Page
 - Fixed button pictures on Control Page
 - Added icon on FeedMe Page
 - Removed white square after start
@@ -189,14 +190,14 @@ success confirm in Factory mode wizard
 - Fix LED, Temp & Fan names
 - Keyboard Prusa Style
 - Fix textFields positions when keyboard is pulled up
-- Fix reseting date to 30.3.2019
+- Fix resetting date to 30.3.2019
 - TurnOff -> Cancel
 - Added rear fan check
 - Fixed wizard
 - Fixed project file sorting
 - Fixed invalid project loading
 - Fixed layer progress in resin calibrate mode
-- Fixed feedme texts
+- Fixed FeedMe Page texts
 
 # Version v0.10.4-r2
 - Fixed date setting
@@ -217,7 +218,7 @@ success confirm in Factory mode wizard
 # Version v0.10.4-r0
 - Wizard
 - Screenshots
-- FeedmePage in main
+- FeedMe Page in main
 - Reduce web to print page only
 - Wizard
 - Slicer-upload, correct response codes
@@ -247,13 +248,13 @@ success confirm in Factory mode wizard
 - Freescale arch timer fix (Linux and uboot)
 - Firmware downloads on separate page
 - Resize of live preview
-- Fix calib overlay + new overlay autoplace
+- Fix calibration overlay + new overlay auto place
 - Fix crash on flash drive remove
 - .. directory sorting, fixes
-- Small progressbar to indicate exposition
+- Small progress bar to indicate exposition
 - Removed image version
 - Corrected QRCode size
-- Fixed timedprogress
+- Fixed timed progress
 - Centered qrcode on video page
 
 # Version v0.10.1-r8
@@ -266,22 +267,22 @@ success confirm in Factory mode wizard
 - Updated MC firmware
 
 # Version v0.10.1-r5
-- A bit more proper hotspot mode fix
+- A bit more proper hot-spot mode fix
 - Removing Admin and Network button from the About page, no longer supported
 - Smoother swiping in PagePrint
 
 # Version v0.10.1-r4
-- Hot-fixed hotspot mode
+- Hot-fixed hot-spot mode
 
 # Version v0.10.1-r3
 - Advanced settings icons
-- MC firmare update
+- MC firmware update
 - fixes
 
 # Version v0.10.1-r2
 - Fixed videos, handbook page items
 - Added SetHostname, SetTimezone page
-- Fixed wifi-ap dependecies
+- Fixed hot-spot dependencies
 
 # Version v0.10.1-r1
 - Firmware update fix
@@ -297,7 +298,7 @@ success confirm in Factory mode wizard
 - fix print buttons on web
 - new network configuration
 - global fw update
-- prerelase UI changes
+- pre-release UI changes
 - page start with fill resin,...
 - fix: do not display projects with invalid name
 - manual, videos, about URLs 
@@ -310,7 +311,7 @@ success confirm in Factory mode wizard
 - Adjustable tilt
 - Backed project sorting
 - Fixed dir listing when using multiple sources
-- Pictogram for PageSupport, header, indicating page
+- Pictogram for Page Support, header, indicating page
 - Sorting of project on the SourceSelect page
 - Removing unused pages
 - Better PageChange layout
@@ -325,7 +326,7 @@ success confirm in Factory mode wizard
 - Layer preview is loaded asynchronously
 - Fixed time
 - Return to the main after 20s
-- Fix api-keygen on firstboot
+- Fix api-keygen on first boot
 - Removed default project image
 - Fixed sysinfo page
 - .dwz .sl1 project extension support
@@ -335,12 +336,12 @@ success confirm in Factory mode wizard
 - Cosmetic changes, temporarily removed unavailable items from the settings page
 - Using some of the new pictograms
 - Calibration vs Move pages, PrintPage menu, new pictures
-- Tower & Tilt move screens are now separate from the CalibrationMove & Tilt
-- PrintPage + Estimated End
-- New progressbar
+- Tower & Tilt move screens are now separate from the Calibration Move & Tilt
+- Print page + Estimated End
+- New progress bar
 - Print - swipable, settings flickable
 - Calibration v3
-- Backed support for time, timezone, hostname, laguage
+- Backed support for time, timezone, hostname, language
 - Provide page data also as raw values where possible
 - A64 and MC serial numbers
 - cp210x serial support
@@ -353,7 +354,7 @@ success confirm in Factory mode wizard
 
 # Version 0.9.3-rc3
 - u-boot: mmc delay, legacy mmc mode
-- PWM backlight
+- PWM back-light
 - python-bitstring included
 - Sample multimedia files
 - No default wifi configured
@@ -363,7 +364,7 @@ success confirm in Factory mode wizard
 # Version 0.9.3-rc2
 - Read eth0 MAC from fuses
 - Disable MAC randomization
-- Disable kernel locking selftest
+- Disable kernel locking self-test
 
 # Version 0.9.3-rc1
 - Calibration v2
@@ -378,23 +379,23 @@ success confirm in Factory mode wizard
 - Fix warning while printing octoprint uploaded project
 - wifi: signal and connected ssid
 - Uboot 2019.1, mmc@26MHz, no boot delay
-- Custom VirtualKeyboard style
+- Custom Virtual Keyboard style
 - Fixes in Qt GUI
 - Up&down and final move is to tower top (no homing)
 - Resin stirring with fast tilt move
-- Feedme button in homeprint (manual resin fill)
+- FeedMe button in homeprint (manual resin fill)
 - Fix max octoprint API upload size
 - Added socat utility
 
 # Version 0.9.2-rc1
 - sl1fw code cleanup
 - Patch u-boot environment on update (fixes setups with old environment)
-- Replace mmc dev select u-boot walkaround by boot delay
+- Replace mmc dev select u-boot walk-around by boot delay
 
 # Version 0.9.2-rc0
 - Calibration UI fixes
 - Support for rev04 and rev05 MC boards
-- Halfauto calibration + infinity test 
+- Half - auto calibration + infinity test 
 - Search for tilt homing profiles and tuning tilt while printing
 - Fixed log access
 - Added new UI screens (network, printing, support, ...)
