@@ -1,3 +1,7 @@
+- Collect 'generic' data right before send + check calibration is done +
+success confirm in Factory mode wizard
+- Test the black display throughput at the end of UV calibration 
+- Do not ask 'show calibration data?' as the end of UV Calibration
 - Differentiate factory reset for factor mode and normal mode
 - Factory mode inidcator
 - New MC software
