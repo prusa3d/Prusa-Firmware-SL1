@@ -1,3 +1,6 @@
+- Fix UV statistics displaying as NA
+- Added Dockerfile used for CI builds and tests
+- Photoshoped pictures of one-screw cantilever
 - MQTT: collect 'generic' data right before send
 - MQTT: check calibration is done
 - MQTT: success confirm in Factory mode wizard
