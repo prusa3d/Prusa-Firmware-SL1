@@ -1,0 +1,10 @@
+- Wizard: Resin senor test does not report disconnected resin sensor.
+- System: A short power loss triggers emergency A64 board shutdown while MC.
+board keeps running (black touchscreen, but power button blinking)
+- UI: All text inputs limited to [0-9A-Za-z_-]
+- Web: Print task name is not updated.
+- UI: Some keyboard layouts contain characters not supported by used font.
+  (empty lines in layout selection, no labes on keybord)
+- UI: Back button contain some random nice on the top edge when pressed. (This
+  is possibly a HW problem)
+

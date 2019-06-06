@@ -41,6 +41,7 @@ build:
       - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest
       - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.manifest
       - changelog.txt
+      - known-issues.txt
 
 bootstrap:
   stage: build
@@ -85,6 +86,7 @@ deploy:
     - echo ${BASE}
     - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
     - mv changelog.txt ${BASE}.changelog.txt
+    - mv known-issues.txt ${BASE}.known-issues.txt
     - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.devsd.xz
     - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.devsd.bmap
     - >
@@ -93,6 +95,7 @@ deploy:
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
         put -O ${DEST} ${BASE}.raucb;
         put -O ${DEST} ${BASE}.changelog.txt;
+        put -O ${DEST} ${BASE}.known-issues.txt;
         put -O ${DEST} ${BASE}.devsd.xz;
         put -O ${DEST} ${BASE}.devsd.bmap;
         "
