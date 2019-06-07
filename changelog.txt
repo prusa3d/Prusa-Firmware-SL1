@@ -1,14 +1,15 @@
+# Version 1.1.0
 - Fix UV statistics displaying as NA
-- Added Dockerfile used for CI builds and tests
+- Added Dockerfile used for sl1fw CI builds and tests
 - Photoshoped pictures of one-screw cantilever
 - MQTT: collect 'generic' data right before send
 - MQTT: check calibration is done
 - MQTT: success confirm in Factory mode wizard
 - Test the black display throughput at the end of UV calibration 
 - Do not ask whenever to show calibration data at the end of UV Calibration process
-- Differentiated factory reset for factor mode and normal mode
-- Factory mode indication
-- New MC software
+- Different factory reset for factory mode and normal mode
+- Factory mode indication in version string
+- New MC firmware
 - Fixed the infinite test
 - Updated photos and texts for calibration
 - Fixed the web UI ??? values
