@@ -8,7 +8,7 @@ SRCREV_pn-${PN} = "ec25ff35c6cc18fed2bcab0a93afee2ece2eb8a8"
 PACKAGES = "${PN}"
 
 
-RDEPENDS_${PN} += "python rsync bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio avahi-daemon avahi-restarter python-lazy-import api-keygen udev-usbmount web-config avrdude python-pydbus python-misc python-pygobject python-systemd socat python-bitstring fbset python-logging python-future python-paho-mqtt python-toml python-pyalsaaudio"
+RDEPENDS_${PN} += "python rsync bash nginx python-websocket-server python-pygame python-pyserial python-pyroute2 python-numpy python-six python-numpy python-jinja2 python-gpio avahi-daemon avahi-restarter python-lazy-import api-keygen udev-usbmount web-config avrdude python-pydbus python-misc python-pygobject python-systemd socat python-bitstring fbset python-logging python-future python-paho-mqtt python-toml python-pyalsaaudio python-monotonic"
 
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
