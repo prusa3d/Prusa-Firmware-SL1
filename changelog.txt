@@ -1,3 +1,5 @@
+- Fix UI updates at print page right after timezone change
+
 # Version 1.1.0
 - Fix UV statistics displaying as NA
 - Added Dockerfile used for sl1fw CI builds and tests
