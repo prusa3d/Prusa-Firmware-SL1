@@ -7,9 +7,8 @@ SRC_URI = "\
 	file://sla-slicer-upload-restarter.path \
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
-	file://py3.patch \
 "
-SRCREV = "4558b42907bd0dd7822a158e7be1063865227f30"
+SRCREV = "6dfdffa47d4738e6a14da180c851d0860f15c236"
 
 inherit systemd setuptools3
 
