@@ -1,3 +1,6 @@
+- Updated MC firmware, ?rev returnes two decimal numbers.
+- Support for MC boards rev. 0.6c+
+
 # Version 1.1.1
 - Fix UI updates at print page right after timezone change
 
