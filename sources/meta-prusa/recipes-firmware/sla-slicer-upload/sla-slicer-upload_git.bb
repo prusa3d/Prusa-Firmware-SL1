@@ -1,18 +1,16 @@
 LICENSE = "CLOSED"
-
+#asdf: 
 SRC_URI = "\
 	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/octo-api-upload-service.git;protocol=ssh\
 	file://sla-slicer-upload.service \
-	file://sla-slicer-upload-restarter.service \
-	file://sla-slicer-upload-restarter.path \
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
 "
-SRCREV = "6dfdffa47d4738e6a14da180c851d0860f15c236"
+SRCREV = "fa68b725bb5d260ee4bb0748962b8871fac1d8aa"
 
 inherit systemd setuptools3
 
-DEPENDS += "python3 python3-setuptools"
+DEPENDS += "python3 python3-setuptools python3-cherrypy python3-pyinotify"
 RDEPENDS_${PN} += "avahi-daemon avahi-restarter api-keygen python3-json"
 
 S="${WORKDIR}/git"
@@ -20,8 +18,6 @@ S="${WORKDIR}/git"
 do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/sla-slicer-upload.service ${D}${systemd_system_unitdir}/
-	install --mode 644 ${WORKDIR}/sla-slicer-upload-restarter.service ${D}${systemd_system_unitdir}/
-	install --mode 644 ${WORKDIR}/sla-slicer-upload-restarter.path ${D}${systemd_system_unitdir}/
 
 	# Avahi service definition
 	install -d ${D}${sysconfdir}/avahi/services
@@ -36,11 +32,10 @@ do_install_append () {
 	# Enable services
 	install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
 	ln -s ${systemd_system_unitdir}/sla-slicer-upload.service ${D}${systemd_system_unitdir}/multi-user.target.wants/
-	ln -s ${systemd_system_unitdir}/sla-slicer-upload-restarter.path ${D}${systemd_system_unitdir}/multi-user.target.wants/
 
 	# Remove ununsed dir
 	rmdir ${D}/usr/share
 }
 
 SYSTEMD_AUTO_ENABLE = "disable"
-SYSTEMD_SERVICE_${PN} = "sla-slicer-upload.service sla-slicer-upload-restarter.service sla-slicer-upload-restarter.path"
+SYSTEMD_SERVICE_${PN} = "sla-slicer-upload.service"
