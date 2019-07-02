@@ -11,6 +11,7 @@ source oe-init-build-env
 
 bitbake sla-image
 ```
+For convenience a Docker image configuration used for CI builds is included. The build can be executed in a Docker container or the Dockerfile can be used just as a list of dependencies.
 
 ### Customers who bought this item also bought ...
 
