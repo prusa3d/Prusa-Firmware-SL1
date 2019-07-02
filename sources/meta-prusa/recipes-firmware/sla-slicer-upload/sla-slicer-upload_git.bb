@@ -10,8 +10,7 @@ SRCREV = "fa68b725bb5d260ee4bb0748962b8871fac1d8aa"
 
 inherit systemd setuptools3
 
-DEPENDS += "python3 python3-setuptools python3-cherrypy python3-pyinotify"
-RDEPENDS_${PN} += "avahi-daemon avahi-restarter api-keygen python3-json"
+RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen"
 
 S="${WORKDIR}/git"
 
