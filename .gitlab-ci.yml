@@ -10,12 +10,13 @@ variables:
 before_script:
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$DEV_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - cat ~/.ssh/known_hosts
   - mkdir -p build/conf && touch build/conf/auto.conf
   - sed -i -e '/BB_NUMBER_THREADS/d' -e '/PARALLEL_MAKE/d' -e '/SSTATE_DIR/d' -e '/PRSERV_HOST/d' build/conf/auto.conf
   - echo 'SSTATE_DIR = "/sstate-cache/noprserv"' >> build/conf/auto.conf
 
-build:
+build:raucb:
   stage: build
 
   only: 
@@ -26,24 +27,27 @@ build:
   script:
     - cat build/conf/auto.conf
     - source oe-init-build-env
-    - bitbake sla-update-bundle sla-image-dev
-    - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
+    - bitbake sla-update-bundle
+    - cd ..
+    - BASE=$(git describe --dirty)
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4 ${BASE}.etc.ext4
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${BASE}.initramfs.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${BASE}.manifest
+    - mv changelog.txt ${BASE}.changelog.txt
+    - mv known-issues.txt ${BASE}.known-issues.txt
 
   artifacts:
     expire_in: 1 week
     name: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb
-      - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4
-      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.xz
-      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.rootfs.wic.bmap
-      - build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest
-      - build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest
-      - build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.manifest
-      - changelog.txt
-      - known-issues.txt
+      - ./*.raucb
+      - ./*.etc.ext4
+      - ./*.manifest
+      - ./*.changelog.txt
+      - ./*.known-issues.txt
 
-bootstrap:
+build:tools:
   stage: build
   when: manual
 
@@ -56,22 +60,29 @@ bootstrap:
 
   script:
     - source oe-init-build-env
-    - bitbake sla-bootstrap
+    - bitbake sla-image-dev sla-bootstrap
     - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
+    - cd ..
+    - BASE=$(git describe --dirty)
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.devsd.xz
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.devsd.bmap
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.manifest ${BASE}.devsd.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz ${BASE}.bootstrapsd.xz
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap ${BASE}.bootstrapsd.bmap
 
   artifacts:
     expire_in: 1 week
     name: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz
-      - build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap
+      - ./*.devsd.*
+      - ./*.bootstrapsd.*
 
-deploy:
+deploy:raucb:
   stage: deploy
   when: manual
   
   dependencies:
-    - build
+    - build:raucb
 
   only:
     - tags
@@ -79,16 +90,7 @@ deploy:
     - web
 
   script:
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ./
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ./
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.bmap ./
-    - BASE=$(ls sla-update-bundle-prusa64-sl1-*.raucb | sed 's/sla-update-bundle-prusa64-sl1-\(.*\)-[0-9]*.raucb/\1/')
-    - echo ${BASE}
-    - mv sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
-    - mv changelog.txt ${BASE}.changelog.txt
-    - mv known-issues.txt ${BASE}.known-issues.txt
-    - mv sla-image-dev-prusa64-sl1-*.wic.xz ${BASE}.devsd.xz
-    - mv sla-image-dev-prusa64-sl1-*.wic.bmap ${BASE}.devsd.bmap
+    - BASE=$(git describe --dirty)
     - >
         lftp -c "
         set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
@@ -96,6 +98,27 @@ deploy:
         put -O ${DEST} ${BASE}.raucb;
         put -O ${DEST} ${BASE}.changelog.txt;
         put -O ${DEST} ${BASE}.known-issues.txt;
-        put -O ${DEST} ${BASE}.devsd.xz;
-        put -O ${DEST} ${BASE}.devsd.bmap;
         "
+    - echo "put ${BASE}.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - echo "put ${BASE}.changelog.txt" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - echo "put ${BASE}.known-issues.txt" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+
+deploy:tools:
+  stage: deploy
+
+  when: manual
+
+  dependencies:
+    - build:tools
+
+  only:
+    - tags
+    - merge_requests
+    - web
+
+  script:
+    - BASE=$(git describe --dirty)
+    - echo "put ${BASE}.devsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - echo "put ${BASE}.devsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - echo "put ${BASE}.bootstrapsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - echo "put ${BASE}.bootstrapsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
