@@ -17,7 +17,7 @@ inherit setuptools3
 do_configure_prepend() {
 	# Drop options to replace them later and drom pypm as we don't have portmidi/porttime
 	sed '/^FREETYPE = /d; /^SDL =/d; /^SMPEG =/d' Setup.in > Setup.tmp
-	sed '/^movie src/d; /^pypm src/d; /^scrap src/d; /^mixer src/d; /^mixer_music/d' Setup.tmp > Setup
+	sed '/^movie src/d; /^pypm src/d; /^scrap src/d;' Setup.tmp > Setup
 	SDL="`pkg-config sdl --cflags --libs`"; echo "SDL=$SDL" >> Setup
 	FREETYPE="`pkg-config freetype2 --cflags --libs`"; echo "FREETYPE=$FREETYPE" >> Setup
 } 
