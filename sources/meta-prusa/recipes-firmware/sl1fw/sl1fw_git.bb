@@ -7,7 +7,7 @@ SRCREV_pn-${PN} = "65a3306fc8930b162f42fc214a6e5c240aa7e36b"
 
 PACKAGES = "${PN}"
 
-DEPENDS += "python3 gettext"
+DEPENDS += "python3 gettext-native"
 
 RDEPENDS_${PN} += " \
 	python3 \
