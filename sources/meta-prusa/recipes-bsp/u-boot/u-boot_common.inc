@@ -42,7 +42,7 @@ do_compile_append() {
 		> ${B}/setenv.scr
 	echo "${B}/uboot.env 0x0 0x20000" > ${B}/setenv.config
 	dd if=/dev/zero of=${B}/uboot.env bs=512k count=1
-	fw_setenv --config ${B}/setenv.config --script ${B}/setenv.scr
+	fw_setenv --config ${B}/setenv.config --script ${B}/setenv.scr --lock ${B}
 }
 
 do_install_append () {
