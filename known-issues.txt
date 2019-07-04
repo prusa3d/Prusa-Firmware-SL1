@@ -1,4 +1,3 @@
-- Wizard: Resin senor test does not report disconnected resin sensor.
 - System: A short power loss triggers emergency A64 board shutdown while MC.
 board keeps running (black touchscreen, but power button blinking)
 - UI: All text inputs limited to [0-9A-Za-z_-]
