@@ -1,3 +1,47 @@
+- Fixed remote_install script
+- Suggest update on failed boot
+- Top limit for tilt calibraion changed to 6000
+- Ask for tank removal before displaytest
+- Require lid closure before any tower movements in wizard and calibration
+- Added speaker test to wizard
+- Fixed disconnected resin sensor check
+- Any fast tower movement uses homingFast profile
+- Add timezone setup in wizard
+- New photos
+- Qt GUI cleaanups
+- Fixed print display instability
+- Translation support, currently only English and Czech are present
+- Audio support
+- Improved cooling capacity
+- Fans RPM control, fan3 poweroff
+- Build MC simulatior using CI
+- Fixed depcrectaion warining in wizard SN check
+- New integration test walking through non-print pages
+- Fixed exceptions exposure unitest
+- Wait page cleanup
+- Fixed print startup error reporting
+- MC firmware bump
+- Fixed MC revision reading
+- UV LED current stored as unitless PWM, rev 0.6c MC board support
+- Yes/No replaces confirm where necessary
+- Fixed calibration overlay clearing
+- Pages separated to standalone source files
+- Fixed flow on source select, preprint, print and some admin pages
+- Python 3 compatibility
+- Fix print UI updates in case of time change
+- Improved dummy Motion controller driver
+- Fix save path in case of USB mount failure
+- Basic libHardware unittests
+- MC simulation for tests,
+- Look for error using PyLint, fix all errors
+- Fixed setenv usage during u-boot build
+- Dockerfile addded to repository
+- Redesigned continuous integration tasks
+- Factory mode sotred in factory partition
+- Fixed UV statistics displaying as NA
+- Run the system using Python 3
+- Added Dockerfile used for CI builds and tests
+- Splited factory calibration and user calibration
 - Fix UV statistics displaying as NA
 - Added Dockerfile used for CI builds and tests
 - Photoshoped pictures of one-screw cantilever
@@ -8,7 +52,6 @@
 - Do not ask whenever to show calibration data at the end of UV Calibration process
 - Differentiated factory reset for factor mode and normal mode
 - Factory mode indication
-- New MC software
 - Fixed the infinite test
 - Updated photos and texts for calibration
 - Fixed the web UI ??? values
