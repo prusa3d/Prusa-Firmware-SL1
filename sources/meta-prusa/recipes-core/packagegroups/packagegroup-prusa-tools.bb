@@ -11,5 +11,5 @@ RDEPENDS_${PN} = "\
     i2c-tools tree jq dash fish \
     bash-completion bash-completion-extra \
     systemd-extra-utils systemd-bash-completion systemd-analyze \
-    ethtool avrdude gettext \
+    ethtool avrdude gettext alsa-utils libmikmod \
 "

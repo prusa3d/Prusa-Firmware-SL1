@@ -2,7 +2,7 @@ state.sun50ia64audio {
 	control.1 {
 		iface MIXER
 		name 'Headphone Playback Volume'
-		value 32
+		value 53
 		comment {
 			access 'read write'
 			type INTEGER
@@ -10,7 +10,7 @@ state.sun50ia64audio {
 			range '0 - 63'
 			dbmin -9999999
 			dbmax 0
-			dbvalue.0 -3100
+			dbvalue.0 -1000
 		}
 	}
 	control.2 {
