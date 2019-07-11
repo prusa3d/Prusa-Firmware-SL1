@@ -6,7 +6,7 @@ SRC_URI = "\
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
 "
-SRCREV = "485514384599341b38a91b4c8c026133dc394c4b"
+SRCREV = "4f6f54f87e1b7a5b7e3911a203de405637351863"
 inherit systemd setuptools3
 
 RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen"
