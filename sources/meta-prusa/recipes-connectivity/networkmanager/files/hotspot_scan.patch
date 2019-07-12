@@ -1,0 +1,69 @@
+diff -Naur NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c NetworkManager-1.14.4/src/devices/wifi/nm-device-wifi.c
+--- NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c	2018-10-24 10:03:43.000000000 +0200
++++ NetworkManager-1.14.4/src/devices/wifi/nm-device-wifi.c	2019-08-12 10:30:47.571086840 +0200
+@@ -431,8 +431,9 @@
+ 		return;
+ 
+ 	/* In AP mode we currently have nothing to do. */
+-	if (priv->mode == NM_802_11_MODE_AP)
+-		return;
++//	NOTE: CUtsomt fix to provide scan in AP mode	
++//	if (priv->mode == NM_802_11_MODE_AP)
++//		return;
+ 
+ 	if (priv->current_ap) {
+ 		/* Smooth out the strength to work around crappy drivers */
+@@ -1214,8 +1215,9 @@
+ 	/* Don't scan when a an AP or Ad-Hoc connection is active as it will
+ 	 * disrupt connected clients or peers.
+ 	 */
+-	if (priv->mode == NM_802_11_MODE_ADHOC || priv->mode == NM_802_11_MODE_AP)
+-		return TRUE;
++// NOTE: Custom fix for Prusa A64, our wifi can scan in AP mode, does it?
++//	if (priv->mode == NM_802_11_MODE_ADHOC || priv->mode == NM_802_11_MODE_AP)
++//		return TRUE;
+ 
+ 	switch (nm_device_get_state (NM_DEVICE (self))) {
+ 	case NM_DEVICE_STATE_UNKNOWN:
+@@ -1555,8 +1557,9 @@
+ 	state = nm_device_get_state (NM_DEVICE (self));
+ 	if (state <= NM_DEVICE_STATE_UNAVAILABLE)
+ 		return;
+-	if (NM_DEVICE_WIFI_GET_PRIVATE (self)->mode == NM_802_11_MODE_AP)
+-		return;
++// NOTE: CUstom fix to provide scan in AP mode
++//	if (NM_DEVICE_WIFI_GET_PRIVATE (self)->mode == NM_802_11_MODE_AP)
++//		return;
+ 
+ 	found_ap = nm_wifi_aps_find_by_supplicant_path (&priv->aps_lst_head, object_path);
+ 	if (found_ap) {
+diff -Naur NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c NetworkManager-1.14.4/src/supplicant/nm-supplicant-config.c
+--- NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c	2018-10-24 10:03:43.000000000 +0200
++++ NetworkManager-1.14.4/src/supplicant/nm-supplicant-config.c	2019-08-12 10:30:47.571086840 +0200
+@@ -462,7 +462,9 @@
+ 	mode = nm_setting_wireless_get_mode (setting);
+ 	is_adhoc = (mode && !strcmp (mode, "adhoc")) ? TRUE : FALSE;
+ 	is_ap = (mode && !strcmp (mode, "ap")) ? TRUE : FALSE;
+-	if (is_adhoc || is_ap)
++// NOTE: Custom change to allow scanning in AP mode
++//	if (is_adhoc || is_ap)
++	if(is_adhoc)
+ 		priv->ap_scan = 2;
+ 	else
+ 		priv->ap_scan = 1;
+@@ -558,10 +560,11 @@
+ 	/* Don't scan when a shared connection (either AP or Ad-Hoc) is active;
+ 	 * it will disrupt connected clients.
+ 	 */
+-	if (NM_IN_STRSET (nm_setting_wireless_get_mode (s_wifi),
+-	                  NM_SETTING_WIRELESS_MODE_AP,
+-	                  NM_SETTING_WIRELESS_MODE_ADHOC))
+-		return TRUE;
++	// NOTE: Custom change to allow scanning in AP mode
++	//if (NM_IN_STRSET (nm_setting_wireless_get_mode (s_wifi),
++	//                  NM_SETTING_WIRELESS_MODE_AP,
++	//                  NM_SETTING_WIRELESS_MODE_ADHOC))
++	//	return TRUE;
+ 
+ 	/* Don't scan when the connection is locked to a specifc AP, since
+ 	 * intra-ESS roaming (which requires periodic scanning) isn't being
