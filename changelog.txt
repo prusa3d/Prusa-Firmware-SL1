@@ -1,3 +1,15 @@
+# Version 1.2.0-rc1
+- Fan test as separate page
+- Fixed speaker initialization on multiple wizard passes
+- Fixed sl1fw part of dynamic language switch
+- Fixed upload size limits, timeout period
+- Fixed wrongly resized first item on TimeSettingsPage on language changes
+- Removed the Up&Down button from print screen, it does not work correctly
+- SysInfo LED counter time units changed  s -> hours
+- Supressed repeated button presses
+- Show project size for each project in source selection page
+
+# Version 1.2.0-rc0
 - Fixed remote_install script
 - Suggest update on failed boot
 - Top limit for tilt calibraion changed to 6000
