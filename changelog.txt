@@ -1,3 +1,8 @@
+# Version 1.2.0-rc2
+- Increased slicer upload reserved size
+- Fixed screenshot saving
+- Export whole log directory, limit log to 50M
+
 # Version 1.2.0-rc1
 - Fan test as separate page
 - Fixed speaker initialization on multiple wizard passes
