@@ -1,12 +1,15 @@
-LICENSE = "CLOSED"
-#asdf: 
+LICENSE = "GPLv3+"
 SRC_URI = "\
-	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/octo-api-upload-service.git;protocol=ssh\
+	git://git@gitlab.com/prusa3d/sl1/project-upload-service.git;protocol=ssh\
 	file://sla-slicer-upload.service \
 	file://avahi/octoprint.service \
 	file://nginx/octoprint \
 "
-SRCREV = "2c9228c2eaae68ea32ba0e96acd842071d0336b2"
+LIC_FILES_CHKSUM = "\
+        file://LICENSE;md5=5b4473596678d62d9d83096273422c8c \
+"
+
+SRCREV = "1966699abf0e6d91789544d922bacd430425c981"
 inherit systemd setuptools3
 
 RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen"
