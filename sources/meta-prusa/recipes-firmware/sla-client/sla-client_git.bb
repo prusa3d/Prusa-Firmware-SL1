@@ -1,14 +1,21 @@
-LICENSE = "CLOSED"
+LICENSE = "GPL3"
 
 SRC_URI = "\
-	git://git@gitlab.webdev.prusa3d.com:22443/martin.kopecky/new-sla-client-application.git;protocol=ssh;branch=master \
+	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=master \
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/qrcode-generator\
 	file://sla-client.service \
 	file://sla-client-config.json \
 	file://000-install-path.patch \
 "
-SRCREV = "2c5bd9542cb45dd18841edba313038d24bbfe9a0"
+SRCREV = "40072581d9860e5b28ba5366951f9cbdb2894913"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
+
+LICENSE = "GPLv3+" 
+LIC_FILES_CHKSUM = "\
+	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
+"
+#LICENSE_qrcode-generator = "GPLv3+"
+#LIC_FILES_CHKSUM_qrcode-generator = "qrcode-generator/LICENSE.md;md5=a83c38e033331f609f4bbb9b55d68662" 
 
 inherit qmake5 systemd
 
