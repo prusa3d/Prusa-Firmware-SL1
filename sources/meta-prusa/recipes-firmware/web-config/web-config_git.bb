@@ -3,7 +3,7 @@ SUMMARY = "web config - captive cportal for wireless configuration"
 LICENSE = "CLOSED"
 
 SRC_URI = "\
-	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/web-setup.git;protocol=ssh;branch=master \
+	git://git@gitlab.com/prusa3d/sl1/captive-portal.git;protocol=ssh;branch=master \
 "
 SRCREV_pn-${PN} = "a36324294dcdb4ebb76a8ff03a4a203042b5383a"
 
