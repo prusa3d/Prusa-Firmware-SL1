@@ -19,7 +19,7 @@ SRCREV_pn-${PN} = "e2fb0d1bfa66298934766f33371da2b5bec4c2bf"
 PV = "v4.18.0-rc6+git${SRCPV}"
 
 SRC_URI="\
-	git://git@gitlab.webdev.prusa3d.com:22443/hw/a64/linux.git;protocol=ssh;branch=${KBRANCH} \
+	git://git@gitlab.com/prusa3d/distro/linux.git;protocol=ssh;branch=${KBRANCH} \
 	file://defconfig \
 	file://freescale_timer_fix.patch \
 "
