@@ -27,13 +27,7 @@ rootfs_disable_serial () {
 	systemctl --root=$D mask serial-getty@ttyS0.service
 }
 
-rootfs_persistent_journal () {
-	ls -al ${IMAGE_ROOTFS}
-	sed -i 's/#Storage=auto/Storage=persistent/' $D/etc/systemd/journald.conf
-	sed -i 's/#SystemMaxUse=/SystemMaxUse=1G/' $D/etc/systemd/journald.conf
-}
-
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_disable_serial ; rootfs_persistent_journal ; "
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_disable_serial ; "
 
 IMAGEE_NAME_SUFFIX = ""
 
