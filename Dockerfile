@@ -23,5 +23,6 @@ WORKDIR /home/appuser/
 # Setup ssh to trust git server
 RUN mkdir -p .ssh
 RUN chmod 700 .ssh
+RUN ssh-keyscan gitlab.com >> .ssh/known_hosts
 RUN ssh-keyscan -p 22443 gitlab.webdev.prusa3d.com >> .ssh/known_hosts
 RUN ssh-keyscan 10.24.10.12 >> .ssh/known_hosts
