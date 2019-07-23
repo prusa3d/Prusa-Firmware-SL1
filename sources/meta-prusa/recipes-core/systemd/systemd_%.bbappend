@@ -5,6 +5,8 @@ SRC_URI_append = "\
 	file://0002-timesyncd-google.patch \
 	file://0003-journal-gatewayd-localhost.patch \
 	file://journal.site \
+	file://journal.conf \
+	file://max_use.conf \
 "
 
 PACKAGECONFIG_append = " microhttpd"
@@ -29,4 +31,12 @@ do_install_append() {
 	# enable journal-gatewayd reverse proxy site
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
 	ln -s ${sysconfdir}/nginx/sites-available/journal ${D}${sysconfdir}/nginx/sites-enabled/journal
+
+	# Persistent journal directory tmpfiles configuration
+	install -d ${D}${libdir}/tmpfiles.d
+	install ${WORKDIR}/journal.conf ${D}${libdir}/tmpfiles.d/journal.conf
+
+	# Size configuration
+	install -d ${D}${libdir}/systemd/journald.conf.d
+	install ${WORKDIR}/max_use.conf ${D}${libdir}/systemd/journald.conf.d/max_use.conf
 }
