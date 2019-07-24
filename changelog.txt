@@ -1,3 +1,6 @@
+# Version 1.2.0-rc3
+- Fixed the overflowing text
+
 # Version 1.2.0-rc2
 - Increased slicer upload reserved size
 - Fixed screenshot saving
