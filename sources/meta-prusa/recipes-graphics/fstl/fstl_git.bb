@@ -1,5 +1,5 @@
-LICENSE = "CLOSED"
-
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://README.md;md5=dc83ce421b74e98abb9beb7b967506e6"
 inherit cmake_qt5 qmake5_base
 
 DEPENDS += "qtbase qt3d qtdeclarative qttools"
