@@ -1,3 +1,8 @@
+# Version 1.2.0-rc4
+- Export logs as xzipped text with distinguished boots
+- Raised journal limit back to 1GiB
+- Configure journald without /etc, persistent devsd logs
+
 # Version 1.2.0-rc3
 - Fixed the overflowing text
 
