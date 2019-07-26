@@ -1,11 +1,12 @@
 SUMMARY = "web config - captive cportal for wireless configuration" 
 
-LICENSE = "CLOSED"
+LICENSE = "GPLv3"
+LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "\
 	git://git@gitlab.com/prusa3d/sl1/captive-portal.git;protocol=ssh;branch=master \
 "
-SRCREV_pn-${PN} = "a36324294dcdb4ebb76a8ff03a4a203042b5383a"
+SRCREV_pn-${PN} = "e7a33e999e1e033660b3823d7f4ce34c37392c25"
 
 PACKAGES = "${PN}"
 
