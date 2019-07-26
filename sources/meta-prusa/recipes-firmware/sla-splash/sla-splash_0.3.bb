@@ -1,8 +1,12 @@
-LICENSE = "CLOSED"
+DESCRIPTION="Service displaying SL1 splash screen"
+
+LICENSE = "GPLv3"
+LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "\
 	file://sla-splash.service \
 	file://prusa-sla-splash.fbimg.xz;unpack=false \
+	file://GPLv3.patch \
 "
 
 inherit systemd
