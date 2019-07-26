@@ -1,5 +1,8 @@
 DESCRIPTION = "Power panic response service"
-LICENSE = "CLOSED"
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
+LICENSE = "GPLv3"
+
 DEPENDS = "libgpiod"
 
 inherit systemd
@@ -7,7 +10,7 @@ inherit systemd
 SRC_URI = "\
 	git://git@gitlab.com/prusa3d/sl1/powerpanic.git;protocol=ssh;branch=master \
 "
-SRCREV = "f757156dd4789ff5d21af70b2acea3cb886e9abf"
+SRCREV = "573bc562d7f63d8fb3aceb7ab0bcb964158a311d"
 
 FILES_${PN} = "\
   ${bindir}/panic \
