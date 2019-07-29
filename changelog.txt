@@ -1,3 +1,7 @@
+# Version 1.2.0-rc6
+- Do not disable factory mode for kits, yet
+- Kits can send mqtt data without passing wizard, uvcalibration is sufficient
+
 # Version 1.2.0-rc5
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
 
