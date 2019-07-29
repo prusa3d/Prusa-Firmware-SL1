@@ -1,3 +1,6 @@
+# Version 1.2.0-rc5
+- Basic kit support (no factory mode, no missing defaults, one step unboxing)
+
 # Version 1.2.0-rc4
 - Export logs as xzipped text with distinguished boots
 - Raised journal limit back to 1GiB
