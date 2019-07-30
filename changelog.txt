@@ -1,24 +1,8 @@
-# Version 1.2.0-rc6
-- Do not disable factory mode for kits, yet
-- Kits can send mqtt data without passing wizard, uvcalibration is sufficient
-
-# Version 1.2.0-rc5
+# Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
-
-# Version 1.2.0-rc4
 - Export logs as xzipped text with distinguished boots
-- Raised journal limit back to 1GiB
-- Configure journald without /etc, persistent devsd logs
-
-# Version 1.2.0-rc3
-- Fixed the overflowing text
-
-# Version 1.2.0-rc2
 - Increased slicer upload reserved size
 - Fixed screenshot saving
-- Export whole log directory, limit log to 50M
-
-# Version 1.2.0-rc1
 - Fan test as separate page
 - Fixed speaker initialization on multiple wizard passes
 - Fixed sl1fw part of dynamic language switch
@@ -28,8 +12,6 @@
 - SysInfo LED counter time units changed  s -> hours
 - Supressed repeated button presses
 - Show project size for each project in source selection page
-
-# Version 1.2.0-rc0
 - Fixed remote_install script
 - Suggest update on failed boot
 - Top limit for tilt calibraion changed to 6000
@@ -59,7 +41,6 @@
 - Fixed calibration overlay clearing
 - Pages separated to standalone source files
 - Fixed flow on source select, preprint, print and some admin pages
-- Python 3 compatibility
 - Fix print UI updates in case of time change
 - Improved dummy Motion controller driver
 - Fix save path in case of USB mount failure
@@ -84,6 +65,46 @@
 - Do not ask whenever to show calibration data at the end of UV Calibration process
 - Differentiated factory reset for factor mode and normal mode
 - Factory mode indication
+- Fixed the infinite test
+- Updated photos and texts for calibration
+- Fixed the web UI ??? values
+- Fixed the web UI live preview loading
+- Default tower offset +0.05 mm
+- Less strict limits in resin sensor check
+- Error injection action in admin menu
+- Improved hard error page
+- Display soft error page on hostname change error
+- Automatic UV LED current calibration with uvledmeter
+- Check content length when downloading
+- Fixed false-positive change check in advanced settings
+- Unittests in tests package
+- Fixed crash on failed download of the examples
+- Warn user that there are no factory defaults
+- UV LED Power Counter & UV LED Time Counter
+- Prevent user from setting an invalid hostname, restricted to [a-zA-Z0-9-_]+
+- Fixed wrong carry in calculating the end of print time
+- Fixed variable picture on the PicturePage
+
+# Version 1.1.2
+- Updated MC firmware, ?rev returnes two decimal numbers.
+- Support for MC boards rev. 0.6c+
+- UV LED current to PWM
+
+# Version 1.1.1
+- Fix UI updates at print page right after timezone change
+
+# Version 1.1.0
+- Fix UV statistics displaying as NA
+- Added Dockerfile used for sl1fw CI builds and tests
+- Photoshoped pictures of one-screw cantilever
+- MQTT: collect 'generic' data right before send
+- MQTT: check calibration is done
+- MQTT: success confirm in Factory mode wizard
+- Test the black display throughput at the end of UV calibration 
+- Do not ask whenever to show calibration data at the end of UV Calibration process
+- Different factory reset for factory mode and normal mode
+- Factory mode indication in version string
+- New MC firmware
 - Fixed the infinite test
 - Updated photos and texts for calibration
 - Fixed the web UI ??? values
