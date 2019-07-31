@@ -41,6 +41,8 @@ RDEPENDS_${PN} += " \
 	python3-paho-mqtt \
 	python3-toml \
 	python3-pyalsaaudio \
+	python3-dbus \
+	python3-networkmanager \
 "
 
 FILES_${PN} += "\
