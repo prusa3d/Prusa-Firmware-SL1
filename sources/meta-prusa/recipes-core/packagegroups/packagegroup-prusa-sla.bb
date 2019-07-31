@@ -8,6 +8,6 @@ inherit packagegroup
 
 RDEPENDS_packagegroup-prusa-sla = "\
 	sla-edid etc sl1fw sla-client \
-	sla-splash sla-slicer-upload web-config\
+	sla-splash sla-slicer-upload wifi-config\
 	"
 
