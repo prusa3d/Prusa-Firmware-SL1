@@ -3,7 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "a6f9647e859eba92c48b9ca34f619dd936ec282c"
+SRCREV_pn-${PN} = "b95fe3220fcc8c0da048d6c335621d1b190ea0e4"
 
 PACKAGES = "${PN}"
 
@@ -25,7 +25,6 @@ RDEPENDS_${PN} += " \
 	python3-websocket-server \
 	python3-pygame \
 	python3-pyserial \
-	python3-pyroute2 \
 	python3-numpy \
 	python3-six \
 	python3-jinja2 \
