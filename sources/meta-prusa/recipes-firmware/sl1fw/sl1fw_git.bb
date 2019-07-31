@@ -20,7 +20,7 @@ RDEPENDS_${PN} += " \
 	avahi-restarter \
 	api-keygen \
 	udev-usbmount \
-	web-config \
+	wifi-config \
 	fbset \
 	python3-websocket-server \
 	python3-pygame \
