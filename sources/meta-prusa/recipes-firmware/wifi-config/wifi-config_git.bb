@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 SRC_URI = "\
 	git://git@gitlab.com/prusa3d/sl1/captive-portal.git;protocol=ssh;branch=networkmanager \
 "
-SRCREV_pn-${PN} = "a08e1e4beee4c050109928ab347f6dc72fc58fef"
+SRCREV_pn-${PN} = "6d67c67ac8eb311b7640a35d652f5132eb9e5b7a"
 
 PACKAGES = "${PN}"
 
