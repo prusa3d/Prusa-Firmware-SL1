@@ -1,3 +1,24 @@
+# Version ~~NEXT~~
+## Summary
+- ~~Important change 1~~
+- ~~Important change 2~~
+- ~~Important change 3~~
+
+## Detailed description
+### ~~New feature 1~~
+~~User readable detailed description of new feature 1.~~
+### ~~New feature 2~~
+~~User readable detailed description of new feature 2.~~
+
+## Fixed bugs
+- ~~Fixed bug 1~~
+- ~~Fixed bug 2~~
+- ~~Fixed bug 3~~
+
+## Others
+- ~~Minor feature, not so important for user 1~~
+- ~~Minor feature, not so important for user 1~~
+
 # Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
 - Export logs as xzipped text with distinguished boots
