@@ -5,3 +5,17 @@ SRC_URI_append = " \
 	file://0003-fix-omitted-boot-ack-bit-during-extcsd-update.patch \
 	file://system.conf \
 "
+
+do_install_append () {
+    install -d ${D}${datadir}/rauc
+    install -m 0644 ${WORKDIR}/system.conf ${D}${datadir}/rauc/system.conf
+
+    install -d ${D}${datadir}/rauc/
+    #correct certificate path absolute/relative
+    case ${RAUC_KEYRING_FILE} in
+    /*)
+        install -m 0644 ${RAUC_KEYRING_FILE} ${D}${datadir}/rauc/ca.cert.pem;;
+    *)
+        install -m 0644 ${WORKDIR}/${RAUC_KEYRING_FILE} ${D}${datadir}/rauc/ca.cert.pem;;
+    esac
+}
