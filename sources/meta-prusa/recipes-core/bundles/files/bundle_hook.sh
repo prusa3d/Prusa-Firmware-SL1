@@ -40,10 +40,6 @@ slot-post-install)
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var
-		
-		# Ensure alsa mixer settings exists
-		mkdir -p /var/lib/alsa
-		test -f /var/lib/alsa/asound.state || cp ${RAUC_SLOT_MOUNT_POINT}/usr/share/factory/var/lib/alsa/asound.state /var/lib/alsa/asound.state
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "bootloader" ]; then
 		echo "Updating u-boot environment"
