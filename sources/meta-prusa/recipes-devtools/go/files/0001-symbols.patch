@@ -1,0 +1,102 @@
+From b81c763efbc280cf97c74e0f203429c9808330c7 Mon Sep 17 00:00:00 2001
+From: Ian Lance Taylor <iant@golang.org>
+Date: Wed, 10 Jul 2019 13:53:44 -0700
+Subject: [PATCH] cmd/link: resolve aliases when renaming a symbol
+
+A shared library built with -buildmode=shared will use a mangled name
+for the type hash and equality functions. When linking against such a
+shared library, the linker will create aliases for these functions,
+so that they are available under multiple ABIs. When the linker mangles
+type symbol names, it will wind up seeing, and using, the alias symbols
+that were already created. When an alias symbol is used in this way,
+it will not be resolved by the deadcode pass, since type mangling happens
+after deadcode. This can cause the alias symbol to be seen unexpectedly
+during symbol relocation, causing a "missing section for relocation" error.
+This CL avoids the error by resolving aliases when renaming symbols.
+
+Fixes #30768
+
+Change-Id: I51421b4e855fbe81297ad6965cc1932cf300cea4
+---
+
+diff --git a/misc/cgo/testshared/shared_test.go b/misc/cgo/testshared/shared_test.go
+index ac1a1c7..9d16338 100644
+--- a/misc/cgo/testshared/shared_test.go
++++ b/misc/cgo/testshared/shared_test.go
+@@ -941,3 +941,10 @@
+ func TestGeneratedMethod(t *testing.T) {
+ 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./issue25065")
+ }
++
++// Test use of shared library struct with generated hash function.
++// Issue 30768.
++func TestGeneratedHash(t *testing.T) {
++	goCmd(nil, "install", "-buildmode=shared", "-linkshared", "./issue30768/issue30768lib")
++	goCmd(nil, "test", "-linkshared", "./issue30768")
++}
+diff --git a/misc/cgo/testshared/testdata/issue30768/issue30768lib/lib.go b/misc/cgo/testshared/testdata/issue30768/issue30768lib/lib.go
+new file mode 100644
+index 0000000..9e45ebe
+--- /dev/null
++++ b/misc/cgo/testshared/testdata/issue30768/issue30768lib/lib.go
+@@ -0,0 +1,11 @@
++// Copyright 2019 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package issue30768lib
++
++// S is a struct that requires a generated hash function.
++type S struct {
++	A string
++	B int
++}
+diff --git a/misc/cgo/testshared/testdata/issue30768/x_test.go b/misc/cgo/testshared/testdata/issue30768/x_test.go
+new file mode 100644
+index 0000000..1bbd139
+--- /dev/null
++++ b/misc/cgo/testshared/testdata/issue30768/x_test.go
+@@ -0,0 +1,22 @@
++// Copyright 2019 The Go Authors. All rights reserved.
++// Use of this source code is governed by a BSD-style
++// license that can be found in the LICENSE file.
++
++package issue30768_test
++
++import (
++	"testing"
++
++	"testshared/issue30768/issue30768lib"
++)
++
++type s struct {
++	s issue30768lib.S
++}
++
++func Test30768(t *testing.T) {
++	// Calling t.Log will convert S to an empty interface,
++	// which will force a reference to the generated hash function,
++	// defined in the shared library.
++	t.Log(s{})
++}
+diff --git a/src/cmd/link/internal/sym/symbols.go b/src/cmd/link/internal/sym/symbols.go
+index f0fcf23..ef5b84d 100644
+--- a/src/cmd/link/internal/sym/symbols.go
++++ b/src/cmd/link/internal/sym/symbols.go
+@@ -106,6 +106,16 @@
+ 	if dup == nil {
+ 		syms.hash[v][new] = s
+ 	} else {
++		// We may see an SABIALIAS symbol here for a mangled
++		// type symbol created when importing a shared library
++		// built with -buildmode=shared.  We will not have
++		// seen resolved such an alias earlier, because alias
++		// resolution works with unmangled type symbol names.
++		// Resolve the alias now.
++		if dup.Type == SABIALIAS {
++			dup = dup.R[0].Sym
++		}
++
+ 		if s.Type == 0 {
+ 			dup.Attr |= s.Attr
+ 			if s.Attr.Reachable() && reachparent != nil {
