@@ -14,6 +14,5 @@ ConditionPathExists=/usr/share/factory/var/lib/alsa/asound.state
 Type=oneshot
 RemainAfterExit=true
 ExecStart=-/usr/sbin/alsactl -f /usr/share/factory/var/lib/alsa/asound.state restore
-ExecStop=/usr/bin/mkdir -p /var/lib/alsa
 ExecStop=-/usr/sbin/alsactl store
 

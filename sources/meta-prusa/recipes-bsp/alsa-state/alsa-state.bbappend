@@ -2,11 +2,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI_append = "\
         file://alsa-factory-restore.service \
+        file://alsa-state.conf \
 "
 
 FILES_${PN} += " \
 	${systemd_system_unitdir}/alsa-factory-restore.service \
 	${systemd_system_unitdir}/sound.target.wants/alsa-factory-restore.service \
+	${libdir}/tmpfiles.d/alsa-state.conf \
 "
 
 do_install_append() {
@@ -21,6 +23,10 @@ do_install_append() {
     # Enable factory sound restore service
     install -d ${D}${libdir}/systemd/system/sound.target.wants
     ln -s ${systemd_system_unitdir}/alsa-factory-restore.service ${D}${systemd_system_unitdir}/sound.target.wants/alsa-factory-restore.service
+
+    # Install alsa state directory tmpfiles configuration
+    install -d ${D}${libdir}/tmpfiles.d
+    install --mode 644 ${WORKDIR}/alsa-state.conf ${D}${libdir}/tmpfiles.d/alsa-state.conf
 }
 
 FILES_alsa-states += "/usr/share/factory/var/lib/alsa/*.state"
