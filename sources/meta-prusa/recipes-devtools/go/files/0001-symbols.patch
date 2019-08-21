@@ -23,9 +23,9 @@ diff --git a/misc/cgo/testshared/shared_test.go b/misc/cgo/testshared/shared_tes
 index ac1a1c7..9d16338 100644
 --- a/misc/cgo/testshared/shared_test.go
 +++ b/misc/cgo/testshared/shared_test.go
-@@ -941,3 +941,10 @@
+@@ -917,3 +917,10 @@
  func TestGeneratedMethod(t *testing.T) {
- 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./issue25065")
+ 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "issue25065")
  }
 +
 +// Test use of shared library struct with generated hash function.
