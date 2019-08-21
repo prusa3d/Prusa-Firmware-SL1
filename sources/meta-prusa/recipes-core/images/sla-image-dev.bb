@@ -50,7 +50,7 @@ rootfs_set_api_key () {
 	hash=$(echo -n "${user}:${realm}:${key}" | md5sum | sed 's/  -$//')
 	echo "${user}:${realm}:${hash}" > ${dir}/htdigest.passwd
 
-	systemctl --root=$D disable api-keygen.service
+	systemctl --root=$D mask api-keygen.service
 }
 
 rootfs_enable_ssh () {

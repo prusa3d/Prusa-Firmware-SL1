@@ -17,7 +17,7 @@ SRC_URI = "gitsm://github.com/bootlin/mali-blobs.git \
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "libdrm wayland"
+DEPENDS = "libdrm patchelf-native wayland"
 
 # Inhibit warnings about files being stripped, we can't do anything about it.
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
@@ -54,6 +54,8 @@ do_install() {
 
     install -d -m 0755 ${D}${libdir}
     install -m 0755 ${S}/r6p2/arm64/wayland/libMali.so ${D}${libdir}/libMali.so.6
+    patchelf --set-soname libMali.so.6 ${D}${libdir}/libMali.so.6
+
     ln -sf libMali.so.6 ${D}${libdir}/libMali.so
 
     for minor in libEGL.so.1.4 libGLESv1_CM.so.1.1 libGLESv2.so.2.0 libgbm.so.1.0 ; do
