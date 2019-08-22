@@ -1,6 +1,8 @@
-SOC_FAMILY = "sun50i"
+DEFAULTTUNE ?= "cortexa53-crypto"
+require conf/machine/include/tune-cortexa53.inc
+
 include conf/machine/include/soc-family.inc
-require conf/machine/include/arm/arch-armv8a.inc
+SOC_FAMILY = "sun50i"
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-mainline"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
