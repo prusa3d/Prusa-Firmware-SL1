@@ -113,8 +113,8 @@ deploy:raucb:
 
 deploy:tools:
   stage: deploy
-
   when: manual
+  cache: {}
 
   dependencies:
     - build:tools
