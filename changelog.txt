@@ -1,3 +1,16 @@
+# Version 1.2.1
+## Summary
+- This is a bugfix release
+
+## Fixed bugs
+- Fixed missing sleep in tower/tilt sync wait
+- Auto adjust tower profiles for reliable homing
+- Erase MC EEPROM on factory reset
+- Fixed UV LED exposure timing
+- Improved log extraction speed
+- Various fixes in test code and build scripts
+- Fixed alsa state restore in new systems
+
 # Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
 - Export logs as xzipped text with distinguished boots
