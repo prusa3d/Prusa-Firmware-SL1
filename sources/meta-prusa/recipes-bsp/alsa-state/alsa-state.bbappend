@@ -5,10 +5,11 @@ SRC_URI_append = "\
         file://alsa-state.conf \
 "
 
-FILES_${PN} += " \
-	${systemd_system_unitdir}/alsa-factory-restore.service \
-	${systemd_system_unitdir}/sound.target.wants/alsa-factory-restore.service \
-	${libdir}/tmpfiles.d/alsa-state.conf \
+FILES_alsa-states += " \
+        ${systemd_system_unitdir}/alsa-factory-restore.service \
+        ${systemd_system_unitdir}/sound.target.wants/alsa-factory-restore.service \
+        ${libdir}/tmpfiles.d/alsa-state.conf \
+        /usr/share/factory/var/lib/alsa/*.state \
 "
 
 do_install_append() {
@@ -28,6 +29,4 @@ do_install_append() {
     install -d ${D}${libdir}/tmpfiles.d
     install --mode 644 ${WORKDIR}/alsa-state.conf ${D}${libdir}/tmpfiles.d/alsa-state.conf
 }
-
-FILES_alsa-states += "/usr/share/factory/var/lib/alsa/*.state"
 
