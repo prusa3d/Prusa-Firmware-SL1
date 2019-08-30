@@ -17,7 +17,7 @@ before_script:
   - cat build/conf/auto.conf
 
 cache:
-  key: build-cache
+  key: build-cache-1.2
   paths:
     - build/downloads
     - build/cache
