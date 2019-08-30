@@ -7,7 +7,7 @@ SRC_URI = "\
 	file://sla-client-config.json \
 	file://000-install-path.patch \
 "
-SRCREV = "6efe0eed4f34aaf61d7816a814009f37b7c78ca8"
+SRCREV = "5bec09c9b680147cd4c99270c5286268e4518ef1"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
