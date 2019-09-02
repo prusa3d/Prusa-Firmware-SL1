@@ -6,8 +6,9 @@ SRC_URI = "\
 	file://sla-client.service \
 	file://sla-client-config.json \
 	file://000-install-path.patch \
+	file://cz.prusa3d.sl1.notificationsink.conf \
 "
-SRCREV = "5bec09c9b680147cd4c99270c5286268e4518ef1"
+SRCREV = "2bc92ffc1503e7b6dffad37825cd18b34175c467"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
@@ -36,6 +37,9 @@ do_install_append () {
 	
 	install -d ${D}/usr/share/
 	install --mode 644 ${WORKDIR}/sla-client-config.json ${D}/usr/share/
+
+	install -d ${D}//etc/dbus-1/system.d
+	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.notificationsink.conf ${D}/etc/dbus-1/system.d/
 }
 
 SYSTEMD_SERVICE_${PN} = "sla-client.service"
