@@ -34,6 +34,9 @@ slot-post-install)
 		# Now default is set in /usr/lib/systemd/journald.conf.d/max_use.conf
 		sed -i 's/SystemMaxUse=.*/#SystemMaxUse=/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
 
+		# Now we use NetworkManager, direct wpa_supplicant service must be disabled
+		systemctl --root ${RAUC_MOUNT_PREFIX} disable wpa_supplicant@wlan0.service
+
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var
