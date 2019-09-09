@@ -4,3 +4,5 @@ downloads
 bitbake.lock
 pseudodone
 *.dot
+*.pem
+

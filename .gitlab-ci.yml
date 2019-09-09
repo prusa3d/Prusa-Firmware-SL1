@@ -14,6 +14,11 @@ before_script:
   - mkdir -p build/conf && touch build/conf/auto.conf
   - sed -i -e '/BB_NUMBER_THREADS/d' -e '/PARALLEL_MAKE/d' -e '/SSTATE_DIR/d' -e '/PRSERV_HOST/d' build/conf/auto.conf
   - echo 'SSTATE_DIR = "/sstate-cache/noprserv"' >> build/conf/auto.conf
+  - echo "$DEV_CA_CERT" > sources/meta-prusa/files/dev-ca.pem
+  - echo "$DEV_CA_CERT" > sources/meta-prusa/recipes-core/rauc/files/ca.cert.pem
+  - echo "$DEV_CA_KEY" > sources/meta-prusa/recipes-core/rauc/files/ca.key.pem
+  - echo "$DEV_CERT" > sources/meta-prusa/files/ca.cert.pem
+  - echo "$DEV_KEY" > sources/meta-prusa/files/ca.key.pem
 
 build:
   stage: build
