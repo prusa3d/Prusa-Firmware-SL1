@@ -15,6 +15,11 @@ before_script:
   - mkdir -p build/conf && touch build/conf/auto.conf
   - sed -i -e '/SSTATE_DIR/d' -e '/DL_DIR/d' build/conf/auto.conf
   - cat build/conf/auto.conf
+  - echo "$DEV_CA_CERT" > sources/meta-prusa/files/dev-ca.pem
+  - echo "$DEV_CA_CERT" > sources/meta-prusa/recipes-core/rauc/files/ca.cert.pem
+  - echo "$DEV_CA_KEY" > sources/meta-prusa/recipes-core/rauc/files/ca.key.pem
+  - echo "$DEV_CERT" > sources/meta-prusa/files/ca.cert.pem
+  - echo "$DEV_KEY" > sources/meta-prusa/files/ca.key.pem
 
 cache:
   key: build-cache-1.2
