@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 # Install tools required to build the system using bitbake
-RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp 
+RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils
 
 # Configure locale, python/bitbake have problems without valid locale
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen 
