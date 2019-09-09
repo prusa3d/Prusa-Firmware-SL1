@@ -8,7 +8,7 @@ DEPENDS = "libusb elfutils hidapi libftdi bison-native"
 inherit autotools
 
 PV = "6.3+svn${SRCPV}"
-SRC_URI = "svn://svn.savannah.nongnu.org/svn/avrdude/;protocol=http;module=trunk;rev=1425"
+SRC_URI = "svn://svn.savannah.nongnu.org/svn/avrdude/;protocol=http;module=trunk;rev=1425;externals=nowarn"
 
 S = "${WORKDIR}/trunk/avrdude"
 
