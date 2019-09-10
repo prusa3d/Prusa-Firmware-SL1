@@ -1,8 +1,6 @@
-# Version ~~NEXT~~
+# Version 1.3.0
 ## Summary
-- ~~Important change 1~~
-- ~~Important change 2~~
-- ~~Important change 3~~
+- Final stats
 
 ## Detailed description
 ### ~~New feature 1~~
@@ -11,13 +9,20 @@
 ~~User readable detailed description of new feature 2.~~
 
 ## Fixed bugs
-- ~~Fixed bug 1~~
-- ~~Fixed bug 2~~
-- ~~Fixed bug 3~~
+- Fixed web UI project name
+- Fixed initial sound settings
+- Fixed overflow in exposure timing
+- Improved log export speed
+- Tower profile auto adjust
 
 ## Others
-- ~~Minor feature, not so important for user 1~~
-- ~~Minor feature, not so important for user 1~~
+- Updated system packages
+- Motion controller command trace
+- Automatic admin check on startup
+- Not calibrated warning at startup
+- NetworkManager
+- Droped Python 2 compatibility
+- UV coin device support on system level
 
 # Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
