@@ -54,6 +54,7 @@ FILES_${PN} += "\
 	/srv/http/intranet\
 	/usr/share/scripts\
 	/usr/share/factory/defaults\
+	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.printer0.conf\
 "
 
 S="${WORKDIR}/git/firmware"
