@@ -41,6 +41,7 @@ RDEPENDS_${PN} += " \
 	python3-toml \
 	python3-pyalsaaudio \
 	python3-dbus \
+	python3-pillow \
 "
 
 FILES_${PN} += "\
