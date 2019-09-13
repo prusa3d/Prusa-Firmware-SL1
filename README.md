@@ -1,27 +1,60 @@
 How to build image
 ==================
 
-```bash
-# in hurry, skip fetching of history by adding `--depth 1 --shallow-submodules`
-git clone --recurse-submodules --jobs 4 \
-	ssh://git@gitlab.webdev.prusa3d.com:22443/hw/a64/meta-prusa.git \
-	oe
-cd oe
-source oe-init-build-env
+What to expect
+--------------
+- Build of a custom Linux distribution from source (something like Gentoo install)
+- Most probbaly it will take hours to complete
+- RAM usage will be as high as 4GiB per each core of your CPU
+- The build will take around 32GiB of your storage
 
-bitbake sla-image
-```
-For convenience a Docker image configuration used for CI builds is included. The build can be executed in a Docker container or the Dockerfile can be used just as a list of dependencies.
+Requirements
+------------
+The requirements for the build are listed in a Dockerfile located in the root of this repository. Docker image build using the Dockerfiles is used for CI build.
 
-### Customers who bought this item also bought ...
+Clone the respoitory
+--------------------
 
-#### Other targets
+	git clone git@github.com:prusa3d/Prusa-Firmware-SL1.git
+	git tag -a -m "My custom build" my_custom_build
+	git submodule init
+	git submodule update
+
+Obtain keys for image signing
+-----------------------------
+	cd keys
+	sh gen_keys.sh # Skip this if you already have the keys
+	sh deploy_keys.sh
+	cd ..
+
+Build development SD image
+--------------------------
+	source ./oe-init-build-en
+	bitbake sla-image-dev # other targets are sla-update-bundle, sla-bootstrap
+
+Write the image to the SD card
+------------------------------
+
+- With bmaptool
+
+
+    bmaptool copy tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.wic /dev/mmcblkXXX
+
+- With dd
+
+    dd if=tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.wic of=/dev/mmcblkXXX bs=1M
+
+
+Customers who bought this item also bought ...
+----------------------------------------------
+
+### Other targets
 
 - sla-image-dev: development-enabled μSD image
 - sla-bootstrap: μSD image for eMMC bring-up
 - sla-update-bundle: OTA & offline update package
 
-#### SDK (cross-toolchain)
+### SDK (cross-toolchain)
 
 A matching [(e)SDK](https://www.yoctoproject.org/docs/latest/sdk-manual/sdk-manual.html) installer can be produced 
 alongside an image by adding {+ -c populate_sdk +} or {+ -c populate_sdk_ext +} to the `bitbake [target]` command.
