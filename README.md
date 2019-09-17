@@ -3,10 +3,10 @@ How to build image
 
 What to expect
 --------------
-- Build of a custom Linux distribution from source (something like Gentoo install)
-- Most probbaly it will take hours to complete
-- RAM usage will be as high as 4GiB per each core of your CPU
-- The build will take around 32GiB of your storage
+- Build of a custom Linux distribution from source (e.g. Gentoo install).
+- The procedure takes several hours to complete.
+- The RAM usage will be as high as 4GiB per each core of your CPU.
+- The build will take around 32GiB of your storage.
 
 Requirements
 ------------
@@ -23,8 +23,8 @@ Clone the respoitory
 Obtain keys for image signing
 -----------------------------
 	cd keys
-	sh gen_keys.sh # Skip this if you already have the keys
-	sh deploy_keys.sh
+	sh gen_certs.sh # Skip this if you already have the keys
+	sh deploy_certs.sh
 	cd ..
 
 Build development SD image
