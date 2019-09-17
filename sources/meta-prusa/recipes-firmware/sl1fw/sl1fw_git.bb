@@ -42,6 +42,7 @@ RDEPENDS_${PN} += " \
 	python3-pyalsaaudio \
 	python3-dbus \
 	python3-pillow \
+	python3-distro \
 "
 
 FILES_${PN} += "\
