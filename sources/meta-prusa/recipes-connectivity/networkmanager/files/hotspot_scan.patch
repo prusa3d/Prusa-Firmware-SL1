@@ -1,7 +1,17 @@
-diff -Naur NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c NetworkManager-1.14.4/src/devices/wifi/nm-device-wifi.c
---- NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c	2018-10-24 10:03:43.000000000 +0200
-+++ NetworkManager-1.14.4/src/devices/wifi/nm-device-wifi.c	2019-08-12 10:30:47.571086840 +0200
-@@ -431,8 +431,9 @@
+From 7e546962217ddf72037b873d088def84a22371e3 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 12 Jul 2019 13:53:31 +0200
+
+---
+ src/devices/wifi/nm-device-wifi.c     | 15 +++++++++------
+ src/supplicant/nm-supplicant-config.c | 13 ++++++++-----
+ 2 files changed, 17 insertions(+), 11 deletions(-)
+
+diff --git a/src/devices/wifi/nm-device-wifi.c b/src/devices/wifi/nm-device-wifi.c
+index 3a58c62..ce00874 100644
+--- a/src/devices/wifi/nm-device-wifi.c
++++ b/src/devices/wifi/nm-device-wifi.c
+@@ -448,8 +448,9 @@ periodic_update (NMDeviceWifi *self)
  		return;
  
  	/* In AP mode we currently have nothing to do. */
@@ -13,7 +23,7 @@ diff -Naur NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c Netwo
  
  	if (priv->current_ap) {
  		/* Smooth out the strength to work around crappy drivers */
-@@ -1214,8 +1215,9 @@
+@@ -1219,8 +1220,9 @@ scanning_prohibited (NMDeviceWifi *self, gboolean periodic)
  	/* Don't scan when a an AP or Ad-Hoc connection is active as it will
  	 * disrupt connected clients or peers.
  	 */
@@ -25,7 +35,7 @@ diff -Naur NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c Netwo
  
  	switch (nm_device_get_state (NM_DEVICE (self))) {
  	case NM_DEVICE_STATE_UNKNOWN:
-@@ -1555,8 +1557,9 @@
+@@ -1560,8 +1562,9 @@ supplicant_iface_bss_updated_cb (NMSupplicantInterface *iface,
  	state = nm_device_get_state (NM_DEVICE (self));
  	if (state <= NM_DEVICE_STATE_UNAVAILABLE)
  		return;
@@ -37,10 +47,11 @@ diff -Naur NetworkManager-1.14.4.vanilla/src/devices/wifi/nm-device-wifi.c Netwo
  
  	found_ap = nm_wifi_aps_find_by_supplicant_path (&priv->aps_lst_head, object_path);
  	if (found_ap) {
-diff -Naur NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c NetworkManager-1.14.4/src/supplicant/nm-supplicant-config.c
---- NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c	2018-10-24 10:03:43.000000000 +0200
-+++ NetworkManager-1.14.4/src/supplicant/nm-supplicant-config.c	2019-08-12 10:30:47.571086840 +0200
-@@ -462,7 +462,9 @@
+diff --git a/src/supplicant/nm-supplicant-config.c b/src/supplicant/nm-supplicant-config.c
+index 7708224..e59736e 100644
+--- a/src/supplicant/nm-supplicant-config.c
++++ b/src/supplicant/nm-supplicant-config.c
+@@ -469,7 +469,9 @@ nm_supplicant_config_add_setting_wireless (NMSupplicantConfig * self,
  	mode = nm_setting_wireless_get_mode (setting);
  	is_adhoc = (mode && !strcmp (mode, "adhoc")) ? TRUE : FALSE;
  	is_ap = (mode && !strcmp (mode, "ap")) ? TRUE : FALSE;
@@ -51,7 +62,7 @@ diff -Naur NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c N
  		priv->ap_scan = 2;
  	else
  		priv->ap_scan = 1;
-@@ -558,10 +560,11 @@
+@@ -565,10 +567,11 @@ nm_supplicant_config_add_bgscan (NMSupplicantConfig *self,
  	/* Don't scan when a shared connection (either AP or Ad-Hoc) is active;
  	 * it will disrupt connected clients.
  	 */
@@ -65,5 +76,5 @@ diff -Naur NetworkManager-1.14.4.vanilla/src/supplicant/nm-supplicant-config.c N
 +	//                  NM_SETTING_WIRELESS_MODE_ADHOC))
 +	//	return TRUE;
  
- 	/* Don't scan when the connection is locked to a specifc AP, since
+ 	/* Don't scan when the connection is locked to a specific AP, since
  	 * intra-ESS roaming (which requires periodic scanning) isn't being
