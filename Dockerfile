@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 # Install tools required to build the system using bitbake
-RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils
+RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin
 
 # Configure locale, python/bitbake have problems without valid locale
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen 
@@ -14,6 +14,12 @@ ENV LC_ALL en_US.UTF-8
 RUN ln -sf /bin/bash /bin/sh
 # Provide python2 command
 RUN ln -sf /usr/bin/python2.7 /usr/bin/python2
+
+# Install pkcs11-proxy
+RUN git clone https://github.com/SUNET/pkcs11-proxy /tmp/pkcs11-proxy && \
+    cd /tmp/pkcs11-proxy && cmake . && make && make install && \
+    rm -rf /tmp/pkcs11-proxy
+ENV RAUC_PKCS11_MODULE /usr/local/lib/libpkcs11-proxy.so
 
 # Create use that will run the build
 RUN useradd --create-home --user-group appuser
