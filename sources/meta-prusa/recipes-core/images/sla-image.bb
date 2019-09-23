@@ -5,7 +5,6 @@ inherit core-image
 IMAGE_INSTALL += "\
 	packagegroup-prusa-base \
 	packagegroup-prusa-sla \
-	packagegroup-prusa-tools \
 "
 
 IMAGE_FEATURES += "\
