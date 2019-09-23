@@ -8,7 +8,7 @@ FILES_${PN} += "\
 	${libdir}/systemd/system \
 "
 
-PACKAGECONFIG_remove_pn-networkmanager = "polkit"
+PACKAGECONFIG_remove_pn-networkmanager = "polkit dhclient dnsmasq ifupdown"
 
 EXTRA_OECONF += "--with-dbus-sys-dir=/usr/share/dbus-1/system.d"
 
