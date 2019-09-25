@@ -10,12 +10,5 @@ SRC_URI_append = " \
 do_install_append () {
     install -d ${D}${datadir}/rauc/
     install -m 0644 ${WORKDIR}/system.conf ${D}${datadir}/rauc/system.conf
-
-    #correct certificate path absolute/relative
-    case ${RAUC_KEYRING_FILE} in
-        /*)
-            install -m 0644 ${RAUC_KEYRING_FILE} ${D}${datadir}/rauc/ca.cert.pem;;
-        *)
-            install -m 0644 ${WORKDIR}/${RAUC_KEYRING_FILE} ${D}${datadir}/rauc/ca.cert.pem;;
-    esac
+    install -m 0644 ${WORKDIR}/${RAUC_KEYRING_FILE} ${D}${datadir}/rauc/ca.cert.pem
 }

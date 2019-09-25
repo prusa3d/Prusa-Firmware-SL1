@@ -41,7 +41,7 @@ do_bundle() {
 	export PKCS11_PROXY_SOCKET=${PKCS11_PROXY_SOCKET}
 	export RAUC_PKCS11_PIN=${RAUC_PKCS11_PIN}
 
-	for val in $RAUC_INTERMEDIATE_FILE; do
+	for val in ${RAUC_INTERMEDIATE_FILE}; do
 		INTERMEDIATE_FILE="${INTERMEDIATE_FILE} --intermediate=${val}"
 	done
 
