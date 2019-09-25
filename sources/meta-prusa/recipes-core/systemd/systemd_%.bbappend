@@ -16,6 +16,8 @@ do_install_append() {
 	if ! ${@bb.utils.contains('PACKAGECONFIG', 'resolved', 'true', 'false', d)}; then
 		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../run/systemd/resolve/stub-resolv.conf%g" \
 			${D}${exec_prefix}/lib/tmpfiles.d/etc.conf
+		install -d ${D}${systemd_system_unitdir}
+		ln -s ../systemd-resolved.service ${D}${systemd_system_unitdir}/multi-user.target.wants/systemd-resolved.service
 	fi
 
 	# Persistent journal directory tmpfiles configuration

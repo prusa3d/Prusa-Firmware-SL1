@@ -36,7 +36,8 @@ SRC_URI = " \
 	https://raw.githubusercontent.com/webpack/webpack/master/LICENSE;md5sum=95a881ed5cb29fc8a0fa0356525f30ac;downloadfilename=LICENSE-webpack \
 	https://raw.githubusercontent.com/webpack/webpack-cli/master/LICENSE;md5sum=7c6802ed94ac83214d15a26008fa22a5;downloadfilename=LICENSE-webpack-cli \
 	https://raw.githubusercontent.com/webpack/webpack-dev-server/master/LICENSE;md5sum=95a881ed5cb29fc8a0fa0356525f30ac;downloadfilename=LICENSE-webpack-dev-server \
-	file://avahi/octoprint.service \
+	file://dnssd/http.dnssd \
+	file://dnssd/octoprint.dnssd \
 	file://nginx/prusa-auth.conf \
 	file://nginx/error_401.txt \
 	file://nginx/sl1fw \
@@ -125,8 +126,7 @@ inherit useradd
 DEPENDS += " nodejs-native python3"
 RDEPENDS_${PN} += "\
 	nginx \
-	avahi-daemon \
-	avahi-restarter \
+	systemd \
 	sl1fw-api \
 "
 FILES_${PN} += " \
@@ -134,7 +134,8 @@ FILES_${PN} += " \
 	${sysconfdir}/nginx/prusa-auth.conf \
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
-	${sysconfdir}/avahi/services/octoprint.service \
+	${systemd_unitdir}/dnssd/http.dnssd \
+	${systemd_unitdir}/dnssd/octoprint.dnssd \
 "
 S = "${WORKDIR}/git"
 
@@ -151,9 +152,10 @@ do_compile() {
 
 do_install_append () {
 
-    # Avahi service definition
-	install -d ${D}${sysconfdir}/avahi/services
-	install --mode 644 ${WORKDIR}/avahi/octoprint.service ${D}${sysconfdir}/avahi/services/octoprint.service
+	# mDNS service definition
+	install -d ${D}${systemd_unitdir}/dnssd
+	install --mode 644 ${WORKDIR}/dnssd/http.dnssd ${D}${systemd_unitdir}/dnssd/
+	install --mode 644 ${WORKDIR}/dnssd/octoprint.dnssd ${D}${systemd_unitdir}/dnssd/
 
 	# static web files
 	install -m 755 -d ${D}/srv/http/intranet/

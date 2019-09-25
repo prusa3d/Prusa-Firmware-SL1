@@ -1,8 +1,0 @@
-[Unit]
-Description=Start avahi-restart when hostname changes
-
-[Path]
-PathChanged=/etc/hostname
-
-[Install]
-WantedBy=multi-user.target
