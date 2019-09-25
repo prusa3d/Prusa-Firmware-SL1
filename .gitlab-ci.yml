@@ -150,14 +150,20 @@ sign:raub:
       - merge_requests
       - web
 
+    variables:
+      - $RAUC_CERT_FILE
+      - $RAUC_KEY_FILE
+      - $RAUC_KEYRING_FILE
+      - $RAUC_INTERMEDIATE_FILE
+      - $RAUC_PKCS11_PIN
+      - $PKCS11_PROXY_SOCKET
+      - $RAUC_PKCS11_MODULE
+
   script:
-    - if [ -z "$RAUC_CERT_FILE" ] || [ -z "$RAUC_KEY_FILE" ] || [ -z "$RAUC_KEYRING_FILE" ] || [ -z "$RAUC_INTERMEDIATE_FILE" ] || [ -z "$RAUC_PKCS11_PIN" ] || [ -z "$PKCS11_PROXY_SOCKET" ] || [ -z "$RAUC_PKCS11_MODULE" ];
-        then echo "Some variable needed for sign process is not set."; exit 1; fi
     - RAUC_KEYRING_FILE=$(echo ${RAUC_KEYRING_FILE} | sed 's/\\//g')
-    - p11tool --provider ${RAUC_PKCS11_MODULE} --export ${RAUC_KEYRING_FILE} > ${HOME}/ca.cert.pem
-    - export RAUC_KEYRING_FILE="$HOME/ca.cert.pem"
+    - p11tool --provider ${RAUC_PKCS11_MODULE} --export ${RAUC_KEYRING_FILE} > sources/meta-prusa/recipes-core/rauc/files/ca.cert.pem
     - source oe-init-build-env
-    - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_KEYRING_FILE RAUC_INTERMEDIATE_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
+    - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_INTERMEDIATE_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
     - bitbake sla-update-bundle
     - cd ..
     - BASE=$(git describe --dirty)
