@@ -1,0 +1,5 @@
+[Service]
+Name=Original Prusa SL1 "%H"
+Type=_octoprint._tcp
+Port=80
+TxtText=model=SL1 vendor="Prusa Research"
