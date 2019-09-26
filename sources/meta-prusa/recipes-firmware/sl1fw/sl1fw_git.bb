@@ -43,6 +43,7 @@ RDEPENDS_${PN} += " \
 	python3-dbus \
 	python3-pillow \
 	python3-distro \
+	python3-readerwriterlock \
 "
 
 FILES_${PN} += "\

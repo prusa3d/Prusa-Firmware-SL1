@@ -1,0 +1,22 @@
+From df821103e33527684b70043f05bfb9c48aa2c520 Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Thu, 26 Sep 2019 12:01:47 +0200
+Subject: [PATCH] Fix README path
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 23eafad..137f610 100644
+--- a/setup.py
++++ b/setup.py
+@@ -20,7 +20,7 @@ setup(
+ 	url="https://github.com/elarivie/pyReaderWriterLock",
+ 	download_url="https://github.com/elarivie/pyReaderWriterLock",
+ 	description=("A python implementation of the three Reader-Writer problems."),
+-	long_description=read('README.rst'),
++	long_description=read('README'),
+ 	license='MIT',
+ 	keywords=['rwlock', 'read-write lock', 'lock', "priority", "reader", "writer", "fair", "read", "write", "thread", "synchronize"],
+ 	classifiers=[
