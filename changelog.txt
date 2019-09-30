@@ -1,33 +1,72 @@
+# Version 1.2.3
+## Summary
+- Fixed tilt jerk in calibration
+- Fixed rehoming tilt when printing
+- Prevent rehoming in measure tilt times
+
+## A detailed description
+### Fixed jerk in calibration
+Few machines encountered problems in calibration when measuring tower height. Tilt couldn't handle the pressure from the platform and skipped a few steps. We gained the current so the motor can withstand the exten$
+
+### Fixed rehoming tilt when printing
+Now printer properly rehomes when printer loses a step in movement up (for example on extremely thin layers with tough resins).
+
+## Others
+- Removed unnecessary movement in Home Tank function
+
+
 # Version 1.2.2
 ## Summary
 - Print quality improvements
 - Vibration elimination while printing
-- Blower fan fix
+- Blower fan fixes
+- Others
 
-## Detailed description
-Improvement of print quality implements the following:
-1. The tank is calibrated to the full-step of stepper motor. It is a spot where motor has the biggest holding torque. Your printer may require recalibration after this update.
-2. Removed any changes of profiles or current in stepper motor to eliminate possible twitching.
-3. Tank rehomes only if it's necessary needed while printing.
-4. Preventing SL1 from vibrations when the tank moves.
-Blower fan reduced RPM to meet it's recommended specs.
+## A detailed description
+### Print quality improvements
+For this release, we have prepared improvements regarding print quality. First, the tank is now calibrated at a full-step of the stepper motor. At this position, the motor has the biggest holding torque. Note that your printer may require recalibration after this update. You will be informed before the next print.
 
-## Other
+In the previous release, the printer lowered the current in the motors after finishing a movement. This current adjustment caused in some scenarios slight jerks of the motor. In this release, the current level isn't lowered to keep the motor stable.
+
+The last improvement is regarding the rehoming procedure. Until this release, the rules were allowing for multiple rehoming procedures during the print, which weren't necessary. Latest release performs rehoming only if needed.
+
+### Vibration elimination while printing
+Some printer's tanks were vibrating while moving during the prints. The current levels we optimized to increase torque in the motor and effectively dampen the vibrations.
+
+### Blower fan fixes
+Right side blower fan RPMs were optimized for this release. The previous peak value of about 4200 RPM was lowered to 3700 RPM to meet the optimal working range of the fan. As a result, the level of noise was reduced.
+
+The second fix is included in the initial Wizard, which was previously strict and sometimes didn't give the fan enough time to spin to its max. speed. This then resulted in a failed self-test. New Wizard gives the fan more time but still insists on the target RPM.
+
+## Others
 - Faster tilt movement in calibration
-- Delay before blower fan error
+
 
 # Version 1.2.1
 ## Summary
-- This is a bugfix release
+This is a bugfix release
+
+- Fixed UV LED exposure timing
+- Auto adjust tower profiles for reliable homing
+- Fixed bugs
+- Others
+
+## A detailed description
+### Fixed UV LED exposure timing
+An integer overflow, which prevented longer exposure times, was fixed in the motion controller firmware. Now the exposure time set in the printer's interface should match the real exposure.
+
+### Auto adjust tower profiles for reliable homing
+Homing of the tower uses a new algorithm that finds automatically optimal axis sensitivity. This feature allows the printer to home reliably, replacing the old system which required manual tweaking in case of unreliable homing. All the issues with tower homing should be resolved by this change.
 
 ## Fixed bugs
 - Fixed missing sleep in tower/tilt sync wait
-- Auto adjust tower profiles for reliable homing
+- Fixed ALSA state restore in new systems
 - Erase MC EEPROM on factory reset
-- Fixed UV LED exposure timing
+
+## Others
+- Various improvements in test code and build scripts
 - Improved log extraction speed
-- Various fixes in test code and build scripts
-- Fixed alsa state restore in new systems
+
 
 # Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
