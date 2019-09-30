@@ -8,7 +8,7 @@ SRC_URI = "\
 	file://000-install-path.patch \
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
-SRCREV = "69b6b1bafc460e0861e6d853fccfe6e346dc6ec1"
+SRCREV = "ac06cb1e5dd0ac2cbbff0a3e0434e1fbb55dc913"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
@@ -20,13 +20,25 @@ LIC_FILES_CHKSUM = "\
 
 inherit qmake5 systemd
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5"
 # qtquickcontrols2 qttools-plugins
 
-RDEPENDS_${PN} += "qtquickcontrols-qmlplugins qtquickcontrols2-qmlplugins qtwebsockets-qmlplugins qtvirtualkeyboard-plugins qtvirtualkeyboard-qmlplugins qtvirtualkeyboard qtmultimedia qtmultimedia-qmlplugins qtmultimedia-plugins"
+RDEPENDS_${PN} += "\
+	qtquickcontrols-qmlplugins \
+	qtquickcontrols2-qmlplugins \
+	qtwebsockets-qmlplugins \
+	qtvirtualkeyboard-plugins \
+	qtvirtualkeyboard-qmlplugins \
+	qtvirtualkeyboard \
+	qtmultimedia \
+	qtmultimedia-qmlplugins \
+	qtmultimedia-plugins \
+	nemo-qml-plugin-dbus-qt5 \
+"
 
 FILES_${PN} += "\
 	/usr/share/sla-client-config.json \
+	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.notificationsink.conf \
 "
 
 S="${WORKDIR}/git"
@@ -38,8 +50,8 @@ do_install_append () {
 	install -d ${D}/usr/share/
 	install --mode 644 ${WORKDIR}/sla-client-config.json ${D}/usr/share/
 
-	install -d ${D}//etc/dbus-1/system.d
-	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.notificationsink.conf ${D}/etc/dbus-1/system.d/
+	install -d ${D}/usr/share/dbus-1/system.d
+	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.notificationsink.conf ${D}/usr/share/dbus-1/system.d/
 }
 
 SYSTEMD_SERVICE_${PN} = "sla-client.service"
