@@ -19,5 +19,4 @@ IMAGE_LINGUAS = "en-us"
 SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs perf "
 
 LICENSE = "MIT"
-
 inherit core-image

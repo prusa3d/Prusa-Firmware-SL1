@@ -9,10 +9,10 @@ LIC_FILES_CHKSUM = "\
         file://LICENSE;md5=5b4473596678d62d9d83096273422c8c \
 "
 
-SRCREV = "1966699abf0e6d91789544d922bacd430425c981"
+SRCREV = "33fd23abaa2e782d778a06370c4d2da0c3e403cf"
 inherit systemd setuptools3
 
-RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen"
+RDEPENDS_${PN} += "python3-cherrypy python3-pyinotify python3-json avahi-daemon avahi-restarter api-keygen python3-pydbus"
 
 S="${WORKDIR}/git"
 
