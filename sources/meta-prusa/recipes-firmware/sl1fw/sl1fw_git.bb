@@ -3,9 +3,9 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "1a66e12e6b9a7632ef2b2a21877ad5f03078be13"
+SRCREV_pn-${PN} = "83264ccaea456b9ae04f53f04fec6d72cca494c2"
 
-PACKAGES = "${PN}"
+PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "python3 gettext-native"
 
@@ -59,6 +59,8 @@ FILES_${PN} += "\
 	/usr/share/factory/defaults\
 	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.printer0.conf\
 "
+FILES_${PN}_remove = "${sysconfdir}/sl1fw/loggerConfig.json"
+FILES_${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
 
 S="${WORKDIR}/git/firmware"
 INTRANET=""
