@@ -2,17 +2,18 @@
 ## Summary
 - Fixed tilt jerk in calibration
 - Fixed rehoming tilt when printing
-- Prevent rehoming in measure tilt times
+- Others
 
 ## A detailed description
 ### Fixed jerk in calibration
-Few machines encountered problems in calibration when measuring tower height. Tilt couldn't handle the pressure from the platform and skipped a few steps. We gained the current so the motor can withstand the exten$
+Some machines have encountered problems during the calibration process while measuring tower height. The tilt mechanism couldn't handle the pressure from the printing platform and skipped a few steps. The current in the tilt motor is now increased to withstand the applied load.
 
 ### Fixed rehoming tilt when printing
-Now printer properly rehomes when printer loses a step in movement up (for example on extremely thin layers with tough resins).
+The printer now properly rehomes when it loses a step in the movement up (e.g. printing extremely thin layers using tough resins).
 
 ## Others
 - Removed unnecessary movement in Home Tank function
+- Prevent rehoming while measuring tilt times
 
 
 # Version 1.2.2
