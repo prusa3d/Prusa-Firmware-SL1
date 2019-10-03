@@ -37,6 +37,9 @@ slot-post-install)
 		# Now we use NetworkManager, direct wpa_supplicant service must be disabled
 		systemctl --root ${RAUC_MOUNT_PREFIX} disable wpa_supplicant@wlan0.service
 
+		#remove old certificates
+		rm -rf ${RAUC_MOUNT_PREFIX}/etc/rauc
+
 		umount ${etc_dev}
 
 		prepare_fs /dev/mmcblk2p6 # /var

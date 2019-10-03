@@ -3,6 +3,7 @@ image: prusa/oe
 stages:
   - build
   - deploy
+  - sign
 
 variables:
   GIT_SUBMODULE_STRATEGY: "normal"
@@ -135,3 +136,50 @@ deploy:tools:
     - echo "put ${BASE}.devsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${BASE}.bootstrapsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${BASE}.bootstrapsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+
+sign:raub:
+  stage: sign
+  when: manual
+  
+  dependencies:
+    - build:raucb
+
+  only:
+    refs:
+      - tags
+      - merge_requests
+      - web
+
+    variables:
+      - $RAUC_CERT_FILE
+      - $RAUC_KEY_FILE
+      - $RAUC_KEYRING_FILE
+      - $RAUC_INTERMEDIATE_FILE
+      - $RAUC_PKCS11_PIN
+      - $PKCS11_PROXY_SOCKET
+      - $RAUC_PKCS11_MODULE
+
+  script:
+    - RAUC_KEYRING_FILE=$(echo ${RAUC_KEYRING_FILE} | sed 's/\\//g')
+    - p11tool --provider ${RAUC_PKCS11_MODULE} --export ${RAUC_KEYRING_FILE} > sources/meta-prusa/recipes-core/rauc/files/ca.cert.pem
+    - source oe-init-build-env
+    - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_INTERMEDIATE_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
+    - bitbake sla-update-bundle
+    - cd ..
+    - BASE=$(git describe --dirty)
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${BASE}.raucb
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.etc.ext4 ${BASE}.etc.ext4
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${BASE}.initramfs.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${BASE}.manifest
+    - mv changelog.md ${BASE}.changelog.md
+    - mv known-issues.txt ${BASE}.known-issues.txt
+
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - ./*.raucb
+      - ./*.etc.ext4
+      - ./*.manifest
+      - ./*.changelog.md
+      - ./*.known-issues.txt

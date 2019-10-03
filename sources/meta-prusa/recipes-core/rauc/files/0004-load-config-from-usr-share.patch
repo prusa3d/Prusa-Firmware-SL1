@@ -1,0 +1,13 @@
+diff --git a/src/context.c b/src/context.c
+index 53ac367..c7dd155 100644
+--- a/src/context.c
++++ b/src/context.c
+@@ -536,7 +536,7 @@ RaucContext *r_context_conf(void)
+ 		}
+ 
+ 		context = g_new0(RaucContext, 1);
+-		context->configpath = g_strdup("/etc/rauc/system.conf");
++		context->configpath = g_strdup("/usr/share/rauc/system.conf");
+ 		context->progress = NULL;
+ 		context->install_info = g_new0(RContextInstallationInfo, 1);
+ 	}
