@@ -8,7 +8,7 @@ SRC_URI = "\
 	file://000-install-path.patch \
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
-SRCREV = "ac06cb1e5dd0ac2cbbff0a3e0434e1fbb55dc913"
+SRCREV = "fcc579c55fa7669151f272619b2d3ff093f9aa69"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
