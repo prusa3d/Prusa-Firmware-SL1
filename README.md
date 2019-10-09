@@ -29,7 +29,7 @@ Obtain keys for image signing
 
 Build development SD image
 --------------------------
-	source ./oe-init-build-en
+	source ./oe-init-build-env
 	bitbake sla-image-dev # other targets are sla-update-bundle, sla-bootstrap
 
 Write the image to the SD card
