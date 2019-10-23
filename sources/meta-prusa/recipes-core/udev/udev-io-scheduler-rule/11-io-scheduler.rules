@@ -1,0 +1,3 @@
+# set bfq scheduler for (e)mmc disks
+ACTION=="add|change", KERNEL=="mmcblk[0-9]*", ATTR{queue/scheduler}="bfq"
+
