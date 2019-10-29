@@ -1,13 +1,14 @@
 SUMMARY = "sl1fw - python firmware part running on a64 board" 
 
-LICENSE = "CLOSED"
+LICENSE = "GPLv3+"
+LIC_FILES_CHKSUM = "file://../LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = " \
 	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "6c25a18bc51757a3150fad4803634450bf337047"
+SRCREV_pn-${PN} = "33ff90ec58980be8b0f70279e378301019ded0da"
 
 PACKAGES = "${PN}-dev ${PN}"
 
