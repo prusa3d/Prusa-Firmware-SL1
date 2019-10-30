@@ -17,6 +17,7 @@ inherit go systemd
 FILES_${PN} = "\
 	${bindir}/updater \
 	${datadir}/dbus-1/system.d/cz.prusa3d.Updater1.conf \
+	${libdir}/systemd/system \
 "
 FILES_${PN}-serve-package = "${bindir}/serve-package"
 
@@ -25,6 +26,10 @@ do_install_append() {
 	install -m 0644 ${S}/src/${GO_IMPORT}/_release/cz.prusa3d.Updater1.conf ${D}${datadir}/dbus-1/system.d/
 	install -d ${D}${systemd_system_unitdir}
 	install -m 0644 ${S}/src/${GO_IMPORT}/_release/updater.service ${D}${systemd_system_unitdir}
+
+	# Enable service
+	install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
+	ln -s ${systemd_system_unitdir}/updater.service ${D}${systemd_system_unitdir}/multi-user.target.wants/
 }
 
 SYSTEMD_SERVICE_${PN} = "updater.service"
