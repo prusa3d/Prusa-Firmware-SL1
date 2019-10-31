@@ -11,12 +11,12 @@ LOCALVERSION ?= ""
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "master"
+KBRANCH ?= "linux-4.19.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "e2fb0d1bfa66298934766f33371da2b5bec4c2bf"
-PV = "v4.18.0-rc6+git${SRCPV}"
+SRCREV_pn-${PN} = "f8ee3c245d713a8421dd70624e7969cb95858adf"
+PV = "v4.19.81+git${SRCPV}"
 
 SRC_URI="\
 	git://git@gitlab.com/prusa3d/distro/linux.git;protocol=ssh;branch=${KBRANCH} \
