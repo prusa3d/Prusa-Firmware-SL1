@@ -34,3 +34,4 @@ do_rootfs() {
 
 	mkimage -C none -A arm -T script -d ${UBOOT_ENV} ${IMAGE_ROOTFS}/boot.scr;
 }
+IMAGE_NAME = "${IMAGE_BASENAME}-${MACHINE}-${DISTRO_VERSION}${IMAGE_VERSION_SUFFIX}"
