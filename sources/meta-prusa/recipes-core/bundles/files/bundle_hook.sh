@@ -11,23 +11,13 @@ function prepare_fs() {
 case "$1" in
 slot-post-install)
 	if [ "$RAUC_SLOT_CLASS" = "rootfs" ]; then
-		case "${RAUC_SLOT_BOOTNAME}" in
-		A)
-			etc_dev=/dev/mmcblk2p4
-			;;
-		B)
-			etc_dev=/dev/mmcblk2p5
-			;;
-		esac
-		prepare_fs $etc_dev
-
-		mkdir -p ${RAUC_MOUNT_PREFIX}/etc
-		mount ${etc_dev} ${RAUC_MOUNT_PREFIX}/etc
-		/lib/systemd/systemd-growfs ${RAUC_MOUNT_PREFIX}/etc
-
-		umount ${etc_dev}
-
 		prepare_fs /dev/mmcblk2p6 # /var
+	fi;
+	if [ "$RAUC_SLOT_CLASS" = "etcfs" ]; then
+		/lib/systemd/systemd-growfs ${RAUC_MOUNT_POINT}
+
+		# Do NOT copy settings from the NEWER(1.3) etc
+		##############################################
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "bootloader" ]; then
 		echo "Updating u-boot environment"
