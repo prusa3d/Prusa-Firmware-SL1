@@ -11,46 +11,24 @@ function prepare_fs() {
 case "$1" in
 slot-post-install)
 	if [ "$RAUC_SLOT_CLASS" = "rootfs" ]; then
-		case "${RAUC_SLOT_BOOTNAME}" in
-		A)
-			etc_dev=/dev/mmcblk2p4
-			;;
-		B)
-			etc_dev=/dev/mmcblk2p5
-			;;
-		esac
-		prepare_fs $etc_dev
-
-		mkdir -p ${RAUC_MOUNT_PREFIX}/etc
-		mount ${etc_dev} ${RAUC_MOUNT_PREFIX}/etc
-		/lib/systemd/systemd-growfs ${RAUC_MOUNT_PREFIX}/etc
-		rsync --archive --delete --verbose /etc/ ${RAUC_MOUNT_PREFIX}/etc/
-
-		rm -f ${RAUC_MOUNT_PREFIX}/etc/dnsmasq.conf
-		sed -i 's/#DNSStubListener=udp/DNSStubListener=no/' ${RAUC_MOUNT_PREFIX}/etc/systemd/resolved.conf
-		rm -f ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sockets.target.wants/sshd.socket
-		ln -sf /dev/null ${RAUC_MOUNT_PREFIX}/etc/systemd/system/sshd.socket
-
-		# Now default is set in /usr/lib/systemd/journald.conf.d/max_use.conf
-		sed -i 's/SystemMaxUse=.*/#SystemMaxUse=/' ${RAUC_MOUNT_PREFIX}/etc/systemd/journald.conf
-
-		# Now we use NetworkManager, direct wpa_supplicant service must be disabled
-		systemctl --root ${RAUC_MOUNT_PREFIX} disable wpa_supplicant@wlan0.service
-
-		# Disable tty1 logins
-		systemctl --root ${RAUC_MOUNT_PREFIX} disable getty@tty1.service
-		systemctl --root ${RAUC_MOUNT_PREFIX} mask getty@tty1.service
-
-		if grep -q 'auth' "${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw"; then
-			sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw
-			patch -o ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw-auth ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw < ${RAUC_MOUNT_PREFIX}/bundle/patches/nginx-sl1fw-auth.patch
-			patch ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw < ${RAUC_MOUNT_PREFIX}/bundle/patches/nginx-sl1fw.patch
-			ln -s /etc/nginx/sites-available/sl1fw-auth ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-enabled/sl1fw-auth
-		fi;
-
-		umount ${etc_dev}
-
 		prepare_fs /dev/mmcblk2p6 # /var
+	fi;
+	if [ "$RAUC_SLOT_CLASS" = "etcfs" ]; then
+		/lib/systemd/systemd-growfs ${RAUC_MOUNT_POINT}
+
+		# Copy system settings
+		cp -av /etc/machine-id ${RAUC_SLOT_MOUNT_POINT}/
+		cp -av /etc/hostname ${RAUC_SLOT_MOUNT_POINT}/
+		cp -av /etc/locale.conf ${RAUC_SLOT_MOUNT_POINT}/
+		cp -av /etc/localtime ${RAUC_SLOT_MOUNT_POINT}/
+		test -f /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service || rm -f ${RAUC_SLOT_MOUNT_POINT}/systemd/system/sysinit.target.wants/systemd-timesyncd.service
+
+		# Copy network settings
+		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/NetworkManager/system-connections
+		cp -av /etc/NetworkManager/system-connections/*.nmconnection ${RAUC_SLOT_MOUNT_POINT}/NetworkManager/system-connections/
+
+		# Copy printer settings
+		cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "bootloader" ]; then
 		echo "Updating u-boot environment"
