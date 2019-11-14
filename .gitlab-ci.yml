@@ -23,7 +23,7 @@ before_script:
   - echo "$DEV_KEY" > sources/meta-prusa/files/ca.key.pem
   - export VERSION=$(./version.sh)
   - echo "Version ${VERSION}"
-  - export BB_ENV_EXTRAWHITE=CI_COMMIT_REF_NAME
+  - export BB_ENV_EXTRAWHITE="${BB_ENV_EXTRAWHITE} CI_COMMIT_REF_NAME CI_COMMIT_TAG"
 
 cache:
   key: build-cache
