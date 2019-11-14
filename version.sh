@@ -12,6 +12,14 @@ if [ -z "${CI_COMMIT_REF_NAME}" ]; then
 else
 	BRANCH=${CI_COMMIT_REF_NAME}
 fi
+
+# Omit master or tag name if present
+if [ -z "${CI_COMMIT_TAG}" ]; then
+	OMMIT=master
+else
+	OMMIT=${CI_COMMIT_TAG}
+fi
+
 COMMITS_FROM_VERSION=$(git -C ${BASE} log --oneline ${VERSION}..HEAD|wc -l)
 SHORT_HASH=$(git -C ${BASE} rev-parse --short HEAD)
 if [ -z "$(git -C ${BASE} status --porcelain)" ]; then DIRTY=""; else DIRTY="-dirty"; fi
@@ -23,5 +31,5 @@ case "$VERSION" in
 		VERSION_SEP=-;;
 esac
 
-echo ${VERSION}${VERSION_SEP}${BRANCH}.${COMMITS_FROM_VERSION}+${SHORT_HASH}${DIRTY} | sed "s/[.-]master.0+${SHORT_HASH}//"
+echo ${VERSION}${VERSION_SEP}${BRANCH}.${COMMITS_FROM_VERSION}+${SHORT_HASH}${DIRTY} | sed "s/[.-]${OMMIT}.0+${SHORT_HASH}//" | sed "s/[^a-zA-Z0-9\.+-]/-/g"
 

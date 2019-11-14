@@ -5,4 +5,11 @@ bitbake.lock
 pseudodone
 *.dot
 *.pem
+/*.raucb
+/*.etc.ext4
+/*.manifest
+/*.changelog.md
+/*.known-issues.txt
+/*.devsd.*
+/*.bootstrapsd.*
 
