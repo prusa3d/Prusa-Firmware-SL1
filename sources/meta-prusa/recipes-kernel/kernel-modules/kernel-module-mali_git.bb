@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://linux/license/gpl/mali_kernel_license.h;md5=1436c0d10
 SRC_URI = "git://git@gitlab.com/prusa3d/distro/kernel-module-mali.git;protocol=ssh"
 
 PV = "6.2+git${SRCPV}"
-SRCREV = "14f31c4cf46e28b493b8cb86d7287d24d11f7b94"
+SRCREV = "206e218239c11a03658f382384a4d7984da9e9ff"
 
 S = "${WORKDIR}/git"
 
