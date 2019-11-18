@@ -32,6 +32,7 @@ SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
 
 TOOLCHAIN_HOST_TASK_append = "\
 	nativesdk-qtdeclarative \
+	networkmanager-qt\
 "
 
 DEPENDS += "systemd-systemctl-native coreutils-native"
