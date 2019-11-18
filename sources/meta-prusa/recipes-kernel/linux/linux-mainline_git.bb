@@ -28,6 +28,12 @@ S="${WORKDIR}/git"
 
 FILES_${KERNEL_PACKAGE_NAME}-devicetree_append = " /${KERNEL_IMAGEDEST}/**/*.dtb"
 
+do_configure_prepend() {
+	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
+		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' ${S}/Makefile
+	fi
+}
+
 do_install_append() {
 	install -d ${D}/${KERNEL_IMAGEDEST}
 	install -d ${D}/boot
