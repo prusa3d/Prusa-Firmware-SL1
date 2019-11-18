@@ -77,6 +77,17 @@ do_install() {
     echo "Libs: -L${libdir} -lgbm"	>> ${D}${libdir}/pkgconfig/gbm.pc
     echo "Libs.private: -ldl"		>> ${D}${libdir}/pkgconfig/gbm.pc
     ln -sf gbm.pc ${D}${libdir}/pkgconfig/libgbm.pc
+
+    echo "prefix=${prefix}"             >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "includedir=${includedir}"     >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "libdir=${libdir}"             >> ${D}${libdir}/pkgconfig/egl.pc
+    echo ""                             >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Name: egl"                    >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Description: sunxi-mali"	>> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Version: 1.0"                 >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Cflags: -I${includedir}"      >> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Libs: -L${libdir} -lEGL"	>> ${D}${libdir}/pkgconfig/egl.pc
+    echo "Libs.private: -ldl"           >> ${D}${libdir}/pkgconfig/egl.pc
 }
 
 RPROVIDES_${PN} += "libGLESv2.so libEGL.so libGLESv2.so libGLESv1_CM.so libMali.so"
