@@ -1,2 +1,4 @@
+# 60 sensors UV meter
 SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="uvmeter"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="2c99", ATTRS{idProduct}=="000b", SYMLINK+="uvmeter-single"
+# 15 sensors UV meter
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="uvmeter"
