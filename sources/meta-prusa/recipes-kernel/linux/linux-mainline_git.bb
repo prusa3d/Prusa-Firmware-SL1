@@ -11,7 +11,7 @@ LOCALVERSION ?= ""
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "linux-4.19.y"
+KBRANCH ?= "linux-4.19.y-backup"
 
 DEFAULT_PREFERENCE = "1"
 
