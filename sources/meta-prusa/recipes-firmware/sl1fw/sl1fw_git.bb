@@ -52,6 +52,7 @@ RDEPENDS_${PN} += " \
 	python3-readerwriterlock \
 	python3-deprecated \
 	python3-psutil \
+	python3-evdev \
 "
 
 FILES_${PN} += "\
