@@ -8,6 +8,7 @@ SRC_URI_append = "\
 	file://journal.conf \
 	file://max_use.conf \
 	file://logind-no-auto-vt.conf \
+	file://logind-no-auto-off.conf \
 "
 
 PACKAGECONFIG_append = " microhttpd"
@@ -41,7 +42,11 @@ do_install_append() {
 	install -d ${D}${libdir}/systemd/journald.conf.d
 	install ${WORKDIR}/max_use.conf ${D}${libdir}/systemd/journald.conf.d/max_use.conf
 
-	# No automatic gettty spawn
 	install -d ${D}${libdir}/systemd/logind.conf.d
+
+	# No automatic gettty spawn
 	install ${WORKDIR}/logind-no-auto-vt.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-vt.conf
+
+	# No poweroff on power button
+	install ${WORKDIR}/logind-no-auto-off.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-off.conf
 }
