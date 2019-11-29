@@ -12,7 +12,7 @@ SRC_URI = "\
 #SRCREV_FORMAT = "sla-client_qrcode-generator"
 #SRCREV = "${AUTOREV}"
 
-SRCREV_sla-client = "bb9c8e2655d061abf66615d8a73bfa22dbdd6397"
+SRCREV_sla-client = "38315af237c5c724748a01636f23c7cc57b4e0cd"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
@@ -22,12 +22,9 @@ LIC_FILES_CHKSUM = "\
 #LICENSE_qrcode-generator = "GPLv3+"
 #LIC_FILES_CHKSUM_qrcode-generator = "qrcode-generator/LICENSE.md;md5=a83c38e033331f609f4bbb9b55d68662" 
 
-#EXTRA_OEMAKE_${PN} += " -I../recipe-sysroot/usr/include/KF5/NetworkManagerQt"
-#OE_QMAKE_CXXFLAGS_${PN} += " -I../recipe-sysroot/usr/include/KF5/NetworkManagerQt"
 inherit qmake5 systemd
 
 DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt"
-# qtquickcontrols2 qttools-plugins
 
 RDEPENDS_${PN} += "\
 	qtquickcontrols-qmlplugins \
