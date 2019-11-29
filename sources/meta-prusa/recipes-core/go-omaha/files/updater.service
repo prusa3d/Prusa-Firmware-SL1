@@ -1,0 +1,20 @@
+[Unit]
+Description=OTA Updater
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=dbus
+BusName=cz.prusa3d.Updater1
+Environment=SERVER=https://update.prusa3d.com/service/update2
+Environment=TRACK=stable
+ExecStart=/usr/bin/updater --server $SERVER --track $TRACK
+RuntimeDirectory=updater
+MemoryDenyWriteExecute=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target
