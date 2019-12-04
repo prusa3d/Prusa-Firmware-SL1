@@ -1,0 +1,19 @@
+diff --git a/modules/ECMGeneratePriFile.cmake b/modules/ECMGeneratePriFile.cmake
+index 645bd5e..b5ebd5d 100644
+--- a/modules/ECMGeneratePriFile.cmake
++++ b/modules/ECMGeneratePriFile.cmake
+@@ -162,12 +162,12 @@ function(ECM_GENERATE_PRI_FILE)
+   set(PRI_TARGET_BASENAME ${EGPF_BASE_NAME})
+   set(PRI_TARGET_LIBNAME ${EGPF_LIB_NAME})
+   set(PRI_TARGET_QTDEPS ${EGPF_DEPS})
+-  if(IS_ABSOLUTE "${EGPF_INCLUDE_INSTALL_DIR}")
++  if(IS_ABSOLUTE "${EGPF_INCLUDE_INSTALL_DIR}" OR EGPF_INCLUDE_INSTALL_DIR MATCHES [[^\$\$]])
+       set(PRI_TARGET_INCLUDES "${EGPF_INCLUDE_INSTALL_DIR}")
+   else()
+       set(PRI_TARGET_INCLUDES "${CMAKE_INSTALL_PREFIX}/${EGPF_INCLUDE_INSTALL_DIR}")
+   endif()
+-  if(IS_ABSOLUTE "${EGPF_LIB_INSTALL_DIR}")
++  if(IS_ABSOLUTE "${EGPF_LIB_INSTALL_DIR}" OR EGPF_LIB_INSTALL_DIR MATCHES [[^\$\$]])
+       set(PRI_TARGET_LIBS "${EGPF_LIB_INSTALL_DIR}")
+   else()
+       set(PRI_TARGET_LIBS "${CMAKE_INSTALL_PREFIX}/${EGPF_LIB_INSTALL_DIR}")
