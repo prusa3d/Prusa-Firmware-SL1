@@ -1,0 +1,11 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 773b4a8..cc8873a 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -290,5 +290,5 @@ if(BUILD_QCH)
+ endif()
+ 
+ include(ECMGeneratePriFile)
+-ecm_generate_pri_file(BASE_NAME NetworkManagerQt LIB_NAME KF5NetworkManagerQt DEPS "core" FILENAME_VAR PRI_FILENAME INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR_KF5}/NetworkManagerQt)
++ecm_generate_pri_file(BASE_NAME NetworkManagerQt LIB_NAME KF5NetworkManagerQt DEPS "core" FILENAME_VAR PRI_FILENAME INCLUDE_INSTALL_DIR "$$QT_MODULE_INCLUDE_BASE/KF5/NetworkManagerQt" LIB_INSTALL_DIR "$$QT_MODULE_LIB_BASE")
+ install(FILES ${PRI_FILENAME} DESTINATION ${ECM_MKSPECS_INSTALL_DIR})

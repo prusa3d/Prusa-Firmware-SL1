@@ -1,0 +1,12 @@
+diff --git a/modules/ECMGeneratePriFile.cmake b/modules/ECMGeneratePriFile.cmake
+index 645bd5e..fb80376 100644
+--- a/modules/ECMGeneratePriFile.cmake
++++ b/modules/ECMGeneratePriFile.cmake
+@@ -114,7 +114,7 @@ if(NOT DEFINED KDE_INSTALL_USE_QT_SYS_PATHS)
+   set(ECM_MKSPECS_INSTALL_DIR ${qt_host_data_dir}/mkspecs/modules CACHE PATH "The directory where mkspecs will be installed to.")
+ else()
+-  set(ECM_MKSPECS_INSTALL_DIR mkspecs/modules CACHE PATH "The directory where mkspecs will be installed to.")
++  set(ECM_MKSPECS_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/mkspecs/modules CACHE PATH "The directory where mkspecs will be installed to.")
+ endif()
+ 
+ function(ECM_GENERATE_PRI_FILE)

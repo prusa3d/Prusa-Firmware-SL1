@@ -6,7 +6,12 @@ PR = "r0"
 
 DEPENDS = "cmake-native qttools"
 
-SRC_URI = "git://anongit.kde.org/extra-cmake-modules;nobranch=1"
+SRC_URI = " \
+	git://anongit.kde.org/extra-cmake-modules;nobranch=1 \
+	file://0001-askqmake-warnings.patch \
+	file://0003-ecmgeneerateprifile-handle-qt-module-base.patch \
+"
+#	file://0002-ecmgeneerateprifile-add-option-to-use-qt-module-base.patch
 S = "${WORKDIR}/git"
 CLEANBROKEN = "1"
 
