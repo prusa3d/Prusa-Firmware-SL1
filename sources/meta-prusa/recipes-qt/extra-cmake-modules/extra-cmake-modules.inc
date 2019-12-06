@@ -15,6 +15,8 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 CLEANBROKEN = "1"
 
+ALLOW_EMPTY_${PN} = "1"
+
 do_compile() {
     cmake -DCMAKE_INSTALL_PREFIX:PATH=${D}/${prefix}/ .
     make
@@ -23,6 +25,7 @@ do_compile() {
 do_install() {
     make install
 }
+
 
 FILES_${PN}-dev += " ${datadir}/ECM"
 

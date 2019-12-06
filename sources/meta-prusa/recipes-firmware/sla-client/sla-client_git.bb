@@ -5,14 +5,13 @@ SRC_URI = "\
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/qrcode-generator\
 	file://sla-client.service \
 	file://sla-client-config.json \
-	file://000-install-path.patch \
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
 #PV = "1.0+git${SRCPV}"
 #SRCREV_FORMAT = "sla-client_qrcode-generator"
 #SRCREV = "${AUTOREV}"
 
-SRCREV_sla-client = "8395cff56b72d5e00935558db101a397ff3dff23"
+SRCREV_sla-client = "fe2799b35bde125beca18c5be1d9e4e3c850a0c3"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
@@ -22,7 +21,7 @@ LIC_FILES_CHKSUM = "\
 #LICENSE_qrcode-generator = "GPLv3+"
 #LIC_FILES_CHKSUM_qrcode-generator = "qrcode-generator/LICENSE.md;md5=a83c38e033331f609f4bbb9b55d68662" 
 
-inherit qmake5 systemd
+inherit cmake_kf5 systemd
 
 DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt"
 
