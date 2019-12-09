@@ -1,0 +1,33 @@
+diff --git a/gio/gdbusconnection.c b/gio/gdbusconnection.c
+index 677fa76f9..6ed5bfd12 100644
+--- a/gio/gdbusconnection.c
++++ b/gio/gdbusconnection.c
+@@ -5354,7 +5354,7 @@ register_with_closures_on_method_call (GDBusConnection       *connection,
+   g_value_set_variant (&params[5], parameters);
+ 
+   g_value_init (&params[6], G_TYPE_DBUS_METHOD_INVOCATION);
+-  g_value_set_object (&params[6], invocation);
++  g_value_take_object (&params[6], invocation);
+ 
+   g_closure_invoke (data->method_call_closure, NULL, G_N_ELEMENTS (params), params, NULL);
+ 
+diff --git a/gio/tests/gdbus-export.c b/gio/tests/gdbus-export.c
+index 506c7458a..ece4e4ab3 100644
+--- a/gio/tests/gdbus-export.c
++++ b/gio/tests/gdbus-export.c
+@@ -145,12 +145,12 @@ foo_method_call (GDBusConnection       *connection,
+       gchar *output;
+       g_variant_get (parameters, "(&s)", &input);
+       output = g_strdup_printf ("You passed the string '%s'. Jolly good!", input);
+-      g_dbus_method_invocation_return_value (invocation, g_variant_new ("(s)", output));
++      g_dbus_method_invocation_return_value (g_object_ref (invocation), g_variant_new ("(s)", output));
+       g_free (output);
+     }
+   else
+     {
+-      g_dbus_method_invocation_return_dbus_error (invocation,
++      g_dbus_method_invocation_return_dbus_error (g_object_ref (invocation),
+                                                   "org.example.SomeError",
+                                                   "How do you like them apples, buddy!");
+     }
+
