@@ -10,6 +10,7 @@ SRC_URI = " \
 	git://github.com/ARM-software/arm-trusted-firmware.git;branch=master \
 	file://0002-drivevbus.patch \
 	file://0003-aldo1-regulator.patch \
+	file://0004-set-current-limit.patch \
 "
 SRCREV = "9a25f98261c134e3af4c1610c4afc74b01201fa2"
 
