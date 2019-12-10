@@ -1,0 +1,14 @@
+diff --git a/plat/allwinner/sun50i_a64/sunxi_power.c b/plat/allwinner/sun50i_a64/sunxi_power.c
+index 07a37167..2e4bc932 100644
+--- a/plat/allwinner/sun50i_a64/sunxi_power.c
++++ b/plat/allwinner/sun50i_a64/sunxi_power.c
+@@ -228,6 +228,9 @@ static void setup_axp803_rails(const void *fdt)
+ 	int node;
+ 	bool dc1sw = false;
+ 
++	/* set ACIN current limit to 3.5 A */
++	axp_clrsetbits(0x3a, BIT(1) | BIT(0), BIT(2));
++
+ 	/* locate the PMIC DT node, bail out if not found */
+ 	node = fdt_node_offset_by_compatible(fdt, -1, "x-powers,axp803");
+ 	if (node < 0) {
