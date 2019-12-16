@@ -1,28 +1,57 @@
 # Version 1.3.0
+
 ## Summary
+- New network management
+- Phantom click resistant UI
+- New way of system update delivery
+- Tower profile auto adjustment
 - Final stats
+- Updated translations (including plurals), images
+- Various user interface improvements
+- Adjusted fan limits
+- Not calibrated warning at startup
+- Display language select dialog at startup
+- Tower and tilt home separately before print
+- Added option to download examples, calibration model
 
 ## Detailed description
-### ~~New feature 1~~
-~~User readable detailed description of new feature 1.~~
-### ~~New feature 2~~
-~~User readable detailed description of new feature 2.~~
+
+### New network management
+The network is now managed by the NetworkManager. The user interface was updated in order to allow for static address/routes/DNS settings and hidden SSID WiFi networks. Also, the new user interface is more responsive and gives more details while working with WiFi connections.
+
+### Phantom click resistant UI
+Critical control paths in the user interface such as print start and print cancel were redesigned in order to be more resistant to phantom touches. This should prevent accidential print cancel on dirty displays.
+
+### New way of system update delivery
+As of 1.3 the system updates come with notfications promting the users to install them. This way everyone with the printer connected to the internet will be aware of new the system releases.
+
+### Examples download
+An option was added to download example models to the printers internal storage. This allows for downloading fresh examples package that now includes a resin calibration project. This one allows for exposure time optimalization for unknown resins.
 
 ## Fixed bugs
 - Fixed web UI project name
-- Fixed initial sound settings
+- More mature fix for initial sound settings
 - Fixed overflow in exposure timing
 - Improved log export speed
 - Tower profile auto adjust
+- Fixed reset on cpuburn and wifi scans, raised current limit for ACIN to 3.5A
+- Fixed unpacking not to display after user factory reset + do not do packing moves for kit
 
 ## Others
-- Updated system packages
-- Motion controller command trace
-- Automatic admin check on startup
+- Updated Linux kernel 4.16, fresh userspace
 - Not calibrated warning at startup
-- NetworkManager
-- Droped Python 2 compatibility
-- UV coin device support on system level
+- Network managed by NetworkManager
+- Reworked configuration
+- Legacy WiFi settings importer
+- Image rendering using Pillow
+- Separate user for slicer upload
+- Less verbose logging
+- Infrastructure for signing with production keys
+- GPLv3 License
+- Printer0 DBus API
+- Client DBus notifications
+- Python 3 only system
+- Switched io scheduler to bfq
 
 # Version 1.2.0
 - Basic kit support (no factory mode, no missing defaults, one step unboxing)
