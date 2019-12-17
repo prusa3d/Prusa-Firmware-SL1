@@ -1,0 +1,72 @@
+From 16309f0ff81a6834d48555d583f972d00441135d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
+Date: Fri, 16 Nov 2018 02:19:25 +0100
+Subject: [PATCH 34/79] net: stmmac: enable MAC address to be read from a nvmem
+ cell as is described in Documentation/devicetree/bindings/net/ethernet.txt
+
+---
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 170c3a052b14..93b3012c2ef3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -15,6 +15,7 @@
+ #include <linux/of_net.h>
+ #include <linux/of_device.h>
+ #include <linux/of_mdio.h>
++#include <linux/nvmem-consumer.h>
+ 
+ #include "stmmac.h"
+ #include "stmmac_platform.h"
+@@ -384,6 +385,22 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
+ 	return -ENODEV;
+ }
+ 
++static void *stmmac_get_nvmem_address(struct device *dev)
++{
++	struct nvmem_cell *cell;
++	size_t cell_size;
++	char *mac;
++
++	cell = nvmem_cell_get(dev, "mac-address");
++	if (IS_ERR(cell))
++		return NULL;
++
++        mac = nvmem_cell_read(cell, &cell_size);
++        nvmem_cell_put(cell);
++
++        return mac;
++}
++
+ /**
+  * stmmac_probe_config_dt - parse device-tree driver parameters
+  * @pdev: platform_device structure
+@@ -398,13 +415,23 @@ stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct plat_stmmacenet_data *plat;
+ 	struct stmmac_dma_cfg *dma_cfg;
++	const u8 *mac_addr;
+ 	int rc;
+ 
+ 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+ 	if (!plat)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	/* U-boot passes a MAC address it found/generated for the
++	   interface as a "local-mac-address" attribute in the dt
++	   node. Here it is received.
++	*/
+ 	*mac = of_get_mac_address(np);
++	mac_addr = stmmac_get_nvmem_address(&pdev->dev);
++	if (mac_addr && is_valid_ether_addr(mac_addr)) {
++		*mac = mac_addr;
++	}
++
+ 	if (IS_ERR(*mac)) {
+ 		if (PTR_ERR(*mac) == -EPROBE_DEFER)
+ 			return ERR_CAST(*mac);
+-- 
+2.24.0
+

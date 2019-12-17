@@ -11,17 +11,34 @@ LOCALVERSION ?= ""
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "torvalds-master"
+KBRANCH ?= "linux-5.4.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "45ee307a75d56b3589581eda1cf3d56c06ef085d"
-PV = "v5.4-rc8+git${SRCPV}"
+SRCREV_pn-${PN} = "v5.4.6"
+PV = "v5.4.6"
+LINUX_VERSION = "${PV}"
 
-SRC_URI="\
-	git://git@gitlab.com/prusa3d/distro/linux.git;protocol=ssh;branch=${KBRANCH} \
+SRC_URI="git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH}"
+SRC_URI_append_sun50i = " \
+	file://0001-drm-sun4i-dsi-Fixes-updates-A33-reworked.patch \
+	file://0002-drm-sun4i-Allwinner-A64-MIPI-DSI-support.patch \
+	file://0003-drm-sun4i-dsi-misc-fixes.patch \
+	file://0004-drm-added-panel-driver-for-a-FullHD-5-LCD-SHARP-LS05.patch \
+	file://0005-drm-panel-ilitek-ili9806e-WIP-implementation.patch \
+	file://0006-sun4i-drm-assume-HDMI-is-always-connected.patch \
+	file://0007-tc358870-hdmi-dsi-bridge-initial-commit.patch \
+	file://0008-arm64-dts-allwinner-set-GPU-clock-to-432-MHz.patch \
+	file://0009-480p-and-2k-displays-working-together.patch \
+	file://0101-add-thermal-sensor-driver-for-A64-A83T-H3-H5-H6-R40.patch \
+	file://0201-net-stmmac-enable-MAC-address-to-be-read-from-a-nvme.patch \
+	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
+	file://1001-dts-copy-sun50i-a64-olinuxino.dts-into-sun50i-a64-pr.patch \
+	file://1002-dts-prusa64-sl1-fix-DAPM-widgets.patch \
+	file://1003-freescale-timer-fix.patch \
+	file://1004-dts-prusa64-sl1-enable-ac_power_supply-node.patch \
+	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://defconfig \
-	file://freescale_timer_fix.patch \
 "
 
 S="${WORKDIR}/git"
