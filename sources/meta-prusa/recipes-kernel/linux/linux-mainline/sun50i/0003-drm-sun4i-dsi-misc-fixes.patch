@@ -1,0 +1,266 @@
+From patchwork Sun Oct  6 16:03:01 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Icenowy Zheng <icenowy@aosc.io>
+X-Patchwork-Id: 11176519
+Return-Path: 
+ <SRS0=WOdq=X7=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 1F076112B
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun,  6 Oct 2019 16:04:56 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id DB2FA20835
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun,  6 Oct 2019 16:04:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="cafNLjH6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2FA20835
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=aosc.io
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=jDpCt92MDDGz3NGuRIlvKfYWdSI571PasCgewhvZW3k=; b=cafNLjH6Cuw5R3
+	0uTGdCaIDOdjY1ZkvUNlHRY9NTHPjp3yuCCkx3I7taVU1P0srvZigsrKQaP/ELn5t/Cn/IWQJFlfR
+	VkuQhFYqZRUapPxtD7kIkisxkiyA6JDuEQ7NZiat7JysYhmNmSRv0xvyqdQiHsD9Vyvpd+3yOFfSO
+	LvTo0pqrxq3efmDVtqD2Yqf6WqMlPIIahWvNDf86nvqwaDoBf18Y/tZKQVF4Aq3Ecu942KtZgN0R4
+	yiKHbIxkp1HAaSGKLjnEEK7t7oiPZzF81b/kuqX8JragCLjG5Zd5wN83bDUM7H/A0H39REjBSqaPE
+	pwaP02o14S/E1jVvroxg==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.2 #3 (Red Hat Linux))
+	id 1iH91f-0006Fc-Ir; Sun, 06 Oct 2019 16:04:51 +0000
+Received: from balrog.mythic-beasts.com ([2a00:1098:0:82:1000:0:2:1])
+ by bombadil.infradead.org with esmtps (Exim 4.92.2 #3 (Red Hat Linux))
+ id 1iH91W-00067P-EG
+ for linux-arm-kernel@lists.infradead.org; Sun, 06 Oct 2019 16:04:44 +0000
+Received: from [199.195.250.187] (port=38244 helo=hermes.aosc.io)
+ by balrog.mythic-beasts.com with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92.3)
+ (envelope-from <icenowy@aosc.io>)
+ id 1iH91S-0004Pf-KI; Sun, 06 Oct 2019 17:04:38 +0100
+Received: from localhost (localhost [127.0.0.1]) (Authenticated sender:
+ icenowy@aosc.io)
+ by hermes.aosc.io (Postfix) with ESMTPSA id 44C978289D;
+ Sun,  6 Oct 2019 16:04:33 +0000 (UTC)
+From: Icenowy Zheng <icenowy@aosc.io>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ Jagan Teki <jagan@amarulasolutions.com>, David Airlie <airlied@linux.ie>,
+ Daniel Vetter <daniel@ffwll.ch>
+Subject: [PATCH v2 1/2] drm/sun4i: dsi: fix the overhead of the horizontal
+ front porch
+Date: Mon,  7 Oct 2019 00:03:01 +0800
+Message-Id: <20191006160303.24413-3-icenowy@aosc.io>
+In-Reply-To: <20191006160303.24413-1-icenowy@aosc.io>
+References: <20191006160303.24413-1-icenowy@aosc.io>
+MIME-Version: 1.0
+X-BlackCat-Spam-Score: 50
+X-Spam-Status: No, score=5.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191006_090442_502956_A43D1FF0 
+X-CRM114-Status: GOOD (  14.14  )
+X-Spam-Score: -2.3 (--)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-2.3 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -2.3 RCVD_IN_DNSWL_MED      RBL: Sender listed at https://www.dnswl.org/,
+ medium trust [2a00:1098:0:82:1000:0:2:1 listed in]
+ [list.dnswl.org]
+ -0.0 SPF_HELO_PASS          SPF: HELO matches SPF record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: linux-sunxi@googlegroups.com, Icenowy Zheng <icenowy@aosc.io>,
+ linux-arm-kernel@lists.infradead.org, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+The formula in the BSP kernel indicates that a 16-byte overhead is used
+when sending the HFP. However, this value is currently set to 6 in the
+sun6i_mipi_dsi driver, which makes some panels flashing.
+
+Fix this overhead value.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index b8a0d0501ca7..8fe8051c34e6 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -569,11 +569,12 @@ static void sun6i_dsi_setup_timings(struct sun6i_dsi *dsi,
+ 			  (mode->htotal - mode->hsync_end) * Bpp - HBP_PACKET_OVERHEAD);
+ 
+ 		/*
+-		 * The frontporch is set using a blanking packet (4
+-		 * bytes + payload + 2 bytes). Its minimal size is
+-		 * therefore 6 bytes
++		 * The frontporch is set using a sync event (4 bytes)
++		 * and two blanking packets (each one is 4 bytes +
++		 * payload + 2 bytes). Its minimal size is therefore
++		 * 16 bytes
+ 		 */
+-#define HFP_PACKET_OVERHEAD	6
++#define HFP_PACKET_OVERHEAD	16
+ 		hfp = max((unsigned int)HFP_PACKET_OVERHEAD,
+ 			  (mode->hsync_start - mode->hdisplay) * Bpp - HFP_PACKET_OVERHEAD);
+ 
+
+From patchwork Sun Oct  6 16:03:02 2019
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Icenowy Zheng <icenowy@aosc.io>
+X-Patchwork-Id: 11176521
+Return-Path: 
+ <SRS0=WOdq=X7=lists.infradead.org=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@kernel.org>
+Received: from mail.kernel.org (pdx-korg-mail-1.web.codeaurora.org
+ [172.30.200.123])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id 777BE139A
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun,  6 Oct 2019 16:05:22 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPS id 537BA20835
+	for <patchwork-linux-arm@patchwork.kernel.org>;
+ Sun,  6 Oct 2019 16:05:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lists.infradead.org
+ header.i=@lists.infradead.org header.b="BHoG90q7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537BA20835
+Authentication-Results: mail.kernel.org;
+ dmarc=none (p=none dis=none) header.from=aosc.io
+Authentication-Results: mail.kernel.org;
+ spf=none
+ smtp.mailfrom=linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=lists.infradead.org; s=bombadil.20170209; h=Sender:
+	Content-Transfer-Encoding:Content-Type:Cc:List-Subscribe:List-Help:List-Post:
+	List-Archive:List-Unsubscribe:List-Id:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:To:From:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	List-Owner; bh=yB5VGtIDiTBYJqZKk7rlIVF4WHSvdomiyZrYvFJdjUs=; b=BHoG90q7UQXhfs
+	8q1+3r0Q+YZOu0m2RsOBA0K6i4UVcE5OM/Eqmm6FETrIF4Yk2D2ewh7chi9CsD38TY4A7jSpmDVGW
+	LhvwZPsK++aBsMt4beijdJwzv/JSj0FadfhvK8If02aPGLznOsh29owXkq1uizoDXYTA2NwINgLzo
+	kg+zqwc4cClMdacHH2yvbZq/NP18Pb+RqXSoG6wgZJthbsi7AIpF/EWXplllY5lFtawJsKwWCyxGq
+	UT6/c+XTEzdPVC0AdtVwIsTQfF/rLiE2dzy0u3RlKFgcMEOavSPkJZL5vBxkW7HrhA3yfcPaZTH7h
+	GmCb41kgxWSEBe+HItfw==;
+Received: from localhost ([127.0.0.1] helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtp (Exim 4.92.2 #3 (Red Hat Linux))
+	id 1iH928-0007lk-8P; Sun, 06 Oct 2019 16:05:20 +0000
+Received: from haggis.mythic-beasts.com ([2a00:1098:0:86:1000:0:2:1])
+ by bombadil.infradead.org with esmtps (Exim 4.92.2 #3 (Red Hat Linux))
+ id 1iH91k-0006JH-5X
+ for linux-arm-kernel@lists.infradead.org; Sun, 06 Oct 2019 16:04:57 +0000
+Received: from [199.195.250.187] (port=53656 helo=hermes.aosc.io)
+ by haggis.mythic-beasts.com with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92.3)
+ (envelope-from <icenowy@aosc.io>)
+ id 1iH91f-00055b-TT; Sun, 06 Oct 2019 17:04:52 +0100
+Received: from localhost (localhost [127.0.0.1]) (Authenticated sender:
+ icenowy@aosc.io)
+ by hermes.aosc.io (Postfix) with ESMTPSA id 1475B8289D;
+ Sun,  6 Oct 2019 16:04:45 +0000 (UTC)
+From: Icenowy Zheng <icenowy@aosc.io>
+To: Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ Jagan Teki <jagan@amarulasolutions.com>, David Airlie <airlied@linux.ie>,
+ Daniel Vetter <daniel@ffwll.ch>
+Subject: [PATCH v2 2/2] drm/sun4i: sun6i_mipi_dsi: fix DCS long write packet
+ length
+Date: Mon,  7 Oct 2019 00:03:02 +0800
+Message-Id: <20191006160303.24413-4-icenowy@aosc.io>
+In-Reply-To: <20191006160303.24413-1-icenowy@aosc.io>
+References: <20191006160303.24413-1-icenowy@aosc.io>
+MIME-Version: 1.0
+X-BlackCat-Spam-Score: 50
+X-Spam-Status: No, score=5.0
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-646709E3 
+X-CRM114-CacheID: sfid-20191006_090456_469867_3A9E30D4 
+X-CRM114-Status: GOOD (  13.61  )
+X-Spam-Score: -2.3 (--)
+X-Spam-Report: SpamAssassin version 3.4.2 on bombadil.infradead.org summary:
+ Content analysis details:   (-2.3 points)
+ pts rule name              description
+ ---- ----------------------
+ --------------------------------------------------
+ -2.3 RCVD_IN_DNSWL_MED      RBL: Sender listed at https://www.dnswl.org/,
+ medium trust [2a00:1098:0:86:1000:0:2:1 listed in]
+ [list.dnswl.org]
+ -0.0 SPF_HELO_PASS          SPF: HELO matches SPF record
+ -0.0 SPF_PASS               SPF: sender matches SPF record
+X-BeenThere: linux-arm-kernel@lists.infradead.org
+X-Mailman-Version: 2.1.29
+Precedence: list
+List-Id: <linux-arm-kernel.lists.infradead.org>
+List-Unsubscribe: 
+ <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: 
+ <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Cc: linux-sunxi@googlegroups.com, Icenowy Zheng <icenowy@aosc.io>,
+ linux-arm-kernel@lists.infradead.org, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: 
+ linux-arm-kernel-bounces+patchwork-linux-arm=patchwork.kernel.org@lists.infradead.org
+
+The packet length of DCS long write packet should not be added with 1
+when constructing long write packet.
+
+Fix this.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index 8fe8051c34e6..c958ca9bae63 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -832,8 +832,8 @@ static u32 sun6i_dsi_dcs_build_pkt_hdr(struct sun6i_dsi *dsi,
+ 	u32 pkt = msg->type;
+ 
+ 	if (msg->type == MIPI_DSI_DCS_LONG_WRITE) {
+-		pkt |= ((msg->tx_len + 1) & 0xffff) << 8;
+-		pkt |= (((msg->tx_len + 1) >> 8) & 0xffff) << 16;
++		pkt |= ((msg->tx_len) & 0xffff) << 8;
++		pkt |= (((msg->tx_len) >> 8) & 0xffff) << 16;
+ 	} else {
+ 		pkt |= (((u8 *)msg->tx_buf)[0] << 8);
+ 		if (msg->tx_len > 1)

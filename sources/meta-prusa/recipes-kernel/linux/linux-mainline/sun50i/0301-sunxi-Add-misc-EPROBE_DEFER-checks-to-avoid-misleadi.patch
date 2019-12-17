@@ -1,0 +1,93 @@
+From f2e7627fa6f3e8293c4a2a5c817090ec6f24746e Mon Sep 17 00:00:00 2001
+From: Ondrej Jirman <megous@megous.com>
+Date: Mon, 2 Sep 2019 14:51:17 +0200
+Subject: [PATCH] sunxi: Add misc EPROBE_DEFER checks to avoid misleading
+ errors during boot
+
+Signed-off-by: Ondrej Jirman <megous@megous.com>
+---
+ arch/arm/kernel/topology.c            | 2 +-
+ drivers/bus/sun50i-de2.c              | 4 +++-
+ drivers/i2c/busses/i2c-gpio.c         | 4 ++++
+ drivers/phy/allwinner/phy-sun4i-usb.c | 9 ++++++---
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/kernel/topology.c b/arch/arm/kernel/topology.c
+index 5b9faba03afb..957c24f28ca6 100644
+--- a/arch/arm/kernel/topology.c
++++ b/arch/arm/kernel/topology.c
+@@ -121,7 +121,7 @@ static void __init parse_dt_topology(void)
+ 
+ 		rate = of_get_property(cn, "clock-frequency", &len);
+ 		if (!rate || len != 4) {
+-			pr_err("%pOF missing clock-frequency property\n", cn);
++			//pr_err("%pOF missing clock-frequency property\n", cn);
+ 			continue;
+ 		}
+ 
+diff --git a/drivers/bus/sun50i-de2.c b/drivers/bus/sun50i-de2.c
+index 672518741f86..e0899a20012a 100644
+--- a/drivers/bus/sun50i-de2.c
++++ b/drivers/bus/sun50i-de2.c
+@@ -16,7 +16,9 @@ static int sun50i_de2_bus_probe(struct platform_device *pdev)
+ 
+ 	ret = sunxi_sram_claim(&pdev->dev);
+ 	if (ret) {
+-		dev_err(&pdev->dev, "Error couldn't map SRAM to device\n");
++		if (ret != -EPROBE_DEFER)
++			dev_err(&pdev->dev,
++				"Error couldn't map SRAM to device (%d)\n", ret);
+ 		return ret;
+ 	}
+ 
+diff --git a/drivers/i2c/busses/i2c-gpio.c b/drivers/i2c/busses/i2c-gpio.c
+index 3a9e840a3546..ad2af7425719 100644
+--- a/drivers/i2c/busses/i2c-gpio.c
++++ b/drivers/i2c/busses/i2c-gpio.c
+@@ -332,6 +332,10 @@ static struct gpio_desc *i2c_gpio_get_desc(struct device *dev,
+ 		return retdesc;
+ 	}
+ 
++	ret = PTR_ERR(retdesc);
++	if (ret == -EPROBE_DEFER)
++		return retdesc;
++
+ 	retdesc = devm_gpiod_get_index(dev, NULL, index, gflags);
+ 	if (!IS_ERR(retdesc)) {
+ 		dev_dbg(dev, "got GPIO from index %u\n", index);
+diff --git a/drivers/phy/allwinner/phy-sun4i-usb.c b/drivers/phy/allwinner/phy-sun4i-usb.c
+index 856927382248..47a24c94f089 100644
+--- a/drivers/phy/allwinner/phy-sun4i-usb.c
++++ b/drivers/phy/allwinner/phy-sun4i-usb.c
+@@ -706,14 +706,16 @@ static int sun4i_usb_phy_probe(struct platform_device *pdev)
+ 	data->id_det_gpio = devm_gpiod_get_optional(dev, "usb0_id_det",
+ 						    GPIOD_IN);
+ 	if (IS_ERR(data->id_det_gpio)) {
+-		dev_err(dev, "Couldn't request ID GPIO\n");
++		if (PTR_ERR(data->id_det_gpio) != -EPROBE_DEFER)
++			dev_err(dev, "Couldn't request ID GPIO\n");
+ 		return PTR_ERR(data->id_det_gpio);
+ 	}
+ 
+ 	data->vbus_det_gpio = devm_gpiod_get_optional(dev, "usb0_vbus_det",
+ 						      GPIOD_IN);
+ 	if (IS_ERR(data->vbus_det_gpio)) {
+-		dev_err(dev, "Couldn't request VBUS detect GPIO\n");
++		if (PTR_ERR(data->vbus_det_gpio) != -EPROBE_DEFER)
++			dev_err(dev, "Couldn't request VBUS detect GPIO\n");
+ 		return PTR_ERR(data->vbus_det_gpio);
+ 	}
+ 
+@@ -721,7 +723,8 @@ static int sun4i_usb_phy_probe(struct platform_device *pdev)
+ 		data->vbus_power_supply = devm_power_supply_get_by_phandle(dev,
+ 						     "usb0_vbus_power-supply");
+ 		if (IS_ERR(data->vbus_power_supply)) {
+-			dev_err(dev, "Couldn't get the VBUS power supply\n");
++			if (PTR_ERR(data->vbus_power_supply) != -EPROBE_DEFER)
++				dev_err(dev, "Couldn't get the VBUS power supply\n");
+ 			return PTR_ERR(data->vbus_power_supply);
+ 		}
+ 
+-- 
+2.24.1
+
