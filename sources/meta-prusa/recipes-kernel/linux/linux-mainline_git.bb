@@ -38,6 +38,7 @@ SRC_URI_append_sun50i = " \
 	file://1003-freescale-timer-fix.patch \
 	file://1004-dts-prusa64-sl1-enable-ac_power_supply-node.patch \
 	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
+	file://1006-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://defconfig \
 "
 
