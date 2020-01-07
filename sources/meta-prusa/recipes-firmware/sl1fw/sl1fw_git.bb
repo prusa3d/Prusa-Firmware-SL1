@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "c4292ec5291daaccfb5cbfeab68777512d920712"
+SRCREV_pn-${PN} = "2c843144cbde451af14ab2d662b003cab3cae1d3"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -64,7 +64,7 @@ FILES_${PN} += "\
 	/srv/http/intranet\
 	/usr/share/scripts\
 	/usr/share/factory/defaults\
-	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.printer0.conf\
+	/usr/share/dbus-1/system.d\
 	/usr/lib/sysusers.d/sl1fw.conf\
 "
 FILES_${PN}_remove = "${sysconfdir}/sl1fw/loggerConfig.json"
