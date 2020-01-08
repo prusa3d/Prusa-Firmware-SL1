@@ -1,7 +1,7 @@
 LICENSE = "GPL3"
 
 SRC_URI = "\
-	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=1.3-fixes;name=sla-client \
+	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=master;name=sla-client \
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/qrcode-generator\
 	file://sla-client.service \
 	file://sla-client-config.json \
@@ -11,7 +11,7 @@ SRC_URI = "\
 #SRCREV_FORMAT = "sla-client_qrcode-generator"
 #SRCREV = "${AUTOREV}"
 
-SRCREV_sla-client = "96897c39d995a28b1b732dac226854d22e4badba"
+SRCREV_sla-client = "3aecb5271e870398f884ef0460062e85c697b137"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
