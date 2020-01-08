@@ -20,6 +20,7 @@ RDEPENDS_${PN} += " \
 	bash \
 	nginx \
 	avrdude \
+	libmikmod \
 	socat \
 	avahi-daemon \
 	avahi-restarter \
