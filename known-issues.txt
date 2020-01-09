@@ -2,4 +2,4 @@
 board keeps running (black touchscreen, but power button blinking)
 - UI: Back button contain some random nice on the top edge when pressed. (This
   is possibly a HW problem)
-
+- Numeric only project names are not working.
