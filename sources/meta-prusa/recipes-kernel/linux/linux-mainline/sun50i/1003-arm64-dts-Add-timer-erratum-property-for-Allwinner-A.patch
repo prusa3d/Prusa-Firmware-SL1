@@ -1,0 +1,29 @@
+From 8b9ddece712df06a3518a68e57879165623c61c7 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Mon, 23 Dec 2019 10:35:16 +0100
+Subject: [PATCH] arm64: dts: Add timer erratum property for Allwinner A64
+
+Although the Freescale A008585 erratum doesn't apply to Allwinner A64 platform,
+the underlying workaround does actually cover the otherwise unrelated timer
+instability in the A64, while the workaround designated specifically for A64
+actually does not.
+---
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+index 1662a268eeb1..934e09cf80a8 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+@@ -192,7 +192,7 @@
+ 
+ 	timer {
+ 		compatible = "arm,armv8-timer";
+-		allwinner,erratum-unknown1;
++		fsl,erratum-a008585;
+ 		interrupts = <GIC_PPI 13
+ 			(GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>,
+ 			     <GIC_PPI 14
+-- 
+2.24.1
+
