@@ -35,7 +35,7 @@ SRC_URI_append_sun50i = " \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
 	file://1001-dts-copy-sun50i-a64-olinuxino.dts-into-sun50i-a64-pr.patch \
 	file://1002-dts-prusa64-sl1-fix-DAPM-widgets.patch \
-	file://1003-freescale-timer-fix.patch \
+	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
 	file://1004-dts-prusa64-sl1-enable-ac_power_supply-node.patch \
 	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://1006-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
