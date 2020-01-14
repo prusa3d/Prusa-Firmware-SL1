@@ -8,7 +8,7 @@ DEPENDS = "libgpiod"
 inherit systemd
 
 SRC_URI = "\
-	git://git@gitlab.com/prusa3d/sl1/powerpanic.git;protocol=ssh;branch=cxx \
+	git://git@gitlab.com/prusa3d/sl1/powerpanic.git;protocol=ssh;branch=master \
 "
 SRCREV = "22abde8944c10451112722228061598b1e8936e5"
 
