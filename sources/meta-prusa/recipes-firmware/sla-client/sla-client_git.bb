@@ -11,7 +11,7 @@ SRC_URI = "\
 #SRCREV_FORMAT = "sla-client_qrcode-generator"
 #SRCREV = "${AUTOREV}"
 
-SRCREV_sla-client = "64d13fde010877a41627d8d05b431a7b4d52ea90"
+SRCREV_sla-client = "29fdc3c864bc7130fadf53e0fb6de56f325567f0"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 
 LICENSE = "GPLv3+" 
