@@ -1,0 +1,16 @@
+diff --git a/buildconfig/__pycache__/config_unix.cpython-37.pyc b/buildconfig/__pycache__/config_unix.cpython-37.pyc
+index 9f477d5..e59f8e7 100644
+Binary files a/buildconfig/__pycache__/config_unix.cpython-37.pyc and b/buildconfig/__pycache__/config_unix.cpython-37.pyc differ
+diff --git a/buildconfig/config_unix.py b/buildconfig/config_unix.py
+index 1eacf1a..6751827 100644
+--- a/buildconfig/config_unix.py
++++ b/buildconfig/config_unix.py
+@@ -209,7 +209,7 @@ def main(sdl2=False):
+         ]
+     else:
+         DEPS = [
+-            DependencyProg('SDL', 'SDL_CONFIG', 'sdl-config', '1.2', ['sdl']),
++            DependencyProg('SDL', 'SDL_CONFIG', 'pkg-config sdl', '1.2', ['sdl'], '--modversion'),
+             Dependency('FONT', 'SDL_ttf.h', 'libSDL_ttf.so', ['SDL_ttf']),
+             Dependency('IMAGE', 'SDL_image.h', 'libSDL_image.so', ['SDL_image']),
+             Dependency('MIXER', 'SDL_mixer.h', 'libSDL_mixer.so', ['SDL_mixer']),
