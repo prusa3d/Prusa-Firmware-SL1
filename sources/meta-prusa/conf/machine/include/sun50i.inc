@@ -11,9 +11,6 @@ KERNEL_IMAGETYPE ?= "Image"
 UBOOT_BINARY ?= "u-boot.itb"
 SPL_BINARY ?= "sunxi-spl.bin"
 
-PREFERRED_VERSION_u-boot = "v2019.04%"
-PREFERRED_VERSION_linux-mainline = "v5.4%"
-
 PREFERRED_PROVIDER_virtual/libgles1 = "mali-blobs"
 PREFERRED_PROVIDER_virtual/libgles2 = "mali-blobs"
 PREFERRED_PROVIDER_virtual/egl = "mali-blobs"
