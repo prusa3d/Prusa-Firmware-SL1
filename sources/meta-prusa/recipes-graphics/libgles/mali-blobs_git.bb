@@ -88,6 +88,10 @@ do_install() {
 	echo "Cflags: -I${includedir}"	>> ${D}${libdir}/pkgconfig/egl.pc
 	echo "Libs: -L${libdir} -lEGL"	>> ${D}${libdir}/pkgconfig/egl.pc
 	echo "Libs.private: -ldl"	>> ${D}${libdir}/pkgconfig/egl.pc
+
+	# Provide fake libffi.so.6
+	${CC} -shared -Wl,-soname,libffi.so.6 -o ${D}${libdir}/libffi.so.6.4.0
+	ln -s libffi.so.6.4.0 ${D}${libdir}/libffi.so.6
 }
 
 RPROVIDES_${PN} += "libGLESv2.so libEGL.so libGLESv2.so libGLESv1_CM.so libMali.so"
