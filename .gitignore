@@ -1,6 +1,4 @@
-build
-conf
-downloads
+/build
 bitbake.lock
 pseudodone
 *.dot
