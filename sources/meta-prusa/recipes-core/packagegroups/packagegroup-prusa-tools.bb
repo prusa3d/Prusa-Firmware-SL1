@@ -12,4 +12,5 @@ RDEPENDS_${PN} = "\
     bash-completion bash-completion-extra \
     systemd-extra-utils systemd-bash-completion systemd-analyze \
     ethtool avrdude gettext alsa-utils \
+    iperf3 cpuburn-arm \
 "
