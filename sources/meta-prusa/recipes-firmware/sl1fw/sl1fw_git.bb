@@ -3,7 +3,7 @@ SUMMARY = "sl1fw - python firmware part running on a64 board"
 LICENSE = "CLOSED"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=1.2"
-SRCREV_pn-${PN} = "4bc8cacdc5bc895a6300f97794066be84dd7eacb"
+SRCREV_pn-${PN} = "fe194c0b65894b9f7cec55055470d6d4d7f549f0"
 
 PACKAGES = "${PN}"
 
