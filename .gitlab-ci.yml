@@ -74,12 +74,12 @@ build:tools:
 
   script:
     - source oe-init-build-env
-    - bitbake sla-image-dev sla-bootstrap
+    - bitbake sla-dev-image sla-bootstrap
     - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
     - cd ..
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.xz ${VERSION}.devsd.xz
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.wic.bmap ${VERSION}.devsd.bmap
-    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1-*.manifest ${VERSION}.devsd.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.wic.xz ${VERSION}.devsd.xz
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.wic.bmap ${VERSION}.devsd.bmap
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.manifest ${VERSION}.devsd.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz ${VERSION}.bootstrapsd.xz
     - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap ${VERSION}.bootstrapsd.bmap
 
