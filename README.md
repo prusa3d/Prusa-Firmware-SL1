@@ -30,7 +30,7 @@ Obtain keys for image signing
 Build development SD image
 --------------------------
 	source ./oe-init-build-env
-	bitbake sla-image-dev # other targets are sla-update-bundle, sla-bootstrap
+	bitbake sla-dev-image # other targets are sla-update-bundle, sla-bootstrap
 
 Write the image to the SD card
 ------------------------------
@@ -38,11 +38,11 @@ Write the image to the SD card
 - With bmaptool
 
 
-    bmaptool copy tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.wic /dev/mmcblkXXX
+    bmaptool copy tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic /dev/mmcblkXXX
 
 - With dd
 
-    dd if=tmp/deploy/images/prusa64-sl1/sla-image-dev-prusa64-sl1.wic of=/dev/mmcblkXXX bs=1M
+    dd if=tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic of=/dev/mmcblkXXX bs=1M
 
 
 Customers who bought this item also bought ...
@@ -50,7 +50,7 @@ Customers who bought this item also bought ...
 
 ### Other targets
 
-- sla-image-dev: development-enabled μSD image
+- sla-dev-image: development-enabled μSD image
 - sla-bootstrap: μSD image for eMMC bring-up
 - sla-update-bundle: OTA & offline update package
 
