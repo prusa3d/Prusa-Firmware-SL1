@@ -10,6 +10,10 @@ COMPATIBLE_MACHINE = "sun50i"
 EXCLUDE_FROM_WORLD = "1"
 PROVIDES = "virtual/libgles1 virtual/libgles2 virtual/egl virtual/mesa virtual/libgbm"
 
+DEBIAN_NOAUTONAME_${PN} = "1"
+DEBIAN_NOAUTONAME_${PN}-dev = "1"
+DEBIAN_NOAUTONAME_${PN}-dbg = "1"
+
 SRCREV_pn-${PN} = "418f55585e76f375792dbebb3e97532f0c1c556d"
 SRC_URI = " \
 	gitsm://github.com/bootlin/mali-blobs.git \
