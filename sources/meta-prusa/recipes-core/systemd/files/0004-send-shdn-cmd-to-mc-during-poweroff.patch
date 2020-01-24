@@ -1,0 +1,118 @@
+diff --git a/src/shared/meson.build b/src/shared/meson.build
+index a7320fc4ed..fa381dd3ba 100644
+--- a/src/shared/meson.build
++++ b/src/shared/meson.build
+@@ -141,6 +141,8 @@ shared_sources = files('''
+         pe-header.h
+         pretty-print.c
+         pretty-print.h
++        prusa-mc-shdn.c
++        prusa-mc-shdn.h
+         ptyfwd.c
+         ptyfwd.h
+         reboot-util.c
+diff --git a/src/shared/prusa-mc-shdn.c b/src/shared/prusa-mc-shdn.c
+new file mode 100644
+index 0000000000..7711bf9a7b
+--- /dev/null
++++ b/src/shared/prusa-mc-shdn.c
+@@ -0,0 +1,49 @@
++#include <fcntl.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <termios.h>
++#include <unistd.h>
++
++#include "log.h"
++#include "prusa-mc-shdn.h"
++
++static int mc_connect(void)
++{
++        struct termios options;
++        int fd = open("/dev/ttyS2", O_RDWR | O_NOCTTY | O_NDELAY);
++        if (fd == -1) return -1;
++
++        memset(&options, 0, sizeof(options));
++        options.c_cflag = (CS8 | CLOCAL | CREAD); /* 8N1, ignore modem lines,
++                                                     receive */
++        options.c_iflag = IGNPAR; /* Ignore bytes with parity errors */
++        options.c_oflag = 0; /* Raw output */
++        options.c_lflag = ICANON; /* Canonical input */
++
++        tcflush(fd, TCIFLUSH);
++        cfsetospeed(&options, B115200);
++        cfsetispeed(&options, B115200);
++        tcsetattr(fd, TCSANOW, &options);
++
++        return fd;
++}
++
++int mc_send_shutdown_command(void)
++{
++        int fd;
++        log_info("Initializing UART connection to the Motion Controller.");
++        fd = mc_connect();
++        if (fd <= 0) {
++                log_error("Couldn't open MC UART.");
++                return 1;
++        }
++
++        write(fd, "!shdn 1\n", 9); /* a command to shutdown within 1 second */
++        usleep(9 * 100UL); /* sending 1 charachter takes approx. 100 us */
++        log_info("Shutdown command has been transmitted to the Motion Controller.");
++        close(fd);
++
++        return 0;
++}
+diff --git a/src/shared/prusa-mc-shdn.h b/src/shared/prusa-mc-shdn.h
+new file mode 100644
+index 0000000000..09fd50e445
+--- /dev/null
++++ b/src/shared/prusa-mc-shdn.h
+@@ -0,0 +1,4 @@
++/* SPDX-License-Identifier: LGPL-2.1+ */
++#pragma once
++
++int mc_send_shutdown_command(void);
+diff --git a/src/shutdown/shutdown.c b/src/shutdown/shutdown.c
+index 15e6c1799e..6ad53e91f1 100644
+--- a/src/shutdown/shutdown.c
++++ b/src/shutdown/shutdown.c
+@@ -26,6 +26,7 @@
+ #include "log.h"
+ #include "parse-util.h"
+ #include "process-util.h"
++#include "prusa-mc-shdn.h"
+ #include "reboot-util.h"
+ #include "rlimit-util.h"
+ #include "signal-util.h"
+@@ -562,6 +563,7 @@ int main(int argc, char *argv[]) {
+                 break;
+ 
+         case RB_POWER_OFF:
++                (void) mc_send_shutdown_command();
+                 log_info("Powering off.");
+                 break;
+ 
+diff --git a/src/systemctl/systemctl.c b/src/systemctl/systemctl.c
+index 60872bc537..31e280a10d 100644
+--- a/src/systemctl/systemctl.c
++++ b/src/systemctl/systemctl.c
+@@ -65,6 +65,7 @@
+ #include "pretty-print.h"
+ #include "proc-cmdline.h"
+ #include "process-util.h"
++#include "prusa-mc-shdn.h"
+ #include "reboot-util.h"
+ #include "rlimit-util.h"
+ #include "set.h"
+@@ -9180,6 +9181,7 @@ static int halt_now(enum action a) {
+                         log_info("Powering off.");
+                 if (arg_dry_run)
+                         return 0;
++                (void) mc_send_shutdown_command();
+                 (void) reboot(RB_POWER_OFF);
+                 return -errno;
+ 
