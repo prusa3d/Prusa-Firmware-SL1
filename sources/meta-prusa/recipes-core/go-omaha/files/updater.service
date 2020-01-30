@@ -8,6 +8,7 @@ Type=dbus
 BusName=cz.prusa3d.Updater1
 Environment=SERVER=https://update.prusa3d.com/service/update2
 Environment=TRACK=stable
+WorkingDirectory=/run/updater
 ExecStart=/usr/bin/updater --server $SERVER --track $TRACK
 RuntimeDirectory=updater
 MemoryDenyWriteExecute=yes
