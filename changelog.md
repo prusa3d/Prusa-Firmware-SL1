@@ -1,3 +1,33 @@
+# Version 1.3.1
+
+## Summary
+- Changelog and QR code at update page
+- Included licence page
+- Overtemp fix when printer idle
+- Redesigned web UI + fix for Mac users
+
+## Detailed description
+
+### Changelog and QR code at update page
+Changelog summary and QR code is now at the notification page about new FW update.
+
+### Included licence page
+Collection of all software used with it's licences. List is included at the bottom of System info page.
+
+### Overtemp fix when printer idle
+Printer now starts to cool down CPU, when over 80 °C and stops under 60 °C. This prevents fans from spinning all the time in warmer environment.
+
+### Redesigned web UI + fix for Mac users
+Redesigned and polished web UI. Now available without login since it is read only (Safari does not support websockets with HTTP Digest).
+
+## Fixed bugs
+- Allow for uvcalibration with disassembeld kit
+- Include usb_path in printer0 API
+- Net change tasks improvements
+- Sensors translations: rephrased texts due to capital letters + no need to reboot for proper translation
+- Use value types when converting config
+- Project including only numbers in name fixed
+
 # Version 1.3.0
 
 ## Summary
