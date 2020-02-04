@@ -105,7 +105,7 @@ deploy:raucb:
   script:
     - >
         lftp -c "
-        set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
+        set sftp:ssl-force yes;
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
         put -O ${DEST} ${VERSION}.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
