@@ -1,10 +1,12 @@
+LICENSE = "GPLv3"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0;md5=c79ff39f19dfec6d293b95dea7b07891"
+
 inherit bundle
 
 SRC_URI += " \
 	file://bundle_hook.sh \
 "
 
-LICENSE = "CLOSED"
 
 BUNDLE_NAME = "${BUNDLE_BASENAME}-${MACHINE}-${DISTRO_VERSION}"
 
