@@ -1,0 +1,25 @@
+From f4919780e251a5b2c6b282d8f0de8eb38f5f61bd Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sat, 18 Jan 2020 20:03:00 +0100
+Subject: [PATCH] revert mali GPU clock to 408 MHz!
+
+---
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi |  2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+index 934e09cf80a8..5ea82a1146e9 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+@@ -1008,7 +1008,7 @@
+ 			resets = <&ccu RST_BUS_GPU>;
+ 
+ 			assigned-clocks = <&ccu CLK_GPU>;
+-			assigned-clock-rates = <432000000>;
++			assigned-clock-rates = <408000000>;
+ 		};
+ 
+ 		gic: interrupt-controller@1c81000 {
+-- 
+2.25.0
+
