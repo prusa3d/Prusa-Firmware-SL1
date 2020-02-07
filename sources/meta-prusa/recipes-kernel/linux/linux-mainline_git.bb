@@ -39,8 +39,18 @@ SRC_URI_append_sun50i = " \
 	file://1004-dts-prusa64-sl1-enable-ac_power_supply-node.patch \
 	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://1006-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
+	file://1008-let-TCON_DIV-be-free-again.patch \
 	file://defconfig \
 "
+
+# optionally add:
+#
+#	file://2001-lcd-timing.patch
+# (for moving LCD timing configuration to its device-tree node)
+
+#	file://1007-revert-DPHY-modclock-to-148-5-MHz.patch
+#	file://1009-revert-mali-GPU-clock-to-408-MHz.patch
+# (further candidates for minimazing tearing animations)
 
 S="${WORKDIR}/git"
 
