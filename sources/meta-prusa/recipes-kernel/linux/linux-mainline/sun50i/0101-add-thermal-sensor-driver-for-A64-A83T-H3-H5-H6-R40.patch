@@ -110,9 +110,9 @@ diff --git a/MAINTAINERS b/MAINTAINERS
 index a049abccaa26..50535a18379a 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -688,6 +688,14 @@ L:	linux-crypto@vger.kernel.org
+@@ -694,6 +694,14 @@ L:	linux-crypto@vger.kernel.org
  S:	Maintained
- F:	drivers/crypto/sunxi-ss/
+ F:	drivers/crypto/allwinner/
  
 +ALLWINNER THERMAL DRIVER
 +M:	Vasily Khoruzhick <anarsoul@gmail.com>
@@ -1203,8 +1203,8 @@ index 53c38deb8a08..93a6df11cb18 100644
 +			};
  		};
  
- 		usb_otg: usb@1c19000 {
-@@ -1156,5 +1163,34 @@
+ 		crypto: crypto@1c15000 {
+@@ -1165,5 +1171,34 @@
  			#address-cells = <1>;
  			#size-cells = <0>;
  		};
@@ -1839,8 +1839,8 @@ index 27e48234f1c2..5e3f16c3b706 100644
 +			};
  		};
  
- 		usb_otg: usb@1c19000 {
-@@ -798,6 +828,18 @@
+ 		crypto: crypto@1c15000 {
+@@ -816,6 +846,18 @@
  			status = "disabled";
  		};
  
