@@ -14,7 +14,6 @@ before_script:
   - echo "$DEV_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - cat ~/.ssh/known_hosts
   - mkdir -p build/conf && touch build/conf/auto.conf
-  - sed -i -e '/SSTATE_DIR/d' -e '/DL_DIR/d' build/conf/auto.conf
   - cat build/conf/auto.conf
   - echo "$DEV_CA_CERT" > sources/meta-prusa/files/dev-ca.pem
   - echo "$DEV_CA_CERT" > sources/meta-prusa/recipes-core/rauc/files/ca.cert.pem
