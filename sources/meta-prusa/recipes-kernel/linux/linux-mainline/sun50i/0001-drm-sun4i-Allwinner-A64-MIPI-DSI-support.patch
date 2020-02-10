@@ -156,8 +156,8 @@ A64 bindings requirements.
 Signed-off-by: Jagan Teki <jagan@amarulasolutions.com>
 Reviewed-by: Rob Herring <robh@kernel.org>
 ---
- .../display/allwinner,sun6i-a31-mipi-dsi.yaml | 21 +++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ .../display/allwinner,sun6i-a31-mipi-dsi.yaml | 20 +++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml b/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml
 index 9d4c25b104f6..892463e4e5b3 100644
@@ -183,7 +183,7 @@ index 9d4c25b104f6..892463e4e5b3 100644
      items:
        - description: Bus Clock
        - description: Module Clock
-@@ -63,11 +67,24 @@ required:
+@@ -63,12 +67,24 @@ required:
    - reg
    - interrupts
    - clocks
@@ -191,7 +191,7 @@ index 9d4c25b104f6..892463e4e5b3 100644
    - phys
    - phy-names
    - resets
-+  - vcc-dsi-supply
+   - vcc-dsi-supply
    - port
 +  
 ++allOf:
@@ -636,10 +636,10 @@ index c958ca9bae63..8c4c541224dd 100644
  MODULE_DEVICE_TABLE(of, sun6i_dsi_of_table);
  
 diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
-index 3f4846f581ef..d791c9f6fccf 100644
+index 3f4846f581ef..cf930f9171e9 100644
 --- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
 +++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
-@@ -15,6 +15,10 @@
+@@ -16,6 +16,10 @@
  
  #define SUN6I_DSI_TCON_DIV	4
  
@@ -650,7 +650,7 @@ index 3f4846f581ef..d791c9f6fccf 100644
  struct sun6i_dsi {
  	struct drm_connector	connector;
  	struct drm_encoder	encoder;
-@@ -31,6 +35,7 @@ struct sun6i_dsi {
+@@ -32,6 +36,7 @@ struct sun6i_dsi {
  	struct sun4i_drv	*drv;
  	struct mipi_dsi_device	*device;
  	struct drm_panel	*panel;

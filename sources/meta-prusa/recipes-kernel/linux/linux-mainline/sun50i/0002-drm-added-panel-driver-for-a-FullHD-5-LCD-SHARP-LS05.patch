@@ -76,18 +76,19 @@ new file mode 100644
 index 000000000000..328663ac8a5d
 --- /dev/null
 +++ b/drivers/gpu/drm/panel/panel-sharp-ls050t1sx01.c
-@@ -0,0 +1,331 @@
+@@ -0,0 +1,330 @@
++#include <linux/delay.h>
 +#include <linux/gpio/consumer.h>
 +#include <linux/module.h>
 +#include <linux/of.h>
 +#include <linux/regulator/consumer.h>
 +
-+#include <drm/drmP.h>
++#include <video/mipi_display.h>
++
 +#include <drm/drm_crtc.h>
++#include <drm/drm_device.h>
 +#include <drm/drm_mipi_dsi.h>
 +#include <drm/drm_panel.h>
-+
-+#include <video/mipi_display.h>
 +
 +struct sharp_panel {
 +    struct drm_panel base;
@@ -327,9 +328,8 @@ index 000000000000..328663ac8a5d
 +        gpiod_set_value(sharp->enable_gpio, 0);
 +    }
 +
-+    drm_panel_init(&sharp->base);
-+    sharp->base.funcs = &sharp_panel_funcs;
-+    sharp->base.dev = &sharp->dsi->dev;
++    drm_panel_init(&sharp->base, &sharp->dsi->dev, &sharp_panel_funcs,
++		    DRM_MODE_CONNECTOR_DSI);
 +
 +    return drm_panel_add(&sharp->base);
 +}
@@ -380,7 +380,6 @@ index 000000000000..328663ac8a5d
 +    if (ret < 0)
 +        dev_err(&dsi->dev, "failed to detach from DSI host: %d\n", ret);
 +
-+    drm_panel_detach(&sharp->base);
 +    sharp_panel_del(sharp);
 +
 +    return 0;
