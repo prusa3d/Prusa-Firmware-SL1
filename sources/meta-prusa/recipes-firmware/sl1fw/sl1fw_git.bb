@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "1616d4a0e0bfda55b50d63939d00a6cfd75e4236"
+SRCREV_pn-${PN} = "9164ebacb68180101b2d747e1b27876d63cc2a40"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -57,6 +57,8 @@ FILES_${PN} += "\
 	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
+	${sysconfdir}/nginx/sites-available/sl1fw-auth\
+	${sysconfdir}/nginx/sites-enabled/sl1fw-auth\
 	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
 	${libdir}/tmpfiles.d/projects-tmpfiles.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
@@ -83,6 +85,7 @@ do_install_append () {
 	# Enable nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
 	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
+	ln -s ${sysconfdir}/nginx/sites-available/sl1fw-auth ${D}${sysconfdir}/nginx/sites-enabled/sl1fw-auth
 
 	# Install projects tmpfiles
 	install -d ${D}${libdir}/tmpfiles.d
