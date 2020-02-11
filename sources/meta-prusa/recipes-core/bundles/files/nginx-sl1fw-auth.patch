@@ -1,0 +1,68 @@
+--- sl1fw	2020-02-06 16:46:47.912768062 +0100
++++ a64-fw/firmware/nginx/sl1fw-auth	2020-02-06 12:24:29.351165606 +0100
+@@ -16,15 +16,6 @@
+ # Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
+ ##
+ 
+-map $http_upgrade $connection_upgrade {
+-	default upgrade;
+-	'' close;
+-}
+-
+-upstream websocket {
+-	server 127.0.0.1:16384;
+-}
+-
+ upstream debugsocket {
+ 	server 127.0.0.1:49152;
+ }
+@@ -32,36 +23,11 @@
+ # Default server configuration
+ #
+ server {
+-	listen 80 default_server; # General usage
+-	listen 81 default_server; # When accessed from wifi hotspot
+-
+-	root /srv/http/intranet;
+-
+-	# Add index.php to the list if you are using PHP
+-	index index.html index.htm;
+-
+-	# Make site accessible from http://localhost/
+-	server_name localhost;
+-
++	listen 82 default_server; # General usage
++	
+ 	# Require htdigest auth
+ 	include /etc/nginx/prusa-auth.conf;
+ 
+-	location / {
+-		try_files $uri $uri.html $uri/ =404;
+-	}
+-
+-	location /ws {
+-		proxy_read_timeout 60m;
+-		proxy_pass http://websocket;
+-		proxy_http_version 1.1;
+-		proxy_set_header Upgrade $http_upgrade;
+-		proxy_set_header Connection $connection_upgrade;
+-	}
+-
+-	location /multimedia {
+-		alias /usr/share/sl1fw/multimedia;
+-	}
+-
+ 	location /dbg {
+ 		proxy_read_timeout 60m;
+ 		proxy_pass http://debugsocket;
+@@ -75,10 +41,5 @@
+ 		proxy_pass http://127.0.0.1:19531/entries?_SYSTEMD_UNIT=sl1fw.service;
+ 	}
+ 
+-	location /live.png {
+-		sendfile on;
+-		tcp_nopush on;
+-		alias /run/sl1fw/live.png;
+-	}
+ }
+ 
