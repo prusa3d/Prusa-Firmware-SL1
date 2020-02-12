@@ -41,11 +41,11 @@ slot-post-install)
 		systemctl --root ${RAUC_MOUNT_PREFIX} disable getty@tty1.service
 		systemctl --root ${RAUC_MOUNT_PREFIX} mask getty@tty1.service
 
-        if grep -q 'auth' "${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw"; then
-		    sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw
+		if grep -q 'auth' "${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw"; then
+			sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw
 			patch -o ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw-auth ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw < ${RAUC_MOUNT_PREFIX}/bundle/patches/nginx-sl1fw-auth.patch
 			patch ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw < ${RAUC_MOUNT_PREFIX}/bundle/patches/nginx-sl1fw.patch
-			ln -s ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-available/sl1fw-auth ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-enabled/sl1fw-auth
+			ln -s /etc/nginx/sites-available/sl1fw-auth ${RAUC_MOUNT_PREFIX}/etc/nginx/sites-enabled/sl1fw-auth
 		fi;
 
 		umount ${etc_dev}
