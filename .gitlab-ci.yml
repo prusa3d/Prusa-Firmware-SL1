@@ -40,13 +40,14 @@ b:raucb-development:
   script:
     - cat build/conf/auto.conf
     - source oe-init-build-env
-    - bitbake sla-update-bundle
+    - bitbake --quiet sla-update-bundle
     - cd ..
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${VERSION}.dev-key.raucb
     - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${VERSION}.initramfs.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
     - mv changelog.md ${VERSION}.changelog.md
     - mv known-issues.txt ${VERSION}.known-issues.txt
+    - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
 
   artifacts:
     expire_in: 1 week
@@ -56,6 +57,7 @@ b:raucb-development:
       - ./*.manifest
       - ./*.changelog.md
       - ./*.known-issues.txt
+      - ./log.txt.xz
 
 b:raucb-production:
   stage: build
@@ -113,7 +115,7 @@ b:tools:
 
   script:
     - source oe-init-build-env
-    - bitbake sla-dev-image sla-bootstrap
+    - bitbake --quiet sla-dev-image sla-bootstrap
     - xz -T0 --verbose tmp/deploy/images/prusa64-sl1/*.rootfs.wic
     - cd ..
     - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.wic.xz ${VERSION}.devsd.xz
@@ -121,6 +123,7 @@ b:tools:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.manifest ${VERSION}.devsd.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz ${VERSION}.bootstrapsd.xz
     - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap ${VERSION}.bootstrapsd.bmap
+    - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
 
   artifacts:
     expire_in: 1 week
@@ -128,6 +131,7 @@ b:tools:
     paths:
       - ./*.devsd.*
       - ./*.bootstrapsd.*
+      - ./log.txt.xz
 
 d:raucb-development:
   stage: deploy
