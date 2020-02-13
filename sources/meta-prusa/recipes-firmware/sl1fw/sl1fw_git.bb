@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "c6378105ca9424b3435a99cefb56d0b05600b87f"
+SRCREV_pn-${PN} = "31dfa615aadc65f0b3722e4b0ce38d2a5cdfc5a7"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -16,12 +16,9 @@ DEPENDS += "python3 gettext-native"
 
 RDEPENDS_${PN} += " \
 	python3 \
-	rsync \
 	bash \
 	nginx \
 	avrdude \
-	libmikmod \
-	socat \
 	avahi-daemon \
 	avahi-restarter \
 	api-keygen \
@@ -29,13 +26,10 @@ RDEPENDS_${PN} += " \
 	wifi-config \
 	fbset \
 	python3-websocket-server \
-	python3-pygame \
 	python3-pyserial \
 	python3-numpy \
-	python3-six \
 	python3-jinja2 \
 	python3-gpio \
-	python3-lazy-import \
 	python3-pydbus \
 	python3-misc \
 	python3-pygobject \
@@ -45,8 +39,6 @@ RDEPENDS_${PN} += " \
 	python3-future \
 	python3-paho-mqtt \
 	python3-toml \
-	python3-pyalsaaudio \
-	python3-dbus \
 	python3-pillow \
 	python3-distro \
 	python3-readerwriterlock \
