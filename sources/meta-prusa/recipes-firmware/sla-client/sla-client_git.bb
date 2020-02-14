@@ -1,25 +1,21 @@
 LICENSE = "GPL3"
 
 SRC_URI = "\
-	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=master;name=sla-client \
-	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/qrcode-generator\
+	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=devel;name=sla-client \
+	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/3rdparty/qrcode-generator\
+	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://sla-client.service \
 	file://sla-client-config.json \
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
-#PV = "1.0+git${SRCPV}"
-#SRCREV_FORMAT = "sla-client_qrcode-generator"
-#SRCREV = "${AUTOREV}"
 
-SRCREV_sla-client = "a74f7af3930b4953a334e673a8848ca6b910c9f2"
+SRCREV_sla-client =  "5e631680485cfe9a30dfc620d006d904d380a97f"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
-
+SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
 "
-#LICENSE_qrcode-generator = "GPLv3+"
-#LIC_FILES_CHKSUM_qrcode-generator = "qrcode-generator/LICENSE.md;md5=a83c38e033331f609f4bbb9b55d68662" 
 
 inherit cmake_kf5 systemd
 
@@ -38,6 +34,11 @@ RDEPENDS_${PN} += "\
 	qtgraphicaleffects \
 	nemo-qml-plugin-dbus-qt5 \
 	networkmanager-qt \
+	gstreamer1.0-plugins-base \
+	gstreamer1.0-plugins-good \
+	gstreamer1.0-plugins-bad \
+	gstreamer1.0-plugins-ugly \
+	gstreamer1.0-libav \
 "
 
 FILES_${PN} += "\
