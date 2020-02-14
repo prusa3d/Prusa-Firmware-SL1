@@ -1,8 +1,16 @@
+From 4e0addd8d37d5b49277651c39685e83192acf0de Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 12 Apr 2019 17:29:49 +0200
+
+---
+ arch/arm/cpu/armv8/generic_timer.c | 48 +++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
+
 diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
-index c1706dcec1..3e3c2212c3 100644
+index 46e63294fe..3cc45d704a 100644
 --- a/arch/arm/cpu/armv8/generic_timer.c
 +++ b/arch/arm/cpu/armv8/generic_timer.c
-@@ -20,7 +20,7 @@ unsigned long get_tbclk(void)
+@@ -21,7 +21,7 @@ unsigned long get_tbclk(void)
  	return cntfrq;
  }
  
@@ -11,7 +19,7 @@ index c1706dcec1..3e3c2212c3 100644
  /*
   * FSL erratum A-008585 says that the ARM generic timer counter "has the
   * potential to contain an erroneous value for a small number of core
-@@ -46,7 +46,7 @@ unsigned long timer_read_counter(void)
+@@ -47,7 +47,7 @@ unsigned long timer_read_counter(void)
  
  	return cntpct;
  }
@@ -20,7 +28,7 @@ index c1706dcec1..3e3c2212c3 100644
  /*
   * This erratum sometimes flips the lower 11 bits of the counter value
   * to all 0's or all 1's, leading to jumps forwards or backwards.
-@@ -59,31 +59,32 @@ unsigned long timer_read_counter(void)
+@@ -60,31 +60,31 @@ unsigned long timer_read_counter(void)
   * single read, so does not have any significant overhead.
   * The algorithm was conceived by Samuel Holland.
   */
@@ -36,19 +44,18 @@ index c1706dcec1..3e3c2212c3 100644
 -	return cntpct;
 -}
 -#else
-+// unsigned long timer_read_counter(void)
-+// {
-+// 	unsigned long cntpct;
-+// 
-+// 	isb();
-+// 	do {
-+// 		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-+// 	} while (((cntpct + 1) & GENMASK(9, 0)) <= 1);
-+// 
-+// 	return cntpct;
-+// }
-+// 
-+// #else
++//unsigned long timer_read_counter(void)
++//{
++//	unsigned long cntpct;
++//
++//	isb();
++//	do {
++//		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
++//	} while (((cntpct + 1) & GENMASK(10, 0)) <= 1);
++//
++//	return cntpct;
++//}
++//#else
  /*
   * timer_read_counter() using the Arm Generic Timer (aka arch timer).
   */
@@ -62,16 +69,16 @@ index c1706dcec1..3e3c2212c3 100644
 -	return cntpct;
 -}
 -#endif
-+// unsigned long timer_read_counter(void)
-+// {
-+// 	unsigned long cntpct;
-+// 
-+// 	isb();
-+// 	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-+// 
-+// 	return cntpct;
-+// }
-+// #endif
++//unsigned long timer_read_counter(void)
++//{
++//	unsigned long cntpct;
++//
++//	isb();
++//	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
++//
++//	return cntpct;
++//}
++//#endif
  
  uint64_t get_ticks(void)
  {

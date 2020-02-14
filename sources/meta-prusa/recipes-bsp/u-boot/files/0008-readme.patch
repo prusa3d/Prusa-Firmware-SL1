@@ -1,0 +1,48 @@
+From 502b8784ae0c88c8bc065d44840db45b32a8edb1 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 12 Apr 2019 17:29:49 +0200
+
+---
+ README.md | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+ create mode 100644 README.md
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000000..a48f092719
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,33 @@
++### Building 32-bit SPL binary for FEL
++
++```
++make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- sun50i-a64-ddr3-spl_config
++make -j`nproc`
++```
++
++Resulting `sunxi-spl.bin` file can be then combined with a regular 64-bit
++`u-boot.bin` binary in a command like this:
++
++```
++sunxi-fel -v -p				\
++	spl sunxi-spl.bin		\
++	write 0x44000 bl31.bin		\
++	write 0x4a000000 u-boot.bin	\
++	write 0x43100000 u-boot.env	\
++	reset64 0x44000
++```
++
++The `u-boot.env` is a text-file which is read by u-boot in order to alter
++environment variables. It must conform this syntax:
++
++```
++#=uEnv
++variable_name=string
++```
++
++Example:
++
++```
++#=uEnv
++bootcmd=ums 0 mmc 1
++```

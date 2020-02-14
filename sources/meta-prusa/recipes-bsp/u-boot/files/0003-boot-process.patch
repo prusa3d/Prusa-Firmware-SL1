@@ -1,0 +1,188 @@
+From ab756f2b24935bda88c458ea98b03af5bb77e43b Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 12 Apr 2019 17:29:49 +0200
+
+---
+ arch/arm/mach-sunxi/board.c    |   1 +
+ board/sunxi/board.c            |   1 +
+ include/configs/sunxi-common.h | 113 +++++++++++++++++++++++++++++++--
+ 3 files changed, 111 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
+index aa1d2230c9..e81186bc2c 100644
+--- a/arch/arm/mach-sunxi/board.c
++++ b/arch/arm/mach-sunxi/board.c
+@@ -248,6 +248,7 @@ uint32_t sunxi_get_boot_device(void)
+ 		return BOOT_DEVICE_BOARD;
+ 
+ 	boot_source = readb(SPL_ADDR + 0x28);
++	printf("sunxi_get_boot_device, boot_source = 0x%02x\n", boot_source);
+ 	switch (boot_source) {
+ 	case SUNXI_BOOTED_FROM_MMC0:
+ 	case SUNXI_BOOTED_FROM_MMC0_HIGH:
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index b9450a0e36..3ca6b62831 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -197,6 +197,7 @@ void i2c_init_board(void)
+ #if defined(CONFIG_ENV_IS_IN_MMC) && defined(CONFIG_ENV_IS_IN_FAT)
+ enum env_location env_get_location(enum env_operation op, int prio)
+ {
++	gd->env_load_prio = prio;
+ 	switch (prio) {
+ 	case 0:
+ 		return ENVL_FAT;
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index 0ef289fd64..b7b3f37445 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -425,6 +425,100 @@ extern int soft_i2c_gpio_scl;
+ #define BOOTCMD_SUNXI_COMPAT
+ #endif
+ 
++#define SCAN_DEV_FOR_FDT									\
++	"scan_dev_for_fdt="									\
++		"for prefix in ${boot_prefixes}; do "						\
++			"if test -e mmc ${mmc_bootdev}:${mmc_bootpart} ${prefix}${fdtfile}; " \
++			"then "	\
++				"setenv boot_prefix ${prefix}; "				\
++				"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${prefix}${fdtfile}; " \
++				"then " \
++					"echo LOAD_FDT_OK; "\
++					"exit; "\
++				"else " \
++					"echo LOAD_FDT_FAIL; " \
++					"reset; " \
++				"fi;"	\
++				"break; "							\
++			"elif test -e mmc ${mmc_bootdev}:${mmc_bootpart} ${prefix}${basefdt}; " \
++			"then "	\
++				"setenv boot_prefix ${prefix}; "				\
++				"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${prefix}${basefdt}; "\
++				"then echo LOAD_FDT_OK; exit; " \
++				"else echo LOAD_FDT_FAIL; reset; " \
++				"fi;"	\
++				"break; " \
++			"fi; "									\
++		"done\0"
++
++
++#define UPDATE_ACTIVE_ROOTFS_SLOT \
++	"update_active_rootfs_slot=" \
++		"test -n \"${BOOT_ORDER}\" || setenv BOOT_ORDER \"A B\"; " \
++		"test -n \"${BOOT_A_LEFT}\" || setenv BOOT_A_LEFT 3; " \
++		"test -n \"${BOOT_B_LEFT}\" || setenv BOOT_B_LEFT 3; " \
++		"setenv boot_prefixes /boot/; " \
++		"setenv slot; " \
++		"setenv rootlabel; " \
++		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
++			"setenv boots_left \\\\${BOOT_${BOOT_SLOT}_LEFT}; " \
++			"setexpr num_slot ${BOOT_SLOT} - a; " \
++			"setenv evaluate_boot_order \"" \
++				"if test ${boots_left} -le 0; then exit; fi; " \
++				"setenv slot ${BOOT_SLOT}; " \
++				"setexpr BOOT_${BOOT_SLOT}_LEFT ${boots_left} - 1; " \
++				"setenv rootlabel rootfs.${num_slot}; " \
++				"\"; " \
++			"run evaluate_boot_order; " \
++			"if test -n \"${slot}\"; " \
++			"then " \
++				"setexpr rootpart ${num_slot} + 2; " \
++				"saveenv; " \
++				"exit; " \
++			"fi; " \
++		"done; " \
++		"echo \"No valid slot found, resetting tries to 3\"; " \
++		"setenv BOOT_A_LEFT 3; " \
++		"setenv BOOT_B_LEFT 3; " \
++		"saveenv; " \
++		"reset; " \
++	"\0"
++
++#define PRUSA_KERNEL_CMDLINE \
++	"console=${console} root=${rootdev} rootwait " \
++	"panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
++	"logo.nologo vt.global_cursor_default=0 ${extra}"
++
++
++#define BOOTCMD_PRUSA \
++	"bootcmd_prusa=" \
++		"if test ${mmc_bootdev} -eq 0; then " \
++			"setenv extra; " \
++			"setenv rootdev /dev/mmcblk0p1; " \
++			"setenv mmc_bootpart 1; " \
++			"if test -e mmc 0:1 boot.scr; then " \
++				"echo Found U-Boot script; " \
++				"load mmc 0:1 ${scriptaddr} boot.scr; " \
++				"source ${scriptaddr}; " \
++			"fi; " \
++		"else " \
++			"run update_active_rootfs_slot; " \
++			"setenv extra rauc.slot=${slot}; " \
++			"setenv rootdev LABEL=${rootlabel}; " \
++			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
++		"fi; " \
++		"run scan_dev_for_fdt; " \
++		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
++		"" \
++		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${kernel_addr_r} ${boot_prefix}Image; " \
++		"then " \
++			"echo LOAD_KERNEL_OK; " \
++		"else " \
++			"reset; " \
++		"fi; " \
++		"booti ${kernel_addr_r} - ${fdt_addr_r};" \
++		"\0"
++
+ #include <config_distro_bootcmd.h>
+ 
+ #ifdef CONFIG_USB_KEYBOARD
+@@ -465,12 +559,17 @@ extern int soft_i2c_gpio_scl;
+ #endif
+ 
+ #define PARTS_DEFAULT \
+-	"name=loader1,start=8k,size=32k,uuid=${uuid_gpt_loader1};" \
+-	"name=loader2,size=984k,uuid=${uuid_gpt_loader2};" \
+-	"name=esp,size=128M,bootable,uuid=${uuid_gpt_esp};" \
+-	"name=system,size=-,uuid=${uuid_gpt_system};"
++	"name=environment,start=512K,size=512K,type=${uuid_gpt_other};"		\
++	"name=rootfs.0,start=4M,size=768M,type=${uuid_gpt_system};"		\
++	"name=rootfs.1,start=772M,size=768M,type=${uuid_gpt_system};"		\
++	"name=etc.0,start=1540M,size=32M,type=${uuid_gpt_other};"		\
++	"name=etc.1,start=1572M,size=32M,type=${uuid_gpt_other};"		\
++	"name=var,start=1668M,size=2000M,type=${uuid_gpt_other};"		\
++	"name=factory,start=1604M,size=64M,type=${uuid_gpt_other};"		\
+ 
+ #define UUID_GPT_ESP "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
++#define UUID_GPT_ENVIRONMENT "bc13c2ff-59e6-4262-a352-b275fd6f7172"
++#define UUID_GPT_OTHER "0fc63daf-8483-4772-8e79-3d69d8477de4"
+ 
+ #ifdef CONFIG_ARM64
+ #define UUID_GPT_SYSTEM "b921b045-1df0-41c3-af44-4c6f280d3fae"
+@@ -484,6 +583,7 @@ extern int soft_i2c_gpio_scl;
+ 
+ #ifdef CONFIG_ARM64
+ #define FDTFILE "allwinner/" CONFIG_DEFAULT_DEVICE_TREE ".dtb"
++#define FDTFILE_BASE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
+ #else
+ #define FDTFILE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
+ #endif
+@@ -493,13 +593,18 @@ extern int soft_i2c_gpio_scl;
+ 	MEM_LAYOUT_ENV_SETTINGS \
+ 	DFU_ALT_INFO_RAM \
+ 	"fdtfile=" FDTFILE "\0" \
++	"basefdt=" FDTFILE_BASE "\0" \
+ 	"console=ttyS0,115200\0" \
+ 	SUNXI_MTDIDS_DEFAULT \
+ 	SUNXI_MTDPARTS_DEFAULT \
+ 	"uuid_gpt_esp=" UUID_GPT_ESP "\0" \
+ 	"uuid_gpt_system=" UUID_GPT_SYSTEM "\0" \
++	"uuid_gpt_other=" UUID_GPT_OTHER "\0" \
+ 	"partitions=" PARTS_DEFAULT "\0" \
+ 	BOOTCMD_SUNXI_COMPAT \
++	SCAN_DEV_FOR_FDT \
++	UPDATE_ACTIVE_ROOTFS_SLOT \
++	BOOTCMD_PRUSA \
+ 	BOOTENV
+ 
+ #else /* ifndef CONFIG_SPL_BUILD */
