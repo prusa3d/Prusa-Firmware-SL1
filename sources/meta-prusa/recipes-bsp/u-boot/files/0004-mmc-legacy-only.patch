@@ -1,3 +1,11 @@
+From 2febca2b91fd902d3495523569dadb205f44c68b Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 12 Apr 2019 17:29:49 +0200
+
+---
+ drivers/mmc/sunxi_mmc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
 diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
 index 9f426661c4..5217bb12e0 100644
 --- a/drivers/mmc/sunxi_mmc.c

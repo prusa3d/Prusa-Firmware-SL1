@@ -1,0 +1,154 @@
+From 9401b899d8f798ee4fb009d6c05c6ea4f9188ba2 Mon Sep 17 00:00:00 2001
+From: Andrey Yurovsky <yurovsky@gmail.com>
+Date: Wed, 13 Dec 2017 21:06:49 -0800
+Subject: [PATCH] gpt: add part-uuid and part-num subcommands
+
+It is useful to be able to retrieve a partition UUID or number given the
+partition label when working with disks that have a GPT. For instance
+some systems use the partition label to indicate the purpose of the
+partition (such as "rootfs0" being the 0th root file system in an A/B
+image scheme).
+
+Add "gpt part-uuid" to retrieve the partition UUID for a given label and
+"gpt part-num" to retrieve the partition number for a given label along
+with some documentation.
+
+Signed-off-by: Andrey Yurovsky <yurovsky@gmail.com>
+
+---
+ cmd/gpt.c      | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/README.gpt | 21 ++++++++++++++
+ 2 files changed, 96 insertions(+)
+
+diff --git a/cmd/gpt.c b/cmd/gpt.c
+index 0c4349f4b2..c936b7eef4 100644
+--- a/cmd/gpt.c
++++ b/cmd/gpt.c
+@@ -355,6 +355,72 @@ static int do_get_gpt_info(struct blk_desc *dev_desc)
+ 	}
+ 	return ret;
+ }
++
++static struct disk_part *find_part_by_label(const char *label)
++{
++	struct disk_part *part = NULL;
++	struct disk_part *curr;
++
++	list_for_each_entry(curr, &disk_partitions, list) {
++		/* Check for the first match of the label we're looking
++		 * for against the partition label
++		 */
++		if (!strcmp((const char *)curr->gpt_part_info.name,
++			    label)) {
++			part = curr;
++			break;
++		}
++	}
++
++	return part;
++}
++
++/**
++ * Find a partition UUID by label and save that UUID to the environment
++ * variable specified
++ */
++static int do_get_part_uuid(struct blk_desc *dev_desc, const char *label,
++			    const char *namestr)
++{
++	int ret;
++
++	ret = get_gpt_info(dev_desc);
++	if (ret > 0) {
++		struct disk_part *part = find_part_by_label(label);
++
++		if (part) {
++			env_set(namestr, part->gpt_part_info.uuid);
++			ret = 0;
++		}
++
++		del_gpt_info();
++	}
++
++	return ret;
++}
++
++/**
++ * Find a partition number by label and save that number to the environment
++ * variable specified
++ */
++static int do_get_part_num(struct blk_desc *dev_desc, const char *label,
++			   const char *namestr)
++{
++	int ret = get_gpt_info(dev_desc);
++
++	if (ret > 0) {
++		struct disk_part *part = find_part_by_label(label);
++
++		if (part) {
++			env_set_ulong(namestr, part->partnum);
++			ret = 0;
++		}
++
++		del_gpt_info();
++	}
++
++	return ret;
++}
+ #endif
+ 
+ /**
+@@ -851,6 +917,10 @@ static int do_gpt(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ #ifdef CONFIG_CMD_GPT_RENAME
+ 	} else if (strcmp(argv[1], "read") == 0) {
+ 		ret = do_get_gpt_info(blk_dev_desc);
++	} else if (strcmp(argv[1], "part-uuid") == 0 && argc == 6) {
++		ret = do_get_part_uuid(blk_dev_desc, argv[4], argv[5]);
++	} else if (strcmp(argv[1], "part-num") == 0 && argc == 6) {
++		ret = do_get_part_num(blk_dev_desc, argv[4], argv[5]);
+ 	} else if ((strcmp(argv[1], "swap") == 0) ||
+ 		   (strcmp(argv[1], "rename") == 0)) {
+ 		ret = do_rename_gpt_parts(blk_dev_desc, argv[1], argv[4], argv[5]);
+@@ -885,6 +955,11 @@ U_BOOT_CMD(gpt, CONFIG_SYS_MAXARGS, 1, do_gpt,
+ 	" gpt guid mmc 0\n"
+ 	" gpt guid mmc 0 varname\n"
+ #ifdef CONFIG_CMD_GPT_RENAME
++	"gpt partition label commands:\n"
++	"gpt part-uuid <interface> <dev> <label> <varname>\n"
++	"    - set environment variable to UUID of label\n"
++	"gpt part-num <interface> <dev> <label> <varname>\n"
++	"    - set environment variable to partition number of label\n"
+ 	"gpt partition renaming commands:\n"
+ 	" gpt read <interface> <dev>\n"
+ 	"    - read GPT into a data structure for manipulation\n"
+diff --git a/doc/README.gpt b/doc/README.gpt
+index facd7afc3a..8e6c3bcc5b 100644
+--- a/doc/README.gpt
++++ b/doc/README.gpt
+@@ -273,6 +273,27 @@ Some strings can be also used at the place of known GUID :
+ 
+ They are also used to display the type of partition in "part list" command.
+ 
++Identifying Partitions in U-Boot:
++=================================
++
++Two subcommands may be used to identify partitions by their label. This can be
++useful for determining which partition to use or for setting boot arguments.
++The 'gpt part-uuid' command looks up a partition UUID for a given label and
++stores it in an environment variable. The 'gpt part-num' command looks up a
++partition number for a given label and stores it in an environment variable.
++The first partition with a matching label is used.
++
++For example, to find the UUID of a partition named 'rootfs0' and then use it
++for boot arguments:
++
++U-BOOT> gpt part-uuid mmc 0 rootfs0 rootfsuuid
++U-BOOT> setenv bootargs root=PARTUUID=${rootfsuuid}
++
++Or, for example, to find the partition number for a partition named 'kernel'
++and load a file from it:
++
++U-BOOT> gpt part-num mmc 0 kernel kernelnum
++U-BOOT> fatload mmc 0:${kernelnum} ${loadaddr} zImage
+ 
+ Useful info:
+ ============
