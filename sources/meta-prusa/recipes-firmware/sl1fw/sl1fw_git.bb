@@ -53,13 +53,10 @@ FILES_${PN} += "\
 	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
-	${sysconfdir}/nginx/sites-available/sl1fw-auth\
-	${sysconfdir}/nginx/sites-enabled/sl1fw-auth\
 	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
 	${libdir}/tmpfiles.d/projects-tmpfiles.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
 	/usr/bin/main.py\
-	/srv/http/intranet\
 	/usr/share/scripts\
 	/usr/share/factory/defaults\
 	/usr/share/dbus-1/system.d\
@@ -81,7 +78,6 @@ do_install_append () {
 	# Enable nginx site
 	install -d ${D}${sysconfdir}/nginx/sites-enabled
 	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
-	ln -s ${sysconfdir}/nginx/sites-available/sl1fw-auth ${D}${sysconfdir}/nginx/sites-enabled/sl1fw-auth
 
 	# Install projects tmpfiles
 	install -d ${D}${libdir}/tmpfiles.d
