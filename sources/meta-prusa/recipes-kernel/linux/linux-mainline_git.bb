@@ -19,7 +19,10 @@ SRCREV_pn-${PN} = "v5.5.2"
 PV = "v5.5.2"
 LINUX_VERSION = "${PV}"
 
-SRC_URI="git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH}"
+SRC_URI="\
+	git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH} \
+	file://ch341-timing.patch \
+"
 SRC_URI_append_sun50i = " \
 	file://0001-drm-sun4i-Allwinner-A64-MIPI-DSI-support.patch \
 	file://0002-drm-added-panel-driver-for-a-FullHD-5-LCD-SHARP-LS05.patch \
