@@ -1,0 +1,40 @@
+--- u-boot.vanilla/include/configs/sunxi-common.h	2020-03-05 16:04:54.206327664 +0100
++++ u-boot/include/configs/sunxi-common.h	2020-03-05 17:02:34.649491180 +0100
+@@ -485,16 +485,17 @@
+ 	"\0"
+ 
+ #define PRUSA_KERNEL_CMDLINE \
+-	"console=${console} root=${rootdev} rootwait " \
+-	"panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
+-	"logo.nologo vt.global_cursor_default=0 board_revision=${board_revision} stmmac.quirks=${eth_quirks} ${extra}"
++	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin logo.nologo " \
++	"vt.global_cursor_default=0 console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
+ 
+ 
+ #define BOOTCMD_PRUSA \
+ 	"bootcmd_prusa=" \
++		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
++		"setenv bootargs ${bootargs} ${extra}; " \
++		"setenv extra; " \
+ 		"if test ${mmc_bootdev} -eq 0; then " \
+-			"setenv extra; " \
+-			"setenv rootdev /dev/mmcblk0p1; " \
++			"setenv bootargs ${bootargs} root=/dev/mmcblk0p1; " \
+ 			"setenv mmc_bootpart 1; " \
+ 			"if test -e mmc 0:1 boot.scr; then " \
+ 				"echo Found U-Boot script; " \
+@@ -503,12 +504,11 @@
+ 			"fi; " \
+ 		"else " \
+ 			"run update_active_rootfs_slot; " \
+-			"setenv extra rauc.slot=${slot}; " \
+-			"setenv rootdev LABEL=${rootlabel}; " \
++			"setenv bootargs ${bootargs} rauc.slot=${slot}; " \
++			"setenv bootargs ${bootargs} root=LABEL=${rootlabel}; " \
+ 			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
+ 		"fi; " \
+ 		"run scan_dev_for_fdt; " \
+-		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
+ 		"" \
+ 		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${kernel_addr_r} ${boot_prefix}Image; " \
+ 		"then " \

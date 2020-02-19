@@ -52,12 +52,14 @@ part_factory=/dev/mmcblk2p7
 fsck.ext4 -pv $part_root
 fsck.ext4 -pv $part_etc
 
+# Ensure var is usable
 fsck.ext4 -pv $part_var
-if [ $? -eq 4 -o $? -eq 8 ]
+if [ $? -eq 4 -o $? -eq 8 ] || grep -q "erasevar" /proc/cmdline
 then
 	mkfs.ext4 -F $part_var -E lazy_itable_init=0
 fi
 
+# Ensure factory is usable
 if test -b $part_factory
 then
 	fsck.ext4 -pv $part_factory
