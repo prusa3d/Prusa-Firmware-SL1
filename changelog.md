@@ -1,3 +1,37 @@
+# Version 1.3.1
+
+## Summary
+- New web interface
+- Software licences updated
+- Fixed bugs
+
+## Detailed description
+
+### New web interface
+The web interface has been completely redesigned. Now, the page displays the printer's telemetry allowing the user to monitor:   
+printer status
+speed of the fans
+status of the cover (lid)
+currently printed layer
+remaining time of the print
+temperatures of the components
+
+For the full list of the features please, access your 3D printer (connected to a local network) via an internet browser. Please note that the page is read-only and does not require any authorization. This enables access from the Apple devices, which were unable to load the page due to a bug in the WebKit browser engine (Safari). A secured version with the ability to control the printer is planned for the future release.
+
+### Software licences updated
+The list of the software licences was updated and contains information about the package used in the firmware, its version and respective licence.
+
+## Fixed bugs
+- Fixed projects named using numbers only (i.e. "123456789.sl1")
+- Fixed fans being disabled during the print process in some cases
+- Fixed release notes in new version announcement
+- Improved response to network online event
+- Fixed calibration model settings
+- Fixed and updated translations
+- Fixed kit factory calibration
+- Fixed screenshots
+- Random UI fixes
+
 # Version 1.3.0
 
 ## Summary
