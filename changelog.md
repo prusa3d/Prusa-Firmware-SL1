@@ -1,32 +1,36 @@
 # Version 1.3.1
 
 ## Summary
-- Changelog and QR code at update page
-- Included licence page
-- Overtemp fix when printer idle
-- Redesigned web UI + fix for Mac users
+- New web interface
+- Software licences updated
+- Fixed bugs
 
 ## Detailed description
 
-### Changelog and QR code at update page
-Changelog summary and QR code is now at the notification page about new FW update.
+### New web interface
+The web interface has been completely redesigned. Now, the page displays the printer's telemetry allowing the user to monitor:   
+printer status
+speed of the fans
+status of the cover (lid)
+currently printed layer
+remaining time of the print
+temperatures of the components
 
-### Included licence page
-Collection of all software used with it's licences. List is included at the bottom of System info page.
+For the full list of the features please, access your 3D printer (connected to a local network) via an internet browser. Please note that the page is read-only and does not require any authorization. This enables access from the Apple devices, which were unable to load the page due to a bug in the WebKit browser engine (Safari). A secured version with the ability to control the printer is planned for the future release.
 
-### Overtemp fix when printer idle
-Printer now starts to cool down CPU, when over 80 °C and stops under 60 °C. This prevents fans from spinning all the time in warmer environment.
-
-### Redesigned web UI + fix for Mac users
-Redesigned and polished web UI. Now available without login since it is read only (Safari does not support websockets with HTTP Digest).
+### Software licences updated
+The list of the software licences was updated and contains information about the package used in the firmware, its version and respective licence.
 
 ## Fixed bugs
-- Allow for uvcalibration with disassembeld kit
-- Include usb_path in printer0 API
-- Net change tasks improvements
-- Sensors translations: rephrased texts due to capital letters + no need to reboot for proper translation
-- Use value types when converting config
-- Project including only numbers in name fixed
+- Fixed projects named using numbers only (i.e. "123456789.sl1")
+- Fixed fans being disabled during the print process in some cases
+- Fixed release notes in new version announcement
+- Improved response to network online event
+- Fixed calibration model settings
+- Fixed and updated translations
+- Fixed kit factory calibration
+- Fixed screenshots
+- Random UI fixes
 
 # Version 1.3.0
 
