@@ -1,3 +1,8 @@
+# Version 1.3.2
+
+## Summary
+- Fixed new calibration target UV intensity
+
 # Version 1.3.1
 
 ## Summary
