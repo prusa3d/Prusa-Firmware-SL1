@@ -9,7 +9,7 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
 
-SRCREV_sla-client = "97d1c0764325d47d2d1b060b2979f6ae1bcad6ce"
+SRCREV_sla-client = "1d19a4da8ebf812b9ba87ddb4299d6b1c62cd761"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 
