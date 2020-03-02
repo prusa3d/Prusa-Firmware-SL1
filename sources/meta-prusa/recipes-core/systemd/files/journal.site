@@ -1,9 +1,0 @@
-server {
-	listen 19532 default_server;
-
-	include /etc/nginx/prusa-auth.conf;
-
-	location / {
-		proxy_pass http://127.0.0.1:19531;
-	}
-}
