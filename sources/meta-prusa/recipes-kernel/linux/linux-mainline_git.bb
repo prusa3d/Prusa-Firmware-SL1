@@ -42,6 +42,7 @@ SRC_URI_append_sun50i = " \
 	file://1006-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1008-let-TCON_DIV-be-free-again.patch \
 	file://defconfig \
+	file://1010-Ethernet-reconnection-fix.patch \
 "
 
 # optionally add:
