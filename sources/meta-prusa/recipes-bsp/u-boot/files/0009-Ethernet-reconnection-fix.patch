@@ -1,0 +1,70 @@
+From 2e9b8a94b526c0a031bba1e05fcad52bae6e41ff Mon Sep 17 00:00:00 2001
+From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
+Date: Tue, 3 Mar 2020 16:05:08 +0100
+Subject: [PATCH] Ethernet reconnection fix
+
+- env: board revison recognition system
+---
+ board/sunxi/board.c            | 28 ++++++++++++++++++++++++++++
+ include/configs/sunxi-common.h |  2 +-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 0ddb96cd5b..d3c442a8ec 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -781,6 +781,7 @@ static void parse_spl_header(const uint32_t spl_addr)
+ static void setup_environment(const void *fdt)
+ {
+ 	char serial_string[17] = { 0 };
++	char board_revision[2] = { 0 };
+ 	unsigned int sid[4];
+ 	uint8_t mac_addr[6];
+ 	char ethaddr[16];
+@@ -839,6 +840,33 @@ static void setup_environment(const void *fdt)
+ 
+ 			env_set("serial#", serial_string);
+ 		}
++
++        // pins PH4, PH5 and PH7 used to determine revision
++        // board_revision = 0 for <= rev1.3a
++        // board_revision = 1 for == rev1.4
++        if (!env_get("board_revision")) {
++            if (!gpio_request(228, "rev0") &&
++            !gpio_request(229, "rev1") &&
++            !gpio_request(231, "rev2")) {
++                gpio_direction_input(228);
++                gpio_direction_input(229);
++                gpio_direction_input(231);
++
++                board_revision[0] = gpio_get_value(228) << 2 |
++                gpio_get_value(229) << 1 |
++                gpio_get_value(231);
++
++                // apply quirks for MAC layer for older board revisions
++                if (board_revision[0] == 0) {
++                    env_set("eth_quirks", "1");
++                } else env_set("eth_quirks", "0");
++
++                board_revision[0] += 48; // to ASCII
++                printf("Board revision %s\n", board_revision);
++                env_set("board_revision", board_revision);
++            } else
++                printf("Error: unable to acquire board revision GPIOs\n");
++        }
+ 	}
+ }
+ 
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index b7b3f37445..f052c0296a 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -487,7 +487,7 @@ extern int soft_i2c_gpio_scl;
+ #define PRUSA_KERNEL_CMDLINE \
+ 	"console=${console} root=${rootdev} rootwait " \
+ 	"panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
+-	"logo.nologo vt.global_cursor_default=0 ${extra}"
++	"logo.nologo vt.global_cursor_default=0 board_revision=${board_revision} stmmac.quirks=${eth_quirks} ${extra}"
+ 
+ 
+ #define BOOTCMD_PRUSA \

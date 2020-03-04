@@ -9,4 +9,5 @@ SRC_URI_append = " \
 	file://0006-archtimer-freescale-fix.patch \
 	file://0007-gpt-add-subcommands.patch \
 	file://0008-readme.patch \
+	file://0009-Ethernet-reconnection-fix.patch \
 "

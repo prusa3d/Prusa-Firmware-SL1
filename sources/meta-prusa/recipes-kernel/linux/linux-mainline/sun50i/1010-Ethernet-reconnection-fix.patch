@@ -1,0 +1,48 @@
+From 8bea18ffa5c2371c595a4fa5bee7961532d3ed3d Mon Sep 17 00:00:00 2001
+From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
+Date: Tue, 3 Mar 2020 15:53:22 +0100
+Subject: [PATCH] Ethernet reconnection fix
+
+- stmmac: added quirk parameter to handle duplex mode
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 80d59b775907..3461215ca46e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -96,6 +96,10 @@ module_param(eee_timer, int, 0644);
+ MODULE_PARM_DESC(eee_timer, "LPI tx expiration time in msec");
+ #define STMMAC_LPI_T(x) (jiffies + msecs_to_jiffies(x))
+ 
++static int quirks = 0;
++module_param(quirks, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++MODULE_PARM_DESC(quirks, "Ethernet MAC fixups");
++
+ /* By default the driver will use the ring mode to manage tx and rx descriptors,
+  * but allow user to force to use the chain instead of the ring
+  */
+@@ -132,6 +136,8 @@ static void stmmac_verify_args(void)
+ 		pause = PAUSE_TIME;
+ 	if (eee_timer < 0)
+ 		eee_timer = STMMAC_DEFAULT_LPI_TIMER;
++	if (unlikely((quirks < 0) || (quirks > 1)))
++		quirks = 0;
+ }
+ 
+ /**
+@@ -859,6 +865,13 @@ static void stmmac_validate(struct phylink_config *config,
+ 		phylink_set(mask, 1000baseT_Half);
+ 	}
+ 
++	/* Do not advertise full duplex for older board revisions */
++	if(quirks) {
++		phylink_set(mask, 10baseT_Full);
++		phylink_set(mask, 100baseT_Full);
++		phylink_set(mask, 1000baseT_Full);
++	}
++
+ 	bitmap_and(supported, supported, mac_supported,
+ 		   __ETHTOOL_LINK_MODE_MASK_NBITS);
+ 	bitmap_andnot(supported, supported, mask,
