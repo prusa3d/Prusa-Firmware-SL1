@@ -1,3 +1,8 @@
+# Version 1.3.3
+
+## Summary
+- Fixed UI crash on invalid language string
+
 # Version 1.3.2
 
 ## Summary
