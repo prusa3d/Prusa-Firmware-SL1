@@ -51,15 +51,10 @@ do_bundle() {
 	export PKCS11_PROXY_SOCKET=${PKCS11_PROXY_SOCKET}
 	export RAUC_PKCS11_PIN=${RAUC_PKCS11_PIN}
 
-	for val in ${RAUC_INTERMEDIATE_FILE}; do
-		INTERMEDIATE_FILE="${INTERMEDIATE_FILE} --intermediate=${val}"
-	done
-
 	${STAGING_DIR_NATIVE}${bindir}/rauc bundle \
 		--debug \
 		--cert=${RAUC_CERT_FILE} \
 		--key=${RAUC_KEY_FILE} \
-		${INTERMEDIATE_FILE} \
 		${BUNDLE_DIR} \
 		${B}/bundle.raucb
 }
