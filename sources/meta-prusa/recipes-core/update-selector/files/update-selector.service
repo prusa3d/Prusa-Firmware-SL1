@@ -1,0 +1,10 @@
+[Unit]
+Description=Ensure some update channel and CA is set
+Before=updater.service
+ConditionPathExists=!/etc/rauc/ca.cert.pem
+
+[Service]
+ExecStart=/usr/sbin/set-update-channel.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -29,6 +29,23 @@ slot-post-install)
 
 		# Copy printer settings
 		cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/
+
+		# Copy update channel override
+		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/
+		cp -av /etc/systemd/system/updater.service.d/channel.conf ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/channel.conf
+		cp /etc/update_channel ${RAUC_SLOT_MOUNT_POINT}/update_channel
+
+		# Set rauc CA
+		# Iterate over trust chain SPKI hashes (from leaf to root)
+		for i in $RAUC_BUNDLE_SPKI_HASHES; do
+				# Test for development certificate (production certificate is preset)
+				echo "Current hash: ${i}"
+				if [ "$i" == "D1:2A:2A:81:75:64:26:C2:E2:3C:3C:45:53:03:2A:87:6E:BF:1A:78:C0:C7:93:C6:4B:E9:41:40:05:6A:7F:AB" ]; then
+						echo "Activating development key chain"
+						cp ${RAUC_SLOT_MOUNT_POINT}/rauc/ca-dev.cert.pem ${RAUC_SLOT_MOUNT_POINT}/rauc/ca.cert.pem
+						break
+				fi
+		done
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "bootloader" ]; then
 		echo "Updating u-boot environment"
