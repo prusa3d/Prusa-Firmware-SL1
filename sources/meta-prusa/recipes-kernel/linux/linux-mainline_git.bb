@@ -15,8 +15,8 @@ KBRANCH ?= "linux-5.5.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "v5.5.2"
-PV = "v5.5.2"
+SRCREV_pn-${PN} = "v5.5.10"
+PV = "v5.5.10"
 LINUX_VERSION = "${PV}"
 
 SRC_URI="\
