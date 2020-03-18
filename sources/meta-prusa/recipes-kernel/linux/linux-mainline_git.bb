@@ -31,8 +31,11 @@ SRC_URI_append_sun50i = " \
 	file://0005-tc358870-hdmi-dsi-bridge-initial-commit.patch \
 	file://0006-arm64-dts-allwinner-set-GPU-clock-to-432-MHz.patch \
 	file://0007-480p-and-2k-displays-working-together.patch \
+	file://0008-drm-sun4i-replace-SUN6I_DSI_TCON_DIV-constant-with-a.patch \
+	file://0009-keep-TCON0_Dclk_Div-at-4-regardless-of-clk-rate.patch \
 	file://0101-add-thermal-sensor-driver-for-A64-A83T-H3-H5-H6-R40.patch \
 	file://0201-net-stmmac-enable-MAC-address-to-be-read-from-a-nvme.patch \
+	file://0202-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
 	file://1001-dts-copy-sun50i-a64-olinuxino.dts-into-sun50i-a64-pr.patch \
 	file://1002-dts-prusa64-sl1-fix-DAPM-widgets.patch \
@@ -40,19 +43,8 @@ SRC_URI_append_sun50i = " \
 	file://1004-dts-prusa64-sl1-enable-ac_power_supply-node.patch \
 	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://1006-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
-	file://1008-let-TCON_DIV-be-free-again.patch \
 	file://defconfig \
-	file://1010-Ethernet-reconnection-fix.patch \
 "
-
-# optionally add:
-#
-#	file://2001-lcd-timing.patch
-# (for moving LCD timing configuration to its device-tree node)
-
-#	file://1007-revert-DPHY-modclock-to-148-5-MHz.patch
-#	file://1009-revert-mali-GPU-clock-to-408-MHz.patch
-# (further candidates for minimazing tearing animations)
 
 S="${WORKDIR}/git"
 
