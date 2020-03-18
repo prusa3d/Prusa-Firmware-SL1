@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "\
         file://LICENSE;md5=5b4473596678d62d9d83096273422c8c \
 "
 
-SRCREV = "33fd23abaa2e782d778a06370c4d2da0c3e403cf"
+SRCREV = "bde2907747f609f5be314714b5420d41e106ab31"
 inherit systemd setuptools3
 
 DEPENDS += "sl1fw"
