@@ -1,0 +1,69 @@
+From 51e158004e6272301303dfd4da673c75fb5cf3f3 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 17 Mar 2020 17:23:07 +0100
+Subject: [PATCH] drm: sun4i: replace SUN6I_DSI_TCON_DIV constant with a
+ calculation
+
+Observations showed that an actual refresh rate differs from the intended.
+Specifically, in case of 4-lane panels it was reduced by 1/3, and in case of
+2-lane panels by 2/3.
+
+This led me to a hypothesis that pll-mipi determines the bitrate on each lane
+and thus the tcon_div value should be defined as bits_per_pixel/lanes.
+As most commonly used format with DSI panels is RGB888, the SUN6I_DSI_TCON_DIV
+constant (4) represents 2/3 and 1/3 of the required tcon_div for 4-lane and
+2-lane panels respectively.
+---
+ drivers/gpu/drm/sun4i/sun4i_tcon.c     | 4 ++--
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c | 4 +++-
+ drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h | 2 --
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+index c81cdce6ed55..9e7e2f3cc9b2 100644
+--- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
++++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
+@@ -341,8 +341,8 @@ static void sun4i_tcon0_mode_set_cpu(struct sun4i_tcon *tcon,
+ 	u32 block_space, start_delay;
+ 	u32 tcon_div;
+ 
+-	tcon->dclk_min_div = SUN6I_DSI_TCON_DIV;
+-	tcon->dclk_max_div = SUN6I_DSI_TCON_DIV;
++	tcon->dclk_min_div = bpp / lanes;
++	tcon->dclk_max_div = bpp / lanes;
+ 
+ 	sun4i_tcon0_mode_set_common(tcon, mode);
+ 
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+index 9f882660157c..a937eff06ab1 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.c
+@@ -387,9 +387,11 @@ static u16 sun6i_dsi_get_drq_edge0(struct sun6i_dsi *dsi,
+ 				   struct drm_display_mode *mode,
+ 				   u16 line_num, u16 edge1)
+ {
++	struct mipi_dsi_device *device = dsi->device;
++	unsigned int Bpp = mipi_dsi_pixel_format_to_bpp(device->format) / 8;
+ 	u16 edge0 = edge1;
+ 
+-	edge0 += (mode->hdisplay + 40) * SUN6I_DSI_TCON_DIV / 8;
++	edge0 += (mode->hdisplay + 40) * Bpp / device->lanes;
+ 
+ 	if (edge0 > line_num)
+ 		return edge0 - line_num;
+diff --git a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
+index d791c9f6fccf..68e68d7faf80 100644
+--- a/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
++++ b/drivers/gpu/drm/sun4i/sun6i_mipi_dsi.h
+@@ -13,8 +13,6 @@
+ #include <drm/drm_encoder.h>
+ #include <drm/drm_mipi_dsi.h>
+ 
+-#define SUN6I_DSI_TCON_DIV	4
+-
+ struct sun6i_dsi_variant {
+ 	bool			has_mod_clk;
+ };
+-- 
+2.25.1
+
