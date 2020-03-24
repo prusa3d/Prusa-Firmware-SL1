@@ -6,8 +6,7 @@ SRC_URI = " \
 	git://git@${GO_IMPORT};protocol=ssh;branch=master \
 	file://updater.service \
 "
-# SRCREV = "c6e611f1a1f6efddfef20e9d5ca216c254fa7656"
-SRCREV = "9bec842486cbc7799eb90649ffeb763051171c7b"
+SRCREV = "954626d8c9246a1b794522b15c83d7fc559717c7"
 UPSTREAM_CHECK_COMMITS = "1"
 
 PACKAGES += "${PN}-serve-package"
