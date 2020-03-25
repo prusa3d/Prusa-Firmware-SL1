@@ -15,6 +15,7 @@ BUNDLE_NAME = "${BUNDLE_BASENAME}-${MACHINE}-${DISTRO_VERSION}"
 UBOOT_WITH_SPL="padded-u-boot-with-spl.bin"
 
 #RAUC_BUNDLE_COMPATIBLE = "prusa64-sl1"
+RAUC_BUNDLE_VERSION="${DISTRO_VERSION}"
 RAUC_BUNDLE_SLOTS = "rootfs bootloader etcfs"
 RAUC_BUNDLE_HOOKS[file] ?= "bundle_hook.sh"
 RAUC_SLOT_rootfs = "sla-image"
