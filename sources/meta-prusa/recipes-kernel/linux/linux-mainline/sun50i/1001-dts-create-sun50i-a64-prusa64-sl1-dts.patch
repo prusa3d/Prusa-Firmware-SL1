@@ -1,16 +1,16 @@
-From cad355ad66e5b056b1de7420a761db0d58d7f47c Mon Sep 17 00:00:00 2001
+From bfc010893e8b5909d79c5cc985895a2442c2a802 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
 Date: Wed, 7 Nov 2018 17:53:49 +0100
-Subject: [PATCH 08/79] dts: create sun50i-a64-prusa64-sl1 dts
+Subject: [PATCH] dts: create sun50i-a64-prusa64-sl1 dts
 
 ---
-  arch/arm64/boot/dts/allwinner/Makefile      | 1 +
-.../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 505 ++++++++++++++++++
- 2 file changed, 506 insertions(+)
+ arch/arm64/boot/dts/allwinner/Makefile        |   1 +
+ .../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 514 ++++++++++++++++++
+ 2 files changed, 515 insertions(+)
  create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 
 diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
-index d2418021768b..1d09f87e548a 100644
+index cf4f78617c3f..afa34f22e053 100644
 --- a/arch/arm64/boot/dts/allwinner/Makefile
 +++ b/arch/arm64/boot/dts/allwinner/Makefile
 @@ -9,6 +9,7 @@ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-orangepi-win.dtb
@@ -23,10 +23,10 @@ index d2418021768b..1d09f87e548a 100644
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-bananapi-m2-plus.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 new file mode 100644
-index 000000000000..d25bc5bd2ac5
+index 000000000000..cbb620a532ae
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -0,0 +1,505 @@
+@@ -0,0 +1,514 @@
 +/*
 + * Copyright (C) 2018 Roman Beranek <roman.beranek@prusa3d.com>
 + * based on sun50i-a64-olinuxino.dts by Jagan Teki <jteki@openedev.com>
@@ -37,6 +37,7 @@ index 000000000000..d25bc5bd2ac5
 +/dts-v1/;
 +
 +#include "sun50i-a64.dtsi"
++#include "sun50i-a64-cpu-opp.dtsi"
 +
 +#include <dt-bindings/gpio/gpio.h>
 +#include <dt-bindings/pwm/pwm.h>
@@ -134,6 +135,22 @@ index 000000000000..d25bc5bd2ac5
 +	status = "okay";
 +};
 +
++&cpu0 {
++	cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu1 {
++	cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu2 {
++	cpu-supply = <&reg_dcdc2>;
++};
++
++&cpu3 {
++	cpu-supply = <&reg_dcdc2>;
++};
++
 +&dai {
 +	status = "okay";
 +};
@@ -142,23 +159,18 @@ index 000000000000..d25bc5bd2ac5
 +	status = "okay";
 +};
 +
-+&tcon0 {
-+	status = "okay";
-+};
-+
-+&mixer0 {
-+	status = "okay";
-+};
-+
 +&dphy {
 +	status = "okay";
 +};
 +
 +&dsi {
++	vcc-dsi-supply = <&reg_dldo2>;
++	#address-cells = <1>;
++	#size-cells = <0>;
 +	status = "okay";
 +
 +	panel@0 {
-+		compatible = "tdo,tl040wv27ct3", "simple-panel";
++		compatible = "tdo,tl040wv27ct3";
 +		reg = <0>;
 +		backlight = <&backlight>;
 +		reset-gpios = <&pio 1 5 GPIO_ACTIVE_LOW>; /* PB5 */
@@ -185,16 +197,8 @@ index 000000000000..d25bc5bd2ac5
 +	};
 +};
 +
-+&tcon1 {
-+        status = "okay";
-+};
-+
-+&mixer1 {
-+        status = "okay";
-+};
-+
 +&hdmi {
-+	hdmi-supply = <&reg_dldo1>;
++	hvcc-supply = <&reg_dldo1>;
 +	status = "okay";
 +};
 +
@@ -209,7 +213,7 @@ index 000000000000..d25bc5bd2ac5
 +	pinctrl-0 = <&i2c0_pins>;
 +	status = "okay";
 +
-+	tc358870: hdmi-bridge@0f {
++	tc358870: hdmi-bridge@f {
 +		compatible = "toshiba,tc358870";
 +		reg = <0x0F>;
 +		vdd12_mipi-supply = <&reg_fldo1>;
@@ -320,6 +324,10 @@ index 000000000000..d25bc5bd2ac5
 +};
 +
 +#include "axp803.dtsi"
++
++&ac_power_supply {
++	status = "okay";
++};
 +
 +&reg_aldo1 {
 +	regulator-always-on;
@@ -470,10 +478,11 @@ index 000000000000..d25bc5bd2ac5
 +
 +&sound {
 +	status = "okay";
++	simple-audio-card,widgets = "Speaker", "Internal Speaker";
 +	simple-audio-card,routing =
 +		"Left DAC", "AIF1 Slot 0 Left",
 +		"Right DAC", "AIF1 Slot 0 Right",
-+		"Speaker", "LINEOUT";
++		"Internal Speaker", "HP";
 +};
 +
 +&ths {
@@ -533,5 +542,5 @@ index 000000000000..d25bc5bd2ac5
 +};
 +
 -- 
-2.24.0
+2.26.0
 
