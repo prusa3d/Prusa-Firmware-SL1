@@ -14,6 +14,7 @@ slot-post-install)
 		prepare_fs /dev/mmcblk2p6 # /var
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "etcfs" ]; then
+		echo "Rauc mount point: ${RAUC_MOUNT_POINT}"
 		/lib/systemd/systemd-growfs ${RAUC_MOUNT_POINT}
 
 		# Copy system settings
