@@ -30,6 +30,7 @@ slot-post-install)
 
 		# Copy printer settings
 		cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/
+		cp -av /etc/touch-ui ${RAUC_SLOT_MOUNT_POINT}/
 
 		# Copy update channel override
 		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/
