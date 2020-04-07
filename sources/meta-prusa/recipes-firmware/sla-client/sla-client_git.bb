@@ -1,7 +1,7 @@
 LICENSE = "GPL3"
 
 SRC_URI = "\
-	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=master;name=sla-client \
+	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;branch=1.4;name=sla-client \
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/3rdparty/qrcode-generator\
 	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://sla-client.service \
@@ -9,7 +9,7 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.notificationsink.conf \
 "
 
-SRCREV_sla-client = "e4255ca1fdea5f9fb87a75c3afd375d88096b13a"
+SRCREV_sla-client = "0a5db37d558d3f60c031134a2f2ae64caf45fd3c"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 
