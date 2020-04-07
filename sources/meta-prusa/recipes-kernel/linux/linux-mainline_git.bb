@@ -26,7 +26,6 @@ SRC_URI_append_sun50i = " \
 	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
 	file://0002-2K-display-over-TC358870.patch \
 	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
-	file://0201-net-stmmac-enable-MAC-address-to-be-read-from-a-nvme.patch \
 	file://0202-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
