@@ -26,12 +26,12 @@ SRC_URI_append_sun50i = " \
 	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
 	file://0002-2K-display-over-TC358870.patch \
 	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
-	file://0202-Ethernet-reconnection-fix.patch \
+	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
+	file://0201-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
-	file://1005-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://defconfig \
 "
 
