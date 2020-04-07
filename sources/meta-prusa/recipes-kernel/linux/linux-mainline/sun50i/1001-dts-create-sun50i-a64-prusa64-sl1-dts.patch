@@ -26,7 +26,7 @@ new file mode 100644
 index 000000000000..cbb620a532ae
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -0,0 +1,514 @@
+@@ -0,0 +1,511 @@
 +/*
 + * Copyright (C) 2018 Roman Beranek <roman.beranek@prusa3d.com>
 + * based on sun50i-a64-olinuxino.dts by Jagan Teki <jteki@openedev.com>
@@ -47,10 +47,7 @@ index 000000000000..cbb620a532ae
 +	compatible = "prusa,prusa64-sl1", "allwinner,sun50i-a64";
 +
 +	aliases {
-+		ethernet0 = &emac;
 +		serial0 = &uart0;
-+		serial2 = &uart2;
-+		serial3 = &uart3;
 +	};
 +
 +	chosen {
