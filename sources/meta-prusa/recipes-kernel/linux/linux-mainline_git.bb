@@ -25,7 +25,7 @@ SRC_URI="\
 SRC_URI_append_sun50i = " \
 	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
 	file://0002-2K-display-over-TC358870.patch \
-	file://0003-drm-sun4i-replace-SUN6I_DSI_TCON_DIV-constant-with-a.patch \
+	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
 	file://0004-sun4i-drm-assume-HDMI-is-always-connected.patch \
 	file://0201-net-stmmac-enable-MAC-address-to-be-read-from-a-nvme.patch \
 	file://0202-Ethernet-reconnection-fix.patch \
