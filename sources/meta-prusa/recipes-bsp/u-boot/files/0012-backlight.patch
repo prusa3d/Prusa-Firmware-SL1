@@ -1,0 +1,127 @@
+From fb2f9e4a4924ab6c812610ba6de3e5873f561c55 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Wed, 15 Apr 2020 15:06:39 +0200
+Subject: [PATCH] u-boot: prevent screen from lighting up for a brief period
+ after linux gets started
+
+When a pin gets muxed into its PWM function with its corresponding PWM channel disabled,
+it will output high voltage level -> in the language of PWM we get 100% duty cycle.
+This happens for a brief moment during boot because the pinmuxes are being configured
+all at once during pinctrl driver probe, "way" earlier than the pwm driver gets picked up.
+
+One possible solution is to initialize the pwm registers before Linux takes over and leave
+it set at 0% duty cycle
+---
+ arch/arm/dts/sun50i-a64-prusa64-sl1.dts | 11 +++++++++++
+ arch/arm/include/asm/arch-sunxi/gpio.h  |  1 +
+ board/sunxi/board.c                     | 13 +++++++++++++
+ drivers/pwm/sunxi_pwm.c                 |  1 +
+ 4 files changed, 26 insertions(+)
+
+diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
+index 1a2afceacc..89cc5b2f94 100644
+--- a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
++++ b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
+@@ -21,6 +21,13 @@
+ 		serial0 = &uart0;
+ 	};
+ 
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&r_pwm 0 50000 0>;
++		brightness-levels = <0 5 10 15 20 30 40 55 70 85 100>;
++		default-brightness-level = <0>;
++	};
++
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+@@ -125,6 +132,10 @@
+ 	status = "okay";
+ };
+ 
++&r_pwm {
++	status = "okay";
++};
++
+ &r_rsb {
+ 	status = "okay";
+ 
+diff --git a/arch/arm/include/asm/arch-sunxi/gpio.h b/arch/arm/include/asm/arch-sunxi/gpio.h
+index a646ea6a3c..550e23d8bc 100644
+--- a/arch/arm/include/asm/arch-sunxi/gpio.h
++++ b/arch/arm/include/asm/arch-sunxi/gpio.h
+@@ -218,6 +218,7 @@ enum sunxi_gpio_number {
+ #define SUN8I_A23_GPL_R_TWI	3
+ #define SUN8I_GPL_R_UART	2
+ #define SUN50I_GPL_R_TWI	2
++#define SUN50I_GPL_R_PWM	2
+ 
+ #define SUN9I_GPN_R_RSB		3
+ 
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index d3c442a8ec..72bd3c10d0 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -33,6 +33,7 @@
+ #include <u-boot/crc.h>
+ #include <env_internal.h>
+ #include <linux/libfdt.h>
++#include <backlight.h>
+ #include <nand.h>
+ #include <net.h>
+ #include <spl.h>
+@@ -215,6 +216,16 @@ enum env_location env_get_location(enum env_operation op, int prio)
+ static void mmc_pinmux_setup(int sdc);
+ #endif
+ 
++static void sunxi_enable_backlight(void)
++{
++#ifdef CONFIG_DM_VIDEO
++	struct udevice *backlight;
++	int ret = uclass_get_device(UCLASS_PANEL_BACKLIGHT, 0, &backlight);
++        if (!ret)
++		backlight_enable(backlight);
++#endif
++}
++
+ /* add board specific code here */
+ int board_init(void)
+ {
+@@ -287,6 +298,8 @@ int board_init(void)
+ #endif
+ #endif	/* CONFIG_DM_MMC */
+ 
++	sunxi_enable_backlight();
++
+ 	/* Uses dm gpio code so do this here and not in i2c_init_board() */
+ 	return soft_i2c_board_init();
+ }
+diff --git a/drivers/pwm/sunxi_pwm.c b/drivers/pwm/sunxi_pwm.c
+index 8a55e4f461..63b80d7310 100644
+--- a/drivers/pwm/sunxi_pwm.c
++++ b/drivers/pwm/sunxi_pwm.c
+@@ -47,6 +47,7 @@ static int sunxi_pwm_config_pinmux(void)
+ {
+ #ifdef CONFIG_MACH_SUN50I
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPD(22), SUNXI_GPD_PWM);
++	sunxi_gpio_set_cfgpin(SUNXI_GPL(10), SUN50I_GPL_R_PWM);
+ #endif
+ 	return 0;
+ }
+diff --git a/configs/prusa64-sl1_defconfig b/configs/prusa64-sl1_defconfig
+index 2df11b0338..eaa2d33b52 100644
+--- a/configs/prusa64-sl1_defconfig
++++ b/configs/prusa64-sl1_defconfig
+@@ -46,6 +46,9 @@ CONFIG_DEFAULT_DEVICE_TREE="sun50i-a64-prusa64-sl1"
+ CONFIG_ENV_IS_IN_MMC=y
+ CONFIG_ENV_FAT_DEVICE_AND_PART="0:1"
+ # CONFIG_NET is not set
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_PWM=y
++CONFIG_PWM_SUNXI=y
+ # CONFIG_VIDEO_DT_SIMPLEFB is not set
+ CONFIG_REGEX=y
+ # CONFIG_EFI_LOADER is not set
+-- 
+2.26.0

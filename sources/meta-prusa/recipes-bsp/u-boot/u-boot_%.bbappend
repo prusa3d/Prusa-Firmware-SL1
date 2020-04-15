@@ -12,4 +12,5 @@ SRC_URI_append = " \
 	file://0009-Ethernet-reconnection-fix.patch \
 	file://0010-concat-bootargs-keep-extra.patch \
 	file://0011-grow-partition-on-SD-card-to-its-full-extent.patch \
+	file://0012-backlight.patch \
 "
