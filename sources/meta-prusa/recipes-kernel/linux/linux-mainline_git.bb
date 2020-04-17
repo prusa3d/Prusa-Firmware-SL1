@@ -32,6 +32,7 @@ SRC_URI_append_sun50i = " \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
+	file://1004-prusa-boot-logo.patch \
 	file://defconfig \
 "
 
