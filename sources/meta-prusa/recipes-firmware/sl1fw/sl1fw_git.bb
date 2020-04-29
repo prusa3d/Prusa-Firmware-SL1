@@ -1,4 +1,4 @@
-SUMMARY = "sl1fw - python firmware part running on a64 board" 
+SUMMARY = "sl1fw - python firmware part running on a64 board"
 
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "5af997b97b0dae9e4fb87fa7bbbe9f6fb026bd2f"
+SRCREV_pn-${PN} = "ee076f4421b0d3016b2e31e1a264f4ed880e8d90"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -46,6 +46,7 @@ RDEPENDS_${PN} += " \
 	python3-psutil \
 	python3-evdev \
 	python3-pysignal \
+	sl1-errors \
 "
 
 FILES_${PN} += "\
