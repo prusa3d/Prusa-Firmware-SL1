@@ -1,3 +1,67 @@
+# Version 1.4.0
+
+## Summary
+- User UV calibration
+- Parallel pre-print checks
+- Manual check for firmware updates
+- Use project file name as project name
+- Prague is the default timezone
+- Simplified fan checks
+- Increased allowed intensity deviation
+- Improved factory reset
+- Various UI improvements
+- Upload notifications redesigned
+
+## Detailed description
+
+### User mode UV calibration
+Starting this release the system allows for a user recalibration of the UV light intensity using an external UV sensor. Until now, this was possible only in the factory, where both the assembled SL1 printers and printer ktis were calibrated before being shipped. The recalibration is needed every time the 2K printing screen is replaced. The system must set a proper light intensity on the LED in order to achieve the correct level of exposure in the resin tank. Setting an incorrect intensity might under or overexpose the printed object leading to a possible print failure.
+To calibrate the UV intensity of the SL1 outside the factory, the developers have created a brand new measuring device, which consists of 15 phototransistors, enabling the printer to measure the intensity in 15 areas and therefore provide a detailed map of the entire print area. First, the intensity is measured in central zones of the screen, then the outer edges are checked.
+The calibration is fully automatic, the user only needs to plug the device to the front USB of the SL1, place it on the top of the print display and start the calibration. The entire process won't take more than several minutes.
+The UV calibration device is currently being manufactured and will be soon available for preorder in a bundle with a new screen. However, since the device can be used multiple times, the print display will be also available for purchase separately.
+
+### Parallel pre-print checks
+To shorten the time before the print is started, some pre-checks now run in parallel. This adjustment saves some time as the hardware setup and logical checks are mostly not blocking each other. A new user interface was created to display all the checks in a unified view.
+
+### Manual check for firmware update
+Starting the firmware version 1.3.0 the printer is automatically checking for available updates on the server and displays a notification for the user. Starting this release there is a slight update as the “firmware check” can be also triggered manually from the printer's menu.
+An alternative option is to use a USB flash drive and download the firmware using a computer. Stable firmware releases are always available at prusa3d.com/drivers.
+
+## Fixed bugs
+- Fixed ethernet reconnecting loop
+- Fixed text size on Notification pages
+- Fixed handling of malformed language strings
+- Fixed reprint without flash drive
+- Fixed touch screen refresh rate
+- Fixed I/O scheduler setting
+- Factory reset for locales and time zones
+
+## Others
+- Linux 5.5.10
+- Zeus Yocto release
+- Stable u-boot v2020.01
+- DBus API for basic tasks
+- Dependency cleanup: dhcp-client, pygame
+- Log CPU, memory usage during print
+- Significant code refactoring
+- Lots of bug fixes
+- Frontend audio play
+- UInput support for power button, cover
+- Deploy etc slot, change config migration
+- Shutdown using systemd
+- Distro version in update bundle
+- 15 and 60 point UV meter support
+
+# Version 1.3.3
+
+## Summary
+- Fixed UI crash on invalid language string
+
+# Version 1.3.2
+
+## Summary
+- Fixed new calibration target UV intensity
+
 # Version 1.3.1
 
 ## Summary
