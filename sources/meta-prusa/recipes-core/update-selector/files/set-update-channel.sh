@@ -31,3 +31,11 @@ cp /usr/share/rauc/ca-${KEYRING}.cert.pem /etc/rauc/ca.cert.pem
 
 # Mark choice
 echo ${CHANNEL} > /etc/update_channel
+
+# Restart rauc to use new keyring
+systemctl restart rauc
+
+# Restart updater to use new channel
+systemctl daemon-reload
+systemctl restart updater
+
