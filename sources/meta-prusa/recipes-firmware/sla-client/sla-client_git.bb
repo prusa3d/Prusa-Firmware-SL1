@@ -17,9 +17,9 @@ LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
 "
 
-inherit cmake_kf5 systemd
+inherit cmake_kf5 systemd python3native
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt sl1-errors-native"
 
 RDEPENDS_${PN} += "\
 	qtquickcontrols-qmlplugins \

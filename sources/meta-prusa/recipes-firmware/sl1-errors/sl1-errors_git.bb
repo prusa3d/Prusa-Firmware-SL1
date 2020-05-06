@@ -14,3 +14,4 @@ S="${WORKDIR}/git"
 
 inherit setuptools3
 
+BBCLASSEXTEND = "native"
