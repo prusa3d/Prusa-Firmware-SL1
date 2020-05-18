@@ -1,8 +1,7 @@
 /*
-   ls055r1sx04_148.5mhz.S: EDID data template
+   edid.S: EDID data template
 
    Copyright (C) 2012 Carsten Emde <C.Emde@osadl.org>
-   Copyright (C) 2019 Roman Beranek <roman.beranek@prusa3d.com>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -19,36 +18,15 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA.
 */
 
-/*
-   EDID for Sharp LS055R1SX04 LCD panel bridged via Toshiba TC358870XBG.
-   Refresh rate is kept at 36 Hz in order to allow for stable timing with
-   the standard 148.5 MHz pixel clock utilized by standard resolutions
-   and timings listed in CEA/EIA-861.
-*/
-
-#define HSYNC_POL 1
-#define VSYNC_POL 1
-#define YPULSE 1 /* VSYNC */
-#define XPULSE 10 /* HSYNC */
-#define YPIX 2560
-#define XPIX 1440
-#define VFREQ 36
-#define DPI 537
-#define CLOCK 148500
+/* EDID */
 #define VERSION 1
 #define REVISION 3
-#define XOFFSET 100 /* HBP */
-#define YOFFSET 3 /* VBP */
-#define YBLANK 8 /* VBP + VSYNC + VFP */
-#define XBLANK 166 /* HBP + HSYNC + HFP */
-#define TIMING_NAME "WHY?"
 
-/* Manufacturer */
-#define MFG_LNX1 'T'
-#define MFG_LNX2 'S'
-#define MFG_LNX3 'B'
-#define YEAR 2011
-#define WEEK 28
+/* EDID 1.3 standard definitions */
+#define XY_RATIO_16_10	0b00
+#define XY_RATIO_4_3	0b01
+#define XY_RATIO_5_4	0b10
+#define XY_RATIO_16_9	0b11
 
 /* Provide defaults for the timing bits */
 #ifndef ESTABLISHED_TIMING1_BITS
@@ -64,17 +42,18 @@
 #define mfgname2id(v1,v2,v3) \
 	((((v1-'@')&0x1f)<<10)+(((v2-'@')&0x1f)<<5)+((v3-'@')&0x1f))
 #define swap16(v1) ((v1>>8)+((v1&0xff)<<8))
+#define lsbs2(v1,v2) (((v1&0x0f)<<4)+(v2&0x0f))
 #define msbs2(v1,v2) ((((v1>>8)&0x0f)<<4)+((v2>>8)&0x0f))
-#define msbs4(v1,v2,v3,v4)		\
-	( (((v1 >> 8) & 0x3) << 6)	\
-	| (((v2 >> 8) & 0x3) << 4)	\
-	| (((v3 >> 8) & 0x3) << 2)	\
-	| (((v4 >> 8) & 0x3) << 0)	\
-	)
-#define pixdpi2mm(pix,dpi) ((pix*25)/dpi)
-#define xsize pixdpi2mm(XPIX,DPI)
-#define ysize pixdpi2mm(YPIX,DPI)
-
+#define msbs4(v1,v2,v3,v4) \
+	((((v1>>8)&0x03)<<6)+(((v2>>8)&0x03)<<4)+\
+	(((v3>>4)&0x03)<<2)+((v4>>4)&0x03))
+#define pixdpi2mm(pix,dpi) ((pix*127)/(dpi*5))
+#ifndef XSIZE
+#define XSIZE pixdpi2mm(XPIX,DPI)
+#endif
+#ifndef YSIZE
+#define YSIZE pixdpi2mm(YPIX,DPI)
+#endif
 		.data
 
 /* Fixed header pattern */
@@ -82,10 +61,10 @@ header:		.byte	0x00,0xff,0xff,0xff,0xff,0xff,0xff,0x00
 
 mfg_id:		.hword	swap16(mfgname2id(MFG_LNX1, MFG_LNX2, MFG_LNX3))
 
-prod_code:	.hword	0x8888
+prod_code:	.hword	1
 
 /* Serial number. 32 bits, little endian. */
-serial_number:	.long	0x88888800
+serial_number:	.long	SERIAL
 
 /* Week of manufacture */
 week:		.byte	WEEK
@@ -111,17 +90,15 @@ revision:	.byte	REVISION	/* EDID revision, usually 3 (for 1.3) */
    Bit 1	Sync on green supported
    Bit 0	VSync pulse must be serrated when somposite or
 		  sync-on-green is used. */
-video_parms:	.byte	0x81
+video_parms:	.byte	0x80
 
 /* Maximum horizontal image size, in centimetres
    (max 292 cm/115 in at 16:9 aspect ratio) */
-/* max_hor_size:	.byte	xsize/10 */
-max_hor_size:	.byte	0
+max_hor_size:	.byte	XSIZE/10
 
 /* Maximum vertical image size, in centimetres.
    If either byte is 0, undefined (e.g. projector) */
-/* max_vert_size:	.byte	ysize/10 */
-max_vert_size:	.byte	0
+max_vert_size:	.byte	YSIZE/10
 
 /* Display gamma, minus 1, times 100 (range 1.00-3.5 */
 gamma:		.byte	120
@@ -143,26 +120,26 @@ dsp_features:	.byte	0x0a
    Bits 5-4	Red y value least-significant 2 bits
    Bits 3-2	Green x value lst-significant 2 bits
    Bits 1-0	Green y value least-significant 2 bits */
-red_green_lsb:	.byte	0xda
+red_green_lsb:	.byte	0x07
 
 /* Blue and white least-significant 2 bits */
-blue_white_lsb:	.byte	0xff
+blue_white_lsb:	.byte	0xf5
 
 /* Red x value most significant 8 bits.
    0-255 encodes 0-0.996 (255/256); 0-0.999 (1023/1024) with lsbits */
-red_x_msb:	.byte	0xa3
+red_x_msb:	.byte	0x9a
 
 /* Red y value most significant 8 bits */
-red_y_msb:	.byte	0x58
+red_y_msb:	.byte	0x56
 
 /* Green x and y value most significant 8 bits */
-green_x_y_msb:	.byte	0x4a,0xa2
+green_x_y_msb:	.byte	0x4e,0x86
 
 /* Blue x and y value most significant 8 bits */
-blue_x_y_msb:	.byte	0x29,0x17
+blue_x_y_msb:	.byte	0x26,0x1e
 
 /* Default white point x and y value most significant 8 bits */
-white_x_y_msb:	.byte	0x49,0x4b
+white_x_y_msb:	.byte	0x50,0x54
 
 /* Established timings */
 /* Bit 7	720x400 @ 70 Hz
@@ -190,7 +167,14 @@ estbl_timing2:	.byte	ESTABLISHED_TIMING2_BITS
 estbl_timing3:	.byte	ESTABLISHED_TIMING3_BITS
 
 /* Standard timing */
-		.fill	8,2,0x0101	/* Unused */
+/* X resolution, less 31, divided by 8 (256-2288 pixels) */
+std_xres:	.byte	0x0
+/* Y resolution, X:Y pixel ratio
+   Bits 7-6	X:Y pixel ratio: 00=16:10; 01=4:3; 10=5:4; 11=16:9.
+   Bits 5-0	Vertical frequency, less 60 (60-123 Hz) */
+std_vres:	.byte	0x0
+		.fill	7,2,0x0101	/* Unused */
+
 descriptor1:
 /* Pixel clock in 10 kHz units. (0.-655.35 MHz, little-endian) */
 clock:		.hword	CLOCK/10
@@ -213,12 +197,12 @@ y_blk_lsb:	.byte	YBLANK&0xff
 y_msbs:		.byte	msbs2(YPIX,YBLANK)
 
 /* Horizontal sync offset pixels 8 lsbits (0-1023) From blanking start */
-x_snc_off_lsb:	.byte	XOFFSET & 0xff
-/* Horizontal sync pulse width pi xels 8 lsbits (0-1023) */
-x_snc_pls_lsb:	.byte	XPULSE & 0xff
-/* Bits 7-4 	Vertical sync offset lines 4 lsbits -63)
-   Bits 3-0 	Vertical sync pulse width lines 4 lsbits -63) */
-y_snc_lsb:	.byte	((YOFFSET & 0x3f)<<4) | (YPULSE & 0x3f)
+x_snc_off_lsb:	.byte	XOFFSET&0xff
+/* Horizontal sync pulse width pixels 8 lsbits (0-1023) */
+x_snc_pls_lsb:	.byte	XPULSE&0xff
+/* Bits 7-4 	Vertical sync offset lines 4 lsbits (0-63)
+   Bits 3-0 	Vertical sync pulse width lines 4 lsbits (0-63) */
+y_snc_lsb:	.byte	lsbs2(YOFFSET, YPULSE)
 /* Bits 7-6 	Horizontal sync offset pixels 2 msbits
    Bits 5-4 	Horizontal sync pulse width pixels 2 msbits
    Bits 3-2 	Vertical sync offset lines 2 msbits
@@ -226,17 +210,14 @@ y_snc_lsb:	.byte	((YOFFSET & 0x3f)<<4) | (YPULSE & 0x3f)
 xy_snc_msbs:	.byte	msbs4(XOFFSET,XPULSE,YOFFSET,YPULSE)
 
 /* Horizontal display size, mm, 8 lsbits (0-4095 mm, 161 in) */
-/* x_dsp_size:	.byte	xsize&0xff */
-x_dsp_size:	.byte	0x44
+x_dsp_size:	.byte	XSIZE&0xff
 
 /* Vertical display size, mm, 8 lsbits (0-4095 mm, 161 in) */
-/* y_dsp_size:	.byte	ysize&0xff */
-y_dsp_size:	.byte	0x7a
+y_dsp_size:	.byte	YSIZE&0xff
 
 /* Bits 7-4 	Horizontal display size, mm, 4 msbits
    Bits 3-0 	Vertical display size, mm, 4 msbits */
-/* dsp_size_mbsb:	.byte	msbs2(xsize,ysize) */
-dsp_size_mbsb:	.byte	0
+dsp_size_mbsb:	.byte	msbs2(XSIZE,YSIZE)
 
 /* Horizontal border pixels (each side; total is twice this) */
 x_border:	.byte	0
@@ -260,32 +241,32 @@ features:	.byte	0x18+(VSYNC_POL<<2)+(HSYNC_POL<<1)
 
 descriptor2:	.byte	0,0	/* Not a detailed timing descriptor */
 		.byte	0	/* Must be zero */
-		.byte	0xfe	/* Descriptor is unspecified text (ASCII) */
+		.byte	0xff	/* Descriptor is monitor serial number (text) */
 		.byte	0	/* Must be zero */
-start1:		.ascii	"WHY THIS SHIT"
-end1:		.fill	(13-(end1-start1))&1, 1, 0xa	/* End marker */
+start1:		.ascii	"Linux #0"
+end1:		.byte	0x0a	/* End marker */
 		.fill	12-(end1-start1), 1, 0x20 /* Padded spaces */
 descriptor3:	.byte	0,0	/* Not a detailed timing descriptor */
 		.byte	0	/* Must be zero */
-		.byte	0xfc	/* Descriptor is text */
-		.byte	0	/* Must be zero */
-start2:		.ascii	TIMING_NAME
-end2:		.byte	0x0a	/* End marker */
-		.fill	12-(end2-start2), 1, 0x0 /* Should be padded with space */
-descriptor4:	.byte	0,0	/* Not a detailed timing descriptor */
-		.byte	0	/* Must be zero */
 		.byte	0xfd	/* Descriptor is monitor range limits */
 		.byte	0	/* Must be zero */
-start3:		.byte	0x17 /* VFREQ-1 */ /* Minimum vertical field rate (1-255 Hz) */
-		.byte	0x46 /* VFREQ+1 */ /* Maximum vertical field rate (1-255 Hz) */
-		.byte	0x0f /* (CLOCK/(XPIX+XBLANK))-1 */ /* Minimum horizontal line
-							      rate (1-255 kHz) */
-		.byte	0xa0 /* (CLOCK/(XPIX+XBLANK))+1 */ /* Maximum horizontal line
-							      rate (1-255 kHz) */
-		.byte	0x1e /* (CLOCK/10000)+1 */ /* Maximum pixel clock rate, rounded up
-						      to 10 MHz multiple (10-2550 MHz) */
+start2:		.byte	VFREQ-1	/* Minimum vertical field rate (1-255 Hz) */
+		.byte	VFREQ+1	/* Maximum vertical field rate (1-255 Hz) */
+		.byte	(CLOCK/(XPIX+XBLANK))-1 /* Minimum horizontal line rate
+						    (1-255 kHz) */
+		.byte	(CLOCK/(XPIX+XBLANK))+1 /* Maximum horizontal line rate
+						    (1-255 kHz) */
+		.byte	(CLOCK/10000)+1	/* Maximum pixel clock rate, rounded up
+					   to 10 MHz multiple (10-2550 MHz) */
 		.byte	0	/* No extended timing information type */
+end2:		.byte	0x0a	/* End marker */
+		.fill	12-(end2-start2), 1, 0x20 /* Padded spaces */
+descriptor4:	.byte	0,0	/* Not a detailed timing descriptor */
+		.byte	0	/* Must be zero */
+		.byte	0xfc	/* Descriptor is text */
+		.byte	0	/* Must be zero */
+start3:		.ascii	TIMING_NAME
 end3:		.byte	0x0a	/* End marker */
 		.fill	12-(end3-start3), 1, 0x20 /* Padded spaces */
 extensions:	.byte	0	/* Number of extensions to follow */
-checksum:	.byte	CHKSUM	/* Sum of all bytes must be 0 */
+checksum:	.byte	CRC	/* Sum of all bytes must be 0 */

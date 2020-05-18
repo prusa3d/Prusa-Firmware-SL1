@@ -6,24 +6,31 @@ inherit allarch
 B = "${WORKDIR}/build"
 
 SRC_URI = " \
-	file://ls055r1sx04_148.5mhz.S \
+	file://edid.h \
+	file://dxq608.S \
+	file://ls055r1sx04.S \
+	file://rv059fbb.S \
 	file://checksum.c \
 "
 
-FILES_${PN} = "${base_libdir}/firmware/edid/ls055r1sx04_148.5mhz.bin"
+FILES_${PN} = "${base_libdir}/firmware/edid/*.bin"
 
 do_compile() {
 	mkdir -p ${B}
-	EDID="ls055r1sx04_148.5mhz"
 	${BUILD_CC} -o ${B}/checksum ${WORKDIR}/checksum.c
-	${BUILD_CC} -c -DCHKSUM="0x00" -o ${B}/${EDID}.nosum.o ${WORKDIR}/${EDID}.S
-	${OBJCOPY} -Obinary ${B}/${EDID}.nosum.o ${B}/${EDID}.nosum.bin
-	CHKSUM=$(${B}/checksum < ${B}/${EDID}.nosum.bin)
-	${BUILD_CC} -c -DCHKSUM="${CHKSUM}" -o ${B}/${EDID}.o ${WORKDIR}/${EDID}.S
-	${OBJCOPY} -Obinary ${B}/${EDID}.o ${B}/${EDID}.bin
+	for edid in dxq608 ls055r1sx04 rv059fbb
+	do
+		${BUILD_CC} -c -DCRC="0x00" -o ${B}/${edid}.nosum.o ${WORKDIR}/${edid}.S
+		${OBJCOPY} -Obinary ${B}/${edid}.nosum.o ${B}/${edid}.nosum.bin
+		crc=$(${B}/checksum < ${B}/${edid}.nosum.bin)
+		${BUILD_CC} -c -DCRC="${crc}" -o ${B}/${edid}.o ${WORKDIR}/${edid}.S
+		${OBJCOPY} -Obinary ${B}/${edid}.o ${B}/${edid}.bin
+	done
 }
 
 do_install() {
         install -d ${D}${base_libdir}/firmware/edid
-        install -m 644 ${B}/ls055r1sx04_148.5mhz.bin	${D}${base_libdir}/firmware/edid/
+        install -m 644 ${B}/dxq608.bin			${D}${base_libdir}/firmware/edid/
+        install -m 644 ${B}/ls055r1sx04.bin		${D}${base_libdir}/firmware/edid/
+        install -m 644 ${B}/rv059fbb.bin		${D}${base_libdir}/firmware/edid/
 }

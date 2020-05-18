@@ -1,0 +1,27 @@
+/* Display */
+#define CLOCK 82610 /* kHz */
+#define XPIX 540
+#define YPIX 2560
+#define XBLANK 95
+#define XOFFSET 50
+#define XPULSE 10
+#define YBLANK 42
+#define YOFFSET 20
+#define YPULSE 10
+#define DPI 518
+#define VFREQ 50 /* Hz */
+#define TIMING_NAME "RV059FBB"
+/* No ESTABLISHED_TIMINGx_BITS */
+#define HSYNC_POL 0
+#define VSYNC_POL 0
+#define XSIZE 81
+
+/* Manufacturer */
+#define MFG_LNX1 'L'
+#define MFG_LNX2 'Z'
+#define MFG_LNX3 'T'
+#define SERIAL 0
+#define YEAR 2017
+#define WEEK 12
+
+#include "edid.h"

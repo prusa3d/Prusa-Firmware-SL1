@@ -11,6 +11,6 @@ int main() {
 		sum += c;
 	}
 	uint8_t result = 0x100 - (sum & 0xff);
-	printf("%x\n", result);
+	printf("0x%02x\n", result);
 	return 0;
 }
