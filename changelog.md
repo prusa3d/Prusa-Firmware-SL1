@@ -35,6 +35,7 @@ An alternative option is to use a USB flash drive and download the firmware usin
 - Fixed touch screen refresh rate
 - Fixed I/O scheduler setting
 - Factory reset for locales and time zones
+- Fixed frozen touch ui when FW download failed
 
 ## Others
 - Linux 5.5.10
@@ -51,6 +52,7 @@ An alternative option is to use a USB flash drive and download the firmware usin
 - Shutdown using systemd
 - Distro version in update bundle
 - 15 and 60 point UV meter support
+- Overwrite few checks for internal use in production
 
 # Version 1.3.3
 
