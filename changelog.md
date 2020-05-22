@@ -36,6 +36,7 @@ An alternative option is to use a USB flash drive and download the firmware usin
 - Fixed I/O scheduler setting
 - Factory reset for locales and time zones
 - Fixed frozen touch ui when FW download failed
+- Fixed exception while flashing motion-contoller
 
 ## Others
 - Linux 5.5.10
