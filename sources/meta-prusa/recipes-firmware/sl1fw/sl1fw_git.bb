@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "2e6340aa27eea8e6e0458c875f9601782183e4d4"
+SRCREV_pn-${PN} = "20d6ede0f703b743d4727f2594a150feb350ae7e"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -42,7 +42,7 @@ RDEPENDS_${PN} += " \
 	python3-pillow \
 	python3-distro \
 	python3-readerwriterlock \
-	python3-deprecated \
+	python3-deprecation \
 	python3-psutil \
 	python3-evdev \
 	python3-pysignal \
