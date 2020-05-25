@@ -24,7 +24,6 @@ SRC_URI="\
 	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
 	file://0002-2K-display-over-TC358870.patch \
 	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
-	file://0004-ls055r1sx04-edid.patch \
 	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://0201-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
@@ -42,10 +41,17 @@ S="${WORKDIR}/git"
 
 FILES_${KERNEL_PACKAGE_NAME}-devicetree_append = " /${KERNEL_IMAGEDEST}/**/*.dtb"
 
+FW_DIR = "${RECIPE_SYSROOT}${nonarch_base_libdir}/firmware"
+
+do_configure[depends] += "sla-edid:do_populate_sysroot"
+
 do_configure_prepend() {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
 		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' ${S}/Makefile
 	fi
+	extra_fw=`find ${FW_DIR} -type f | sed "s#^${FW_DIR}/##" | tr '\n' ' '`
+	echo "CONFIG_EXTRA_FIRMWARE=\"${extra_fw}\"" >> ${WORKDIR}/defconfig
+	echo "CONFIG_EXTRA_FIRMWARE_DIR=\"${FW_DIR}\"" >> ${WORKDIR}/defconfig
 }
 
 do_install_append() {
