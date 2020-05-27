@@ -12,6 +12,7 @@ case "$1" in
 slot-post-install)
 	if [ "$RAUC_SLOT_CLASS" = "rootfs" ]; then
 		prepare_fs /dev/mmcblk2p6 # /var
+		chgrp -R projects /var/sl1fw/projects
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "etcfs" ]; then
 		echo "Rauc mount point: ${RAUC_MOUNT_POINT}"
