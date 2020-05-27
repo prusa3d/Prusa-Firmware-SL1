@@ -6,6 +6,7 @@
 
 MOUNT="/usr/bin/systemd-mount"
 UMOUNT="/usr/bin/systemd-umount"
+GID=`awk -F':' '/^projects/{print $3}' /etc/group`
 
 for line in `grep -h -v ^# @nonarch_base_libdir@/udev/mount.blacklist @nonarch_base_libdir@/udev/mount.blacklist.d/*`
 do
@@ -27,9 +28,10 @@ automount_systemd() {
         # grant it with  w/r/x permissions.
         #MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' @sysconfdir@/group`"
         # TODO
-        MOUNT="$MOUNT -o utf8"
+        MOUNT="$MOUNT -o utf8,gid=$GID,dmask=007,fmask=117"
         ;;
     *)
+        MOUNT="$MOUNT -o gid=$GID,dmask=007,fmask=117"
         ;;
     esac
 

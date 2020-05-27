@@ -5,8 +5,6 @@ inherit bundle
 
 SRC_URI += " \
 	file://bundle_hook.sh \
-	file://nginx-sl1fw-auth.patch \
-	file://nginx-sl1fw.patch \
 "
 
 
@@ -44,8 +42,6 @@ do_unpack[prefuncs] += "compose_uboot"
 
 do_bundle() {
 	install -m 644 ${DEPLOY_DIR_IMAGE}/setenv.scr ${BUNDLE_DIR}/
-	install -d ${BUNDLE_DIR}/patches
-	install ${WORKDIR}/*.patch ${BUNDLE_DIR}/patches
 
 	export OPENSSL_ENGINES=${STAGING_LIBDIR_NATIVE}/engines-1.1
 	export RAUC_PKCS11_MODULE=${RAUC_PKCS11_MODULE}

@@ -5,11 +5,11 @@
         <name replace-wildcards="yes">Original Prusa SL1 "%h"</name>
         <service>
                 <type>_http._tcp</type>
-                <port>8000</port>
+                <port>80</port>
         </service>
         <service>
                 <type>_octoprint._tcp</type>
-                <port>8000</port>
+                <port>80</port>
                 <txt-record>model=SL1</txt-record>
                 <txt-record>vendor=Prusa Research</txt-record>
         </service>
