@@ -37,6 +37,8 @@ An alternative option is to use a USB flash drive and download the firmware usin
 - Factory reset for locales and time zones
 - Fixed frozen touch ui when FW download failed
 - Fixed exception while flashing motion-contoller
+- Fixed typos in Polish
+- Fixed cyclic returns into to finished page
 
 ## Others
 - Linux 5.5.10
