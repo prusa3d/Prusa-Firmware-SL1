@@ -12,7 +12,7 @@ Requirements
 ------------
 The requirements for the build are listed in a Dockerfile located in the root of this repository. Docker image build using the Dockerfiles is used for CI build.
 
-Clone the respoitory
+Clone the repository
 --------------------
 
 	git clone git@github.com:prusa3d/Prusa-Firmware-SL1.git
