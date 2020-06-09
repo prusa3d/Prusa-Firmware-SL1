@@ -1,4 +1,4 @@
-RDEPENDS_${PN}_remove = "tzdata-core tzdata-misc tzdata-posix tzdata-right"
+RDEPENDS_${PN}_remove = "tzdata-arctic tzdata-misc tzdata-posix tzdata-right"
 DEFAULT_TIMEZONE = "Europe/Prague"
 
 FILES_tzdata-core_remove = "\
@@ -19,4 +19,11 @@ do_install_append() {
 	install --directory ${D}/usr/share/factory/etc
 	cp -av ${D}/${sysconfdir}/localtime ${D}/usr/share/factory/etc/localtime
 	cp -av ${D}/${sysconfdir}/timezone ${D}/usr/share/factory/etc/timezone
+
+	find ${D}/${datadir}/zoneinfo -maxdepth 1 -type f -exec rm "{}" \; # remove all files in base folder
+	rm -rf ${D}/${datadir}/zoneinfo/Arctic
+	rm -rf ${D}/${datadir}/zoneinfo/Chile
+	rm -rf ${D}/${datadir}/zoneinfo/Etc
+	rm -rf ${D}/${datadir}/zoneinfo/posix
+	rm -rf ${D}/${datadir}/zoneinfo/right
 }
