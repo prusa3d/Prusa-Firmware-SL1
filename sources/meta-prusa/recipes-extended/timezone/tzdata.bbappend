@@ -21,6 +21,7 @@ do_install_append() {
 	cp -av ${D}/${sysconfdir}/timezone ${D}/usr/share/factory/etc/timezone
 
 	find ${D}/${datadir}/zoneinfo -maxdepth 1 -type f -exec rm "{}" \; # remove all files in base folder
+	cp -v "${S}${datadir}/zoneinfo/Universal" ${D}${datadir}/zoneinfo # keep Universal timezone installed
 	rm -rf ${D}/${datadir}/zoneinfo/Arctic
 	rm -rf ${D}/${datadir}/zoneinfo/Chile
 	rm -rf ${D}/${datadir}/zoneinfo/Etc
