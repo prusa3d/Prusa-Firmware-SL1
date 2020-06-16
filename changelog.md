@@ -18,6 +18,11 @@
 ## Fixed bugs
 - FW update service throws error if download fails
 - Reprint from USB
+- Fix resin warning
+
+## Others
+- Show precise resin volume in resin sensor test
+
 
 # Version 1.4.0
 
