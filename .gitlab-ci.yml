@@ -43,7 +43,6 @@ b:raucb-development:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${VERSION}.initramfs.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
     - mv changelog.md ${VERSION}.changelog.md
-    - mv known-issues.txt ${VERSION}.known-issues.txt
     - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
 
   artifacts:
@@ -53,7 +52,6 @@ b:raucb-development:
       - ./*.raucb
       - ./*.manifest
       - ./*.changelog.md
-      - ./*.known-issues.txt
       - ./log.txt.xz
 
 b:raucb-production:
@@ -84,7 +82,6 @@ b:raucb-production:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${VERSION}.initramfs.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
     - mv changelog.md ${VERSION}.changelog.md
-    - mv known-issues.txt ${VERSION}.known-issues.txt
 
   artifacts:
     expire_in: 1 week
@@ -93,7 +90,6 @@ b:raucb-production:
       - ./*.raucb
       - ./*.manifest
       - ./*.changelog.md
-      - ./*.known-issues.txt
 
 b:tools:
   stage: build
@@ -146,11 +142,9 @@ d:raucb-development:
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
         put -O ${DEST} ${VERSION}.dev-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
-        put -O ${DEST} ${VERSION}.known-issues.txt;
         "
     - echo "put ${VERSION}.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.known-issues.txt" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:raucb-production:
   stage: deploy
@@ -172,11 +166,9 @@ d:raucb-production:
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
         put -O ${DEST} ${VERSION}.prod-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
-        put -O ${DEST} ${VERSION}.known-issues.txt;
         "
     - echo "put ${VERSION}.prod-key.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.known-issues.txt" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:tools:
   stage: deploy
