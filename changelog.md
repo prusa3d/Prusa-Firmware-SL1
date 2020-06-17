@@ -16,9 +16,7 @@
 - Dump printers config while saving the logs
 
 ## Fixed bugs
-- FW update service throws error if download fails
 - Reprint from USB
-- Fix resin warning
 
 ## Others
 - Show precise resin volume in resin sensor test
