@@ -27,7 +27,7 @@ automount_systemd() {
         # grant it with  w/r/x permissions.
         #MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' @sysconfdir@/group`"
         # TODO
-        MOUNT="$MOUNT -o utf8"
+        MOUNT="$MOUNT -o utf8,flush"
         ;;
     *)
         ;;
