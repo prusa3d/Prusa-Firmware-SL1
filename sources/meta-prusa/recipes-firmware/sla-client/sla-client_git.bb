@@ -6,10 +6,10 @@ SRC_URI = "\
 	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://sla-client.service \
 	file://sla-client-config.json \
-	file://cz.prusa3d.sl1.notificationsink.conf \
+	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV_sla-client = "e0da945d7f8967db85541ecb178e3f6d2d33b6de"
+SRCREV_sla-client = "f60ff2576c8ef47d5a8d45734677a19617d33f76"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 
@@ -43,7 +43,7 @@ RDEPENDS_${PN} += "\
 
 FILES_${PN} += "\
 	/usr/share/sla-client-config.json \
-	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.notificationsink.conf \
+	/usr/share/dbus-1/system.d/cz.prusa3d.sl1.Notify1.conf \
 "
 
 S="${WORKDIR}/git"
@@ -56,7 +56,7 @@ do_install_append () {
 	install --mode 644 ${WORKDIR}/sla-client-config.json ${D}/usr/share/
 
 	install -d ${D}/usr/share/dbus-1/system.d
-	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.notificationsink.conf ${D}/usr/share/dbus-1/system.d/
+	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.Notify1.conf ${D}/usr/share/dbus-1/system.d/
 }
 
 SYSTEMD_SERVICE_${PN} = "sla-client.service"
