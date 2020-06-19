@@ -28,14 +28,14 @@ automount_systemd() {
         # grant it with  w/r/x permissions.
         #MOUNT="$MOUNT -o umask=007,gid=`awk -F':' '/^disk/{print $3}' @sysconfdir@/group`"
         # TODO
-        MOUNT="$MOUNT -o utf8,gid=$GID,dmask=007,fmask=117,flush"
+        MOUNT="$MOUNT -o ro,utf8,gid=$GID,dmask=007,fmask=117,flush"
         ;;
     *)
-        MOUNT="$MOUNT -o gid=$GID,dmask=007,fmask=117"
+        MOUNT="$MOUNT -o ro,gid=$GID,dmask=007,fmask=117"
         ;;
     esac
 
-    if ! $MOUNT --no-block -t auto --automount=yes --timeout-idle-sec=1s $DEVNAME ${mount_point}
+    if ! $MOUNT --no-block -t auto --automount=yes --timeout-idle-sec=3s $DEVNAME ${mount_point}
     then
         rmdir ${mount_point}
     else
