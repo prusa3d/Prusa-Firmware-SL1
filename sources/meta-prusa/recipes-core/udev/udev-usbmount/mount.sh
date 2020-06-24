@@ -63,12 +63,9 @@ if [ "$ACTION" = "add" ] && [ -n "$DEVNAME" ] && [ -n "$ID_FS_TYPE" ]; then
 fi
 
 if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [ -n "$DEVNAME" ]; then
-    for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `
-    do
-        $UMOUNT $mnt
-    done
-
-    # Remove empty directories from auto-mounter
+    # automount may not show the devname in /proc/mounts
     name="`basename "$DEVNAME"`"
-    test -e "/tmp/.automount-$name" && rm_dir ${mount_point}
+    mount_point="/run/media/root/${name}"
+    $UMOUNT  $mount_point
+    test -e "/tmp/.automount-$name" && rm_dir $mount_point
 fi
