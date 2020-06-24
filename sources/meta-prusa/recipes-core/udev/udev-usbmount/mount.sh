@@ -37,21 +37,11 @@ automount_systemd() {
 
     if ! $MOUNT --no-block -t auto --automount=yes --timeout-idle-sec=1s $DEVNAME ${mount_point}
     then
-        rm_dir ${mount_point}
+        rmdir ${mount_point}
     else
         logger "mount.sh/automount" "Auto-mount of [${mount_point}] successful"
         touch "/tmp/.automount-$name"
     fi
-}
-
-rm_dir() {
-	# We do not want to rm -r populated directories
-	if test "`find "$1" | wc -l | tr -d " "`" -lt 2 -a -d "$1"
-	then
-		! test -z "$1" && rm -r "$1"
-	else
-		logger "mount.sh/automount" "Not removing non-empty directory [$1]"
-	fi
 }
 
 name="`basename "$DEVNAME"`"
@@ -70,6 +60,6 @@ if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [
     name="`basename "$DEVNAME"`"
     mount_point="/run/media/root/${name}"
     $UMOUNT  $mount_point
-    test -e "/tmp/.automount-$name" && rm_dir $mount_point
+    test -e "/tmp/.automount-$name" && rmdir $mount_point
     nohup dbus-send --system --type="method_call" --dest=cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0.remove_usb &
 fi
