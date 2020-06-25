@@ -1,0 +1,191 @@
+From 7055ede8b16d071191c51475ca8f0e6cecc3dcc6 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 25 Jun 2020 12:47:51 +0200
+Subject: [PATCH] grow partition on SD card to its full extent
+
+Added sunxi_grow_sd function which checks where a backup GPT is
+located on an SD card. If it doesn't reside at the last available
+LBA, it is moved there and the rightmost partition is expanded
+to fill the created gap.
+---
+ board/sunxi/Makefile  |   4 ++
+ board/sunxi/board.c   |   8 +++
+ board/sunxi/grow_sd.c | 128 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 140 insertions(+)
+ create mode 100644 board/sunxi/grow_sd.c
+
+diff --git a/board/sunxi/Makefile b/board/sunxi/Makefile
+index c4e13f8c38..ed3553254e 100644
+--- a/board/sunxi/Makefile
++++ b/board/sunxi/Makefile
+@@ -11,3 +11,7 @@ obj-$(CONFIG_SUN7I_GMAC)	+= gmac.o
+ obj-$(CONFIG_MACH_SUN4I)	+= dram_sun4i_auto.o
+ obj-$(CONFIG_MACH_SUN5I)	+= dram_sun5i_auto.o
+ obj-$(CONFIG_MACH_SUN7I)	+= dram_sun5i_auto.o
++
++ifndef CONFIG_SPL_BUILD
++obj-$(CONFIG_EFI_PARTITION)	+= grow_sd.o
++endif
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index a35e803404..181e7261f9 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -215,6 +215,12 @@ enum env_location env_get_location(enum env_operation op, int prio)
+ static void mmc_pinmux_setup(int sdc);
+ #endif
+ 
++#if defined(CONFIG_DM_MMC) && defined(CONFIG_EFI_PARTITION)
++void sunxi_grow_sd(void);
++#else
++static void sunxi_grow_sd(void) {}
++#endif
++
+ /* add board specific code here */
+ int board_init(void)
+ {
+@@ -889,6 +895,8 @@ int misc_init_r(void)
+ 	/* or if we booted from MMC, and which one */
+ 	} else if (boot == BOOT_DEVICE_MMC1) {
+ 		env_set("mmc_bootdev", "0");
++		/* booted from a SD card: grow partition table (if needed) */
++		sunxi_grow_sd();
+ 	} else if (boot == BOOT_DEVICE_MMC2) {
+ 		env_set("mmc_bootdev", "1");
+ 	}
+diff --git a/board/sunxi/grow_sd.c b/board/sunxi/grow_sd.c
+new file mode 100644
+index 0000000000..af9a59c46c
+--- /dev/null
++++ b/board/sunxi/grow_sd.c
+@@ -0,0 +1,128 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2020 Prusa Development a.s.
++ * Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#include <common.h>
++#include <memalign.h>
++#include <part.h>
++
++static int is_pte_valid(gpt_entry *pte)
++{
++	efi_guid_t unused_guid;
++
++	if (!pte) {
++		printf("%s: Invalid Argument(s)\n", __func__);
++		return 0;
++	}
++
++	/* Only one validation for now:
++	 * The GUID Partition Type != Unused Entry (ALL-ZERO)
++	 */
++	memset(unused_guid.b, 0, sizeof(unused_guid.b));
++
++	return memcmp(pte->partition_type_guid.b, unused_guid.b,
++		      sizeof(unused_guid.b)) != 0;
++}
++
++static int read_gpt(struct blk_desc* dev_desc, gpt_header *gpt_head,
++		    gpt_entry **gpt_pte)
++{
++	struct blk_desc desc_copy;
++
++	/* Read GPT Header from device */
++	if (blk_dread(dev_desc, GPT_PRIMARY_PARTITION_TABLE_LBA, 1,
++		      gpt_head) != 1) {
++		printf("*** ERROR: Can't read GPT header ***\n");
++		return 0;
++	}
++
++	/* Check the GPT header signature */
++	if (le64_to_cpu(gpt_head->signature) != GPT_HEADER_SIGNATURE_UBOOT) {
++		printf("%s signature is wrong: 0x%llX != 0x%llX\n",
++		       "GUID Partition Table Header",
++		       le64_to_cpu(gpt_head->signature),
++		       GPT_HEADER_SIGNATURE_UBOOT);
++		return -1;
++	}
++
++	memcpy(&desc_copy, dev_desc, sizeof(struct blk_desc));
++	desc_copy.lba = le64_to_cpu(gpt_head->alternate_lba) + 1;
++
++	return gpt_verify_headers(&desc_copy, gpt_head, gpt_pte);
++}
++
++static int grow_last_partition(gpt_header *gpt_h, gpt_entry *gpt_pte)
++{
++	int i, part = 0;
++
++	for (i = 0; i < le32_to_cpu(gpt_h->num_partition_entries); i++) {
++		/* Stop at the first non valid PTE */
++		if (!is_pte_valid(&gpt_pte[i]))
++			break;
++		if (le64_to_cpu(gpt_pte[i].ending_lba)
++		    > le64_to_cpu(gpt_pte[part].ending_lba))
++			part = i;
++	}
++	if (i == 0) {
++		printf("%s: ERROR: no valid entry found\n", __func__);
++		return 1;
++	}
++	gpt_pte[part].ending_lba = gpt_h->last_usable_lba;
++	return 0;
++}
++
++static void prepare_gpt_header(struct blk_desc* dev_desc, gpt_header *gpt_h)
++{
++	char str_disk_guid[UUID_STR_LEN + 1];
++	__le32 num_partition_entries = gpt_h->num_partition_entries;
++
++	gen_rand_uuid_str(str_disk_guid, UUID_STR_FORMAT_STD);
++	gpt_fill_header(dev_desc, gpt_h, str_disk_guid, 0);
++	gpt_h->num_partition_entries = num_partition_entries;
++}
++
++/**
++ * grow_gpt() - Expand GPT over entire block device
++ * @param dev_desc  - block device descriptor
++ *
++ * @return - '0' on success, otherwise error
++ */
++static int grow_gpt(struct blk_desc *dev_desc)
++{
++	ALLOC_CACHE_ALIGN_BUFFER_PAD(gpt_header, gpt_h, 1, dev_desc->blksz);
++	gpt_entry *gpt_pte = NULL;
++	int r;
++
++	if (read_gpt(dev_desc, gpt_h, &gpt_pte))
++		return -1;
++
++	/* gpt_h currently contains the backup GPT header,
++	 * thus my_lba actually refers to the last LBA while
++	 * gpt_h->alternate_lba = 2
++	 */
++	if (le64_to_cpu(gpt_h->my_lba) == (dev_desc->lba - 1)) {
++		printf("%s: NOTICE: GPT has already been grown\n", __func__);
++		return 0;
++	}
++
++	prepare_gpt_header(dev_desc, gpt_h);
++
++	if (grow_last_partition(gpt_h, gpt_pte)) {
++		free(gpt_pte);
++		return -1;
++	}
++
++	r = write_gpt_table(dev_desc, gpt_h, gpt_pte);
++	free(gpt_pte);
++	return r;
++}
++
++void sunxi_grow_sd(void) {
++	struct blk_desc *dev_desc = blk_get_dev("mmc", 0);
++	if (dev_desc == NULL) {
++		printf("%s: ERROR: mmc0 device NOT available!\n", __func__);
++	}
++	grow_gpt(dev_desc);
++}
+-- 
+2.27.0
+
