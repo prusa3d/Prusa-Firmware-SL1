@@ -23,15 +23,26 @@ enter_init() {
 	exec switch_root /sysroot /lib/systemd/systemd
 }
 
+grow_rootfs() {
+	mkdir /dev/block/
+	major=$(stat -c '%t' ${root_dev})
+	minor=$(stat -c '%T' ${root_dev})
+	block_dev=/dev/block/$(printf '%d:%d' 0x${major} 0x${minor})
+	ln -s ${root_dev} ${block_dev}
+	export LD_LIBRARY_PATH=/sysroot/lib/systemd:/sysroot/lib
+	/sysroot/lib/systemd/systemd-growfs /sysroot
+}
+
 mkdir -p /dev /sysroot /proc /sys
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev
 
-root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
+export root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
 if ! grep 'rauc\.slot=[AB]' /proc/cmdline > /dev/null 2>&1
 then
 	mount ${root_dev} /sysroot
+	grow_rootfs
 	enter_init
 fi
 
