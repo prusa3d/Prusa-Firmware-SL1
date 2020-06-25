@@ -5,56 +5,60 @@ Subject: [PATCH] Ethernet reconnection fix
 
 - env: board revison recognition system
 ---
- board/sunxi/board.c            | 28 ++++++++++++++++++++++++++++
+ board/sunxi/board.c            | 32 ++++++++++++++++++++++++++++++++
  include/configs/sunxi-common.h |  2 +-
- 2 files changed, 29 insertions(+), 1 deletion(-)
+ 2 files changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 0ddb96cd5b..d3c442a8ec 100644
+index 0ddb96cd5b..a35e803404 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -781,6 +781,7 @@ static void parse_spl_header(const uint32_t spl_addr)
- static void setup_environment(const void *fdt)
- {
- 	char serial_string[17] = { 0 };
-+	char board_revision[2] = { 0 };
- 	unsigned int sid[4];
- 	uint8_t mac_addr[6];
- 	char ethaddr[16];
-@@ -839,6 +840,33 @@ static void setup_environment(const void *fdt)
- 
- 			env_set("serial#", serial_string);
- 		}
-+
-+        // pins PH4, PH5 and PH7 used to determine revision
-+        // board_revision = 0 for <= rev1.3a
-+        // board_revision = 1 for == rev1.4
-+        if (!env_get("board_revision")) {
-+            if (!gpio_request(228, "rev0") &&
-+            !gpio_request(229, "rev1") &&
-+            !gpio_request(231, "rev2")) {
-+                gpio_direction_input(228);
-+                gpio_direction_input(229);
-+                gpio_direction_input(231);
-+
-+                board_revision[0] = gpio_get_value(228) << 2 |
-+                gpio_get_value(229) << 1 |
-+                gpio_get_value(231);
-+
-+                // apply quirks for MAC layer for older board revisions
-+                if (board_revision[0] == 0) {
-+                    env_set("eth_quirks", "1");
-+                } else env_set("eth_quirks", "0");
-+
-+                board_revision[0] += 48; // to ASCII
-+                printf("Board revision %s\n", board_revision);
-+                env_set("board_revision", board_revision);
-+            } else
-+                printf("Error: unable to acquire board revision GPIOs\n");
-+        }
- 	}
+@@ -774,6 +774,37 @@ static void parse_spl_header(const uint32_t spl_addr)
+ 	env_set_hex("fel_scriptaddr", spl->fel_script_address);
  }
  
++/*
++ * pins PH4, PH5 and PH7 used to determine revision
++ * board_revision = 0 for <= rev1.3a
++ * board_revision = 1 for == rev1.4
++ */
++static void setup_board_revision(void)
++{
++	const int pin_array[] = {231, 229, 228, -1};
++	int board_revision;
++
++	env_set("board_revision", NULL);
++
++	if (gpio_claim_vector(pin_array, "rev%d")) {
++		printf("%s: ERROR: unable to acquire board revision GPIOs\n",
++			__func__);
++		return;
++	}
++
++	board_revision = gpio_get_values_as_int(pin_array);
++	if (board_revision < 0) {
++		printf("%s: ERROR: couldn't read values of revision GPIOs\n",
++		       __func__);
++		return;
++	}
++
++	env_set_ulong("eth_quirks", (board_revision == 0));
++
++	printf("Board revision %d\n", board_revision);
++	env_set_ulong("board_revision", board_revision);
++}
++
+ /*
+  * Note this function gets called multiple times.
+  * It must not make any changes to env variables which already exist.
+@@ -863,6 +894,7 @@ int misc_init_r(void)
+ 	}
+ 
+ 	setup_environment(gd->fdt_blob);
++	setup_board_revision();
+ 
+ #ifdef CONFIG_USB_ETHER
+ 	usb_ether_init();
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
 index b7b3f37445..f052c0296a 100644
 --- a/include/configs/sunxi-common.h
