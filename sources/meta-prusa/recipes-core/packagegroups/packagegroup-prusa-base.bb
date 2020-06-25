@@ -9,5 +9,5 @@ inherit packagegroup
 RDEPENDS_${PN} = "\
 	haveged nano powerpanic rauc readline \
 	tzdata emergencyupdate update-selector \
-	networkmanager go-omaha \
+	networkmanager go-omaha firstboot\
 "
