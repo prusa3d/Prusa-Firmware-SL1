@@ -8,7 +8,7 @@ PR = "r0"
 DEPENDS += "networkmanager"
 
 SRC_URI = "\
-	git://anongit.kde.org/networkmanager-qt;nobranch=1 \
+	git://invent.kde.org/frameworks/networkmanager-qt.git;protocol=https;nobranch=1 \
 	file://0001-mkspecs-fix.patch \
 "
 S = "${WORKDIR}/git"

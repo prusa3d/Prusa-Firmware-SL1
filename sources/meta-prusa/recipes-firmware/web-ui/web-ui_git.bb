@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/prusa3d/Prusa-Connect-Local"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRCREV_pn-${PN} = "46e4ee29bc40b1f043297f88b856ba56102d9de2"
+SRCREV_pn-${PN} = "7c41cc834b78312b34183889ace037d64327e772"
 SRC_URI = " \
     git://git@github.com/prusa3d/Prusa-Connect-Local.git;protocol=ssh;branch=master \
 "
