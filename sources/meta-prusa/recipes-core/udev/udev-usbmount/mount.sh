@@ -61,16 +61,15 @@ if [ "$ACTION" = "add" ] && [ -n "$DEVNAME" ] && [ -n "$ID_FS_TYPE" ]; then
     # so check the device number too
     if expr $MAJOR "*" 256 + $MINOR != `stat -c %d /`; then
         automount_systemd
+        nohup dbus-send --system --type="method_call" --dest=cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0.add_usb &
     fi
 fi
 
 if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [ -n "$DEVNAME" ]; then
-    for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `
-    do
-        $UMOUNT $mnt
-    done
-
-    # Remove empty directories from auto-mounter
+    # automount may not show the devname in /proc/mounts
     name="`basename "$DEVNAME"`"
-    test -e "/tmp/.automount-$name" && rm_dir ${mount_point}
+    mount_point="/run/media/root/${name}"
+    $UMOUNT  $mount_point
+    test -e "/tmp/.automount-$name" && rm_dir $mount_point
+    nohup dbus-send --system --type="method_call" --dest=cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0.remove_usb &
 fi

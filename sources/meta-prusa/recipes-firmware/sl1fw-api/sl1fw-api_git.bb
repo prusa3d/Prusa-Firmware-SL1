@@ -8,7 +8,7 @@ SRC_URI = "\
     file://avahi/octoprint.service \
 "
 
-SRCREV_pn-${PN} = "355ba68e9ae4992024ebb8c2af40384341574c0d"
+SRCREV_pn-${PN} = "aa0393312f7c475be3d72e474f6e029bdd677b50"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "sl1fw"
