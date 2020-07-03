@@ -4,6 +4,7 @@ inherit core-image
 
 IMAGE_INSTALL += "\
 	packagegroup-prusa-base \
+	packagegroup-prusa-fs \
 	packagegroup-prusa-sla \
 "
 

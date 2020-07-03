@@ -6,6 +6,7 @@ IMAGE_INSTALL += "\
 	packagegroup-prusa-base \
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
+	packagegroup-prusa-fs \
 	packagegroup-prusa-sla \
 	packagegroup-prusa-framebuffer \
 "
