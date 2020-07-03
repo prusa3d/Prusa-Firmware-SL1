@@ -1,0 +1,3 @@
+
+PACKAGECONFIG ??= "usr"
+PACKAGECONFIG[usr] = "ROOTSBINDIR=${sbindir},"
