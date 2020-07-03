@@ -1,3 +1,42 @@
+# Version 1.4.1
+
+## Summary
+- Fixed missing timezones
+- Fixed UV calibrator disconnection
+- Fixed data corruption on USB
+- Fixed resin volume warning
+- Fixed preprint warning delay
+- Fixed message "printer is not calibrated" during calibration
+
+## Detailed description
+
+### Fixed missing timezones
+Based on the customer feedback there were several missing major cities across the world. These cities were added to the list. Also, the underscore sign was removed from the city names.
+
+### Fixed UV calibrator disconnection
+In a rare situation, the USB bus had to reconnect the UV calibrator due to the EMI surge. Now, the firmware correctly reconnects the device and calibration will continue without any interruption.
+
+### Fixed data corruption on the USB drive
+This release brings improved behavior of handling the USB drives. It is now mounted with a `flush` flag which ensures data are written into the memory sooner. The potential cause of deleting of the files was eliminated by using standard `rmdir` command which will not delete the non-empty directory in any situation.
+
+### Fixed resin volume warning
+The Original Prusa SL1 printer is equipped with the resin level sensor, which measures the volume of the resin in the tank before the print is started and compares it to the amount required by the printed model.
+
+During the printing process, the printer calculates the amount of the remaining resin and ensures a minimum level of the resin. If this level is reached, the print stops and the user is asked to refill the tank. This feature wasn't properly working in the 1.4.0 due to the major code refactoring and is fixed in this release.
+
+### Fixed message "printer is not calibrated" during calibration
+After replacing the print display and performing the UV calibration or during recalibration using the same display, the user was informed in the very beginning, that the printer is not calibrated, which wasn't true. The printer had at that moment the calibration information of the previous successful calibration. This is now fixed and the message is now not displayed.
+
+## Others
+- Fixed scrollbar is now shown only when needed
+- Fixed race condition between warnings being displayed
+- Fixed hang on cancel print page if HW button was used
+- Fixed incorrect data displayed from previous print
+- Fixed turn off motors, fans and UV when the exception occurs during print
+- Translations updated
+- Updated company name and copyright
+- Improvements to the Wi-Fi service (faster initialization)
+
 # Version 1.4.0
 
 ## Summary
