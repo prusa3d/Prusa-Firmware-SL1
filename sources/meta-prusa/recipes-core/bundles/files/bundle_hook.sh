@@ -33,6 +33,14 @@ slot-post-install)
 		cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/
 		cp -av /etc/touch-ui ${RAUC_SLOT_MOUNT_POINT}/
 
+		# update http digest
+		NGINX_FILE=${RAUC_SLOT_MOUNT_POINT}/nginx/sites-available/sl1fw
+		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/htdigest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
+			sed -i 's/include\s*\/etc\/nginx/# include \/etc\/nginx/' $NGINX_FILE
+		else
+			sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' $NGINX_FILE
+		fi
+
 		# Copy update channel override
 		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/
 		cp -av /etc/systemd/system/updater.service.d/channel.conf ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/channel.conf

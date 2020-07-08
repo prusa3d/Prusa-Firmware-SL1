@@ -3,32 +3,30 @@ HOMEPAGE = "https://gitlab.com/prusa3d/sl1/remote-api"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "\
-    git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=master \
-    file://avahi/octoprint.service \
-"
+SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=master"
 
-SRCREV_pn-${PN} = "aa0393312f7c475be3d72e474f6e029bdd677b50"
+SRCREV_pn-${PN} = "21e2a9ae41cd1a968ab382f510463a1c787d5e62"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "sl1fw"
 RDEPENDS_${PN} += " \
-    python3 \
-    python3-flask \
-    python3-gevent \
-    python3-pydbus \
-    python3-pygobject \
-    python3-compression \
-    python3-core \
-    python3-crypt \
-    python3-datetime \
-    python3-json \
-    python3-logging \
-    python3-misc \
-    python3-netclient \
-    python3-stringold \
-    python3-typing \
-    python3-xml \
+	python3 \
+	python3-flask \
+	python3-gevent \
+	python3-pydbus \
+	python3-pygobject \
+	python3-compression \
+	python3-core \
+	python3-crypt \
+	python3-datetime \
+	python3-json \
+	python3-logging \
+	python3-misc \
+	python3-netclient \
+	python3-stringold \
+	python3-typing \
+	python3-xml \
+	sl1fw \
 "
 
 FILES_${PN} += " \
@@ -45,18 +43,22 @@ S = "${WORKDIR}/git"
 inherit setuptools3 useradd
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system -g sl1fw_api --shell /bin/false sl1fw_api"
-GROUPADD_PARAM_${PN} = "--system sl1fw_api"
+USERADD_PARAM_${PN} = "\
+	--system \
+	--no-create-home \
+	--home-dir /nonexistent \
+	--shell /bin/false \
+	--groups projects \
+	--user-group \
+	sl1fw_api \
+"
+GROUPADD_PARAM_${PN} = "--system projects"
 
 do_install_append () {
 
-    # Avahi service definition
-	install -d ${D}${sysconfdir}/avahi/services
-	install --mode 644 ${WORKDIR}/avahi/octoprint.service ${D}${sysconfdir}/avahi/services/octoprint.service
+	# Enable sl1fw_api
+	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
+	ln -s ${libdir}/systemd/system/sl1fw_api.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw_api.service
 
-    # Enable sl1fw_api
-    install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
-    ln -s ${libdir}/systemd/system/sl1fw_api.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw_api.service
-
-    rmdir ${D}/usr/share
+	rmdir ${D}/usr/share
 }

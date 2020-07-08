@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "4bd89109522f9275d9499b3d6715ea649a56d2a6"
+SRCREV_pn-${PN} = "ed1bf3266b4c48a795cde103f48cc814e12b60b4"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -17,10 +17,7 @@ DEPENDS += "python3 gettext-native"
 RDEPENDS_${PN} += " \
 	python3 \
 	bash \
-	nginx \
 	avrdude \
-	avahi-daemon \
-	avahi-restarter \
 	api-keygen \
 	udev-usbmount \
 	wifi-config \
@@ -53,8 +50,6 @@ RDEPENDS_${PN} += " \
 FILES_${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
 	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
-	${sysconfdir}/nginx/sites-available/sl1fw\
-	${sysconfdir}/nginx/sites-enabled/sl1fw\
 	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
 	${libdir}/tmpfiles.d/projects-tmpfiles.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
@@ -77,10 +72,6 @@ do_install_append () {
 	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants	
 	ln -s ${libdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
 	
-	# Enable nginx site
-	install -d ${D}${sysconfdir}/nginx/sites-enabled
-	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
-
 	# Install projects tmpfiles
 	install -d ${D}${libdir}/tmpfiles.d
 	install --mode 644 ${WORKDIR}/projects-tmpfiles.conf ${D}${libdir}/tmpfiles.d/projects.conf
