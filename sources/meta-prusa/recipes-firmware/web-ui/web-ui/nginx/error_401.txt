@@ -1,0 +1,1 @@
+The printer has digest security on. To use slicer upload, please turn this security option off in Advanced settings > Login credentials.
