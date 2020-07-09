@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "ed1bf3266b4c48a795cde103f48cc814e12b60b4"
+SRCREV_pn-${PN} = "a032ce1463c0ef98dc8e18f172fab08a4bf11c12"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -44,7 +44,7 @@ RDEPENDS_${PN} += " \
 	python3-evdev \
 	python3-pysignal \
 	python3-requests \
-	sl1-errors \
+	prusa-errors \
 "
 
 FILES_${PN} += "\
