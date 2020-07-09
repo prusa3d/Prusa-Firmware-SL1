@@ -1,0 +1,11 @@
+diff -Naur avahi-0.7.vanilla/avahi-daemon/avahi-daemon.service.in avahi-0.7/avahi-daemon/avahi-daemon.service.in
+--- avahi-0.7.vanilla/avahi-daemon/avahi-daemon.service.in	2017-07-10 12:14:59.107370577 +0200
++++ avahi-0.7/avahi-daemon/avahi-daemon.service.in	2020-07-09 17:59:01.046658022 +0200
+@@ -25,6 +25,7 @@
+ ExecStart=@sbindir@/avahi-daemon -s
+ ExecReload=@sbindir@/avahi-daemon -r
+ NotifyAccess=main
++LogLevelMax=5
+ 
+ [Install]
+ WantedBy=multi-user.target
