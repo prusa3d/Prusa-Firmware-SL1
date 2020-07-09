@@ -7,6 +7,7 @@
 - Fixed resin volume warning
 - Fixed preprint warning delay
 - Fixed message "printer is not calibrated" during calibration
+- Fixed title overflow on some pages by sliding the title
 
 ## Detailed description
 
