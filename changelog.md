@@ -1,3 +1,35 @@
+# Version 1.5.0-alpha.2
+
+## Summary (relative to 1.5.0-alpha.1)
+- flush mount option for USB
+- custom rm_dir replaced by rmdir (should prevent for deleting files on USB)
+- wifi correctly loads nvram and uses host interrupt
+- added firstboot recipe (RTC can be tested)
+- One click print + model preview
+- automatic growfs on dev image
+- reading of revision GPIOs rewritten
+- prepared support in Yocto for sftp/webDAV/cifs fuse modules
+- improved error displayed by slicer when http digest is ON + bugfix
+- change log level to debug if admin or factory mode detected
+- cancel print does not hang in confirm page
+- show correct data (layer num/height, print times, ...) on next print, if previous print was canceled
+- changed lower limit of UV PWM since some printers failed in UV claibration
+- allow UV meter to reconnect due to EMI surge
+- fixed config export in admin
+- support for 2mm screw (couldn't home in calibration)
+- virtual printer fixed + tests for virtual printer added
+- logs upload to sever (only development version TODO: change to production server)
+- notification are on correct dbus name cz.prusa3d.sl1.Notify1
+- Fixed timezone names
+- Fixed text overflow on error page
+- show admin while printing
+- Rotating clock on wait page
+- log upload, export and poweroff via API
+- Advanced settings using API
+- Added counter for exposition display (both counters can be erased in admin->display)
+- Integrated prusa errors
+- Fixed preprint check warnings (thrown ASAP)
+
 # Version 1.5.0
 
 ## Summary
