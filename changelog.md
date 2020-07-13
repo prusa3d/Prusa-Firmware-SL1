@@ -1,3 +1,8 @@
+# Version 1.5.0-alpha.3
+
+## Summary (relative to 1.5.0-alpha.2)
+- Fixed ambient temp warning confirm
+
 # Version 1.5.0-alpha.2
 
 ## Summary (relative to 1.5.0-alpha.1)
