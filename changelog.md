@@ -2,6 +2,17 @@
 
 ## Summary (relative to 1.5.0-alpha.2)
 - Fixed ambient temp warning confirm
+- Don't hightlight advanced settings items on press
+- Shorter timeout for properties reload
+- Fixed short flicker back to advancedsettings after save cofiguration page
+- Removed reading of config0 value limits from backend
+- Disabled switch from firmwareupdate to networksetting page
+- Touch-UI code refactoring
+- Fixed beeping and highlighting for DelegateRef items
+- Hotfix log export/upload
+- Fixed beeping on text buttons, notification list
+- FIxed caching of PageConfirm messed up with rollUp header->disabled
+- Fixed double logs upload call
 
 # Version 1.5.0-alpha.2
 
