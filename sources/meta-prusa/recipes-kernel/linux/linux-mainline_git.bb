@@ -29,6 +29,7 @@ SRC_URI_append_sun50i = " \
 	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://0201-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
+	file://0401-backlight-keep-default-brightness-at-0.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
