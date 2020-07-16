@@ -1,0 +1,29 @@
+From 9ed2ae55d03662efb7641747a0e7fe492c0393f8 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 16 Jul 2020 14:51:28 +0200
+Subject: [PATCH] backlight: keep default-brightness at 0
+
+---
+ drivers/video/backlight/backlight.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/video/backlight/backlight.c b/drivers/video/backlight/backlight.c
+index cac3e35d7630..813a264a1b11 100644
+--- a/drivers/video/backlight/backlight.c
++++ b/drivers/video/backlight/backlight.c
+@@ -630,12 +630,6 @@ struct backlight_device *of_find_backlight(struct device *dev)
+ 			of_node_put(np);
+ 			if (!bd)
+ 				return ERR_PTR(-EPROBE_DEFER);
+-			/*
+-			 * Note: gpio_backlight uses brightness as
+-			 * power state during probe
+-			 */
+-			if (!bd->props.brightness)
+-				bd->props.brightness = bd->props.max_brightness;
+ 		}
+ 	}
+ 
+-- 
+2.27.0
+
