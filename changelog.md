@@ -34,9 +34,12 @@ After replacing the print display and performing the UV calibration or during re
 - Fixed hang on cancel print page if HW button was used
 - Fixed incorrect data displayed from previous print
 - Fixed turn off motors, fans and UV when the exception occurs during print
+- Fixed exposure time increment only dispayed for calibration projects
 - Translations updated
 - Updated company name and copyright
 - Improvements to the Wi-Fi service (faster initialization)
+- Printer summary printed at the end of the logs
+- Silence avahi logs
 
 # Version 1.4.0
 
