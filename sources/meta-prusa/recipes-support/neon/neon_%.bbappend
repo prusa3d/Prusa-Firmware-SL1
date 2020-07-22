@@ -1,0 +1,3 @@
+BINCONFIG = ""
+
+inherit binconfig

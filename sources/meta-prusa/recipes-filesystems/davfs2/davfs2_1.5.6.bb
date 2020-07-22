@@ -7,42 +7,40 @@ LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8f0e2cd40e05189ec81232da84bd6e1a \
                     file://config/COPYING.davfs2;md5=8f0e2cd40e05189ec81232da84bd6e1a"
 
-SRC_URI = "http://download.savannah.nongnu.org/releases/davfs2/davfs2-${PV}.tar.gz"
+SRC_URI = " \
+	http://download.savannah.nongnu.org/releases/davfs2/davfs2-${PV}.tar.gz \
+	file://0001-Handle-building-with--fno-common-for-gcc-10.patch \
+	file://0002-etc.patch \
+"
 SRC_URI[md5sum] = "eb9948097dc08664cbc19ad06eeacd97"
 SRC_URI[sha256sum] = "417476cdcfd53966b2dcfaf12455b54f315959b488a89255ab4b44586153d801"
 
-inherit autotools useradd gettext xmlcatalog pkgconfig
+inherit autotools useradd gettext pkgconfig
 
-DEPENDS += "neon"
+DEPENDS_append = " neon"
 
-do_configure_prepend() {
-	sed -i \
-	's/cd man; po4a po4a.conf; cd ..//g' \
-	${S}/bootstrap
-	(cd ${S}; ./bootstrap; cd -)
-	cp -R ${S}/etc ${B}/etc
-}
+PACKAGECONFIG ?= ""
+PACKAGECONFIG_append_class-target = "\
+	${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)}"
+PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 
-python do_package_prepend() {
-    base_sbindir = d.getVar("base_sbindir")
-    if base_sbindir != "/sbin":
-        source = d.expand("${D}/sbin")
-        with os.scandir(source) as it:
-            for entry in it:
-                os.remove(entry.path)
-        os.rmdir(source)
-}
+# The dos2unix NLS relies on po4a-native, while po4a recipe is
+# provided by meta-perl layer, so make it optional here, you
+# need have meta-perl in bblayers.conf before enabling nls in
+# PACKAGECONFIG.
+PACKAGECONFIG[nls] = ",,po4a-native"
+USE_NLS = "${@bb.utils.contains('PACKAGECONFIG', 'nls', 'yes', 'no', d)}"
 
-EXTRA_OECONF = " --disable-nls"
-EXTRA_AUTORECONF = " -I ${S}/config "
-FILES_${PN} = "\
-	${base_sbindir}/mount.davfs \
-	${base_sbindir}/umount.davfs \
+EXTRA_OECONF_append = " ssbindir=${sbindir} "
+EXTRA_AUTORECONF_append = " -I ${S}/config "
+
+CONFFILES_${PN}_append = " \
 	${sysconfdir}/davfs2/secrets \ 
 	${sysconfdir}/davfs2/davfs2.conf \ 
-	${sysconfdir}/davfs2/certs/private \
-	${datadir}/davfs2/secrets \
-	${datadir}/davfs2/davfs2.conf \
+"
+FILES_${PN}_append = " \
+	${sysconfdir}/davfs2 \
+	${datadir}/davfs2 \
 "
 
 USERADD_PACKAGES = "${PN}"
