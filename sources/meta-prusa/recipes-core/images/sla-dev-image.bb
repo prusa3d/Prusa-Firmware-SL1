@@ -34,9 +34,7 @@ SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
 TOOLCHAIN_TARGET_TASK_append = "\
 	networkmanager-qt-dev \
 	extra-cmake-modules-dev \
-	mali-blobs-dev \
 "
-
 TOOLCHAIN_HOST_TASK_append = "\
         nativesdk-qtdeclarative-tools \
         nativesdk-python3 \
