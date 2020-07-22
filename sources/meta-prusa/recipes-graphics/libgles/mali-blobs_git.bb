@@ -22,88 +22,87 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "libdrm wayland"
+DEPENDS = "libdrm wayland patchelf-native"
+RDEPENDS_${PN} += "kernel-module-mali"
 
 # Inhibit warnings about files being stripped, we can't do anything about it.
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_SYSROOT_STRIP = "1"
 
+# These are closed binaries generated elsewhere so don't check ldflags & text relocations
+INSANE_SKIP_${PN} = "dev-so ldflags textrel"
+INSANE_SKIP_${PN}-test = "dev-so ldflags textrel"
+
+FILES_${PN}-dev += "${libdir}/.libMali.so.6~"
+
 do_configure[noexec] = "1"
 
 do_install() {
 	# install headers
-	install -d -m 0755 ${D}${includedir}
-	install -m 0644 ${S}/include/wayland/gbm.h ${D}${includedir}/
-	install -d -m 0755 ${D}${includedir}/EGL
-	install -m 0644 ${S}/include/wayland/EGL/*.h ${D}${includedir}/EGL/
-	install -d -m 0755 ${D}${includedir}/GLES
-	install -m 0644 ${S}/include/wayland/GLES/*.h ${D}${includedir}/GLES/
-	install -d -m 0755 ${D}${includedir}/GLES2
-	install -m 0644 ${S}/include/wayland/GLES2/*.h ${D}${includedir}/GLES2/
-	install -d -m 0755 ${D}${includedir}/KHR
-	install -m 0644 ${S}/include/wayland/KHR/*.h ${D}${includedir}/KHR/
-
-	# Copy the .pc files
-	# install -d -m 0755 ${D}${libdir}/pkgconfig
-	# install -m 0644 ${S}/egl.pc ${D}${libdir}/pkgconfig/
-	# install -m 0644 ${S}/gles_cm.pc ${D}${libdir}/pkgconfig/
-	# install -m 0644 ${S}/glesv2.pc ${D}${libdir}/pkgconfig/
-
-	# install -d ${D}${libdir}
-	# install -d ${D}${includedir}
-
-	# Fix .so name and create symlinks, binary package provides .so wich can't be included directly in package without triggering the 'dev-so' QA check
-	# Packages like xf86-video-fbturbo dlopen() libUMP.so, so we do need to ship the .so files in ${PN}
-
-	install -d -m 0755 ${D}${libdir}
-	install -m 0755 ${S}/r6p2/arm64/wayland/libMali.so ${D}${libdir}/libMali.so.6
-
-	ln -sf libMali.so.6 ${D}${libdir}/libMali.so
-
-	for minor in libEGL.so.1.4 libGLESv1_CM.so.1.1 libGLESv2.so.2.0 libgbm.so.1.0 ; do
-		major=${minor%.*}
-		plain=${major%.*}
-		ln -sf libMali.so.6 ${D}${libdir}/${major}
-		ln -sf ${major} ${D}${libdir}/${minor}
-		ln -sf ${major} ${D}${libdir}/${plain}
+	for dir in . EGL GLES GLES2 KHR; do
+		install -d -m 0755 ${D}${includedir}/${dir}
+		install -m 0644 ${S}/include/wayland/${dir}/*.h ${D}${includedir}/${dir}/
 	done
 
+	install -d -m 0755 ${D}${libdir}
 	install -d -m 0755 ${D}${libdir}/pkgconfig
-	echo "prefix=${prefix}"		>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "includedir=${includedir}"	>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "libdir=${libdir}"		>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo ""				>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Name: gbm"		>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Description: sunxi-mali"	>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Version: 1.0"		>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Cflags: -I${includedir}"	>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Libs: -L${libdir} -lgbm"	>> ${D}${libdir}/pkgconfig/gbm.pc
-	echo "Libs.private: -ldl"	>> ${D}${libdir}/pkgconfig/gbm.pc
-	ln -sf gbm.pc ${D}${libdir}/pkgconfig/libgbm.pc
 
-	echo "prefix=${prefix}"		>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "includedir=${includedir}"	>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "libdir=${libdir}"		>> ${D}${libdir}/pkgconfig/egl.pc
-	echo ""				>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Name: egl"		>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Description: sunxi-mali"	>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Version: 1.0"		>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Cflags: -I${includedir}"	>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Libs: -L${libdir} -lEGL"	>> ${D}${libdir}/pkgconfig/egl.pc
-	echo "Libs.private: -ldl"	>> ${D}${libdir}/pkgconfig/egl.pc
+	install -m 0755 ${S}/r6p2/arm64/wayland/libMali.so ${D}${libdir}/libMali.so.6
+	ln -sf libMali.so.6 ${D}${libdir}/libMali.so
+
+	libs="EGL:1.4 GLESv1_CM:1.1 GLESv2:2.0 gbm:1.0"
+	for lib in $libs; do
+		set -- `echo $lib | tr ':' ' '`
+
+		name=$1
+		lower=`echo $name | tr '[:upper:]' '[:lower:]'`
+		version=$2
+		major=${version%.*}
+
+		ln -sf libMali.so.6 ${D}${libdir}/lib${name}.so.${major}
+		ln -sf lib${name}.so.${major} ${D}${libdir}/lib${name}.so.${version}
+		ln -sf lib${name}.so.${major} ${D}${libdir}/lib${name}.so
+
+		cat > ${D}${libdir}/pkgconfig/${lower}.pc <<EOF
+prefix=${prefix}
+includedir=${includedir}
+libdir=${libdir}
+
+Name: ${lower}
+Description: sunxi-mali
+Version: ${version}
+Cflags: -I${includedir}
+Libs: -L${libdir} -lMali
+Libs.private: -ldl
+EOF
+		ln -sf ${lower}.pc ${D}${libdir}/pkgconfig/lib${lower}.pc
+	done
 
 	# Provide fake libffi.so.6
 	${CC} -shared -Wl,-soname,libffi.so.6 -o ${D}${libdir}/libffi.so.6.4.0
 	ln -s libffi.so.6.4.0 ${D}${libdir}/libffi.so.6
 }
 
-RPROVIDES_${PN} += "libGLESv2.so libEGL.so libGLESv2.so libGLESv1_CM.so libMali.so"
-RDEPENDS_${PN} += "kernel-module-mali"
+patch_installed_lib() {
+	soname=libMali.so.6
+	so=${D}${libdir}/${soname}
+	bkp=${D}${libdir}/.${soname}~
 
-FILES_${PN} += "${libdir}/lib*.so"
-FILES_${PN}-dev = "${includedir} ${libdir}/pkgconfig"
+	echo "Backing ${soname} up in ${bkp} ..."
+	cp ${so} ${bkp}
+	echo "Patching SONAME of ${so} ..."
+	patchelf --set-soname ${soname} ${so}
+}
 
-# These are closed binaries generated elsewhere so don't check ldflags & text relocations
-INSANE_SKIP_${PN} = "dev-so ldflags textrel"
-INSANE_SKIP_${PN}-test = "dev-so ldflags textrel"
+restore_vanilla_lib_for_ipk() {
+	soname=libMali.so.6
+	so=${PKGDEST}/${PN}${base_prefix}${libdir}/${soname}
+	bkp=${PKGDEST}/${PN}-dev${base_prefix}${libdir}/.${soname}~
+
+	echo "Restoring original copy of ${soname} in ${so} ..."
+        cp ${bkp} ${so}
+}
+
+do_install[postfuncs] += "patch_installed_lib"
+do_package_write_ipk[prefuncs] += "restore_vanilla_lib_for_ipk"
