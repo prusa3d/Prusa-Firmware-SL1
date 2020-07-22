@@ -1,0 +1,15 @@
+diff --git a/etc/Makefile.am b/etc/Makefile.am
+index 5a01282..4577c5e 100644
+--- a/etc/Makefile.am
++++ b/etc/Makefile.am
+@@ -25,8 +25,8 @@ pkgsysconfdir = $(sysconfdir)/@PACKAGE@
+ install-data-local: $(dist_pkgdata_DATA)
+ 	@$(NORMAL_INSTALL)
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgsysconfdir)
+-	$(INSTALL_DATA) -b davfs2.conf $(DESTDIR)$(pkgsysconfdir)/davfs2.conf
+-	$(INSTALL_DATA) -b -m 600 secrets $(DESTDIR)$(pkgsysconfdir)/secrets
++	$(INSTALL_DATA) $(srcdir)/davfs2.conf $(DESTDIR)$(pkgsysconfdir)/davfs2.conf
++	$(INSTALL_DATA) -m 600 $(srcdir)/secrets $(DESTDIR)$(pkgsysconfdir)/secrets
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgsysconfdir)/certs
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgsysconfdir)/certs/private
+ 	chmod 700 $(DESTDIR)$(pkgsysconfdir)/certs/private
