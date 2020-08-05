@@ -37,8 +37,26 @@ TOOLCHAIN_TARGET_TASK_append = "\
 "
 
 TOOLCHAIN_HOST_TASK_append = "\
-	nativesdk-qtdeclarative \
+        nativesdk-qtdeclarative-tools \
+        nativesdk-python3 \
+        nativesdk-python3-core \
+        nativesdk-python3-pickle \
+        nativesdk-python3-logging \
+        nativesdk-python3-compile \
+        nativesdk-python3-fcntl \
+        nativesdk-python3-shell \
+        nativesdk-python3-misc \
+        nativesdk-python3-multiprocessing \
+        nativesdk-python3-distutils \
+        nativesdk-python3-compression \
+        nativesdk-python3-json \
+        nativesdk-python3-unittest \
+        nativesdk-python3-mmap \
+        nativesdk-python3-git \
+        nativesdk-python3-pkgutil \
 "
+
+
 
 DEPENDS += "systemd-systemctl-native coreutils-native"
 
