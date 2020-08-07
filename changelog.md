@@ -1,3 +1,8 @@
+# Varsion 1.4.2
+
+## Summary
+- Fixed UV calibration in case of wavelength mismatch
+
 # Version 1.4.1
 
 ## Summary
