@@ -9,7 +9,7 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV_sla-client = "3bfcde28a55fef3461567cd13fc4aa4417cfd9d3"
+SRCREV_sla-client = "f217f8ec84427aa4d367014fbd50453ff8776120"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 
@@ -19,7 +19,7 @@ LIC_FILES_CHKSUM = "\
 
 inherit cmake_kf5 systemd python3native
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt sl1-errors-native"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt prusa-errors-native"
 
 RDEPENDS_${PN} += "\
 	bash \
