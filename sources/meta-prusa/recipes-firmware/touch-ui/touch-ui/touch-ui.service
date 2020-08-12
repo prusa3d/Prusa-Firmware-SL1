@@ -6,10 +6,10 @@ After=sl1fw.service
 WorkingDirectory=/var/run/sl1fw
 Environment="HOME=/var/run/sl1fw"
 Environment="QT_QPA_PLATFORM=eglfs"
-Environment="QT_QPA_EGLFS_KMS_CONFIG=/usr/share/sla-client-config.json"
+Environment="QT_QPA_EGLFS_KMS_CONFIG=/usr/share/touch-ui-config.json"
 Environment="EGLFS_DEVICE_INTEGRATION=eglfs_kms"
 Environment="QT_QPA_EGLFS_INTEGRATION=eglfs_kms"
-ExecStart=/usr/bin/SLAGUI
+ExecStart=/usr/bin/touch-ui
 Restart=on-failure
 RestartSec=3
 
