@@ -66,13 +66,9 @@ FILES_${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
 S="${WORKDIR}/git/firmware"
 INTRANET=""
 
-inherit setuptools3
+inherit setuptools3 systemd
 
 do_install_append () {
-	# Enable sl1fw
-	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants	
-	ln -s ${libdir}/systemd/system/sl1fw.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service
-	
 	# Install projects tmpfiles
 	install -d ${D}${libdir}/tmpfiles.d
 	install --mode 644 ${WORKDIR}/projects-tmpfiles.conf ${D}${libdir}/tmpfiles.d/projects.conf
@@ -82,3 +78,4 @@ do_install_append () {
 	install --mode 644 ${WORKDIR}/sl1fw.conf ${D}${libdir}/sysusers.d/sl1fw.conf
 }
 
+SYSTEMD_SERVICE_${PN} = "${BPN}.service"
