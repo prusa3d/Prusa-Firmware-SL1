@@ -1,0 +1,56 @@
+From e40ed81eb84e36a13defa32f1ce315c9cab485b1 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 25 Aug 2020 13:11:52 +0200
+Subject: [PATCH] sl1fw: set path to weston-framebuffer's fb
+
+python always truncates a file opened for writing:
+let us get the fd ourselves then
+
+and skip setting fb black on initialization (it already is black)
+---
+ sl1fw/defines.py   | 2 +-
+ sl1fw/libScreen.py | 5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/sl1fw/defines.py b/sl1fw/defines.py
+index 91f3a8ea..c179d6a4 100644
+--- a/sl1fw/defines.py
++++ b/sl1fw/defines.py
+@@ -96,7 +96,7 @@ octoprintURI = ":8000"
+ octoprintAuthFile = configDir / "slicer-upload-api.key"
+ static_octoprintAuthFile = configDir / "static_api.key"
+ 
+-fbFile = "/dev/fb0"
++fbFile = "/dev/shm/fb"
+ 
+ resinMinVolume = 68.5
+ resinMaxVolume = 200.0
+diff --git a/sl1fw/libScreen.py b/sl1fw/libScreen.py
+index 4bbb49ac..0533291c 100644
+--- a/sl1fw/libScreen.py
++++ b/sl1fw/libScreen.py
+@@ -38,12 +38,8 @@ class ScreenServer(multiprocessing.Process):
+         self.stoprequest = multiprocessing.Event()
+         self.width = defines.screenWidth
+         self.height = defines.screenHeight
+-        if not test_runtime.testing:
+-            subprocess.call(['/usr/sbin/fbset', '-fb', defines.fbFile, '%dx%d-0' % (self.width, self.height)])
+-        #endif
+         self.blackImage = Image.new("L", (self.width, self.height))
+         self.whiteImage = Image.new("L", (self.width, self.height), 255)
+-        self.getImgBlack()
+         self.overlays = dict()
+         self.project = None
+         self.perPartes = False
+@@ -104,7 +104,7 @@ class ScreenServer(multiprocessing.Process):
+ 
+ 
+     def _writefb(self):
+-        with open(defines.fbFile, 'wb') as fb:
++        with os.fdopen(os.open(defines.fbFile, os.O_RDWR), 'rb+') as fb:
+             fb.write(self.screen.convert("RGBX").tobytes())
+         #endwith
+ #        self.screen.show()
+-- 
+2.28.0
+

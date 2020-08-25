@@ -98,6 +98,7 @@ FILES_${PN}-examples = "${bindir}/*"
 FILES_${PN}-framebuffer = " \
 	${bindir}/weston-simple-framebuffer \
 	${systemd_system_unitdir}/weston-framebuffer.service \
+	${systemd_system_unitdir}/graphical.target.wants/weston-framebuffer.service \
 "
 
 RDEPENDS_${PN} += "xkeyboard-config"
