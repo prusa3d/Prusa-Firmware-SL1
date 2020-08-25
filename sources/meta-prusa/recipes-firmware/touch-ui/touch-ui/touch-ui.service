@@ -1,15 +1,16 @@
 [Unit]
 Description=SL1 Client
-After=sl1fw.service
+After=sl1fw.service weston.service
+BindsTo=weston.service
 
 [Service]
-WorkingDirectory=/var/run/sl1fw
-Environment="HOME=/var/run/sl1fw"
-Environment="QT_QPA_PLATFORM=eglfs"
-Environment="QT_QPA_EGLFS_KMS_CONFIG=/usr/share/touch-ui-config.json"
-Environment="EGLFS_DEVICE_INTEGRATION=eglfs_kms"
-Environment="QT_QPA_EGLFS_INTEGRATION=eglfs_kms"
+WorkingDirectory=/run/sl1fw
+Environment="HOME=/run/sl1fw"
+Environment="QT_QPA_PLATFORM=wayland"
+Environment="WAYLAND_DISPLAY=wayland-0"
 ExecStart=/usr/bin/touch-ui
+User=root
+PAMName=login
 Restart=on-failure
 RestartSec=3
 
