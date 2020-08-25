@@ -1,0 +1,13 @@
+[Unit]
+After=weston.service
+BindsTo=weston.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/weston-simple-framebuffer
+Environment=WAYLAND_DISPLAY=wayland-0
+User=root
+PAMName=login
+
+[Install]
+WantedBy=graphical.target

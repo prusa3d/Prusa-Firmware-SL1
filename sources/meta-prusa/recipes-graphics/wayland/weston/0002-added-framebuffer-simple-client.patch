@@ -1,0 +1,303 @@
+From 586ffdadb0621d4c4df7d229ed9f0f4720e519cf Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 25 Aug 2020 13:47:24 +0200
+Subject: [PATCH 2/2] added framebuffer simple client
+
+---
+ clients/framebuffer.c | 249 ++++++++++++++++++++++++++++++++++++++++++
+ clients/meson.build   |   9 ++
+ meson_options.txt     |   2 +-
+ 3 files changed, 259 insertions(+), 1 deletion(-)
+ create mode 100644 clients/framebuffer.c
+
+diff --git a/clients/framebuffer.c b/clients/framebuffer.c
+new file mode 100644
+index 00000000..5ef2b1c8
+--- /dev/null
++++ b/clients/framebuffer.c
+@@ -0,0 +1,249 @@
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <linux/limits.h>
++#include <wayland-client.h>
++#include <wayland-client-protocol.h>
++#include <wayland-server-protocol.h>
++
++#include "xdg-shell-client-protocol.h"
++
++#define STRINGIFY(x) #x
++#define TOSTRING(x) STRINGIFY(x)
++#define AT __FILE__ ":" TOSTRING(__LINE__)
++
++struct client_state {
++	/* globals */
++	struct wl_display *display;
++	struct wl_registry *registry;
++	struct wl_shell *shell;
++	struct wl_shm *shm;
++	struct wl_compositor *compositor;
++	struct xdg_wm_base *xdg_wm_base;
++	/* objects */
++	struct wl_surface *surface;
++	struct xdg_surface *xdg_surface;
++	struct xdg_toplevel *xdg_toplevel;
++	struct wl_buffer *buffer;
++	struct wl_callback *frame_callback;
++	/* misc */
++	int fd;
++	void *shm_data;
++	int width;
++	int height;
++};
++
++int
++os_create_shm_file(off_t size)
++{
++	struct stat sb;
++	int fd = shm_open("/fb", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
++
++	if (fd < 0)
++		return -1;
++
++	if (fstat(fd, &sb) < 0)
++		goto fail;
++
++	if (sb.st_size != size)
++		if (ftruncate(fd, size) < 0)
++			goto fail;
++
++	return fd;
++
++fail:
++	close(fd);
++	return -1;
++}
++
++static const struct wl_callback_listener frame_listener;
++
++static void
++redraw(void *data, struct wl_callback *callback, uint32_t time)
++{
++	struct client_state *state = data;
++	if (state->frame_callback) wl_callback_destroy(state->frame_callback);
++	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
++	state->frame_callback = wl_surface_frame(state->surface);
++	wl_surface_attach(state->surface, state->buffer, 0, 0);
++	wl_callback_add_listener(state->frame_callback, &frame_listener, state);
++	wl_surface_commit(state->surface);
++}
++
++static const struct wl_callback_listener frame_listener = {
++    redraw
++};
++
++static void
++create_buffer(struct client_state *state) {
++	struct wl_shm_pool *pool;
++	int stride = state->width * 4; // 4 bytes per pixel
++	int size = stride * state->height;
++
++	state->fd = os_create_shm_file(size);
++	if (state->fd < 0) {
++		fprintf(stderr, "creating a buffer file for %d B failed: %m\n", size);
++		exit(1);
++	}
++
++    	state->shm_data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0);
++	if (state->shm_data == MAP_FAILED) {
++		fprintf(stderr, "mmap failed: %m\n");
++		close(state->fd);
++		exit(1);
++	}
++
++	pool = wl_shm_create_pool(state->shm, state->fd, size);
++	state->buffer = wl_shm_pool_create_buffer(pool, 0, state->width, state->height, stride, WL_SHM_FORMAT_XRGB8888);
++	wl_shm_pool_destroy(pool);
++}
++
++static void
++create_window(struct client_state *state)
++{
++	if (!state->width || !state->height) {
++		fprintf(stderr, "Invalid resolution!\n");
++		exit(1);
++	}
++
++	if (state->buffer) {
++		fprintf(stderr, "wl_buffer already exists, doing nothing\n");
++		return;
++	}
++	create_buffer(state);
++	wl_surface_attach(state->surface, state->buffer, 0, 0);
++	wl_surface_commit(state->surface);
++}
++
++static void
++xdg_surface_configure(void *data, struct xdg_surface *xdg_surface, uint32_t serial)
++{
++	fprintf(stderr, AT "\n");
++	struct client_state *state = data;
++	xdg_surface_ack_configure(xdg_surface, serial);
++
++	state->frame_callback = wl_surface_frame(state->surface);
++	wl_callback_add_listener(state->frame_callback, &frame_listener, state);
++	create_window(state);
++}
++
++static const struct xdg_surface_listener xdg_surface_listener = {
++	.configure = xdg_surface_configure,
++};
++
++static void
++xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base, uint32_t serial)
++{
++	xdg_wm_base_pong(xdg_wm_base, serial);
++}
++
++static const struct xdg_wm_base_listener xdg_wm_base_listener = {
++	.ping = xdg_wm_base_ping,
++};
++
++static void
++xdg_toplevel_configure(void *data, struct xdg_toplevel *xdg_toplevel, int32_t width, int32_t height, struct wl_array *states)
++{
++	fprintf(stderr, AT " %s, width = %d, height = %d\n", __func__, width, height);
++	struct client_state *state = data;
++	if (!state->width) state->width = width;
++	if (!state->height) state->height = height;
++}
++
++static void
++xdg_toplevel_close(void *data, struct xdg_toplevel *xdg_toplevel)
++{
++	fprintf(stderr, AT " %s\n", __func__);
++}
++
++static const struct xdg_toplevel_listener xdg_toplevel_listener = {
++	.configure = xdg_toplevel_configure,
++	.close = xdg_toplevel_close,
++};
++
++static void
++shm_format(void *data, struct wl_shm *wl_shm, uint32_t format)
++{
++	fprintf(stderr, "Possible shmem format: 0x%08x\n", format);
++}
++
++struct wl_shm_listener shm_listener = {
++	shm_format
++};
++
++static void
++global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
++	       const char *interface, uint32_t version)
++{
++	struct client_state *state = data;
++	if (strcmp(interface, wl_compositor_interface.name) == 0) {
++		state->compositor = wl_registry_bind(registry, id, &wl_compositor_interface, 4);
++	} else if (strcmp(interface, wl_shm_interface.name) == 0) {
++		state->shm = wl_registry_bind(registry, id, &wl_shm_interface, 1);
++		wl_shm_add_listener(state->shm, &shm_listener, NULL);
++	} else if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
++		state->xdg_wm_base = wl_registry_bind(registry, id, &xdg_wm_base_interface, 1);
++		xdg_wm_base_add_listener(state->xdg_wm_base, &xdg_wm_base_listener, state);
++	}
++}
++
++static void
++global_registry_remover(void *data, struct wl_registry *registry, uint32_t id)
++{
++    printf("Got a registry losing event for %d\n", id);
++}
++
++static const struct wl_registry_listener registry_listener = {
++	.global = global_registry_handler,
++	.global_remove = global_registry_remover
++};
++
++
++int main(int argc, char **argv)
++{
++	struct client_state state = { 0 };
++	state.display = wl_display_connect(NULL);
++	if (state.display == NULL) {
++		fprintf(stderr, "Can't connect to display\n");
++		exit(1);
++	}
++	printf("connected to display\n");
++
++	state.registry = wl_display_get_registry(state.display);
++	wl_registry_add_listener(state.registry, &registry_listener, &state);
++
++	wl_display_dispatch(state.display);
++	wl_display_roundtrip(state.display);
++
++	if (state.compositor == NULL) {
++		fprintf(stderr, "Can't find compositor\n");
++		exit(1);
++	} else fprintf(stderr, "Found compositor\n");
++
++	state.surface = wl_compositor_create_surface(state.compositor);
++	if (state.surface == NULL) {
++		fprintf(stderr, "Can't create surface\n");
++		exit(1);
++	} else fprintf(stderr, "Created surface\n");
++
++	state.xdg_surface = xdg_wm_base_get_xdg_surface(state.xdg_wm_base, state.surface);
++	state.xdg_toplevel = xdg_surface_get_toplevel(state.xdg_surface);
++	xdg_toplevel_set_title(state.xdg_toplevel, "Framebuffer emulator");
++	xdg_toplevel_set_app_id(state.xdg_toplevel, "org.freedesktop.weston-simple-framebuffer");
++	xdg_toplevel_add_listener(state.xdg_toplevel, &xdg_toplevel_listener, &state);
++	wl_surface_commit(state.surface);
++	xdg_surface_add_listener(state.xdg_surface, &xdg_surface_listener, &state);
++	wl_surface_commit(state.surface);
++
++	while (wl_display_dispatch(state.display) != -1);
++
++	wl_display_disconnect(state.display);
++	printf("disconnected from display\n");
++
++	return 0;
++}
+diff --git a/clients/meson.build b/clients/meson.build
+index ff6246db..60426f01 100644
+--- a/clients/meson.build
++++ b/clients/meson.build
+@@ -99,6 +99,15 @@ simple_clients = [
+ 		'deps': [ 'egl', 'wayland-egl', 'glesv2', 'wayland-cursor' ],
+ 		'options': [ 'renderer-gl' ]
+ 	},
++	{
++		'name': 'framebuffer',
++		'sources': [
++			'framebuffer.c',
++			xdg_shell_client_protocol_h,
++			xdg_shell_protocol_c,
++		],
++		'dep_objs': [ dep_wayland_client, cc.find_library('rt') ]
++	},
+ 	# weston-simple-im is handled specially separately due to install_dir and odd window.h usage
+ 	{
+ 		'name': 'shm',
+diff --git a/meson_options.txt b/meson_options.txt
+index 4e44dcf5..a21fa37b 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -180,7 +180,7 @@ option(
+ option(
+ 	'simple-clients',
+ 	type: 'array',
+-	choices: [ 'all', 'damage', 'im', 'egl', 'shm', 'touch', 'dmabuf-v4l', 'dmabuf-egl' ],
++	choices: [ 'all', 'damage', 'im', 'egl', 'shm', 'touch', 'dmabuf-v4l', 'dmabuf-egl', 'framebuffer' ],
+ 	value: [ 'all' ],
+ 	description: 'Sample clients: simple test programs'
+ )
+-- 
+2.28.0
+
