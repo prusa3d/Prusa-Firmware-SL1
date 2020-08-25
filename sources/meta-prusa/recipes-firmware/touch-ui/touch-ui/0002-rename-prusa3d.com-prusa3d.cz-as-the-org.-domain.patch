@@ -1,0 +1,25 @@
+From faf2509fd9d8b288edccc7413168350560a3a0e2 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 13 Aug 2020 12:23:12 +0200
+Subject: [PATCH] rename prusa3d.com -> prusa3d.cz as the org. domain
+
+---
+ main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/main.cpp b/main.cpp
+index ae5e72e..c251c8f 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
+     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+     QGuiApplication app(argc, argv);
+     app.setOrganizationName("Prusa Research");
+-    app.setOrganizationDomain("prusa3d.com");
++    app.setOrganizationDomain("prusa3d.cz");
+     app.setApplicationName("SL1 Touch UI");
+     
+     QSettings::setPath(QSettings::NativeFormat, QSettings::Scope::SystemScope, "/etc/touch-ui");
+-- 
+2.28.0
+

@@ -3,8 +3,9 @@ SRC_URI = "\
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/3rdparty/qrcode-generator\
 	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://touch-ui.service \
-	file://touch-ui-config.json \
 	file://cz.prusa3d.sl1.Notify1.conf \
+	file://0001-disable-rotation.patch \
+	file://0002-rename-prusa3d.com-prusa3d.cz-as-the-org.-domain.patch \
 "
 
 SRCREV_touch-ui = "f0d1b25102f2da815381e1d68fcc4cd24ba567a3"
@@ -21,6 +22,7 @@ DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtual
 
 RDEPENDS_${PN} += "\
 	bash \
+	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '' ,d)} \
 	qtquickcontrols-qmlplugins \
 	qtquickcontrols2-qmlplugins \
 	qtwebsockets-qmlplugins \
@@ -41,7 +43,6 @@ RDEPENDS_${PN} += "\
 "
 
 FILES_${PN} += "\
-	${datadir}/touch-ui-config.json \
 	${datadir}/dbus-1/system.d/cz.prusa3d.sl1.Notify1.conf \
 "
 
@@ -52,9 +53,6 @@ do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/touch-ui.service ${D}${systemd_system_unitdir}/
 	
-	install -d ${D}/usr/share/
-	install --mode 644 ${WORKDIR}/touch-ui-config.json ${D}${datadir}/
-
 	install -d ${D}/usr/share/dbus-1/system.d
 	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.Notify1.conf ${D}${datadir}/dbus-1/system.d/
 }
