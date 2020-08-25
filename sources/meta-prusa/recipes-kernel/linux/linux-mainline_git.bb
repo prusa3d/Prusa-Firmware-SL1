@@ -33,6 +33,7 @@ SRC_URI="\
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
 	file://1004-prusa-boot-logo.patch \
+	file://1005-a64-increase-mali-frequency.patch \
 	file://defconfig \
 "
 

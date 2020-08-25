@@ -14,19 +14,24 @@ SPL_BINARY ?= "sunxi-spl.bin"
 PREFERRED_VERSION_u-boot = "v2020.01%"
 PREFERRED_VERSION_linux-mainline = "v5.6%"
 
-PREFERRED_PROVIDER_virtual/libgles1 = "mali-blobs"
-PREFERRED_PROVIDER_virtual/libgles2 = "mali-blobs"
-PREFERRED_PROVIDER_virtual/egl = "mali-blobs"
-PREFERRED_PROVIDER_virtual/mesa = "mali-blobs"
-PREFERRED_PROVIDER_virtual/libgbm = "mali-blobs"
+USE_LIMA ?= "1"
+MACHINEOVERRIDES_append = ":gl-${@ 'lima' if d.getVar('USE_LIMA') == '1' else 'mali'}"
 
-KERNEL_MODULE_AUTOLOAD_append = " mali "
+PREFERRED_PROVIDER_virtual/libgles1_gl-mali = "mali-blobs"
+PREFERRED_PROVIDER_virtual/libgles2_gl-mali = "mali-blobs"
+PREFERRED_PROVIDER_virtual/egl_gl-mali = "mali-blobs"
+PREFERRED_PROVIDER_virtual/mesa_gl-mali = "mali-blobs"
+PREFERRED_PROVIDER_virtual/libgbm_gl-mali = "mali-blobs"
+
+KERNEL_MODULE_AUTOLOAD_append_gl-mali = " mali"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
-MACHINE_EXTRA_RDEPENDS += "     \
-        kernel-module-mali      \
-        mali-blobs              \
-"
+MACHINE_EXTRA_RDEPENDS_append_gl-mali = " kernel-module-mali mali-blobs"
+MACHINE_EXTRA_RDEPENDS_append_gl-lima = " kernel-module-lima"
+
+
+PACKAGECONFIG_append_pn-mesa_class-target = " lima kmsro"
+PACKAGECONFIG_remove_pn-mpv_class-target = "opengl"
 
 INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"
