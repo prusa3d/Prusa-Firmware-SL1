@@ -1,0 +1,44 @@
+[Unit]
+Description=Weston, a Wayland compositor, as a system service
+Documentation=man:weston(1) man:weston.ini(5)
+Documentation=http://wayland.freedesktop.org/
+
+# Make sure we are started after logins are permitted.
+After=systemd-user-sessions.service
+
+# If Plymouth is used, we want to start when it is on its way out.
+After=plymouth-quit-wait.service
+
+# D-Bus is necessary for contacting logind. Logind is required.
+Wants=dbus.socket
+After=dbus.socket
+
+# Since we are part of the graphical session, make sure we are started before
+# it is complete.
+Before=graphical.target
+
+# Prevent starting on systems without virtual consoles, Weston requires one
+# for now.
+ConditionPathExists=/dev/tty0
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/weston --modules=systemd-notify.so
+TimeoutStartSec=60
+WatchdogSec=20
+User=root
+PAMName=login
+
+# A virtual terminal is needed.
+TTYPath=/dev/tty2
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+# Fail to start if not controlling the tty.
+StandardInput=tty-fail
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target

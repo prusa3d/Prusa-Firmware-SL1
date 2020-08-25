@@ -9,6 +9,7 @@ inherit packagegroup
 RDEPENDS_packagegroup-prusa-sla = "\
 	sla-edid etc sl1fw touch-ui \
 	sl1fw-api web-ui wifi-config\
-	libva-v4l2-request \
+	libva-v4l2-request weston \
+	weston-framebuffer \
 	"
 
