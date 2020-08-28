@@ -11,3 +11,4 @@ pseudodone
 /*.devsd.*
 /*.bootstrapsd.*
 log.txt.xz
+/vscode-bitbake-build
