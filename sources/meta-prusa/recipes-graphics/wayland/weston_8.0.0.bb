@@ -12,6 +12,8 @@ SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
            file://0001-weston-launch-Provide-a-default-version-that-doesn-t.patch \
            file://0002-added-framebuffer-simple-client.patch \
 	   file://0003-kiosk-shell-Introduce-kiosk-fullscreen-shell-for-des.patch \
+	   file://0004-kiosk-bg-shell.patch \
+	   file://prusa_logo.webp \
 "
 SRC_URI[md5sum] = "53e4810d852df0601d01fd986a5b22b3"
 SRC_URI[sha256sum] = "7518b49b2eaa1c3091f24671bdcc124fd49fc8f1af51161927afa4329c027848"
@@ -31,7 +33,7 @@ WESTON_MAJOR_VERSION = "${@'.'.join(d.getVar('PV').split('.')[0:1])}"
 EXTRA_OEMESON += "-Dbackend-default=drm -Dbackend-rdp=false -Dpipewire=false -Dremoting=false"
 EXTRA_OEMESON_append = " -Dshell-ivi=false -Dshell-fullscreen=false -Dshell-desktop=false -Dshell-kiosk=true"
 
-PACKAGECONFIG ?= "kms egl clients pam systemd"
+PACKAGECONFIG ?= "kms egl clients pam systemd webp"
 
 #
 # Compositor choices
@@ -112,3 +114,8 @@ FILES_${PN} += " \
 	${systemd_system_unitdir}/multi-user.target.wants/graphical.target \
 "
 CONFFILES_${PN} += "${sysconfdir}/xdg/weston/weston.ini"
+
+copy_prusa_logo() {
+	cp ${WORKDIR}/prusa_logo.webp ${S}/data/
+}
+do_unpack[postfuncs] = "copy_prusa_logo"

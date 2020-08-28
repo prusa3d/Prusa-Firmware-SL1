@@ -1,0 +1,423 @@
+From bfa7aaa1a1ecd45bda6a0e16ada112fa391d4841 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 28 Aug 2020 17:13:28 +0200
+Subject: [PATCH] kiosk-bg-shell
+
+---
+ clients/kiosk-bg-shell.c  | 133 ++++++++++++++++++++++++++++++++++++++
+ clients/meson.build       |  12 ++++
+ clients/window.c          |  48 ++++++++++----
+ clients/window.h          |   5 ++
+ data/meson.build          |   1 +
+ kiosk-shell/kiosk-shell.c |  55 ++++++++++++++++
+ kiosk-shell/kiosk-shell.h |  11 ++++
+ 7 files changed, 251 insertions(+), 14 deletions(-)
+ create mode 100644 clients/kiosk-bg-shell.c
+
+diff --git a/clients/kiosk-bg-shell.c b/clients/kiosk-bg-shell.c
+new file mode 100644
+index 00000000..eb062a81
+--- /dev/null
++++ b/clients/kiosk-bg-shell.c
+@@ -0,0 +1,133 @@
++/*
++ * Copyright © 2020 Roman Beránek
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
++ * DEALINGS IN THE SOFTWARE.
++ */
++
++#include "config.h"
++
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <cairo.h>
++#include <errno.h>
++
++#include <linux/input.h>
++#include <wayland-client.h>
++#include <shared/cairo-util.h>
++#include <shared/file-util.h>
++#include "window.h"
++
++#define DEFAULT_BG_IMAGE "prusa_logo.webp"
++
++struct background {
++	struct display *display;
++	struct window *window;
++	struct widget *widget;
++	struct weston_config *config;
++	cairo_surface_t *image;
++};
++
++static void
++draw_image(cairo_surface_t *surface, struct background* bg)
++{
++	struct rectangle allocation;
++	cairo_t *cr = cairo_create(surface);
++	window_get_allocation(bg->window, &allocation);
++	cairo_rectangle(cr, allocation.x, allocation.y,
++			allocation.width, allocation.height);
++
++	cairo_clip(cr);
++	cairo_push_group(cr);
++	cairo_translate(cr, allocation.x, allocation.y);
++
++	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
++	cairo_set_source_rgba(cr, 0, 0, 0, 1);
++	cairo_paint(cr);
++
++	if (bg->image) {
++		cairo_set_source_surface(cr, bg->image, 0, 0);
++		cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
++		cairo_paint(cr);
++	}
++
++	cairo_pop_group_to_source(cr);
++	cairo_paint(cr);
++	cairo_destroy(cr);
++
++	cairo_surface_destroy(surface);
++}
++
++static void
++redraw_handler(struct widget *widget, void *data)
++{
++	struct background *bg = data;
++	cairo_surface_t *surface;
++
++	surface = window_get_surface(bg->window);
++	if (surface == NULL ||
++		cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
++		fprintf(stderr, "failed to create cairo egl surface\n");
++		return;
++	}
++	draw_image(surface, bg);
++	cairo_surface_destroy(surface);
++}
++
++int main(int argc, char *argv[])
++{
++	struct background bg;
++	struct rectangle geometry;
++	struct weston_config_section *s;
++	const char *config_file;
++	char *bg_image;
++
++	config_file = weston_config_get_name_from_env();
++	bg.config = weston_config_parse(config_file);
++	s = weston_config_get_section(bg.config, "shell", NULL, NULL);
++	weston_config_section_get_string(s, "background-image", &bg_image, NULL);
++
++	bg.display = display_create(&argc, argv);
++	if (bg.display == NULL) {
++		fprintf(stderr, "failed to create display: %s\n",
++			strerror(errno));
++		return -1;
++	}
++	bg.window = window_create(bg.display);
++	window_set_app_id(bg.window, "org.freedesktop.kiosk-bg-shell");
++	window_get_toplevel_geometry(bg.window, &geometry);
++
++	bg.widget = window_add_widget(bg.window, &bg);
++	if (!bg_image) {
++		bg_image =
++			file_name_with_datadir(DEFAULT_BG_IMAGE);
++	}
++	bg.image = load_cairo_surface(bg_image);
++
++	widget_set_redraw_handler(bg.widget, redraw_handler);
++
++	display_run(bg.display);
++	widget_destroy(bg.widget);
++	window_destroy(bg.window);
++	display_destroy(bg.display);
++
++	return 0;
++}
+diff --git a/clients/meson.build b/clients/meson.build
+index 449d8916..f13a89e9 100644
+--- a/clients/meson.build
++++ b/clients/meson.build
+@@ -378,3 +378,15 @@ if get_option('shell-ivi')
+ 	)
+ 	env_modmap += 'weston-ivi-shell-user-interface=@0@;'.format(exe_shell_ivi_ui.full_path())
+ endif
++
++if get_option('shell-kiosk')
++	exe_shell_kiosk_bg = executable(
++		'weston-kiosk-bg-shell',
++		'kiosk-bg-shell.c',
++		include_directories: common_inc,
++		dependencies: dep_toytoolkit,
++		install: true,
++		install_dir: get_option('libexecdir')
++	)
++	env_modmap += 'weston-kiosk-bg-shell=@0@;'.format(exe_shell_kiosk_bg.full_path())
++endif
+diff --git a/clients/window.c b/clients/window.c
+index 2bd303ee..35cddb97 100644
+--- a/clients/window.c
++++ b/clients/window.c
+@@ -234,6 +234,7 @@ struct window {
+ 	struct rectangle min_allocation;
+ 	struct rectangle pending_allocation;
+ 	struct rectangle last_geometry;
++	struct rectangle toplevel_geometry;
+ 	int x, y;
+ 	int redraw_inhibited;
+ 	int redraw_needed;
+@@ -4337,6 +4338,7 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
+ 			      struct wl_array *states)
+ {
+ 	struct window *window = data;
++	struct rectangle geometry = {0};
+ 	uint32_t *p;
+ 
+ 	window->maximized = 0;
+@@ -4379,21 +4381,24 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
+ 		}
+ 	}
+ 
+-	if (width > 0 && height > 0) {
+-		/* The width / height params are for window geometry,
+-		 * but window_schedule_resize takes allocation. Add
+-		 * on the shadow margin to get the difference. */
+-		int margin = window_get_shadow_margin(window);
++	if (width <= 0 || height <= 0)
++		return;
+ 
+-		window_schedule_resize(window,
+-				       width + margin * 2,
+-				       height + margin * 2);
+-	} else if (window->saved_allocation.width > 0 &&
+-		   window->saved_allocation.height > 0) {
+-		window_schedule_resize(window,
+-				       window->saved_allocation.width,
+-				       window->saved_allocation.height);
+-	}
++	/* The width / height params are for window geometry,
++	 * but window_schedule_resize takes allocation. Add
++	 * on the shadow margin to get the difference. */
++	int margin = window_get_shadow_margin(window);
++	geometry.x = 0;
++	geometry.y = 0;
++	geometry.width = width + margin * 2;
++	geometry.height = height + margin * 2;
++
++	if (geometry.width == window->toplevel_geometry.width
++	    && geometry.height == window->toplevel_geometry.height)
++		return;
++
++	window->toplevel_geometry = geometry;
++	window_schedule_resize(window, geometry.width, geometry.height);
+ }
+ 
+ static void
+@@ -4497,6 +4502,13 @@ menu_destroy(struct menu *menu)
+ 	free(menu);
+ }
+ 
++void
++window_get_toplevel_geometry(struct window *window,
++			     struct rectangle *geometry)
++{
++	*geometry = window->toplevel_geometry;
++}
++
+ void
+ window_get_allocation(struct window *window,
+ 		      struct rectangle *allocation)
+@@ -4799,6 +4811,14 @@ window_set_locked_pointer_motion_handler(struct window *window,
+ 	window->locked_pointer_motion_handler = handler;
+ }
+ 
++void
++window_set_app_id(struct window *window, const char *app_id)
++{
++	if (!window->xdg_toplevel)
++		return;
++	xdg_toplevel_set_app_id(window->xdg_toplevel, app_id);
++}
++
+ void
+ window_set_title(struct window *window, const char *title)
+ {
+diff --git a/clients/window.h b/clients/window.h
+index c66dd065..8a59e138 100644
+--- a/clients/window.h
++++ b/clients/window.h
+@@ -373,6 +373,8 @@ window_move(struct window *window, struct input *input, uint32_t time);
+ void
+ window_get_allocation(struct window *window, struct rectangle *allocation);
+ void
++window_get_toplevel_geometry(struct window *window, struct rectangle *geometry);
++void
+ window_schedule_redraw(struct window *window);
+ void
+ window_schedule_resize(struct window *window, int width, int height);
+@@ -497,6 +499,9 @@ void
+ window_set_locked_pointer_motion_handler(
+ 	struct window *window, window_locked_pointer_motion_handler_t handler);
+ 
++void
++window_set_app_id(struct window *window, const char *app_id);
++
+ void
+ window_set_title(struct window *window, const char *title);
+ 
+diff --git a/data/meson.build b/data/meson.build
+index 16f172fe..3099abf5 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -15,6 +15,7 @@ install_data(
+ 		'icon_window.png',
+ 		'panel.png',
+ 		'pattern.png',
++		'prusa_logo.webp',
+ 		'random.png',
+ 		'sidebyside.png',
+ 		'sign_close.png',
+diff --git a/kiosk-shell/kiosk-shell.c b/kiosk-shell/kiosk-shell.c
+index ac9c8684..c154131b 100644
+--- a/kiosk-shell/kiosk-shell.c
++++ b/kiosk-shell/kiosk-shell.c
+@@ -35,6 +35,8 @@
+ #include "shared/helpers.h"
+ #include "util.h"
+ 
++#define KIOSK_SHELL_CLIENT "weston-kiosk-bg-shell"
++
+ static struct kiosk_shell_surface *
+ get_kiosk_shell_surface(struct weston_surface *surface)
+ {
+@@ -989,6 +991,48 @@ kiosk_shell_handle_seat_created(struct wl_listener *listener, void *data)
+ 	kiosk_shell_seat_create(seat);
+ }
+ 
++static void
++bg_shell_client_destroy(struct wl_listener *listener, void *data)
++{
++	struct kiosk_shell *shell;
++
++	shell = container_of(listener, struct kiosk_shell,
++			     child.client_destroy_listener);
++
++	wl_list_remove(&shell->child.client_destroy_listener.link);
++	shell->child.client = NULL;
++	/*
++	 * unbind_desktop_shell() will reset shell->child.desktop_shell
++	 * before the respawned process has a chance to create a new
++	 * desktop_shell object, because we are being called from the
++	 * wl_client destructor which destroys all wl_resources before
++	 * returning.
++	 */
++
++}
++
++
++static void
++launch_bg_shell_process(void *data)
++{
++	struct kiosk_shell *shell = data;
++	weston_log("launch_bg_shell_process %s\n", shell->client);
++
++	shell->child.client = weston_client_start(shell->compositor,
++						  shell->client);
++
++	if (!shell->child.client) {
++		weston_log("not able to start %s\n", shell->client);
++		return;
++	}
++	weston_log("Started %s\n", shell->client);
++
++	shell->child.client_destroy_listener.notify =
++		bg_shell_client_destroy;
++	wl_client_add_destroy_listener(shell->child.client,
++				       &shell->child.client_destroy_listener);
++}
++
+ static void
+ kiosk_shell_destroy(struct wl_listener *listener, void *data)
+ {
+@@ -996,6 +1040,12 @@ kiosk_shell_destroy(struct wl_listener *listener, void *data)
+ 		container_of(listener, struct kiosk_shell, destroy_listener);
+ 	struct kiosk_shell_output *shoutput, *tmp;
+ 
++	if (shell->child.client) {
++		/* disable respawn */
++		wl_list_remove(&shell->child.client_destroy_listener.link);
++		wl_client_destroy(shell->child.client);
++	}
++
+ 	wl_list_remove(&shell->destroy_listener.link);
+ 	wl_list_remove(&shell->output_created_listener.link);
+ 	wl_list_remove(&shell->output_resized_listener.link);
+@@ -1018,12 +1068,14 @@ wet_shell_init(struct weston_compositor *ec,
+ 	struct kiosk_shell *shell;
+ 	struct weston_seat *seat;
+ 	struct weston_output *output;
++	struct wl_event_loop *loop;
+ 
+ 	shell = zalloc(sizeof *shell);
+ 	if (shell == NULL)
+ 		return -1;
+ 
+ 	shell->compositor = ec;
++	shell->client = wet_get_libexec_path(KIOSK_SHELL_CLIENT);
+ 
+ 	if (!weston_compositor_add_destroy_listener_once(ec,
+ 							 &shell->destroy_listener,
+@@ -1047,6 +1099,9 @@ wet_shell_init(struct weston_compositor *ec,
+ 	if (!shell->desktop)
+ 		return -1;
+ 
++	loop = wl_display_get_event_loop(ec->wl_display);
++	wl_event_loop_add_idle(loop, launch_bg_shell_process, shell);
++
+ 	wl_list_for_each(seat, &ec->seat_list, link)
+ 		kiosk_shell_seat_create(seat);
+ 	shell->seat_created_listener.notify = kiosk_shell_handle_seat_created;
+diff --git a/kiosk-shell/kiosk-shell.h b/kiosk-shell/kiosk-shell.h
+index 09f5a777..33fcf95b 100644
+--- a/kiosk-shell/kiosk-shell.h
++++ b/kiosk-shell/kiosk-shell.h
+@@ -41,6 +41,17 @@ struct kiosk_shell {
+ 	struct weston_layer normal_layer;
+ 
+ 	struct wl_list output_list;
++
++	struct {
++		struct wl_client *client;
++		struct wl_resource *bg_shell;
++		struct wl_listener client_destroy_listener;
++
++		unsigned deathcount;
++		struct timespec deathstamp;
++	} child;
++
++	char *client;
+ };
+ 
+ struct kiosk_shell_surface {
+-- 
+2.28.0
+
