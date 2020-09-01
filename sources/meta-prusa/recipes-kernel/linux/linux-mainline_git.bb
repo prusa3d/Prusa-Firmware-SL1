@@ -34,6 +34,7 @@ SRC_URI="\
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
 	file://1004-prusa-boot-logo.patch \
 	file://1005-a64-increase-mali-frequency.patch \
+	file://1006-dts-prusa64-sl1-add-reserved-memory-node-for-lima.patch \
 	file://defconfig \
 "
 
