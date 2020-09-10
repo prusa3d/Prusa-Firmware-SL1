@@ -4,11 +4,9 @@ SRC_URI = "\
 	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://touch-ui.service \
 	file://cz.prusa3d.sl1.Notify1.conf \
-	file://0001-disable-rotation.patch \
-	file://0002-rename-prusa3d.com-prusa3d.cz-as-the-org.-domain.patch \
 "
 
-SRCREV_touch-ui = "f0d1b25102f2da815381e1d68fcc4cd24ba567a3"
+SRCREV_touch-ui = "76fd9ffe0305bd3ec8969e318b20f75ca93c7ae6"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 

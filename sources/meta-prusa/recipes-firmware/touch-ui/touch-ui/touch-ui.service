@@ -5,6 +5,7 @@ BindsTo=weston.service
 
 [Service]
 WorkingDirectory=/run/sl1fw
+ConfigurationDirectory=touch-ui
 Environment="HOME=/run/sl1fw"
 Environment="QT_QPA_PLATFORM=wayland"
 Environment="WAYLAND_DISPLAY=wayland-0"
