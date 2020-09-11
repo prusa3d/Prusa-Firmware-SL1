@@ -26,7 +26,6 @@ FILES_${PN} += " \
 	${sysconfdir}/nginx/prusa-auth.conf \
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
-	${sysconfdir}/sl1fw/static_api.key \
 	${sysconfdir}/avahi/services/octoprint.service \
 "
 S = "${WORKDIR}/git"
@@ -38,10 +37,8 @@ USERADD_PARAM_${PN} = " \
 	--user-group www"
 
 do_compile() {
-	KEY=$(python3 -c "import secrets; print(secrets.token_hex(16))")
-	echo -n $KEY > api.key
 	npm install
-	node node_modules/webpack/bin/webpack.js --config ./webpack.config.js --mode production --env.apiKey=$KEY --env.printer=sl1
+	node node_modules/webpack/bin/webpack.js --config ./webpack.config.js --mode production --env.apiKey=developer --env.printer=sl1
 }
 
 do_install_append () {
@@ -56,10 +53,6 @@ do_install_append () {
     install --mode 755 ${WORKDIR}/nginx/error_401.txt ${D}/srv/http/intranet/error_401.txt
 	chmod -R 755 ${D}/srv/http/intranet/
 	chown www:www-data -R ${D}/srv/http/intranet/
-
-    # static api key
-	install -m 755 -d ${D}${sysconfdir}/sl1fw
-	install --mode 755 ${S}/api.key ${D}${sysconfdir}/sl1fw/static_api.key
 
 	# Nginx htdigest configuration
 	install -d ${D}${sysconfdir}/nginx
