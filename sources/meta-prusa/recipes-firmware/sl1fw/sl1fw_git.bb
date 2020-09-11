@@ -4,12 +4,11 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = " \
-	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master \
-	file://0001-sl1fw-set-path-to-weston-framebuffer-s-fb.patch \
+	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;nobranch=1 \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "e711fbd7a7bb9007d31879ff958294195b2fe19f"
+SRCREV_pn-${PN} = "e30d74e5a485aac9001f3145ff044946b5c4e6a0"
 
 PACKAGES = "${PN}-dev ${PN}"
 
