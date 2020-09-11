@@ -1,3 +1,31 @@
+# Version 1.5.0-alpha.4
+
+## Summary (relative to 1.5.0-alpha.3)
+- Touch screen blink removal
+- Screen saver
+- Cancelable log upload/export and FW download
+- Harmonize names for Qt (touch-ui)
+- Prusa errors specified in separate repository
+- RTC tested
+- mount USB read only and remount only when needed
+- Omaha statistics displays OS version instread of UUID
+- Printer summary is exported at the end of the logs
+- UV calibration in only one guide
+- Printer statistics (total print time, resin consumed, ...)
+- Fixed covercheck after resin refill
+- Increase serial port write timeout
+- Exposition display counter
+- Counters of replacements for LED set and expo display
+- Fixed http digest
+- Add mc-fw and other components as submodules
+- wizard API (new unboxing)
+- Exposure objects being pickled (can be used after restart)
+- Various fixes on dbus API
+- Virtual printer moved into folder
+- Scripts for tests
+- Finished page displayed as notification
+- Nemo removal
+
 # Version 1.5.0-alpha.3
 
 ## Summary (relative to 1.5.0-alpha.2)
