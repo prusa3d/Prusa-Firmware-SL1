@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "e711fbd7a7bb9007d31879ff958294195b2fe19f"
+SRCREV_pn-${PN} = "sources/meta-prusa/recipes-firmware/sl1fw/sl1fw_git.bb"
 
 PACKAGES = "${PN}-dev ${PN}"
 
