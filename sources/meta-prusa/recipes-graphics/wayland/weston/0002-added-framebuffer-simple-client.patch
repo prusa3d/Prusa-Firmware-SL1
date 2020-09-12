@@ -4,10 +4,10 @@ Date: Tue, 25 Aug 2020 13:47:24 +0200
 Subject: [PATCH 2/2] added framebuffer simple client
 
 ---
- clients/framebuffer.c | 249 ++++++++++++++++++++++++++++++++++++++++++
+ clients/framebuffer.c | 271 ++++++++++++++++++++++++++++++++++++++++++
  clients/meson.build   |   9 ++
  meson_options.txt     |   2 +-
- 3 files changed, 259 insertions(+), 1 deletion(-)
+ 3 files changed, 281 insertions(+), 1 deletion(-)
  create mode 100644 clients/framebuffer.c
 
 diff --git a/clients/framebuffer.c b/clients/framebuffer.c
@@ -15,7 +15,7 @@ new file mode 100644
 index 00000000..5ef2b1c8
 --- /dev/null
 +++ b/clients/framebuffer.c
-@@ -0,0 +1,249 @@
+@@ -0,0 +1,271 @@
 +#include <errno.h>
 +#include <fcntl.h>
 +#include <stdio.h>
@@ -23,6 +23,7 @@ index 00000000..5ef2b1c8
 +#include <string.h>
 +#include <unistd.h>
 +#include <sys/mman.h>
++#include <sys/inotify.h>
 +#include <sys/stat.h>
 +#include <linux/limits.h>
 +#include <wayland-client.h>
@@ -51,6 +52,7 @@ index 00000000..5ef2b1c8
 +	struct wl_callback *frame_callback;
 +	/* misc */
 +	int fd;
++	int inotify_fd;
 +	void *shm_data;
 +	int width;
 +	int height;
@@ -79,6 +81,26 @@ index 00000000..5ef2b1c8
 +	return -1;
 +}
 +
++int init_inotify()
++{
++	int fd = inotify_init();
++	inotify_add_watch(fd, "/dev/shm/fb", IN_CLOSE_WRITE | IN_MODIFY);
++	return fd;
++}
++
++void wait_for_fb_write(struct client_state *state) {
++	struct inotify_event event = { 0 };
++	uint32_t mask = 0;
++	int length;
++
++	while (mask ^ (IN_CLOSE_WRITE | IN_MODIFY)) {
++		length = read(state->inotify_fd, &event, sizeof(struct inotify_event));
++		mask |= event.mask;
++		fprintf(stderr, "mask: 0x%08x\n", mask);
++		if (length < 0) perror("read");
++	}
++}
++
 +static const struct wl_callback_listener frame_listener;
 +
 +static void
@@ -86,6 +108,8 @@ index 00000000..5ef2b1c8
 +{
 +	struct client_state *state = data;
 +	if (state->frame_callback) wl_callback_destroy(state->frame_callback);
++	wait_for_fb_write(state);
++
 +	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
 +	state->frame_callback = wl_surface_frame(state->surface);
 +	wl_surface_attach(state->surface, state->buffer, 0, 0);
@@ -108,6 +132,7 @@ index 00000000..5ef2b1c8
 +		fprintf(stderr, "creating a buffer file for %d B failed: %m\n", size);
 +		exit(1);
 +	}
++	state->inotify_fd = init_inotify();
 +
 +    	state->shm_data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0);
 +	if (state->shm_data == MAP_FAILED) {
@@ -141,7 +166,6 @@ index 00000000..5ef2b1c8
 +static void
 +xdg_surface_configure(void *data, struct xdg_surface *xdg_surface, uint32_t serial)
 +{
-+	fprintf(stderr, AT "\n");
 +	struct client_state *state = data;
 +	xdg_surface_ack_configure(xdg_surface, serial);
 +
@@ -176,7 +200,6 @@ index 00000000..5ef2b1c8
 +static void
 +xdg_toplevel_close(void *data, struct xdg_toplevel *xdg_toplevel)
 +{
-+	fprintf(stderr, AT " %s\n", __func__);
 +}
 +
 +static const struct xdg_toplevel_listener xdg_toplevel_listener = {
@@ -187,7 +210,6 @@ index 00000000..5ef2b1c8
 +static void
 +shm_format(void *data, struct wl_shm *wl_shm, uint32_t format)
 +{
-+	fprintf(stderr, "Possible shmem format: 0x%08x\n", format);
 +}
 +
 +struct wl_shm_listener shm_listener = {
