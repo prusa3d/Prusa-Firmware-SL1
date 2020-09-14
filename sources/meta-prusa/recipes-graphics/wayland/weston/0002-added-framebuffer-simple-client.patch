@@ -4,18 +4,18 @@ Date: Tue, 25 Aug 2020 13:47:24 +0200
 Subject: [PATCH 2/2] added framebuffer simple client
 
 ---
- clients/framebuffer.c | 271 ++++++++++++++++++++++++++++++++++++++++++
+ clients/framebuffer.c | 312 ++++++++++++++++++++++++++++++++++++++++++
  clients/meson.build   |   9 ++
  meson_options.txt     |   2 +-
- 3 files changed, 281 insertions(+), 1 deletion(-)
+ 3 files changed, 322 insertions(+), 1 deletion(-)
  create mode 100644 clients/framebuffer.c
 
 diff --git a/clients/framebuffer.c b/clients/framebuffer.c
 new file mode 100644
-index 00000000..5ef2b1c8
+index 00000000..dd7e62a
 --- /dev/null
 +++ b/clients/framebuffer.c
-@@ -0,0 +1,271 @@
+@@ -0,0 +1,312 @@
 +#include <errno.h>
 +#include <fcntl.h>
 +#include <stdio.h>
@@ -56,6 +56,9 @@ index 00000000..5ef2b1c8
 +	void *shm_data;
 +	int width;
 +	int height;
++	uint32_t mask;
++	uint32_t time;
++	int inotify_nonblock;
 +};
 +
 +int
@@ -81,9 +84,10 @@ index 00000000..5ef2b1c8
 +	return -1;
 +}
 +
-+int init_inotify()
++int init_inotify(int nonblock)
 +{
-+	int fd = inotify_init();
++	int fd;
++	fd = nonblock ? inotify_init1(IN_NONBLOCK) : inotify_init();
 +	inotify_add_watch(fd, "/dev/shm/fb", IN_CLOSE_WRITE | IN_MODIFY);
 +	return fd;
 +}
@@ -96,9 +100,33 @@ index 00000000..5ef2b1c8
 +	while (mask ^ (IN_CLOSE_WRITE | IN_MODIFY)) {
 +		length = read(state->inotify_fd, &event, sizeof(struct inotify_event));
 +		mask |= event.mask;
-+		fprintf(stderr, "mask: 0x%08x\n", mask);
 +		if (length < 0) perror("read");
 +	}
++}
++
++int fb_needs_update(struct client_state *state)
++{
++	struct inotify_event event = { 0 };
++	int length;
++
++	length = read(state->inotify_fd, &event, sizeof(struct inotify_event));
++	if (length == -1) {
++		if (errno != EWOULDBLOCK) perror("read");
++		return 0;
++	}
++	state->mask |= event.mask;
++	if (state->mask ^ (IN_CLOSE_WRITE | IN_MODIFY)) {
++		state->mask = 0;
++		return 1;
++	}
++	return 0;
++}
++
++static void
++damage_buffer(struct client_state *state)
++{
++	fprintf(stderr, "surface damaged\n");
++	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
 +}
 +
 +static const struct wl_callback_listener frame_listener;
@@ -108,13 +136,20 @@ index 00000000..5ef2b1c8
 +{
 +	struct client_state *state = data;
 +	if (state->frame_callback) wl_callback_destroy(state->frame_callback);
-+	wait_for_fb_write(state);
 +
-+	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
-+	state->frame_callback = wl_surface_frame(state->surface);
++	if (state->inotify_nonblock) {
++		if (fb_needs_update(state) || !state->time)
++			damage_buffer(state);
++	} else {
++		if (state->time) wait_for_fb_write(state);
++		damage_buffer(state);
++	}
++
 +	wl_surface_attach(state->surface, state->buffer, 0, 0);
++	state->frame_callback = wl_surface_frame(state->surface);
 +	wl_callback_add_listener(state->frame_callback, &frame_listener, state);
 +	wl_surface_commit(state->surface);
++	state->time = time;
 +}
 +
 +static const struct wl_callback_listener frame_listener = {
@@ -132,7 +167,7 @@ index 00000000..5ef2b1c8
 +		fprintf(stderr, "creating a buffer file for %d B failed: %m\n", size);
 +		exit(1);
 +	}
-+	state->inotify_fd = init_inotify();
++	state->inotify_fd = init_inotify(state->inotify_nonblock);
 +
 +    	state->shm_data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0);
 +	if (state->shm_data == MAP_FAILED) {
@@ -247,6 +282,12 @@ index 00000000..5ef2b1c8
 +int main(int argc, char **argv)
 +{
 +	struct client_state state = { 0 };
++	while (--argc > 1) {
++		if (!strcmp("--nonblock", argv[argc])) {
++			state.inotify_nonblock = 1;
++			break;
++		}
++	}
 +	state.display = wl_display_connect(NULL);
 +	if (state.display == NULL) {
 +		fprintf(stderr, "Can't connect to display\n");
@@ -322,4 +363,3 @@ index 4e44dcf5..a21fa37b 100644
  )
 -- 
 2.28.0
-
