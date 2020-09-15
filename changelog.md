@@ -1,7 +1,16 @@
-# Varsion 1.4.2
+# Version 1.4.2
 
 ## Summary
-- Fixed UV calibration in case of wavelength mismatch
+- UV calibration algorithm updated
+- Fixed cover check after resin refill
+
+## Detailed description
+
+### UV calibration algorithm updated
+The SL1 LED array has a wavelength of 405 nm, however, some units might have a slight manufacturing tolerance. This doesn't affect the print itself, but in some scenarios, the UV calibration process wouldn’t finish correctly. The calibration algorithm is now updated and this issue fixed.
+
+### Fixed cover check after resin refill
+After resin refilling, the printer should check whether the acrylic lid is closed and if not, inform the user. This feature wasn't always working correctly and is now fixed.
 
 # Version 1.4.1
 
