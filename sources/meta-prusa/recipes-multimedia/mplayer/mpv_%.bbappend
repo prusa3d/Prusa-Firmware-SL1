@@ -1,7 +1,0 @@
-REQUIRED_DISTRO_FEATURES_remove = "x11"
-INSANE_SKIP_${PN} += "file-rdeps"
-DEPENDS_remove = "xsp libxv libxscrnsaver libxinerama virtual/libx11"
-DEPENDS_append = " virtual/egl "
-PACKAGECONFIG = " drm gbm vaapi "
-EXTRA_OECONF_remove = "--disable-gl"
-EXTRA_OECONF_append = " --disable-x11 --enable-egl-drm --enable-vaapi-drm"

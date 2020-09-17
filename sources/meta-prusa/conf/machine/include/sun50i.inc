@@ -31,7 +31,6 @@ MACHINE_EXTRA_RDEPENDS_append_gl-lima = " kernel-module-lima"
 
 
 PACKAGECONFIG_append_pn-mesa_class-target = " lima kmsro"
-PACKAGECONFIG_remove_pn-mpv_class-target = "opengl"
 
 INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"
