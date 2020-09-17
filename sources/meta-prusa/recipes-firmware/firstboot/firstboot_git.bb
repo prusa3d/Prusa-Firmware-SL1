@@ -16,3 +16,6 @@ SYSTEMD_SERVICE_${PN} = "\
 	storetime.service \
 "
 
+do_install_append() {
+	rmdir --ignore-fail-on-non-empty ${D}${datadir}
+}
