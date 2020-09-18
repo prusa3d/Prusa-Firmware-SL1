@@ -41,7 +41,7 @@ FILES_${PN}_remove = "${localstatedir}/sl1fw_api/loggerConfig.json"
 FILES_${PN}-dev = "${localstatedir}/sl1fw_api/loggerConfig.json"
 
 S = "${WORKDIR}/git/prusa_sl1_api"
-inherit setuptools3 useradd
+inherit setuptools3 systemd useradd
 
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM_${PN} = "\
@@ -56,10 +56,7 @@ USERADD_PARAM_${PN} = "\
 GROUPADD_PARAM_${PN} = "--system projects"
 
 do_install_append () {
-
-	# Enable sl1fw_api
-	install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
-	ln -s ${libdir}/systemd/system/sl1fw_api.service ${D}${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw_api.service
-
 	rmdir ${D}/usr/share
 }
+
+SYSTEMD_SERVICE_${PN} = "sl1fw_api.service"
