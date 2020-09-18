@@ -17,7 +17,7 @@ FILES_${PN} = "\
 "
 
 do_install_append () {
-	rm ${D}/opt/tests -rf
+	rm ${D}/opt -rf
 }
 
 
