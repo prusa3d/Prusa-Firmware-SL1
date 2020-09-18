@@ -14,7 +14,7 @@ PACKAGES += "${PN}-serve-package"
 GO_IMPORT = "gitlab.com/prusa3d/${BPN}"
 #GO_INSTALL = "${GO_IMPORT}"
 
-inherit go systemd
+inherit go-mod systemd
 
 FILES_${PN} = "\
 	${bindir}/updater \
