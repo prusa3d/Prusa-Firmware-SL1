@@ -18,3 +18,6 @@ inherit setuptools3 systemd
 
 SYSTEMD_SERVICE_${PN} = "legacy-wifi-importer.service"
 
+do_install_append() {
+	rmdir --ignore-fail-on-non-empty ${D}${datadir}
+}
