@@ -1,0 +1,24 @@
+From cd093e2912ed457f105e088928b74cb54668f7cc Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 1 Sep 2020 22:21:38 +0200
+Subject: [PATCH] add .bin image handler for boot-emmc slots
+
+---
+ src/update_handler.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/update_handler.c b/src/update_handler.c
+index 9265efe..44c50b0 100644
+--- a/src/update_handler.c
++++ b/src/update_handler.c
+@@ -1737,6 +1737,7 @@ RaucUpdatePair updatepairs[] = {
+ 	{"*.squashfs", "ubivol", img_to_ubivol_handler},
+ #if ENABLE_EMMC_BOOT_SUPPORT == 1
+ 	{"*.img", "boot-emmc", img_to_boot_emmc_handler},
++	{"*.bin", "boot-emmc", img_to_boot_emmc_handler},
+ 	{"*", "boot-emmc", NULL},
+ #endif
+ 	{"*.vfat", "boot-mbr-switch", img_to_boot_mbr_switch_handler},
+-- 
+2.28.0
+
