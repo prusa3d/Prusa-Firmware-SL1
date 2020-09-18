@@ -1,0 +1,54 @@
+From 94960a1d77e192a07c0ee782edae67da5e7ab9b0 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Mon, 21 Sep 2020 12:27:16 +0000
+Subject: [PATCH] use target_link_libraries for linking Zlib
+
+---
+ CMakeLists.txt     | 2 +-
+ src/CMakeLists.txt | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1ad6a2c..ba3a6cc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required (VERSION 2.6)
++cmake_minimum_required (VERSION 3.6)
+ project (libubootenv C)
+ 
+ # The version number.
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e86456c..199ab3d 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required (VERSION 2.6)
++cmake_minimum_required (VERSION 3.6)
+ # Sources and private headers
+ SET(libubootenv_SOURCES
+   uboot_env.c
+@@ -11,16 +11,18 @@ SET(include_HEADERS
+ )
+ 
+ include(GNUInstallDirs) # for the CMAKE_INSTALL_LIBDIR variable
++find_package(ZLIB REQUIRED)
+ 
+ add_library(ubootenv SHARED ${libubootenv_SOURCES} ${include_HEADERS})
++target_link_libraries(ubootenv ZLIB::ZLIB)
+ SET_TARGET_PROPERTIES(ubootenv PROPERTIES SOVERSION ${SOVERSION})
+ 
+ ADD_LIBRARY(ubootenv_static STATIC ${libubootenv_SOURCES} ${include_HEADERS})
+ SET_TARGET_PROPERTIES(ubootenv_static PROPERTIES OUTPUT_NAME ubootenv)
+ add_executable(fw_printenv fw_printenv.c)
+ add_executable(fw_setenv fw_setenv.c)
+-target_link_libraries(fw_printenv ubootenv z)
+-target_link_libraries(fw_setenv ubootenv z)
++target_link_libraries(fw_printenv ubootenv)
++target_link_libraries(fw_setenv ubootenv)
+ 
+ install (TARGETS ubootenv ubootenv_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install (FILES libuboot.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+-- 
+2.28.0
+

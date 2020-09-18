@@ -57,10 +57,9 @@ slot-post-install)
 						break
 				fi
 		done
-	fi;
-	if [ "$RAUC_SLOT_CLASS" = "bootloader" ]; then
+
 		echo "Updating u-boot environment"
-		fw_setenv --script ${RAUC_MOUNT_PREFIX}/bundle/setenv.scr
+		fw_setenv --config ${RAUC_SLOT_MOUNT_POINT}/fw_env.config --script ${RAUC_SLOT_MOUNT_POINT}/u-boot-initial-env
 	fi;
 	;;
 *)
