@@ -1,15 +1,20 @@
 [submodule "sources/oe-core"]
 	path = sources/oe-core
 	url = git://git.openembedded.org/openembedded-core
+	branch = dunfell
 [submodule "sources/bitbake"]
 	path = sources/bitbake
 	url = git://git.openembedded.org/bitbake
+	branch = 1.46
 [submodule "sources/meta-openembedded"]
 	path = sources/meta-openembedded
 	url = git://git.openembedded.org/meta-openembedded
+	branch = dunfell
 [submodule "sources/meta-qt5"]
 	path = sources/meta-qt5
 	url = https://github.com/meta-qt5/meta-qt5.git
+	branch = dunfell
 [submodule "sources/meta-rauc"]
 	path = sources/meta-rauc
 	url = https://github.com/rauc/meta-rauc.git
+	branch = dunfell
