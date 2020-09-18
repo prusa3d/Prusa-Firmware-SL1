@@ -25,15 +25,14 @@ inherit meson pkgconfig features_check systemd
 # depends on virtual/egl
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg"
+DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0"
 DEPENDS += "wayland wayland-protocols libinput virtual/egl pango wayland-native"
 
 WESTON_MAJOR_VERSION = "${@'.'.join(d.getVar('PV').split('.')[0:1])}"
 
-EXTRA_OEMESON += "-Dbackend-default=drm -Dbackend-rdp=false -Dpipewire=false -Dremoting=false"
-EXTRA_OEMESON_append = " -Dshell-ivi=false -Dshell-fullscreen=false -Dshell-desktop=false -Dshell-kiosk=true"
+EXTRA_OEMESON += "-Dbackend-default=drm -Dbackend-rdp=false -Dpipewire=false"
 
-PACKAGECONFIG ?= "kms egl clients pam systemd webp"
+PACKAGECONFIG ?= "kms egl clients pam shell-kiosk systemd webp"
 
 #
 # Compositor choices
@@ -70,6 +69,18 @@ PACKAGECONFIG[clients] = "-Dsimple-clients=all -Ddemo-clients=true,-Dsimple-clie
 PACKAGECONFIG[remoting] = "-Dremoting=true,-Dremoting=false,gstreamer-1.0"
 # Weston with PAM support
 PACKAGECONFIG[pam] = "-Dpam=true,-Dpam=false,libpam"
+# Weston with screen-share support
+PACKAGECONFIG[screenshare] = "-Dscreenshare=true,-Dscreenshare=false"
+# Traditional desktop shell
+PACKAGECONFIG[shell-desktop] = "-Dshell-desktop=true,-Dshell-desktop=false"
+# Fullscreen shell
+PACKAGECONFIG[shell-fullscreen] = "-Dshell-fullscreen=true,-Dshell-fullscreen=false"
+# In-Vehicle Infotainment (IVI) shell
+PACKAGECONFIG[shell-ivi] = "-Dshell-ivi=true,-Dshell-ivi=false"
+# Kiosk shell
+PACKAGECONFIG[shell-kiosk] = "-Dshell-kiosk=true,-Dshell-kiosk=false"
+# JPEG image loading support
+PACKAGECONFIG[image-jpeg] = "-Dimage-jpeg=true,-Dimage-jpeg=false, jpeg"
 
 SYSTEMD_PACKAGES = "${PN} ${PN}-framebuffer"
 SYSTEMD_SERVICE_${PN} = "weston.service"
