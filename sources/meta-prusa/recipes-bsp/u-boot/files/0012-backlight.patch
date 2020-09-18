@@ -62,7 +62,7 @@ index a646ea6a3c..550e23d8bc 100644
  #define SUN9I_GPN_R_RSB		3
  
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index d3c442a8ec..72bd3c10d0 100644
+index 587f15b2e4..511459f806 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
 @@ -33,6 +33,7 @@
@@ -73,8 +73,8 @@ index d3c442a8ec..72bd3c10d0 100644
  #include <nand.h>
  #include <net.h>
  #include <spl.h>
-@@ -215,6 +216,16 @@ enum env_location env_get_location(enum env_operation op, int prio)
- static void mmc_pinmux_setup(int sdc);
+@@ -221,6 +222,16 @@ void sunxi_grow_sd(void);
+ static void sunxi_grow_sd(void) {}
  #endif
  
 +static void sunxi_enable_backlight(void)
@@ -90,7 +90,7 @@ index d3c442a8ec..72bd3c10d0 100644
  /* add board specific code here */
  int board_init(void)
  {
-@@ -287,6 +298,8 @@ int board_init(void)
+@@ -293,6 +304,8 @@ int board_init(void)
  #endif
  #endif	/* CONFIG_DM_MMC */
  
@@ -126,7 +126,7 @@ index 8a55e4f461..63b80d7310 100644
  	return 0;
  }
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index bf33a06a14..711d1c776b 100644
+index a97fb566e4..76a176ef30 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
 @@ -485,7 +485,7 @@ extern int soft_i2c_gpio_scl;
@@ -136,8 +136,7 @@ index bf33a06a14..711d1c776b 100644
 -	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin logo.nologo " \
 +	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
  	"vt.global_cursor_default=0 console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
- 	"board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
  
  
 -- 
-2.26.0
+2.28.0

@@ -1,6 +1,7 @@
-From 2febca2b91fd902d3495523569dadb205f44c68b Mon Sep 17 00:00:00 2001
+From bf4e180b65c27f6c6745ca6036b9c41d93e59914 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
-Date: Fri, 12 Apr 2019 17:29:49 +0200
+Date: Fri, 18 Sep 2020 12:26:21 +0000
+Subject: [PATCH 04/12] mmc-legacy-only
 
 ---
  drivers/mmc/sunxi_mmc.c | 4 +++-
@@ -21,3 +22,6 @@ index 9f426661c4..5217bb12e0 100644
  	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
  
  	cfg->f_min = 400000;
+-- 
+2.28.0
+

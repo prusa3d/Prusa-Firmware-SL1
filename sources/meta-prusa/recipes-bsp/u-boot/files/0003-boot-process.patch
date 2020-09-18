@@ -1,6 +1,7 @@
-From ab756f2b24935bda88c458ea98b03af5bb77e43b Mon Sep 17 00:00:00 2001
+From 448db8a9f0cb577b7d435956636192b2b4a8cbd2 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
-Date: Fri, 12 Apr 2019 17:29:49 +0200
+Date: Fri, 18 Sep 2020 12:26:21 +0000
+Subject: [PATCH 03/12] boot-process
 
 ---
  arch/arm/mach-sunxi/board.c    |   1 +
@@ -186,3 +187,6 @@ index 0ef289fd64..b7b3f37445 100644
  	BOOTENV
  
  #else /* ifndef CONFIG_SPL_BUILD */
+-- 
+2.28.0
+

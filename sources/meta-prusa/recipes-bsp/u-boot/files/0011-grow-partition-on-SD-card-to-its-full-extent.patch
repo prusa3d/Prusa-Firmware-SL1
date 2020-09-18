@@ -27,7 +27,7 @@ index c4e13f8c38..ed3553254e 100644
 +obj-$(CONFIG_EFI_PARTITION)	+= grow_sd.o
 +endif
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index a35e803404..181e7261f9 100644
+index 35ea6bef47..587f15b2e4 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
 @@ -215,6 +215,12 @@ enum env_location env_get_location(enum env_operation op, int prio)
@@ -187,5 +187,4 @@ index 0000000000..af9a59c46c
 +	grow_gpt(dev_desc);
 +}
 -- 
-2.27.0
-
+2.28.0
