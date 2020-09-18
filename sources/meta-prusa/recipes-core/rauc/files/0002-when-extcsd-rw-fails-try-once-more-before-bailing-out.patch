@@ -1,5 +1,14 @@
+From 9bf57770c1b58aaf978a9ebd32407ccd7a80ce0d Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 18 Sep 2020 17:44:30 +0000
+Subject: [PATCH 2/3] when extcsd rw fails try once more before bailing out
+
+---
+ src/emmc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
 diff --git a/src/emmc.c b/src/emmc.c
-index 83fec96..7d7c536 100644
+index 0ea464e..84735ce 100644
 --- a/src/emmc.c
 +++ b/src/emmc.c
 @@ -46,6 +46,12 @@ gboolean r_emmc_read_bootpart(const gchar *device, gint *bootpart_active, GError
@@ -15,8 +24,8 @@ index 83fec96..7d7c536 100644
  	if (ret) {
  		g_set_error(error, R_UPDATE_ERROR, R_UPDATE_ERROR_FAILED,
  				"Could not read from extcsd register %d in %s\n",
-@@ -106,6 +112,12 @@ gboolean r_emmc_write_bootpart(const gchar *device, gint bootpart_active, GError
- 		value = 0x10;
+@@ -122,6 +128,12 @@ gboolean r_emmc_write_bootpart(const gchar *device, gint bootpart_active, GError
+ 		value |= 0x10;
  
  	ret = r_emmc_write_extcsd(fd, EXT_CSD_PART_CONFIG, value);
 +	if (ret) {
@@ -28,3 +37,6 @@ index 83fec96..7d7c536 100644
  	if (ret) {
  		g_set_error(error, R_UPDATE_ERROR, R_UPDATE_ERROR_FAILED,
  				"Could not write 0x%02x to extcsd register %d in %s\n",
+-- 
+2.28.0
+
