@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "7518b49b2eaa1c3091f24671bdcc124fd49fc8f1af51161927afa4329c
 
 UPSTREAM_CHECK_URI = "https://wayland.freedesktop.org/releases.html"
 
-inherit meson pkgconfig distro_features_check systemd
+inherit meson pkgconfig features_check systemd
 
 # depends on virtual/egl
 REQUIRED_DISTRO_FEATURES = "opengl"
