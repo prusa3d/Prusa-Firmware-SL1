@@ -11,7 +11,6 @@ KERNEL_IMAGETYPE ?= "Image"
 UBOOT_BINARY ?= "u-boot.itb"
 SPL_BINARY ?= "sunxi-spl.bin"
 
-PREFERRED_VERSION_u-boot = "v2020.01%"
 PREFERRED_VERSION_linux-mainline = "v5.6%"
 
 USE_LIMA ?= "1"
