@@ -8,7 +8,6 @@ IMAGE_INSTALL += "\
 	packagegroup-prusa-devel \
 	packagegroup-prusa-fs \
 	packagegroup-prusa-sla \
-	packagegroup-prusa-framebuffer \
 "
 
 IMAGE_FEATURES += "\
