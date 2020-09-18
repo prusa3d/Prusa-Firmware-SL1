@@ -41,8 +41,6 @@ compose_uboot() {
 do_unpack[prefuncs] += "compose_uboot"
 
 do_bundle() {
-	install -m 644 ${DEPLOY_DIR_IMAGE}/setenv.scr ${BUNDLE_DIR}/
-
 	export OPENSSL_ENGINES=${STAGING_LIBDIR_NATIVE}/engines-1.1
 	export RAUC_PKCS11_MODULE=${RAUC_PKCS11_MODULE}
 	export PKCS11_PROXY_SOCKET=${PKCS11_PROXY_SOCKET}

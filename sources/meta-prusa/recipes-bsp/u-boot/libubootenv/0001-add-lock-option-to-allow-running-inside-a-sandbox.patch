@@ -1,0 +1,122 @@
+From 87a950ffca7d01fade5f4295134c981f805115be Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 18 Sep 2020 22:20:19 +0000
+Subject: [PATCH] add --lock option to allow running inside a sandbox
+
+---
+ src/fw_printenv.c | 15 ++++++++++++---
+ src/libuboot.h    |  2 +-
+ src/uboot_env.c   | 11 +++--------
+ 3 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/src/fw_printenv.c b/src/fw_printenv.c
+index 8b830d5..a8f4891 100644
+--- a/src/fw_printenv.c
++++ b/src/fw_printenv.c
+@@ -20,6 +20,7 @@
+ #define VERSION "0.1"
+ #endif
+ 
++#define PROGRAM_PRINT	"fw_printenv"
+ #define PROGRAM_SET	"fw_setenv"
+ 
+ static struct option long_options[] = {
+@@ -28,6 +29,7 @@ static struct option long_options[] = {
+ 	{"help", no_argument, NULL, 'h'},
+ 	{"config", required_argument, NULL, 'c'},
+ 	{"defenv", required_argument, NULL, 'f'},
++	{"lock", required_argument, NULL, 'l'},
+ 	{"script", required_argument, NULL, 's'},
+ 	{NULL, 0, NULL, 0}
+ };
+@@ -41,6 +43,7 @@ static void usage(char *program, bool setprogram)
+ 		" -h,                              : print this help\n"
+ 		" -c, --config <filename>          : configuration file (old fw_env.config)\n"
+ 		" -f, --defenv <filename>          : default environment if no one found\n"
++		" -l, --lock <node>                : lock node, default: /var/lock\n"
+ 		" -V,                              : print version and exit\n"
+ 	);
+ 	if (!setprogram)
+@@ -55,11 +58,12 @@ static void usage(char *program, bool setprogram)
+ 	
+ int main (int argc, char **argv) {
+ 	struct uboot_ctx *ctx;
+-	char *options = "Vc:f:s:nh";
++	char *options = "Vc:f:l:s:nh";
+ 	char *cfgfname = NULL;
+ 	char *defenvfile = NULL;
+ 	char *scriptfile = NULL;
+-	int c, i;
++	char *lockname = "/var/lock/" PROGRAM_PRINT ".lock";
++	int c, i, n;
+ 	int ret = 0;
+ 	void *tmp;
+ 	const char *name, *value;
+@@ -99,6 +103,11 @@ int main (int argc, char **argv) {
+ 		case 'f':
+ 			defenvfile = strdup(optarg);
+ 			break;
++		case 'l':
++			n = strlen(optarg) + sizeof("/" PROGRAM_PRINT ".lock");
++			lockname = malloc(n);
++			snprintf(lockname, n, "%s/%s.lock", optarg, PROGRAM_PRINT);
++			break;
+ 		case 's':
+ 			scriptfile = strdup(optarg);
+ 			break;
+@@ -124,7 +133,7 @@ int main (int argc, char **argv) {
+ 	if (!defenvfile)
+ 		defenvfile = "/etc/u-boot-initial-env";
+ 
+-	if ((ret = libuboot_open(ctx)) < 0) {
++	if ((ret = libuboot_open(ctx, lockname)) < 0) {
+ 		fprintf(stderr, "Cannot read environment, using default\n");
+ 		if ((ret = libuboot_load_file(ctx, defenvfile)) < 0) {
+ 			fprintf(stderr, "Cannot read default environment from file\n");
+diff --git a/src/libuboot.h b/src/libuboot.h
+index bfcaeb1..0487ccd 100644
+--- a/src/libuboot.h
++++ b/src/libuboot.h
+@@ -96,7 +96,7 @@ void libuboot_exit(struct uboot_ctx *ctx);
+  * @param[in] ctx libuboot context
+  * @return 0 in case of success
+  */
+-int libuboot_open(struct uboot_ctx *ctx);
++int libuboot_open(struct uboot_ctx *ctx, const char* lockname);
+ 
+ /** @brief Release an environment
+  *
+diff --git a/src/uboot_env.c b/src/uboot_env.c
+index c9a900f..b6630ea 100644
+--- a/src/uboot_env.c
++++ b/src/uboot_env.c
+@@ -51,12 +51,7 @@
+ 	    ((tvar) = LIST_NEXT((var), field), 1);			\
+ 	    (var) = (tvar))
+ 
+-/*
+- * The lockfile is the same as defined in U-Boot for
+- * the fw_printenv utilities
+- */
+-static const char *lockname = "/var/lock/fw_printenv.lock";
+-static int libuboot_lock(struct uboot_ctx *ctx)
++static int libuboot_lock(struct uboot_ctx *ctx, const char *lockname)
+ {
+ 	int lockfd = -1;
+ 	lockfd = open(lockname, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+@@ -1457,10 +1452,10 @@ int libuboot_initialize(struct uboot_ctx **out,
+ 	return 0;
+ }
+ 
+-int libuboot_open(struct uboot_ctx *ctx) {
++int libuboot_open(struct uboot_ctx *ctx, const char *lockname) {
+ 	if (!ctx)
+ 		return -EINVAL;
+-	libuboot_lock(ctx);
++	libuboot_lock(ctx, lockname);
+ 
+ 	return libuboot_load(ctx);
+ }
+-- 
+2.28.0
+

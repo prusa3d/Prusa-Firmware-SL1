@@ -17,7 +17,7 @@ WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
 WKS_FILE_DEPENDS = "virtual/bootloader dosfstools-native bmap-tools-native gptfdisk-native"
 WKS_FILE = "sla-bootstrap.wks"
 
-DEPENDS += "u-boot-tools-native"
+DEPENDS += "libubootenv-native u-boot-tools-native"
 
 UBOOT_ENV := "${THISDIR}/files/boot.cmd"
 
@@ -30,7 +30,16 @@ do_rootfs() {
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.root.ext4 ${IMAGE_ROOTFS}/root.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.etc.ext4 ${IMAGE_ROOTFS}/etc.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.factory.ext4 ${IMAGE_ROOTFS}/factory.img
-	install -m 0644 ${DEPLOY_DIR_IMAGE}/uboot.env ${IMAGE_ROOTFS}/uboot.env
+
+	echo "${IMAGE_ROOTFS}/uboot.env 0x0 0x20000" > ${IMAGE_ROOTFS}/setenv.config
+	dd if=/dev/zero of=${IMAGE_ROOTFS}/uboot.env bs=512k count=1
+	fw_setenv \
+		--lock ${IMAGE_ROOTFS} \
+		--config ${IMAGE_ROOTFS}/setenv.config \
+		--defenv ${DEPLOY_DIR_IMAGE}/${UBOOT_INITIAL_ENV} \
+		--script ${DEPLOY_DIR_IMAGE}/${UBOOT_INITIAL_ENV}
+	rm ${IMAGE_ROOTFS}/setenv.config
+	rm ${IMAGE_ROOTFS}/*.lock
 
 	mkimage -C none -A arm -T script -d ${UBOOT_ENV} ${IMAGE_ROOTFS}/boot.scr;
 }
