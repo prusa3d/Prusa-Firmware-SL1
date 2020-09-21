@@ -20,5 +20,3 @@ PACKAGECONFIG[atf] = "BL31=${STAGING_DIR_HOST}/boot/bl31.bin,,arm-trusted-firmwa
 PACKAGECONFIG_append_sun50i = " atf"
 
 EXTRA_OEMAKE_append += " ${PACKAGECONFIG_CONFARGS}"
-
-SPL_BINARY = "spl/sunxi-spl.bin"

@@ -34,7 +34,7 @@ do_bundle[depends] += "u-boot:do_deploy"
 
 compose_uboot() {
 	UBOOT_FILE=${DEPLOY_DIR_IMAGE}/${UBOOT_WITH_SPL}
-	dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARY} of=${UBOOT_FILE} bs=1k
+	dd if=${DEPLOY_DIR_IMAGE}/${SPL_BINARYNAME} of=${UBOOT_FILE} bs=1k
 	dd if=${DEPLOY_DIR_IMAGE}/${UBOOT_BINARY} of=${UBOOT_FILE} bs=1k seek=160
 }
 
