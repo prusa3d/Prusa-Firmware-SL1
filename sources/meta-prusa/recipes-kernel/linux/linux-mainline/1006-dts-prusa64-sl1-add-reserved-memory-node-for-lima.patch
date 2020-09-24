@@ -24,7 +24,7 @@ index 549fa97d106f..541529e2681d 100644
 +		linux,cma {
 +			compatible = "shared-dma-pool";
 +			reusable;
-+			size = <0x4000000>;
++			size = <0x10000000>;
 +			linux,cma-default;
 +		};
 +	};
