@@ -41,6 +41,15 @@ slot-post-install)
 			sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' $NGINX_FILE
 		fi
 
+		if  [ -f "/etc/sl1fw/remoteConfig.toml" ]; then
+			chmod 664 /etc/sl1fw/remoteConfig.toml
+			chgrp remote_config /etc/sl1fw/remoteConfig.toml
+		else
+			touch /etc/sl1fw/remoteConfig.toml
+			chmod 664 /etc/sl1fw/remoteConfig.toml
+			chgrp remote_config /etc/sl1fw/remoteConfig.toml
+		fi
+
 		# Copy update channel override
 		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/
 		cp -av /etc/systemd/system/updater.service.d/channel.conf ${RAUC_SLOT_MOUNT_POINT}/systemd/system/updater.service.d/channel.conf

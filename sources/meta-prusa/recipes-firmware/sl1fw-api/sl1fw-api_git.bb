@@ -44,6 +44,7 @@ S = "${WORKDIR}/git/prusa_sl1_api"
 inherit setuptools3 systemd useradd
 
 USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM_${PN} = "-f --system projects"
 USERADD_PARAM_${PN} = "\
 	--system \
 	--no-create-home \
@@ -53,7 +54,6 @@ USERADD_PARAM_${PN} = "\
 	--user-group \
 	sl1fw_api \
 "
-GROUPADD_PARAM_${PN} = "--system projects"
 
 do_install_append () {
 	rmdir ${D}/usr/share

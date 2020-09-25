@@ -1,4 +1,5 @@
 /build
+/vscode-bitbake-build
 bitbake.lock
 pseudodone
 *.dot
