@@ -1,0 +1,183 @@
+From 728df88e7952714729ac5f301ba9da2ef795598c Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Mon, 5 Oct 2020 10:00:14 +0000
+Subject: [PATCH] framebuffer: emit signal after new frame becomes ready for
+ exposure
+
+---
+ clients/framebuffer.c | 83 ++++++++++++++++++++++++++++++++++++-------
+ clients/meson.build   |  3 +-
+ 2 files changed, 73 insertions(+), 13 deletions(-)
+
+diff --git a/clients/framebuffer.c b/clients/framebuffer.c
+index dd7e62a..2b6bfcd 100644
+--- a/clients/framebuffer.c
++++ b/clients/framebuffer.c
+@@ -4,16 +4,24 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <linux/limits.h>
+ #include <sys/mman.h>
+ #include <sys/inotify.h>
+ #include <sys/stat.h>
+-#include <linux/limits.h>
++
++#include <systemd/sd-bus.h>
++
+ #include <wayland-client.h>
+ #include <wayland-client-protocol.h>
+ #include <wayland-server-protocol.h>
+ 
+ #include "xdg-shell-client-protocol.h"
+ 
++#define DBUS_SERVICE	"cz.prusa3d.framebuffer1"
++#define DBUS_PATH	"/cz/prusa3d/framebuffer1"
++#define DBUS_INTERFACE	DBUS_SERVICE ".Frame"
++#define DBUS_SIGNAL	"Ready"
++
+ #define STRINGIFY(x) #x
+ #define TOSTRING(x) STRINGIFY(x)
+ #define AT __FILE__ ":" TOSTRING(__LINE__)
+@@ -32,6 +40,7 @@ struct client_state {
+ 	struct xdg_toplevel *xdg_toplevel;
+ 	struct wl_buffer *buffer;
+ 	struct wl_callback *frame_callback;
++	struct sd_bus *bus;
+ 	/* misc */
+ 	int fd;
+ 	int inotify_fd;
+@@ -41,10 +50,54 @@ struct client_state {
+ 	uint32_t mask;
+ 	uint32_t time;
+ 	int inotify_nonblock;
++	int pending_emit;
+ };
+ 
+-int
+-os_create_shm_file(off_t size)
++static int open_sd_bus(sd_bus **bus)
++{
++	int r;
++	r = sd_bus_open_system(bus);
++	if (r < 0) {
++		fprintf(stderr, "Failed to connect to system bus: %s\n", strerror(-r));
++		return 1;
++	}
++
++	r = sd_bus_request_name(*bus, DBUS_SERVICE, 0);
++	if (r < 0) {
++		fprintf(stderr, "Failed to acquire service name: %s\n", strerror(-r));
++		return 1;
++	}
++	return 0;
++}
++
++static void emit_ready_signal(struct client_state *state)
++{
++	sd_bus_message *msg;
++	uint64_t cookie;
++	int r;
++
++	state->pending_emit = 0;
++	r = sd_bus_message_new_signal(state->bus, &msg, DBUS_PATH,
++				      DBUS_INTERFACE, DBUS_SIGNAL);
++	if (r < 0) {
++		fprintf(stderr, "Failed to create message for sd_bus: %s\n", strerror(-r));
++		return;
++	}
++
++	r = sd_bus_send(state->bus, msg, &cookie);
++	if (r < 0) {
++		fprintf(stderr, "Failed to emit a signal: %d)", strerror(-r));
++		return;
++	}
++}
++
++static void close_sd_bus(sd_bus *bus)
++{
++	sd_bus_release_name(bus, DBUS_SERVICE);
++	sd_bus_unref(bus);
++}
++
++int os_create_shm_file(off_t size)
+ {
+ 	struct stat sb;
+ 	int fd = shm_open("/fb", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+@@ -109,6 +162,7 @@ damage_buffer(struct client_state *state)
+ {
+ 	fprintf(stderr, "surface damaged\n");
+ 	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
++	state->pending_emit = 1;
+ }
+ 
+ static const struct wl_callback_listener frame_listener;
+@@ -117,15 +171,14 @@ static void
+ redraw(void *data, struct wl_callback *callback, uint32_t time)
+ {
+ 	struct client_state *state = data;
+-	if (state->frame_callback) wl_callback_destroy(state->frame_callback);
+-
+-	if (state->inotify_nonblock) {
+-		if (fb_needs_update(state) || !state->time)
+-			damage_buffer(state);
+-	} else {
+-		if (state->time) wait_for_fb_write(state);
++	if (state->frame_callback)
++		wl_callback_destroy(state->frame_callback);
++	if (state->pending_emit)
++		emit_ready_signal(state);
++	if (!state->inotify_nonblock && state->time)
++		wait_for_fb_write(state);
++	if (!state->inotify_nonblock || !state->time || fb_needs_update(state))
+ 		damage_buffer(state);
+-	}
+ 
+ 	wl_surface_attach(state->surface, state->buffer, 0, 0);
+ 	state->frame_callback = wl_surface_frame(state->surface);
+@@ -260,7 +313,6 @@ static const struct wl_registry_listener registry_listener = {
+ 	.global_remove = global_registry_remover
+ };
+ 
+-
+ int main(int argc, char **argv)
+ {
+ 	struct client_state state = { 0 };
+@@ -270,6 +322,12 @@ int main(int argc, char **argv)
+ 			break;
+ 		}
+ 	}
++
++	if (open_sd_bus(&state.bus)) {
++		fprintf(stderr, "Can't connect to system D-Bus\n");
++		exit(1);
++	}
++
+ 	state.display = wl_display_connect(NULL);
+ 	if (state.display == NULL) {
+ 		fprintf(stderr, "Can't connect to display\n");
+@@ -307,6 +365,7 @@ int main(int argc, char **argv)
+ 
+ 	wl_display_disconnect(state.display);
+ 	printf("disconnected from display\n");
++	close_sd_bus(state.bus);
+ 
+ 	return 0;
+ }
+diff --git a/clients/meson.build b/clients/meson.build
+index f13a89e..2aaa0fa 100644
+--- a/clients/meson.build
++++ b/clients/meson.build
+@@ -106,7 +106,8 @@ simple_clients = [
+ 			xdg_shell_client_protocol_h,
+ 			xdg_shell_protocol_c,
+ 		],
+-		'dep_objs': [ dep_wayland_client, cc.find_library('rt') ]
++		'dep_objs': [ dep_wayland_client, cc.find_library('rt') ],
++		'deps': [ 'libsystemd' ]
+ 	},
+ 	# weston-simple-im is handled specially separately due to install_dir and odd window.h usage
+ 	{
+-- 
+2.28.0
+
