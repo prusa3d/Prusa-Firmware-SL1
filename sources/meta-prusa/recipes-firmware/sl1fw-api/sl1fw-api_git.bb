@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=master"
 
-SRCREV_pn-${PN} = "d42d104d4c1e79c14efbbeb6e0822712361b8051"
+SRCREV_pn-${PN} = "2e097eea5bb8f8e75079987e8b187996c0a7700b"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "sl1fw"
@@ -26,6 +26,7 @@ RDEPENDS_${PN} += " \
 	python3-stringold \
 	python3-typing \
 	python3-xml \
+	python3-streaming-form-data \
 	sl1fw \
 	prusa-errors \
 "
