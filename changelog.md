@@ -1,3 +1,43 @@
+# Version 1.5.0-alpha.5
+
+## Summary (relative to 1.5.0-alpha.4)
+- Yocto updated to Dunfell (LTS)
+- Fix UV calibration boost
+- New a64-fw wizard API
+- New a64-fw uv display counter
+- New a64-fw add statistics
+- New a64-fw store old exposure objects. It may allow reprinting 
+- Overall codebase cleanup
+- Using Lima (gpu driver) instead of mali blob
+- Fixed shallow git fetch
+- Using Wayland compositor (Weston)
+- Prusa connect via Dbus (registration, status reporting and telemetry)
+- Fix web-ui one-click (works only if you are ok "Projects" page. To work everywhere needs refactoring)
+- Fix slicer upload texts (slices displays more descriptive texts on error)
+- Fix web-ui feed me response and project cancel
+- Fix web-ui works properly with both http digest and API key
+- Fix web-ui notifies when printer is busy or uncalibrated
+- New filemanager0 dbus service. It should handle all the files management (for now lists the projects and extracts metadata)
+- New admin API (new admin using dbus API. Now works in parallel with the old one)
+- Fix a64-fw wait for dbus event from Weston. Still some delay before the picture is shown, but should not be a problem for SL1.
+- New a64-fw project format support
+- Fix a64-fw deleting projects, wizard resin volume, uv calibration save statistics
+- New pages handled by touch-ui (finished, time and date pages, advanced settings, )
+- Fix a64-fw cover check while printing
+- New logs upload API
+older projects. Not used now.
+- Fix a64-fw force cover close after resin refill
+- Fix uv calibration only one guide (needs to be fixed in touch-ui)
+- Fix mc-fw as a submodule of a64-fw
+- New mc-fw version 1.0.0 (older MC revisions discontinued)
+- Fix a64-fw turn on the NTP on factory reset
+- Fix touch-ui rotated since we use Weston
+- Fix touch-ui dbus service name
+- New touch-ui advanced settings squash
+- Fix touch-ui high cpu consumption
+- Fix display backlight blink
+- Fix web-ui modal window timeout
+ 
 # Version 1.5.0-alpha.4
 
 ## Summary (relative to 1.5.0-alpha.3)
