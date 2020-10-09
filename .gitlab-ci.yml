@@ -6,6 +6,7 @@ stages:
 
 variables:
   GIT_SUBMODULE_STRATEGY: "normal"
+  GIT_DEPTH: 120
 
 before_script:
   - eval $(ssh-agent -s)
