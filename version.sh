@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Bail on the first occurence of an uncaught error
+set -e
+
 # Run the command relative to this script location
 BASE=$(dirname $0)
 
@@ -26,7 +29,7 @@ esac
 
 (
 	if [ "$COMMITS_FROM_VERSION" = "0" ]; then
-		echo ${VERSION}${DIRTY} 
+		echo ${VERSION}${DIRTY}
 	else
 		echo ${VERSION}${VERSION_SEP}${BRANCH}.${COMMITS_FROM_VERSION}+${SHORT_HASH}${DIRTY}
 	fi
