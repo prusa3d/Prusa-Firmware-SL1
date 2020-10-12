@@ -1,14 +1,14 @@
 SUMMARY = "sl1fw - python firmware part running on a64 board"
 
 LICENSE = "GPLv3+"
-LIC_FILES_CHKSUM = "file://../LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = " \
 	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;branch=master \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "e58125a510af100382ccb615dee6b737b8c785e3"
+SRCREV_pn-${PN} = "d6e0ffce3a4dfe668d68c6bd5a4538591f8020f6"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -62,8 +62,7 @@ FILES_${PN} += "\
 FILES_${PN}_remove = "${sysconfdir}/sl1fw/loggerConfig.json"
 FILES_${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
 
-S="${WORKDIR}/git/firmware"
-INTRANET=""
+S="${WORKDIR}/git"
 
 inherit setuptools3 systemd
 
