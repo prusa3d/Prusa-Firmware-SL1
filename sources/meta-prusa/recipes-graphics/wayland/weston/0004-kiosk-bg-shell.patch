@@ -1,7 +1,7 @@
-From bfa7aaa1a1ecd45bda6a0e16ada112fa391d4841 Mon Sep 17 00:00:00 2001
+From b9d61ced809768a3397c9791607c5dabbada2227 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 28 Aug 2020 17:13:28 +0200
-Subject: [PATCH] kiosk-bg-shell
+Subject: [PATCH 4/4] kiosk-bg-shell
 
 ---
  clients/kiosk-bg-shell.c  | 133 ++++++++++++++++++++++++++++++++++++++
@@ -154,10 +154,10 @@ index 00000000..eb062a81
 +	return 0;
 +}
 diff --git a/clients/meson.build b/clients/meson.build
-index 449d8916..f13a89e9 100644
+index bbebcae1..86ea64d0 100644
 --- a/clients/meson.build
 +++ b/clients/meson.build
-@@ -378,3 +378,15 @@ if get_option('shell-ivi')
+@@ -381,3 +381,15 @@ if get_option('shell-ivi')
  	)
  	env_modmap += 'weston-ivi-shell-user-interface=@0@;'.format(exe_shell_ivi_ui.full_path())
  endif
@@ -297,7 +297,7 @@ index 16f172fe..3099abf5 100644
  		'sidebyside.png',
  		'sign_close.png',
 diff --git a/kiosk-shell/kiosk-shell.c b/kiosk-shell/kiosk-shell.c
-index ac9c8684..c154131b 100644
+index 9d4f8a18..b1023912 100644
 --- a/kiosk-shell/kiosk-shell.c
 +++ b/kiosk-shell/kiosk-shell.c
 @@ -35,6 +35,8 @@
