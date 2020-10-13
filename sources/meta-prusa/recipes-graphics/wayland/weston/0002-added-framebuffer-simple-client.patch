@@ -1,40 +1,51 @@
-From 586ffdadb0621d4c4df7d229ed9f0f4720e519cf Mon Sep 17 00:00:00 2001
+From b44e36aa3766198aa66bb0fd9b9fc278b3fb4dad Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
-Date: Tue, 25 Aug 2020 13:47:24 +0200
-Subject: [PATCH 2/2] added framebuffer simple client
+Date: Tue, 13 Oct 2020 08:34:33 +0200
+Subject: [PATCH 2/4] added framebuffer simple client
 
 ---
- clients/framebuffer.c | 312 ++++++++++++++++++++++++++++++++++++++++++
- clients/meson.build   |   9 ++
+ clients/framebuffer.c | 508 ++++++++++++++++++++++++++++++++++++++++++
+ clients/meson.build   |  12 +
  meson_options.txt     |   2 +-
- 3 files changed, 322 insertions(+), 1 deletion(-)
+ 3 files changed, 521 insertions(+), 1 deletion(-)
  create mode 100644 clients/framebuffer.c
 
 diff --git a/clients/framebuffer.c b/clients/framebuffer.c
 new file mode 100644
-index 00000000..dd7e62a
+index 00000000..86822573
 --- /dev/null
 +++ b/clients/framebuffer.c
-@@ -0,0 +1,312 @@
+@@ -0,0 +1,508 @@
 +#include <errno.h>
 +#include <fcntl.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
 +#include <unistd.h>
++#include <linux/limits.h>
 +#include <sys/mman.h>
 +#include <sys/inotify.h>
 +#include <sys/stat.h>
-+#include <linux/limits.h>
++
++#include <systemd/sd-bus.h>
++
 +#include <wayland-client.h>
 +#include <wayland-client-protocol.h>
 +#include <wayland-server-protocol.h>
 +
++#include "shared/helpers.h"
++#include "shared/timespec-util.h"
++#include "presentation-time-client-protocol.h"
 +#include "xdg-shell-client-protocol.h"
++
++#define DBUS_SERVICE	"cz.prusa3d.framebuffer1"
++#define DBUS_PATH	"/cz/prusa3d/framebuffer1"
++#define DBUS_INTERFACE	DBUS_SERVICE ".Frame"
++#define DBUS_SIGNAL	"Ready"
 +
 +#define STRINGIFY(x) #x
 +#define TOSTRING(x) STRINGIFY(x)
-+#define AT __FILE__ ":" TOSTRING(__LINE__)
++#define AT __FILE__ ":" TOSTRING(__LINE__) " "
 +
 +struct client_state {
 +	/* globals */
@@ -43,6 +54,7 @@ index 00000000..dd7e62a
 +	struct wl_shell *shell;
 +	struct wl_shm *shm;
 +	struct wl_compositor *compositor;
++	struct wp_presentation *presentation;
 +	struct xdg_wm_base *xdg_wm_base;
 +	/* objects */
 +	struct wl_surface *surface;
@@ -50,6 +62,7 @@ index 00000000..dd7e62a
 +	struct xdg_toplevel *xdg_toplevel;
 +	struct wl_buffer *buffer;
 +	struct wl_callback *frame_callback;
++	struct sd_bus *bus;
 +	/* misc */
 +	int fd;
 +	int inotify_fd;
@@ -59,10 +72,59 @@ index 00000000..dd7e62a
 +	uint32_t mask;
 +	uint32_t time;
 +	int inotify_nonblock;
++	int pending_emit;
++	struct timespec commit;
++	struct timespec redraw;
++	struct timespec prev;
++	struct timespec present;
++	clockid_t clk_id;
 +};
 +
-+int
-+os_create_shm_file(off_t size)
++static int open_sd_bus(sd_bus **bus)
++{
++	int r;
++	r = sd_bus_open_system(bus);
++	if (r < 0) {
++		fprintf(stderr, "Failed to connect to system bus: %s\n", strerror(-r));
++		return 1;
++	}
++
++	r = sd_bus_request_name(*bus, DBUS_SERVICE, 0);
++	if (r < 0) {
++		fprintf(stderr, "Failed to acquire service name: %s\n", strerror(-r));
++		return 1;
++	}
++	return 0;
++}
++
++static void emit_ready_signal(struct client_state *state)
++{
++	sd_bus_message *msg;
++	uint64_t cookie;
++	int r;
++
++	state->pending_emit = 0;
++	r = sd_bus_message_new_signal(state->bus, &msg, DBUS_PATH,
++				      DBUS_INTERFACE, DBUS_SIGNAL);
++	if (r < 0) {
++		fprintf(stderr, "Failed to create message for sd_bus: %s\n", strerror(-r));
++		return;
++	}
++
++	r = sd_bus_send(state->bus, msg, &cookie);
++	if (r < 0) {
++		fprintf(stderr, "Failed to emit a signal: %s)", strerror(-r));
++		return;
++	}
++}
++
++static void close_sd_bus(sd_bus *bus)
++{
++	sd_bus_release_name(bus, DBUS_SERVICE);
++	sd_bus_unref(bus);
++}
++
++int os_create_shm_file(off_t size)
 +{
 +	struct stat sb;
 +	int fd = shm_open("/fb", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
@@ -83,6 +145,105 @@ index 00000000..dd7e62a
 +	close(fd);
 +	return -1;
 +}
++
++static void
++feedback_sync_output(void *data,
++		     struct wp_presentation_feedback *presentation_feedback,
++		     struct wl_output *output)
++{
++	/* not interested */
++}
++
++static char *
++pflags_to_str(uint32_t flags, char *str, unsigned len)
++{
++	static const struct {
++		uint32_t flag;
++		char sym;
++	} desc[] = {
++		{ WP_PRESENTATION_FEEDBACK_KIND_VSYNC, 's' },
++		{ WP_PRESENTATION_FEEDBACK_KIND_HW_CLOCK, 'c' },
++		{ WP_PRESENTATION_FEEDBACK_KIND_HW_COMPLETION, 'e' },
++		{ WP_PRESENTATION_FEEDBACK_KIND_ZERO_COPY, 'z' },
++	};
++	unsigned i;
++
++	*str = '\0';
++	if (len < ARRAY_LENGTH(desc) + 1)
++		return str;
++
++	for (i = 0; i < ARRAY_LENGTH(desc); i++)
++		str[i] = (flags & desc[i].flag) ? desc[i].sym : '_';
++	str[ARRAY_LENGTH(desc)] = '\0';
++
++	return str;
++}
++
++static uint32_t
++timespec_to_ms(const struct timespec *ts)
++{
++	return (uint32_t)ts->tv_sec * 1000 + ts->tv_nsec / 1000000;
++}
++
++static long
++timespec_diff_to_usec(const struct timespec *a, const struct timespec *b)
++{
++	time_t secs = a->tv_sec - b->tv_sec;
++	long nsec = a->tv_nsec - b->tv_nsec;
++
++	return secs * 1000000 + nsec / 1000;
++}
++
++static void
++feedback_presented(void *data,
++		   struct wp_presentation_feedback *presentation_feedback,
++		   uint32_t tv_sec_hi,
++		   uint32_t tv_sec_lo,
++		   uint32_t tv_nsec,
++		   uint32_t refresh_nsec,
++		   uint32_t seq_hi,
++		   uint32_t seq_lo,
++		   uint32_t flags)
++{
++	struct client_state *state = data;
++	uint64_t seq = ((uint64_t)seq_hi << 32) + seq_lo;
++	long c2p, r2p;
++	uint32_t pres, prev, p2p;
++	char flagstr[10];
++
++	emit_ready_signal(state);
++
++	timespec_from_proto(&state->present, tv_sec_hi, tv_sec_lo, tv_nsec);
++
++	pres = timespec_to_ms(&state->present);
++	prev = timespec_to_ms(&state->prev);
++	p2p = pres - prev;
++
++	c2p = timespec_diff_to_usec(&state->present, &state->commit);
++	r2p = timespec_diff_to_usec(&state->present, &state->redraw);
++
++	printf("c2p %6ld us, r2p %6ld us, p2p %8u ms, [%s] "
++	       "seq %" PRIu64 "\n", c2p, r2p, p2p,
++	       pflags_to_str(flags, flagstr, sizeof(flagstr)), seq);
++
++	state->prev.tv_nsec = state->present.tv_nsec;
++	state->prev.tv_sec = state->present.tv_sec;
++	wp_presentation_feedback_destroy(presentation_feedback);
++}
++
++static void
++feedback_discarded(void *data,
++		   struct wp_presentation_feedback *presentation_feedback)
++{
++	printf("discarded\n");
++	wp_presentation_feedback_destroy(presentation_feedback);
++}
++
++static const struct wp_presentation_feedback_listener feedback_listener = {
++	feedback_sync_output,
++	feedback_presented,
++	feedback_discarded
++};
 +
 +int init_inotify(int nonblock)
 +{
@@ -115,7 +276,7 @@ index 00000000..dd7e62a
 +		return 0;
 +	}
 +	state->mask |= event.mask;
-+	if (state->mask ^ (IN_CLOSE_WRITE | IN_MODIFY)) {
++	if (!(state->mask ^ (IN_CLOSE_WRITE | IN_MODIFY))) {
 +		state->mask = 0;
 +		return 1;
 +	}
@@ -125,8 +286,17 @@ index 00000000..dd7e62a
 +static void
 +damage_buffer(struct client_state *state)
 +{
-+	fprintf(stderr, "surface damaged\n");
 +	wl_surface_damage(state->surface, 0, 0, state->width, state->height);
++	if (state->inotify_nonblock) {
++		struct wp_presentation_feedback *feedback =
++			wp_presentation_feedback(state->presentation, state->surface);
++		wp_presentation_feedback_add_listener(feedback, &feedback_listener, state);
++		clock_gettime(state->clk_id, &state->commit);
++	} else {
++		state->pending_emit = 1;
++	}
++
++	wl_surface_attach(state->surface, state->buffer, 0, 0);
 +}
 +
 +static const struct wl_callback_listener frame_listener;
@@ -135,17 +305,19 @@ index 00000000..dd7e62a
 +redraw(void *data, struct wl_callback *callback, uint32_t time)
 +{
 +	struct client_state *state = data;
-+	if (state->frame_callback) wl_callback_destroy(state->frame_callback);
-+
-+	if (state->inotify_nonblock) {
-+		if (fb_needs_update(state) || !state->time)
-+			damage_buffer(state);
-+	} else {
-+		if (state->time) wait_for_fb_write(state);
-+		damage_buffer(state);
++	if (state->inotify_nonblock)
++		clock_gettime(state->clk_id, &state->redraw);
++	if (state->frame_callback)
++		wl_callback_destroy(state->frame_callback);
++	if (!state->inotify_nonblock && state->time) {
++		if (state->pending_emit)
++			emit_ready_signal(state);
++		wait_for_fb_write(state);
++		fprintf(stderr, "writing finished\n");
 +	}
++	if (!state->inotify_nonblock || !state->time || fb_needs_update(state))
++		damage_buffer(state);
 +
-+	wl_surface_attach(state->surface, state->buffer, 0, 0);
 +	state->frame_callback = wl_surface_frame(state->surface);
 +	wl_callback_add_listener(state->frame_callback, &frame_listener, state);
 +	wl_surface_commit(state->surface);
@@ -169,7 +341,7 @@ index 00000000..dd7e62a
 +	}
 +	state->inotify_fd = init_inotify(state->inotify_nonblock);
 +
-+    	state->shm_data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0);
++	state->shm_data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, state->fd, 0);
 +	if (state->shm_data == MAP_FAILED) {
 +		fprintf(stderr, "mmap failed: %m\n");
 +		close(state->fd);
@@ -226,7 +398,7 @@ index 00000000..dd7e62a
 +static void
 +xdg_toplevel_configure(void *data, struct xdg_toplevel *xdg_toplevel, int32_t width, int32_t height, struct wl_array *states)
 +{
-+	fprintf(stderr, AT " %s, width = %d, height = %d\n", __func__, width, height);
++	fprintf(stderr, AT "%s, width = %d, height = %d\n", __func__, width, height);
 +	struct client_state *state = data;
 +	if (!state->width) state->width = width;
 +	if (!state->height) state->height = height;
@@ -252,6 +424,20 @@ index 00000000..dd7e62a
 +};
 +
 +static void
++presentation_clock_id(void *data, struct wp_presentation *presentation,
++		      uint32_t clk_id)
++{
++	struct client_state *state = data;
++	state->clk_id = clk_id;
++	clock_gettime(clk_id, &state->prev);
++}
++
++
++static const struct wp_presentation_listener presentation_listener = {
++	presentation_clock_id
++};
++
++static void
 +global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
 +	       const char *interface, uint32_t version)
 +{
@@ -264,6 +450,9 @@ index 00000000..dd7e62a
 +	} else if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
 +		state->xdg_wm_base = wl_registry_bind(registry, id, &xdg_wm_base_interface, 1);
 +		xdg_wm_base_add_listener(state->xdg_wm_base, &xdg_wm_base_listener, state);
++	} else if (strcmp(interface, wp_presentation_interface.name) == 0) {
++		state->presentation = wl_registry_bind(registry, id, &wp_presentation_interface, 1);
++		wp_presentation_add_listener(state->presentation, &presentation_listener, state);
 +	}
 +}
 +
@@ -278,22 +467,28 @@ index 00000000..dd7e62a
 +	.global_remove = global_registry_remover
 +};
 +
-+
 +int main(int argc, char **argv)
 +{
 +	struct client_state state = { 0 };
-+	while (--argc > 1) {
++	while (argc-- > 1) {
 +		if (!strcmp("--nonblock", argv[argc])) {
++			fprintf(stderr, AT "nonblock\n");
 +			state.inotify_nonblock = 1;
 +			break;
 +		}
 +	}
-+	state.display = wl_display_connect(NULL);
-+	if (state.display == NULL) {
-+		fprintf(stderr, "Can't connect to display\n");
++
++	if (open_sd_bus(&state.bus)) {
++		fprintf(stderr, AT "Can't connect to system D-Bus\n");
 +		exit(1);
 +	}
-+	printf("connected to display\n");
++
++	state.display = wl_display_connect(NULL);
++	if (state.display == NULL) {
++		fprintf(stderr, AT "Can't connect to display\n");
++		exit(1);
++	}
++	fprintf(stderr, AT "connected to display\n");
 +
 +	state.registry = wl_display_get_registry(state.display);
 +	wl_registry_add_listener(state.registry, &registry_listener, &state);
@@ -302,15 +497,15 @@ index 00000000..dd7e62a
 +	wl_display_roundtrip(state.display);
 +
 +	if (state.compositor == NULL) {
-+		fprintf(stderr, "Can't find compositor\n");
++		fprintf(stderr, AT "Can't find compositor\n");
 +		exit(1);
-+	} else fprintf(stderr, "Found compositor\n");
++	} else fprintf(stderr, AT "Found compositor\n");
 +
 +	state.surface = wl_compositor_create_surface(state.compositor);
 +	if (state.surface == NULL) {
-+		fprintf(stderr, "Can't create surface\n");
++		fprintf(stderr, AT "Can't create surface\n");
 +		exit(1);
-+	} else fprintf(stderr, "Created surface\n");
++	} else fprintf(stderr, AT "Created surface\n");
 +
 +	state.xdg_surface = xdg_wm_base_get_xdg_surface(state.xdg_wm_base, state.surface);
 +	state.xdg_toplevel = xdg_surface_get_toplevel(state.xdg_surface);
@@ -325,14 +520,15 @@ index 00000000..dd7e62a
 +
 +	wl_display_disconnect(state.display);
 +	printf("disconnected from display\n");
++	close_sd_bus(state.bus);
 +
 +	return 0;
 +}
 diff --git a/clients/meson.build b/clients/meson.build
-index ff6246db..60426f01 100644
+index bdc5d44a..bbebcae1 100644
 --- a/clients/meson.build
 +++ b/clients/meson.build
-@@ -99,6 +99,15 @@ simple_clients = [
+@@ -99,6 +99,18 @@ simple_clients = [
  		'deps': [ 'egl', 'wayland-egl', 'glesv2', 'wayland-cursor' ],
  		'options': [ 'renderer-gl' ]
  	},
@@ -340,19 +536,22 @@ index ff6246db..60426f01 100644
 +		'name': 'framebuffer',
 +		'sources': [
 +			'framebuffer.c',
++			presentation_time_client_protocol_h,
++			presentation_time_protocol_c,
 +			xdg_shell_client_protocol_h,
 +			xdg_shell_protocol_c,
 +		],
-+		'dep_objs': [ dep_wayland_client, cc.find_library('rt') ]
++		'dep_objs': [ dep_wayland_client, cc.find_library('rt') ],
++		'deps': [ 'libsystemd' ]
 +	},
  	# weston-simple-im is handled specially separately due to install_dir and odd window.h usage
  	{
  		'name': 'shm',
 diff --git a/meson_options.txt b/meson_options.txt
-index 4e44dcf5..a21fa37b 100644
+index 73ef2c34..8424a52d 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -180,7 +180,7 @@ option(
+@@ -187,7 +187,7 @@ option(
  option(
  	'simple-clients',
  	type: 'array',
@@ -363,3 +562,4 @@ index 4e44dcf5..a21fa37b 100644
  )
 -- 
 2.28.0
+

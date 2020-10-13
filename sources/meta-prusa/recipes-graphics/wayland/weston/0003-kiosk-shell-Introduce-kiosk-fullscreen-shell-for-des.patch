@@ -1,7 +1,7 @@
-From 6efa5bd2fc8ab25023eafb2c26bd9dad7001c21e Mon Sep 17 00:00:00 2001
+From dc4a8ca2c0a4a5e2236a8dbea0692c679803e0f7 Mon Sep 17 00:00:00 2001
 From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
 Date: Tue, 21 Apr 2020 18:23:37 +0300
-Subject: [PATCH] kiosk-shell: Introduce kiosk/fullscreen shell for desktop
+Subject: [PATCH 3/4] kiosk-shell: Introduce kiosk/fullscreen shell for desktop
  apps
 
 kiosk-shell is fullscreen shell for apps that use the xdg-shell
@@ -464,7 +464,7 @@ index 00000000..bf78384e
 +#endif /* WESTON_KIOSK_SHELL_GRAB_H */
 diff --git a/kiosk-shell/kiosk-shell.c b/kiosk-shell/kiosk-shell.c
 new file mode 100644
-index 00000000..ac9c8684
+index 00000000..9d4f8a18
 --- /dev/null
 +++ b/kiosk-shell/kiosk-shell.c
 @@ -0,0 +1,1071 @@
@@ -1929,10 +1929,10 @@ index 82107e1e..49177d0f 100644
  subdir('pipewire')
  subdir('clients')
 diff --git a/meson_options.txt b/meson_options.txt
-index c862ecc4..af2a24bb 100644
+index 8424a52d..83d69cad 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -124,6 +124,12 @@ option(
+@@ -131,6 +131,12 @@ option(
  	value: true,
  	description: 'Weston shell UI: IVI (automotive)'
  )

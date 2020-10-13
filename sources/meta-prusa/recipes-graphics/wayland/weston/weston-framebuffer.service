@@ -4,7 +4,7 @@ BindsTo=weston.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/weston-simple-framebuffer
+ExecStart=/usr/bin/weston-simple-framebuffer --nonblock
 Environment=WAYLAND_DISPLAY=wayland-0
 Environment=XDG_RUNTIME_DIR=/run/user/0
 User=root

@@ -13,7 +13,6 @@ SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
            file://0002-added-framebuffer-simple-client.patch \
 	   file://0003-kiosk-shell-Introduce-kiosk-fullscreen-shell-for-des.patch \
 	   file://0004-kiosk-bg-shell.patch \
-	   file://0005-framebuffer-emit-signal-after-new-frame-becomes-read.patch \
 	   file://cz.prusa3d.framebuffer1.conf \
 	   file://prusa_logo.webp \
 "
