@@ -4,9 +4,10 @@ After=sl1fw.service weston.service
 BindsTo=weston.service
 
 [Service]
-WorkingDirectory=/run/sl1fw
+RuntimeDirectory=touch-ui
+WorkingDirectory=/run/touch-ui
 ConfigurationDirectory=touch-ui
-Environment="HOME=/run/sl1fw"
+Environment="HOME=/run/touch-ui"
 Environment="QT_QPA_PLATFORM=wayland"
 Environment="WAYLAND_DISPLAY=wayland-0"
 ExecStart=/usr/bin/touch-ui
