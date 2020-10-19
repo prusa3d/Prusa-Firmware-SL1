@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=master"
 
-SRCREV_pn-${PN} = "ee9c2aea0f0fa6d80cbab9f0cffd068022eb5729"
+SRCREV_pn-${PN} = "052f955c9d173f130358546bf8670fda1aa1040d"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "sl1fw"
