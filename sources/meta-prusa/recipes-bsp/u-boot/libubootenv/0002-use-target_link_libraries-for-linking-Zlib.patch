@@ -36,7 +36,7 @@ index e86456c..199ab3d 100644
  
  add_library(ubootenv SHARED ${libubootenv_SOURCES} ${include_HEADERS})
 +target_link_libraries(ubootenv ZLIB::ZLIB)
- SET_TARGET_PROPERTIES(ubootenv PROPERTIES SOVERSION ${SOVERSION})
+ SET_TARGET_PROPERTIES(ubootenv PROPERTIES VERSION ${VERSION} SOVERSION ${SOVERSION})
  
  ADD_LIBRARY(ubootenv_static STATIC ${libubootenv_SOURCES} ${include_HEADERS})
  SET_TARGET_PROPERTIES(ubootenv_static PROPERTIES OUTPUT_NAME ubootenv)
