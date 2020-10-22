@@ -10,6 +10,8 @@
 - Final logs upload url
 - Fixed unknown preprint warning display
 - Fixed a64-fw documentation
+- filemanager refactoring
+- Fixed Remote API without internet
 
 # Version 1.5.0-alpha.5
 
