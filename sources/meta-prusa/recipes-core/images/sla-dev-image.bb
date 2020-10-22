@@ -52,6 +52,7 @@ TOOLCHAIN_HOST_TASK_append = "\
         nativesdk-python3-mmap \
         nativesdk-python3-git \
         nativesdk-python3-pkgutil \
+        nativesdk-python3-pyyaml \
 "
 
 
