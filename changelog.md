@@ -1,3 +1,16 @@
+# Version 1.5.0-alpha.6
+
+## Summary (relative to relative to 1.5.0-alpha.5)
+- Fixed admin based loglevel switching
+- Fixed general pritner failure on broken project open
+- Make a64-fw a DBus service, improve startup stability
+- Fixed http digest enable
+- Refactored a64-fw logs
+- YAML based prusa error codes
+- Final logs upload url
+- Fixed unknown preprint warning display
+- Fixed a64-fw documentation
+
 # Version 1.5.0-alpha.5
 
 ## Summary (relative to 1.5.0-alpha.4)
