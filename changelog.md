@@ -12,6 +12,8 @@
 - Fixed a64-fw documentation
 - filemanager refactoring
 - Fixed Remote API without internet
+- Fixed touch-ui: forgotten references to pages that are no longer instantiated
+- Fixed touch-ui: automatically pushing PageWizard to the stack if printer0.state changes to WIZARD
 
 # Version 1.5.0-alpha.5
 
