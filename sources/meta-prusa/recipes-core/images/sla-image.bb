@@ -20,19 +20,11 @@ IMAGE_LINGUAS = ""
 
 DEPENDS += "systemd-systemctl-native"
 
-rootfs_disable_ssh () {
-	systemctl --root=$D mask sshd.socket
-}
-
-rootfs_disable_serial () {
-	systemctl --root=$D mask serial-getty@ttyS0.service
-}
-
 rootfs_disable_terminal () {
 	systemctl --root=$D mask getty@tty1.service
 }
 
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_ssh ; rootfs_disable_serial ; rootfs_disable_terminal ; "
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_disable_terminal ; "
 
 IMAGEE_NAME_SUFFIX = ""
 
