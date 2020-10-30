@@ -1,6 +1,19 @@
+# Version 1.5.0-alpha.7
+
+## Summary (relative to 1.5.0-alpha.6)
+- Changed set login button property invisible to disable
+- Removed Prusa Connect and filemanager objects
+- Fixed reprint for out of range exposure times
+- Fixed fixing out of range exposure values
+- Fixed project load error handling
+- New factory mode switch support
+- Updated remote services
+- Bump Yocto layers - fixes haveged boot issue
+- touch-ui.service: change WorkingDirectory & HOME to /run/touch-ui
+
 # Version 1.5.0-alpha.6
 
-## Summary (relative to relative to 1.5.0-alpha.5)
+## Summary (relative to 1.5.0-alpha.5)
 - Fixed admin based loglevel switching
 - Fixed general pritner failure on broken project open
 - Make a64-fw a DBus service, improve startup stability
