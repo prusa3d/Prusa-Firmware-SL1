@@ -1,1 +1,2 @@
 enable sshd.socket
+enable serial-getty@ttyS0.service
