@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/prusa3d/Prusa-Connect-Local"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRCREV_pn-${PN} = "c4da04eaa0a70e60d5189cfaa66f980e4840ab77"
+SRCREV_pn-${PN} = "216dcb119108ca4437c0c4cd5c3affe8a543d36f"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Connect-Local.git;protocol=ssh;branch=master \
 	file://avahi/octoprint.service \
