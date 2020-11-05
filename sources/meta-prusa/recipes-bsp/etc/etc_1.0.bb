@@ -9,6 +9,7 @@ SRC_URI = " \
 	file://wpa_supplicant-wlan0.conf	\
 	file://sshd_config	\
 	file://usr-share-factory-defaults.mount \
+	file://backlight.conf			\
 "
 
 CONFFILES = "							\
@@ -30,6 +31,7 @@ FILES_${PN} = "							\
 	${sysconfdir}/ssh/sshd_config	\
 	${systemd_unitdir}/system/usr-share-factory-defaults.mount \
 	${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount \
+	${systemd_system_unitdir}/systemd-backlight@.service.d/override.conf \
 	/usr/share/factory/defaults \
 "
 
@@ -52,6 +54,8 @@ do_install() {
 	install -d ${D}${systemd_unitdir}/system/local-fs.target.wants
 	ln -s ${systemd_unitdir}/system/usr-share-factory-defaults.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/usr-share-factory-defaults.mount
 	install -d ${D}/usr/share/factory/defaults
+	install -d ${D}${systemd_system_unitdir}/systemd-backlight@.service.d
+	install -m 644 ${WORKDIR}/backlight.conf ${D}${systemd_system_unitdir}/systemd-backlight@.service.d/override.conf
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
