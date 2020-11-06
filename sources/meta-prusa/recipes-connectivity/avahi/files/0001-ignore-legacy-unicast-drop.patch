@@ -1,0 +1,12 @@
+diff -Naur a/avahi-core/server.c b/avahi-core/server.c
+--- a/avahi-core/server.c	2017-07-10 12:14:59.107370577 +0200
++++ b/avahi-core/server.c	2020-11-06 11:37:12.949739466 +0100
+@@ -381,7 +381,7 @@
+                 avahi_dns_packet_inc_field(reply, AVAHI_DNS_FIELD_ANCOUNT);
+             else {
+                 char *t = avahi_record_to_string(r);
+-                avahi_log_warn("Record [%s] not fitting in legacy unicast packet, dropping.", t);
++                //avahi_log_warn("Record [%s] not fitting in legacy unicast packet, dropping.", t);
+                 avahi_free(t);
+             }
+ 
