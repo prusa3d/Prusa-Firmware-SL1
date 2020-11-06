@@ -16,14 +16,24 @@ etcfs0_blkoffset=0x302000
 etcfs1_blkoffset=0x312000
 factory_blkoffset=0x322000
 var_blkoffset=0x342000
-rootimg_buf_offset=0x50000000
-bootimg_buf_offset=0x4ff00000
-etcimg_buf_offset=0x4ef00000
-factoryimg_buf_offset=0x4af00000
-#
+
 uuid_gpt_system=b921b045-1df0-41c3-af44-4c6f280d3fae
 uuid_gpt_other=0fc63daf-8483-4772-8e79-3d69d8477de4
 uuid_gpt_environment=bc13c2ff-59e6-4262-a352-b275fd6f7172
+
+# Physical memory area starts at 0x40000000 and is 0x40000000 (1 GB) long.
+# U-boot's reserved memory region is pushed to the end of the area at 0x79f5a900.
+# Factory (64 MB), etc (32 MB), and U-Boot (1 MB) images total in 97 MB of space.
+# Thus, starting at 0x46100000, rootfs image is left with 830 MB.
+
+# Shall it ever require more than that, we have 2 options (that I can think of):
+# a) overwrite the smaller images to get the entire 927 MiB block or,
+# b) flash it 'per partes'
+
+factoryimg_buf_offset=0x40000000
+etcimg_buf_offset=0x44000000
+bootimg_buf_offset=0x46000000
+rootimg_buf_offset=0x46100000
 
 setenv partitions "name=environment,start=512K,size=512K,type=${uuid_gpt_environment};name=rootfs.0,start=4M,size=768M,type=${uuid_gpt_system};name=rootfs.1,start=772M,size=768M,type=${uuid_gpt_system};name=etc.0,start=1540M,size=32M,type=${uuid_gpt_other};name=etc.1,start=1572M,size=32M,type=${uuid_gpt_other};name=var,start=1668M,size=2000M,type=${uuid_gpt_other};name=factory,start=1604M,size=64M,type=${uuid_gpt_other};"
 
