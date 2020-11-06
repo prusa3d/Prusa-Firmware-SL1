@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI += "\
-        file://silence.patch \
+        file://0001-ignore-legacy-unicast-drop.patch \
 "
 
