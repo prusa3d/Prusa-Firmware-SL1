@@ -29,8 +29,8 @@ do_install_append() {
 	install -d ${D}${libdir}/systemd/logind.conf.d
 
 	# No automatic gettty spawn
-	install ${WORKDIR}/logind-no-auto-vt.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-vt.conf
+	install --mode 644 ${WORKDIR}/logind-no-auto-vt.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-vt.conf
 
 	# No poweroff on power button
-	install ${WORKDIR}/logind-no-auto-off.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-off.conf
+	install --mode 644 ${WORKDIR}/logind-no-auto-off.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-off.conf
 }
