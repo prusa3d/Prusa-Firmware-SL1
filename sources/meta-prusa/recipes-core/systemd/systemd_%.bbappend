@@ -3,6 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
 	file://0001-enable-all-sysrq-commands.patch \
 	file://0002-timesyncd-google.patch \
+	file://0003-resolve-implement-Legacy-Unicast-Response.patch \
 	file://0004-send-shdn-cmd-to-mc-during-poweroff.patch \
 	file://journal.conf \
 	file://max_use.conf \
