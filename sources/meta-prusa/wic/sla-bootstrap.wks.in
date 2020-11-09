@@ -15,6 +15,6 @@
 
 part SPL --source rawcopy --sourceparams="file=sunxi-spl.bin" --ondisk mmcblk --no-table --align 128
 part u-boot --source rawcopy --sourceparams="file=u-boot.itb" --ondisk mmcblk --no-table --align 160
-part / --source rootfs --ondisk mmcblk --fstype=vfat --label bootstrap --align 4096
+part / --source rootfs --ondisk mmcblk --fstype=vfat --label bootstrap --part-name "${DISTRO_VERSION}" --align 4096
 
 bootloader --ptable gpt

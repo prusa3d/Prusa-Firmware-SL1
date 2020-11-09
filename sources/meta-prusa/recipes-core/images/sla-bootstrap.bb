@@ -15,7 +15,7 @@ KERNELDEPMODDEPEND = ""
 IMAGE_FSTYPES = "wic wic.bmap"
 WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
 WKS_FILE_DEPENDS = "virtual/bootloader dosfstools-native bmap-tools-native gptfdisk-native"
-WKS_FILE = "sla-bootstrap.wks"
+WKS_FILE = "sla-bootstrap.wks.in"
 
 DEPENDS += "libubootenv-native u-boot-tools-native"
 
