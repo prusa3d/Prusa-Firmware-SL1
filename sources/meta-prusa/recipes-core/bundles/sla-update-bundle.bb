@@ -47,6 +47,7 @@ do_bundle() {
 	export RAUC_PKCS11_PIN=${RAUC_PKCS11_PIN}
 
 	${STAGING_DIR_NATIVE}${bindir}/rauc bundle \
+		--conf= \
 		--debug \
 		--cert=${RAUC_CERT_FILE} \
 		--key=${RAUC_KEY_FILE} \
