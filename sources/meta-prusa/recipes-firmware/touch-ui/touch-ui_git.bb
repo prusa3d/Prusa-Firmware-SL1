@@ -33,11 +33,7 @@ RDEPENDS_${PN} += "\
 	qtgraphicaleffects \
 	nemo-qml-plugin-dbus-qt5 \
 	networkmanager-qt \
-	gstreamer1.0-plugins-base \
-	gstreamer1.0-plugins-good \
-	gstreamer1.0-plugins-bad \
-	gstreamer1.0-plugins-ugly \
-	gstreamer1.0-libav \
+	gstreamer1.0-plugins-bad-modplug \
 "
 
 FILES_${PN} += "\
