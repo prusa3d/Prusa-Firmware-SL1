@@ -31,7 +31,7 @@ do_rootfs() {
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.root.ext4 ${IMAGE_ROOTFS}/root.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.etc.ext4 ${IMAGE_ROOTFS}/etc.img
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/sla-image-${MACHINE}.factory.ext4 ${IMAGE_ROOTFS}/factory.img
-	rm ${IMAGE_ROOTFS}/sla-bootstrap-*
+	rm -f ${IMAGE_ROOTFS}/sla-bootstrap-*
 	touch ${IMAGE_ROOTFS}/sla-bootstrap-${DISTRO_VERSION}
 
 	echo "${IMAGE_ROOTFS}/uboot.env 0x0 0x20000" > ${IMAGE_ROOTFS}/setenv.config
