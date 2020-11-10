@@ -14,7 +14,7 @@ SRC_URI = " \
 
 inherit useradd
 
-DEPENDS += " nodejs nodejs-native python3"
+DEPENDS += " nodejs-native python3"
 RDEPENDS_${PN} += "\
 	nginx \
 	avahi-daemon \
