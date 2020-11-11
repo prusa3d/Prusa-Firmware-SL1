@@ -1,0 +1,115 @@
+The usbmount program effectively only calls StartTransientUnit
+on .systemd1.Manager with the following message as an example:
+
+  Destination=org.freedesktop.systemd1
+  Path=/org/freedesktop/systemd1
+  Interface=org.freedesktop.systemd1.Manager
+  Member=StartTransientUnit
+
+  MESSAGE "ssa(sv)a(sa(sv))" {
+	  STRING "run-media-system-sda1.automount";
+	  STRING "fail";
+	  ARRAY "(sv)" {
+		  STRUCT "sv" {
+			  STRING "After";
+			  VARIANT "as" { ARRAY "s" { STRING "dev-sda1.device"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "BindsTo";
+			  VARIANT "as" { ARRAY "s" { STRING "dev-sda1.device"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "CollectMode";
+			  VARIANT "s" { STRING "inactive-or-failed"; };
+		  };
+		  STRUCT "sv" {
+			  STRING "Wants";
+			  VARIANT "as" { ARRAY "s" { STRING "rmdir-on-exit@run-media-system-sda1.service"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "After";
+			  VARIANT "as" { ARRAY "s" { STRING "rmdir-on-exit@run-media-system-sda1.service"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "Wants";
+			  VARIANT "as" { ARRAY "s" { STRING "mount-notification@run-media-system-sda1.service"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "Before";
+			  VARIANT "as" { ARRAY "s" { STRING "mount-notification@run-media-system-sda1.service"; }; };
+		  };
+		  STRUCT "sv" {
+			  STRING "TimeoutIdleUSec";
+			  VARIANT "t" { UINT64 3000000; };
+		  };
+	  };
+	  ARRAY "(sa(sv))" {
+		  STRUCT "sa(sv)" {
+			  STRING "run-media-system-sda1.mount";
+			  ARRAY "(sv)" {
+				  STRUCT "sv" {
+					  STRING "After";
+					  VARIANT "as" { ARRAY "s" { STRING "dev-sda1.device"; }; };
+				  };
+				  STRUCT "sv" {
+					  STRING "BindsTo";
+					  VARIANT "as" { ARRAY "s" { STRING "dev-sda1.device"; }; };
+				  };
+				  STRUCT "sv" {
+					  STRING "CollectMode";
+					  VARIANT "s" { STRING "inactive-or-failed"; };
+				  };
+				  STRUCT "sv" {
+					  STRING "What";
+					  VARIANT "s" { STRING "/dev/sda1"; };
+				  };
+				  STRUCT "sv" {
+					  STRING "Type";
+					  VARIANT "s" { STRING "vfat"; };
+				  };
+				  STRUCT "sv" {
+					  STRING "Options";
+					  VARIANT "s" { STRING "ro,gid=988,dmask=007,fmask=117,flush"; };
+				  };
+				  STRUCT "sv" {
+					  STRING "Requires";
+					  VARIANT "as" { ARRAY "s" { STRING "systemd-fsck@dev-dev-sda1.service"; }; };
+				  };
+				  STRUCT "sv" {
+					  STRING "After";
+					  VARIANT "as" { ARRAY "s" { STRING "systemd-fsck@dev-dev-sda1.service"; }; };
+				  };
+			  };
+		  };
+	  };
+  };
+
+Which creates these two transient units:
+
+==> /run/systemd/transient/run-media-system-sda1.automount <==
+# This is a transient unit file, created programmatically via the systemd API. Do not edit.
+[Unit]
+Wants=rmdir-on-exit@run-media-system-sdc1.service
+After=rmdir-on-exit@run-media-system-sdc1.service
+Wants=mount-notification@run-media-system-sdc1.service
+Before=mount-notification@run-media-system-sdc1.service
+After=dev-sdc1.device
+BindsTo=dev-sdc1.device
+CollectMode=inactive-or-failed
+
+[Automount]
+TimeoutIdleSec=3s
+
+==> /run/systemd/transient/run-media-system-sda1.mount <==
+# This is a transient unit file, created programmatically via the systemd API. Do not edit.
+[Unit]
+Requires=systemd-fsck@dev-sdc1.service
+After=systemd-fsck@dev-sdc1.service
+After=dev-sdc1.device
+BindsTo=dev-sdc1.device
+CollectMode=inactive-or-failed
+
+[Mount]
+What=/dev/sdc1
+Type=vfat
+Options=ro,gid=1000,dmask=007,fmask=117,flush
