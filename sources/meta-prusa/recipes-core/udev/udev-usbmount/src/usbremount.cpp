@@ -7,8 +7,8 @@
 #include <vector>
 #include <filesystem>
 
-const std::string USB_MOUNT_ROOT_XXX = "/run/media/root/";
-const std::filesystem::path USB_MOUNT_ROOT = std::filesystem::path("/run/media/root");
+const std::string USB_MOUNT_ROOT_XXX = "/run/media/system/";
+const std::filesystem::path USB_MOUNT_ROOT = std::filesystem::path("/run/media/system");
 
 int main(int argc, char **argv) {
 	std::vector<std::string> args(argv, argv + argc);
