@@ -1,0 +1,7 @@
+[Unit]
+PartOf=%i.automount
+
+[Service]
+Type=oneshot
+ExecStop=-/bin/rmdir --verbose %f
+RemainAfterExit=yes
