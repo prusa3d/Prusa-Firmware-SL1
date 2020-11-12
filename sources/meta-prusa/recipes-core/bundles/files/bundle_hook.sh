@@ -35,10 +35,10 @@ slot-post-install)
 
 		# update http digest
 		NGINX_FILE=${RAUC_SLOT_MOUNT_POINT}/nginx/sites-available/sl1fw
-		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/htdigest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
+		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/http_digest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
 			sed -i 's/include\s*\/etc\/nginx/# include \/etc\/nginx/' $NGINX_FILE
 		else
-			sed -i 's/# include\s*\/etc\/nginx/include \/etc\/nginx/' $NGINX_FILE
+			sed -i 's/.*include\s*\/etc\/nginx/\tinclude \/etc\/nginx/' $NGINX_FILE
 		fi
 
 		if  [ -f "/etc/sl1fw/remoteConfig.toml" ]; then
