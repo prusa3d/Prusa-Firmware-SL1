@@ -20,7 +20,7 @@ def check_size_limits(d):
                 (p, actual_size, p.upper(), max_size))
 
 
-python do_populate_mountpoints() {
+fakeroot python do_populate_mountpoints() {
     import logging
     import os
     import shutil
@@ -79,6 +79,7 @@ do_image_root[deptask] = "do_populate_mountpoints do_image"
 do_image_etc[deptask] = "do_populate_mountpoints do_image"
 do_image_factory[deptask] = "do_populate_mountpoints do_image"
 
+do_populate_mountpoints[depends] += "virtual/fakeroot-native:do_populate_sysroot"
 do_populate_mountpoints[deptask] = "do_rootfs"
 
 do_image_root[respect_exclude_path] = "0"
