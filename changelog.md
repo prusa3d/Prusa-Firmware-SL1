@@ -1,3 +1,20 @@
+# Version 1.5.0-alpha.8
+
+## Summary (relative to 1.5.0-alpha.7)
+- fix firstboot service (dependent on machine-id)
+- fix touch-ui can bootup after bootstrap
+- fix bootstrap partition order
+- New ssh, uart handling
+- fix selective silence of avahi logs
+- fix default brightness to 100 %
+- fix exposure time change (isn't this introducing the delay?)
+- new merge setting and advanced settings into one page
+- fix sl1fw.service failed to start due to weston framebuffer not started
+- new exception page redesing
+- fix refresh raucb files on FW update page
+- fix unify design QR code pages
+- new prusa-errors using yaml
+
 # Version 1.5.0-alpha.7
 
 ## Summary (relative to 1.5.0-alpha.6)
