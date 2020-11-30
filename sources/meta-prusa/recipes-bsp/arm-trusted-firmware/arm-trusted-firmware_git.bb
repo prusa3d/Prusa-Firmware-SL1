@@ -11,6 +11,7 @@ SRC_URI = " \
 	file://0002-drivevbus.patch \
 	file://0003-aldo1-regulator.patch \
 	file://0004-set-current-limit.patch \
+	file://0005-dcdc4-eldo2-for-tc358870.patch \
 "
 SRCREV = "9a25f98261c134e3af4c1610c4afc74b01201fa2"
 
