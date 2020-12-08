@@ -24,6 +24,7 @@ SRC_URI="\
 	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
 	file://0002-2K-display-over-TC358870.patch \
 	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
+	file://0004-tc358870-added-DSI-init-sequence-for-RV059FBB.patch \
 	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://0201-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
