@@ -5,8 +5,8 @@ stages:
   - deploy
 
 variables:
-  GIT_SUBMODULE_STRATEGY: "normal"
-  GIT_DEPTH: 120
+  GIT_SUBMODULE_STRATEGY: "recursive"
+  GIT_DEPTH: "120"
 
 before_script:
   - eval $(ssh-agent -s)
@@ -23,10 +23,9 @@ before_script:
   - export BB_ENV_EXTRAWHITE="${BB_ENV_EXTRAWHITE} CI_COMMIT_REF_NAME CI_COMMIT_TAG"
 
 cache:
-  key: build-cache-zeus
+  key: build-cache-dunfell
   paths:
     - build/cache
-    - build/sstate-cache
 
 b:raucb-development:
   stage: build
