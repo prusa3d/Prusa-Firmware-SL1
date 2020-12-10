@@ -1,4 +1,6 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # Install tools required to build the system using bitbake
 RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin
@@ -22,9 +24,9 @@ RUN git clone https://github.com/SUNET/pkcs11-proxy /tmp/pkcs11-proxy && \
 ENV RAUC_PKCS11_MODULE /usr/local/lib/libpkcs11-proxy.so
 
 # Create use that will run the build
-RUN useradd --create-home --user-group appuser
-USER appuser
-WORKDIR /home/appuser/
+RUN useradd --create-home --user-group docker-build-user --uid 1234
+USER docker-build-user
+WORKDIR /home/docker-build-user/
 
 # Setup ssh to trust git server
 RUN mkdir -p .ssh
