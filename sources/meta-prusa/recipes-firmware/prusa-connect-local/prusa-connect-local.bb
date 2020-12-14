@@ -1,7 +1,7 @@
 SUMMARY = "web ui - static web files firmware part running on a64 board" 
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Connect-Local"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV_pn-${PN} = "216dcb119108ca4437c0c4cd5c3affe8a543d36f"
+SRCREV_pn-${PN} = "307ea7c40c1d1cd5f05003fa427f5df4bac56e8a"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Connect-Local.git;protocol=ssh;branch=master \
 	https://raw.githubusercontent.com/jgthms/bulma/master/LICENSE;md5sum=814d77c8b54f22875dfdb6f42417ad45;downloadfilename=LICENSE-bulma \

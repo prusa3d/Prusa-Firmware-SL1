@@ -34,6 +34,7 @@ server {
 	include /etc/nginx/prusa-auth.conf;
 
 	location / {
+		auth_digest off;
 		if (!-e $request_filename){
 			rewrite ^(.*)$ /index.html break;
 		}

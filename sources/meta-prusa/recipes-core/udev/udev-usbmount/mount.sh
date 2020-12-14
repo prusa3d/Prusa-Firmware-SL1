@@ -31,7 +31,7 @@ automount_systemd() {
         MOUNT="$MOUNT -o ro,utf8,gid=$GID,dmask=007,fmask=117,flush"
         ;;
     *)
-        MOUNT="$MOUNT -o ro,gid=$GID,dmask=007,fmask=117"
+        MOUNT="$MOUNT -o ro,dmask=007,fmask=117"
         ;;
     esac
 
@@ -51,7 +51,7 @@ if [ "$ACTION" = "add" ] && [ -n "$DEVNAME" ] && [ -n "$ID_FS_TYPE" ]; then
     # so check the device number too
     if expr $MAJOR "*" 256 + $MINOR != `stat -c %d /`; then
         automount_systemd
-        nohup dbus-send --system --type="method_call" --dest=cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0.add_usb &
+        /usr/bin/busctl --system --expect-reply=no call cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0 add_usb
     fi
 fi
 
@@ -61,5 +61,5 @@ if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [
     mount_point="/run/media/root/${name}"
     $UMOUNT  $mount_point
     test -e "/tmp/.automount-$name" && rmdir $mount_point
-    nohup dbus-send --system --type="method_call" --dest=cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0.remove_usb &
+    /usr/bin/busctl --system --expect-reply=no call cz.prusa3d.sl1.printer0 /cz/prusa3d/sl1/printer0 cz.prusa3d.sl1.printer0 remove_usb
 fi
