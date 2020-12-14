@@ -1,0 +1,20 @@
+diff --git a/setup.py b/setup.py
+index 8528dfd..464f99c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -26,7 +26,6 @@ sys.path.insert(0, 'pywayland')
+ 
+ default_xml_file = '/usr/share/wayland/wayland.xml'
+ 
+-
+ def get_protocol_command(klass):
+     class ProtocolCommand(klass):
+         user_options = [
+@@ -42,6 +41,7 @@ def get_protocol_command(klass):
+             # try to figure out where the main wayland protocols are installed
+             try:
+                 data_dir = pkgconfig('wayland-scanner', 'pkgdatadir')
++                data_dir = os.environ.get("PKG_CONFIG_SYSROOT_DIR", "") + data_dir
+             except subprocess.CalledProcessError:
+                 # silently fallback to the default
+                 self.xml_file = default_xml_file

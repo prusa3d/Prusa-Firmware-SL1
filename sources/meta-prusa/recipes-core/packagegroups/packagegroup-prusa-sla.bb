@@ -11,6 +11,5 @@ RDEPENDS_packagegroup-prusa-sla = "\
 	sl1fw-api wifi-config \
 	prusa-connect-local \
 	libva-v4l2-request weston \
-	weston-framebuffer \
 	"
 

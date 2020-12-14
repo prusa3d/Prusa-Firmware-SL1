@@ -8,12 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
 SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
            file://weston.ini \
            file://weston.service \
-           file://weston-framebuffer.service \
            file://0001-weston-launch-Provide-a-default-version-that-doesn-t.patch \
-           file://0002-added-framebuffer-simple-client.patch \
 	   file://0003-kiosk-shell-Introduce-kiosk-fullscreen-shell-for-des.patch \
 	   file://0004-kiosk-bg-shell.patch \
-	   file://cz.prusa3d.framebuffer1.conf \
 	   file://prusa_logo.webp \
 "
 SRC_URI[md5sum] = "53e4810d852df0601d01fd986a5b22b3"
@@ -83,29 +80,20 @@ PACKAGECONFIG[shell-kiosk] = "-Dshell-kiosk=true,-Dshell-kiosk=false"
 # JPEG image loading support
 PACKAGECONFIG[image-jpeg] = "-Dimage-jpeg=true,-Dimage-jpeg=false, jpeg"
 
-SYSTEMD_PACKAGES = "${PN} ${PN}-framebuffer"
+SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "weston.service"
-SYSTEMD_SERVICE_${PN}-framebuffer = "weston-framebuffer.service"
 
 do_install_append() {
 	# Weston doesn't need the .la files to load modules, so wipe them
 	rm -f ${D}/${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.la
 	install -d ${D}${sysconfdir}/xdg/weston
 	install -m 0644 ${WORKDIR}/weston.ini ${D}${sysconfdir}/xdg/weston/
-	install -d ${D}${systemd_system_unitdir}/graphical.target.wants
 	install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
 	install -m 0644 ${WORKDIR}/weston.service ${D}${systemd_system_unitdir}/
-	install -m 0644 ${WORKDIR}/weston-framebuffer.service ${D}${systemd_system_unitdir}/
-	ln -sf ../weston-framebuffer.service ${D}${systemd_system_unitdir}/graphical.target.wants/
 	ln -sf ../graphical.target ${D}${systemd_system_unitdir}/multi-user.target.wants/
-
-	# D-Bus system.d configure file
-	install -d ${D}${datadir}/dbus-1/system.d
-	install -m 0644 ${WORKDIR}/cz.prusa3d.framebuffer1.conf ${D}${datadir}/dbus-1/system.d/
 }
 
 PACKAGES += "libweston-${WESTON_MAJOR_VERSION} ${PN}-examples"
-PACKAGES_prepend = "${PN}-framebuffer "
 
 FILES_${PN}-dev += "${libdir}/${BPN}/libexec_weston.so"
 FILES_${PN} = "${bindir}/weston ${bindir}/weston-terminal ${bindir}/weston-info ${bindir}/weston-launch ${bindir}/wcap-decode ${libexecdir} ${libdir}/${BPN}/*.so* ${datadir}"
@@ -114,12 +102,6 @@ FILES_libweston-${WESTON_MAJOR_VERSION} = "${libdir}/lib*${SOLIBS} ${libdir}/lib
 SUMMARY_libweston-${WESTON_MAJOR_VERSION} = "Helper library for implementing 'wayland window managers'."
 
 FILES_${PN}-examples = "${bindir}/*"
-FILES_${PN}-framebuffer = " \
-	${bindir}/weston-simple-framebuffer \
-	${systemd_system_unitdir}/weston-framebuffer.service \
-	${systemd_system_unitdir}/graphical.target.wants/weston-framebuffer.service \
-	${datadir}/dbus-1/system.d/cz.prusa3d.framebuffer1.conf \
-"
 
 RDEPENDS_${PN} += "xkeyboard-config"
 RRECOMMENDS_${PN} = "liberation-fonts"
