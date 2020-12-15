@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "9d04baa37d06fd35531cfa990ded1871c12bd468"
+SRCREV_pn-${PN} = "c1cbcd024c4f0ca2a48170c9a58b7f3cb5b1ce72"
 
 PACKAGES = "${PN}-dev ${PN}"
 
