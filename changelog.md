@@ -1,3 +1,28 @@
+# Version 1.5.0-beta.0
+
+## Summary (relative to 1.5.0-alpha.8)
+- default backlight 50 %
+- fixed strings in slicer and web-ui regarding printer security
+- refreshed Dockerfile and gitlab CI scripts (new buildserver in use)
+- fixes in web-ui (oneclick is displayed everywhere, show popup window before start print, fixed texts where to find credentials)
+- add licences for web-ui
+- fix timezone offset in time estimation for web-ui
+- New Errors are used to generate unique Prusa style error screens
+- printer identification in QR codes
+- delete only wifi connections on ethernet (bugfix)
+- Open projects are deleted, but still occupy space (bugfix)
+- improve reliability due to forking of the preloader (bugfix)
+- error codes available in new admin menu
+- Error apge new (hopefully final) design with smartphone icon and red
+- Avoid repeatedly showing Finishewd page
+- Advanced settings merged with settings and deleted (new design)
+- notifications are white
+- finsihed page and new firmware pages are normal pages. Not in top bar
+- do not show notifications on splashscreen
+- touch button behaviour unifications
+- fixed preloader process -> thread
+- fixed saving data into factory partition un uvcalibration
+
 # Version 1.5.0-alpha.8
 
 ## Summary (relative to 1.5.0-alpha.7)
