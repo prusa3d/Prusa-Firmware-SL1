@@ -1,0 +1,38 @@
+From 9de73b4b2a95a07bf8c8db0c0d5ff0b25468e484 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 5 Jan 2021 11:55:58 +0100
+Subject: [PATCH] include edid_bootarg in default env
+
+... for backward compatibility
+---
+ include/configs/sunxi-common.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index 233c15b920..186afdf838 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -486,6 +486,12 @@ extern int soft_i2c_gpio_scl;
+ 	"rootwait panic=10 video=HDMI-A-1:D ${edid_bootarg} vt.global_cursor_default=0 " \
+ 	"console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
+ 
++#define DEFAULT_EDID_BOOTARG \
++	"edid_bootarg=" \
++		"drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin" \
++	"\0" \
++	"panel_det_ready=1" \
++	"\0"
+ 
+ #define BOOTCMD_PRUSA \
+ 	"bootcmd_prusa=" \
+@@ -602,6 +608,7 @@ extern int soft_i2c_gpio_scl;
+ 	BOOTCMD_SUNXI_COMPAT \
+ 	SCAN_DEV_FOR_FDT \
+ 	UPDATE_ACTIVE_ROOTFS_SLOT \
++	DEFAULT_EDID_BOOTARG \
+ 	BOOTCMD_PRUSA \
+ 	BOOTENV
+ 
+-- 
+2.30.0
+
