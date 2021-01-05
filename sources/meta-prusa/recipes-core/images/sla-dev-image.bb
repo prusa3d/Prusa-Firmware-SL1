@@ -57,7 +57,7 @@ TOOLCHAIN_HOST_TASK_append = "\
 
 
 
-DEPENDS += "systemd-systemctl-native coreutils-native"
+DEPENDS += "systemd-systemctl-native coreutils-native u-boot-tools-native"
 
 rootfs_set_api_key () {
 	user=maker
@@ -80,6 +80,12 @@ rootfs_enable_ssh () {
 	systemctl --root=$D enable sshd.socket
 }
 
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_set_api_key ; rootfs_enable_ssh ; "
+UBOOT_DEV_CMD := "${THISDIR}/files/dev.cmd"
+
+rootfs_insert_boot_scr () {
+	mkimage -C none -A arm -T script -d ${UBOOT_DEV_CMD} $D/boot.scr
+}
+
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_set_api_key ; rootfs_enable_ssh ; rootfs_insert_boot_scr ; "
 IMAGE_NAME = "${IMAGE_BASENAME}-${MACHINE}-${DISTRO_VERSION}${IMAGE_VERSION_SUFFIX}"
 
