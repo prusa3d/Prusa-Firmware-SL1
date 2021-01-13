@@ -49,8 +49,8 @@ do_bundle() {
 	${STAGING_DIR_NATIVE}${bindir}/rauc bundle \
 		--conf= \
 		--debug \
-		--cert=${RAUC_CERT_FILE} \
-		--key=${RAUC_KEY_FILE} \
+		--cert="${RAUC_CERT_FILE}" \
+		--key="${RAUC_KEY_FILE}" \
 		${BUNDLE_DIR} \
 		${B}/bundle.raucb
 }
