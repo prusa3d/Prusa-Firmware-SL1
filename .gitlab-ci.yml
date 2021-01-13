@@ -73,8 +73,10 @@ b:raucb-production:
       - $RAUC_PKCS11_PIN
       - $PKCS11_PROXY_SOCKET
       - $RAUC_PKCS11_MODULE
+      - $CERT_VALID_DAYS
 
   script:
+    - ./sign_cert_check.sh
     - source oe-init-build-env
     - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
     - bitbake sla-update-bundle
