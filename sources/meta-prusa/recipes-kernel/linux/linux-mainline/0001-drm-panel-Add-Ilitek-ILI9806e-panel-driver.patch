@@ -1,0 +1,1304 @@
+From cc7d90d30b15a7f135171bf85595e86aa1e7633c Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 30 Aug 2018 04:39:09 +0200
+Subject: [PATCH 1/4] drm/panel: Add Ilitek ILI9806e panel driver
+
+TDO TL040WV27CT3 is a panel built into the Prusa SL1 printer,
+and is based on the Ilitek ILI9806e controller. This panel
+has a 4" IPS LCD screen with 480x800 pixels and 2-lane
+MIPI-DSI interface.
+---
+ drivers/gpu/drm/panel/Kconfig                 |   9 +
+ drivers/gpu/drm/panel/Makefile                |   1 +
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 381 ++++++++++++++++++
+ 3 files changed, 391 insertions(+)
+ create mode 100644 drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+
+diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
+index ae44ac2ec106..b3fddb4691f7 100644
+--- a/drivers/gpu/drm/panel/Kconfig
++++ b/drivers/gpu/drm/panel/Kconfig
+@@ -67,6 +67,15 @@ config DRM_PANEL_ILITEK_IL9322
+ 	  Say Y here if you want to enable support for Ilitek IL9322
+ 	  QVGA (320x240) RGB, YUV and ITU-T BT.656 panels.
+ 
++config DRM_PANEL_ILITEK_ILI9806E
++	tristate "Ilitek ILI9806e-based panels"
++	depends on OF
++	depends on DRM_MIPI_DSI
++	depends on BACKLIGHT_CLASS_DEVICE
++	help
++	  Say Y if you want to enable support for panels based on the
++	  Ilitek ILI9806e controller.
++
+ config DRM_PANEL_ILITEK_ILI9881C
+ 	tristate "Ilitek ILI9881C-based panels"
+ 	depends on OF
+diff --git a/drivers/gpu/drm/panel/Makefile b/drivers/gpu/drm/panel/Makefile
+index 7c4d3c581fd4..05524ebf26b7 100644
+--- a/drivers/gpu/drm/panel/Makefile
++++ b/drivers/gpu/drm/panel/Makefile
+@@ -5,6 +5,7 @@ obj-$(CONFIG_DRM_PANEL_LVDS) += panel-lvds.o
+ obj-$(CONFIG_DRM_PANEL_SIMPLE) += panel-simple.o
+ obj-$(CONFIG_DRM_PANEL_FEIYANG_FY07024DI26A30D) += panel-feiyang-fy07024di26a30d.o
+ obj-$(CONFIG_DRM_PANEL_ILITEK_IL9322) += panel-ilitek-ili9322.o
++obj-$(CONFIG_DRM_PANEL_ILITEK_ILI9806E) += panel-ilitek-ili9806e.o
+ obj-$(CONFIG_DRM_PANEL_ILITEK_ILI9881C) += panel-ilitek-ili9881c.o
+ obj-$(CONFIG_DRM_PANEL_INNOLUX_P079ZCA) += panel-innolux-p079zca.o
+ obj-$(CONFIG_DRM_PANEL_JDI_LT070ME05000) += panel-jdi-lt070me05000.o
+diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+new file mode 100644
+index 000000000000..e503c35645c0
+--- /dev/null
++++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+@@ -0,0 +1,381 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2018, Roman Beranek
++ */
++
++#include <linux/delay.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/errno.h>
++#include <linux/fb.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++#include <linux/gpio/consumer.h>
++#include <linux/regulator/consumer.h>
++
++#include <drm/drm_mipi_dsi.h>
++#include <drm/drm_modes.h>
++#include <drm/drm_panel.h>
++#include <drm/drm_print.h>
++
++#include <video/mipi_display.h>
++
++struct ili9806e {
++	struct drm_panel	panel;
++	struct mipi_dsi_device	*dsi;
++
++	struct regulator	*power_supply;
++	struct gpio_desc	*reset_gpio;
++
++	bool	prepared;
++	bool	enabled;
++};
++
++static inline struct ili9806e *panel_to_i9806e(struct drm_panel *panel)
++{
++	return container_of(panel, struct ili9806e, panel);
++}
++
++#define dcs_write_seq(ctx, cmd, seq...)			\
++({							\
++	static const u8 d[] = { seq };			\
++	mipi_dsi_dcs_write(ctx, cmd, d, ARRAY_SIZE(d));	\
++})
++
++static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
++{
++	u8 seq[] = { 0xff, 0x98, 0x06, 0x04, page };
++	if (page > 7)
++		return -1;
++	return mipi_dsi_dcs_write(ctx->dsi, 0xff, seq, 5);
++}
++
++/*
++ * The panel seems to accept some private DCS commands that map
++ * directly to registers.
++ *
++ * It is organised by page, with each page having its own set of
++ * registers, and the first page looks like it's holding the standard
++ * DCS commands.
++ *
++ * So before any attempt at sending a command or data, we have to be
++ * sure if we're in the right page or not.
++ */
++static int ili9806e_prepare(struct drm_panel *panel)
++{
++	struct ili9806e *ctx = panel_to_i9806e(panel);
++	int ret;
++
++	if (ctx->prepared)
++		return 0;
++
++	/* Power the panel on */
++	ret = regulator_enable(ctx->power_supply);
++	if (ret)
++		return ret;
++	msleep(10);
++
++	/* And reset it */
++	/* Delay times taken from an ILI9806e AN */
++	gpiod_set_value(ctx->reset_gpio, 0);
++	msleep(1);
++	gpiod_set_value(ctx->reset_gpio, 1);
++	msleep(10);
++	gpiod_set_value(ctx->reset_gpio, 0);
++	msleep(120);
++
++	ili9806e_switch_page(ctx, 1);
++	dcs_write_seq(ctx->dsi, 0x08, 0x10); /* Output SDA */
++	dcs_write_seq(ctx->dsi, 0x21, 0x01); /* DE -> ACTIVE_LOW */
++	dcs_write_seq(ctx->dsi, 0x30, 0x02); /* RESCTRL, 480x800 */
++	dcs_write_seq(ctx->dsi, 0x31, 0x02); /* INVTR, 2-dot column inversion */
++	dcs_write_seq(ctx->dsi, 0x40, 0x11); /* PWCTRL1, VDH = 2.5xVCI, VDL = -2.5xVCI */
++	dcs_write_seq(ctx->dsi, 0x41, 0x77); /* PWCTRL2, VDL clamp ->  -5.6V, VDH clamp -> 5.0V */
++	dcs_write_seq(ctx->dsi, 0x42, 0x03); /* PWCTRL3 */
++	dcs_write_seq(ctx->dsi, 0x43, 0x09); /* PWCTRL4 */
++	dcs_write_seq(ctx->dsi, 0x44, 0x07); /* PWCTRL5 */
++	dcs_write_seq(ctx->dsi, 0x50, 0x78); /* PWCTRL9, VREG1OUT ->  4.5V */
++	dcs_write_seq(ctx->dsi, 0x51, 0x78); /* PWCTRL10 VREG2OUT -> -4.5V */
++	dcs_write_seq(ctx->dsi, 0x52, 0x00); /* VMCTRL1 */
++	dcs_write_seq(ctx->dsi, 0x53, 0x54); /* VMCTRL2, VCOM -> -1.8750V */
++	dcs_write_seq(ctx->dsi, 0x60, 0x07); /* SDTI, Source SDT timing adjustment ~1.54 us */
++	dcs_write_seq(ctx->dsi, 0x61, 0x00); /* CRTI, Source CR timing adjustment ~0.88 us */
++	dcs_write_seq(ctx->dsi, 0x62, 0x08); /* EQTI, Source EQ timing adjustment ~1.76 us */
++	dcs_write_seq(ctx->dsi, 0x63, 0x00); /* PCTI, Source PC timing adjustment ~0.88 us */
++
++
++	/* Positive Gamma Control 1-16 */
++	dcs_write_seq(ctx->dsi, 0xa0, 0x00);
++	dcs_write_seq(ctx->dsi, 0xa1, 0x03);
++	dcs_write_seq(ctx->dsi, 0xa2, 0x0a);
++	dcs_write_seq(ctx->dsi, 0xa3, 0x0e);
++	dcs_write_seq(ctx->dsi, 0xa4, 0x09);
++	dcs_write_seq(ctx->dsi, 0xa5, 0x18);
++	dcs_write_seq(ctx->dsi, 0xa6, 0x07);
++	dcs_write_seq(ctx->dsi, 0xa7, 0x08);
++	dcs_write_seq(ctx->dsi, 0xa8, 0x03);
++	dcs_write_seq(ctx->dsi, 0xa9, 0x09);
++	dcs_write_seq(ctx->dsi, 0xaa, 0x04);
++	dcs_write_seq(ctx->dsi, 0xab, 0x03);
++	dcs_write_seq(ctx->dsi, 0xac, 0x08);
++	dcs_write_seq(ctx->dsi, 0xad, 0x36);
++	dcs_write_seq(ctx->dsi, 0xae, 0x31);
++	dcs_write_seq(ctx->dsi, 0xaf, 0x00);
++
++	/* Negative Gamma Control 1-16 */
++	dcs_write_seq(ctx->dsi, 0xc0, 0x00);
++	dcs_write_seq(ctx->dsi, 0xc1, 0x02);
++	dcs_write_seq(ctx->dsi, 0xc2, 0x07);
++	dcs_write_seq(ctx->dsi, 0xc3, 0x0d);
++	dcs_write_seq(ctx->dsi, 0xc4, 0x05);
++	dcs_write_seq(ctx->dsi, 0xc5, 0x12);
++	dcs_write_seq(ctx->dsi, 0xc6, 0x09);
++	dcs_write_seq(ctx->dsi, 0xc7, 0x08);
++	dcs_write_seq(ctx->dsi, 0xc8, 0x03);
++	dcs_write_seq(ctx->dsi, 0xc9, 0x06);
++	dcs_write_seq(ctx->dsi, 0xca, 0x09);
++	dcs_write_seq(ctx->dsi, 0xcb, 0x03);
++	dcs_write_seq(ctx->dsi, 0xcc, 0x0d);
++	dcs_write_seq(ctx->dsi, 0xcd, 0x29);
++	dcs_write_seq(ctx->dsi, 0xce, 0x22);
++	dcs_write_seq(ctx->dsi, 0xcf, 0x00);
++
++	/* GIP Setting */
++	ili9806e_switch_page(ctx, 6);
++	dcs_write_seq(ctx->dsi, 0x00, 0x21);
++	dcs_write_seq(ctx->dsi, 0x01, 0x0a);
++	dcs_write_seq(ctx->dsi, 0x02, 0x00);
++	dcs_write_seq(ctx->dsi, 0x03, 0x00);
++	dcs_write_seq(ctx->dsi, 0x04, 0x01);
++	dcs_write_seq(ctx->dsi, 0x05, 0x01);
++	dcs_write_seq(ctx->dsi, 0x06, 0x80);
++	dcs_write_seq(ctx->dsi, 0x07, 0x06);
++	dcs_write_seq(ctx->dsi, 0x08, 0x01);
++	dcs_write_seq(ctx->dsi, 0x09, 0x80);
++	dcs_write_seq(ctx->dsi, 0x0a, 0x00);
++	dcs_write_seq(ctx->dsi, 0x0b, 0x00);
++	dcs_write_seq(ctx->dsi, 0x0c, 0x0a);
++	dcs_write_seq(ctx->dsi, 0x0d, 0x0a);
++	dcs_write_seq(ctx->dsi, 0x0e, 0x00);
++	dcs_write_seq(ctx->dsi, 0x0f, 0x00);
++	dcs_write_seq(ctx->dsi, 0x10, 0xf0);
++	dcs_write_seq(ctx->dsi, 0x11, 0xf4);
++	dcs_write_seq(ctx->dsi, 0x12, 0x04);
++	dcs_write_seq(ctx->dsi, 0x13, 0x00);
++	dcs_write_seq(ctx->dsi, 0x14, 0x00);
++	dcs_write_seq(ctx->dsi, 0x15, 0xc0);
++	dcs_write_seq(ctx->dsi, 0x16, 0x08);
++	dcs_write_seq(ctx->dsi, 0x17, 0x00);
++	dcs_write_seq(ctx->dsi, 0x18, 0x00);
++	dcs_write_seq(ctx->dsi, 0x19, 0x00);
++	dcs_write_seq(ctx->dsi, 0x1a, 0x00);
++	dcs_write_seq(ctx->dsi, 0x1b, 0x00);
++	dcs_write_seq(ctx->dsi, 0x1c, 0x00);
++	dcs_write_seq(ctx->dsi, 0x1d, 0x00);
++	dcs_write_seq(ctx->dsi, 0x20, 0x01);
++	dcs_write_seq(ctx->dsi, 0x21, 0x23);
++	dcs_write_seq(ctx->dsi, 0x22, 0x45);
++	dcs_write_seq(ctx->dsi, 0x23, 0x67);
++	dcs_write_seq(ctx->dsi, 0x24, 0x01);
++	dcs_write_seq(ctx->dsi, 0x25, 0x23);
++	dcs_write_seq(ctx->dsi, 0x26, 0x45);
++	dcs_write_seq(ctx->dsi, 0x27, 0x67);
++	dcs_write_seq(ctx->dsi, 0x30, 0x01);
++	dcs_write_seq(ctx->dsi, 0x31, 0x11);
++	dcs_write_seq(ctx->dsi, 0x32, 0x00);
++	dcs_write_seq(ctx->dsi, 0x33, 0xee);
++	dcs_write_seq(ctx->dsi, 0x34, 0xff);
++	dcs_write_seq(ctx->dsi, 0x35, 0xbb);
++	dcs_write_seq(ctx->dsi, 0x36, 0xca);
++	dcs_write_seq(ctx->dsi, 0x37, 0xdd);
++	dcs_write_seq(ctx->dsi, 0x38, 0xac);
++	dcs_write_seq(ctx->dsi, 0x39, 0x76);
++	dcs_write_seq(ctx->dsi, 0x3a, 0x67);
++	dcs_write_seq(ctx->dsi, 0x3b, 0x22);
++	dcs_write_seq(ctx->dsi, 0x3c, 0x22);
++	dcs_write_seq(ctx->dsi, 0x3d, 0x22);
++	dcs_write_seq(ctx->dsi, 0x3e, 0x22);
++	dcs_write_seq(ctx->dsi, 0x3f, 0x22);
++	dcs_write_seq(ctx->dsi, 0x40, 0x22);
++	dcs_write_seq(ctx->dsi, 0x52, 0x10);
++	dcs_write_seq(ctx->dsi, 0x53, 0x10);
++
++	ili9806e_switch_page(ctx, 7);
++	dcs_write_seq(ctx->dsi, 0x17, 0x22); /* VGLREG_EN */
++	dcs_write_seq(ctx->dsi, 0x02, 0x77); /* DDVDH/L clamp bias -> 16 uA */
++	dcs_write_seq(ctx->dsi, 0xe1, 0x79); /* ??? undocumented */
++
++	ili9806e_switch_page(ctx, 0);
++
++	ret = mipi_dsi_dcs_exit_sleep_mode(ctx->dsi);
++	if (ret)
++		return ret;
++
++	msleep(120);
++
++	ret = mipi_dsi_dcs_set_display_on(ctx->dsi);
++	if (ret)
++		return ret;
++
++	msleep(20);
++
++	ctx->prepared = true;
++
++	return 0;
++}
++
++static int ili9806e_enable(struct drm_panel *panel)
++{
++	struct ili9806e *ctx = panel_to_i9806e(panel);
++
++	msleep(120);
++	mipi_dsi_dcs_set_display_on(ctx->dsi);
++
++	return 0;
++}
++
++static int ili9806e_disable(struct drm_panel *panel)
++{
++	struct ili9806e *ctx = panel_to_i9806e(panel);
++
++	return mipi_dsi_dcs_set_display_off(ctx->dsi);
++}
++
++static int ili9806e_unprepare(struct drm_panel *panel)
++{
++	struct ili9806e *ctx = panel_to_i9806e(panel);
++
++	if (!ctx->prepared)
++		return 0;
++
++	mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
++	msleep(120);
++
++	regulator_disable(ctx->power_supply);
++	gpiod_set_value(ctx->reset_gpio, 1);
++
++	ctx->prepared = false;
++	return 0;
++}
++
++static const struct drm_display_mode default_mode = {
++	.clock		= 19800,
++	.vrefresh	= 45,
++
++	.hdisplay	= 480,
++	.hsync_start	= 480 + 25,
++	.hsync_end	= 480 + 25 + 10,
++	.htotal		= 480 + 25 + 10 + 10,
++
++	.vdisplay	= 800,
++	.vsync_start	= 800 + 34,
++	.vsync_end	= 800 + 34 + 10,
++	.vtotal		= 800 + 34 + 10 + 8,
++};
++
++static int ili9806e_get_modes(struct drm_panel *panel,
++			      struct drm_connector *connector)
++{
++	struct drm_display_mode *mode;
++
++	mode = drm_mode_duplicate(connector->dev, &default_mode);
++	if (!mode) {
++		DRM_ERROR("failed to add mode %ux%ux@%u\n",
++			default_mode.hdisplay,
++			default_mode.vdisplay,
++			default_mode.vrefresh);
++		return -ENOMEM;
++	}
++
++	drm_mode_set_name(mode);
++
++	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
++	drm_mode_probed_add(connector, mode);
++
++	connector->display_info.width_mm = 57;
++	connector->display_info.height_mm = 97;
++
++	return 1;
++}
++
++static const struct drm_panel_funcs ili9806e_funcs = {
++	.prepare	= ili9806e_prepare,
++	.unprepare	= ili9806e_unprepare,
++	.enable		= ili9806e_enable,
++	.disable	= ili9806e_disable,
++	.get_modes	= ili9806e_get_modes,
++};
++
++static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
++{
++	struct ili9806e *ctx;
++	int ret;
++
++	dsi->mode_flags = MIPI_DSI_MODE_VIDEO;
++	dsi->format = MIPI_DSI_FMT_RGB888;
++	dsi->lanes = 2;
++
++	ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return -ENOMEM;
++	mipi_dsi_set_drvdata(dsi, ctx);
++	ctx->dsi = dsi;
++
++	ctx->power_supply = devm_regulator_get(&dsi->dev, "power");
++	if (IS_ERR(ctx->power_supply)) {
++		dev_err(&dsi->dev, "Couldn't get MIPI power regulator. "
++			"Error: %ld\n", PTR_ERR(ctx->power_supply));
++		return PTR_ERR(ctx->power_supply);
++	}
++
++	ctx->reset_gpio = devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_LOW);
++	if (IS_ERR(ctx->reset_gpio)) {
++		dev_err(&dsi->dev, "Couldn't get our reset GPIO. Error: %ld\n",
++			PTR_ERR(ctx->reset_gpio));
++		return PTR_ERR(ctx->reset_gpio);
++	}
++
++	drm_panel_init(&ctx->panel, &dsi->dev, &ili9806e_funcs,
++		       DRM_MODE_CONNECTOR_DSI);
++
++	ret = drm_panel_of_backlight(&ctx->panel);
++	if (ret)
++		return ret;
++
++	ret = drm_panel_add(&ctx->panel);
++	if (ret < 0)
++		return ret;
++
++	return mipi_dsi_attach(dsi);
++}
++
++static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
++{
++	struct ili9806e *ctx = mipi_dsi_get_drvdata(dsi);
++
++	mipi_dsi_detach(dsi);
++	drm_panel_remove(&ctx->panel);
++
++	return 0;
++}
++
++static const struct of_device_id ili9806e_of_match[] = {
++	{ .compatible = "tdo,tl040wv27ct3" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, ili9806e_of_match);
++
++static struct mipi_dsi_driver ili9806e_dsi_driver = {
++	.probe		= ili9806e_dsi_probe,
++	.remove		= ili9806e_dsi_remove,
++	.driver = {
++		.name		= "ili9806e-dsi",
++		.of_match_table	= ili9806e_of_match,
++	},
++};
++module_mipi_dsi_driver(ili9806e_dsi_driver);
++
++MODULE_AUTHOR("Roman Beranek <roman.beranek@prusa3d.com>");
++MODULE_DESCRIPTION("Ilitek ILI9806E Controller Driver");
++MODULE_LICENSE("GPL v2");
+-- 
+2.30.0
+
+
+From 5391e103497bba89fb15c1bb1a76597875035440 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 16 Mar 2021 04:54:10 +0100
+Subject: [PATCH 2/4] drm/panel: ili9806e: prepare for adding support for
+ extra panels
+
+---
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 420 +++++++++++-------
+ 1 file changed, 251 insertions(+), 169 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+index e503c35645c0..a3c70ea52cbb 100644
+--- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
++++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+@@ -19,7 +19,9 @@
+ #include <drm/drm_panel.h>
+ #include <drm/drm_print.h>
+ 
+-#include <video/mipi_display.h>
++#include <linux/of_device.h>
++
++struct ili9806e_panel_data;
+ 
+ struct ili9806e {
+ 	struct drm_panel	panel;
+@@ -28,43 +30,257 @@ struct ili9806e {
+ 	struct regulator	*power_supply;
+ 	struct gpio_desc	*reset_gpio;
+ 
++	const struct ili9806e_panel_data *panel_data;
++
++	u8 current_page;
++
+ 	bool	prepared;
+ 	bool	enabled;
+ };
+ 
+-static inline struct ili9806e *panel_to_i9806e(struct drm_panel *panel)
++/* value = (page << 8) | cmd */
++enum ili9806e_reg {
++	IFMODE1 	= 0x108u,
++	DISCTRL2	= 0x121u,
++	RESCTRL 	= 0x130u,
++	INVTR	 	= 0x131u,
++	PWCTRL1 	= 0x140u, /* PWRCTRL1-8 */
++	PWCTRL9 	= 0x150u, /* PWRCTRL9-10 */
++	VMCTRL1 	= 0x152u, /* VMCTRL1-5 */
++	LVD		= 0x157u,
++	TI		= 0x160u, /* SDTI, CRTI, EQTI, PCTI */
++	REGAM_P		= 0x1a0u,
++	REGAM_N		= 0x1c0u,
++	GIPCTRL1	= 0x600u, /* GIP_0_SET0-27, STV_A_Rise, CLK_A_Rise */
++	GIPCTRL2	= 0x620u, /* GIP_1_SET0-7 */
++	GIPCTRL3	= 0x630u, /* GIP_2_SET0-16 */
++	GVLOCTRL	= 0x653u,
++	GVHOCTRL	= 0x654u,
++	PWBCTRL		= 0x702u,
++	VCLCTRL		= 0x706u,
++	VGLREGEN	= 0x717u,
++	UNKNOWN1	= 0x726u,
++	UNKNOWN2	= 0x7b3u,
++	TIMECTRL	= 0x7e1u,
++};
++
++enum ili9806e_resolution {
++	RESCTRL_480x864 = 0,
++	RESCTRL_480x854,
++	RESCTRL_480x800,
++	RESCTRL_480x640,
++	RESCTRL_480x720,
++	RESCTRL_INVALID = 0xff,
++};
++
++struct ili9806e_reg_data {
++	u8 invtr;
++	u8 pwctrl1[5];
++	u8 pwctrl9[2];
++	u8 vmctrl[4];
++	u8 lvd;
++	u8 ti[4];
++	u8 regam_p[16];
++	u8 regam_n[16];
++	u8 gipctrl1[30];
++	u8 gipctrl2[8];
++	u8 gipctrl3[17];
++	u8 gvloctrl;
++	u8 gvhoctrl;
++	u8 pwbctrl;
++	u8 vclctrl;
++	u8 vglregen;
++	u8 unknown1;
++	u8 unknown2;
++	u8 timectrl;
++};
++
++struct ili9806e_panel_data {
++	struct drm_display_mode mode;
++	struct ili9806e_reg_data reg;
++};
++
++static const struct ili9806e_panel_data tl040wv27ct3_data = {
++	.mode = {
++		.clock = 19800,
++		.hdisplay = 480,
++		.hsync_start = 480 + 25,
++		.hsync_end = 480 + 25 + 10,
++		.htotal = 480 + 25 + 10 + 10,
++		.vdisplay = 800,
++		.vsync_start = 800 + 34,
++		.vsync_end = 800 + 34 + 10,
++		.vtotal = 800 + 34 + 10 + 8,
++		.width_mm = 57,
++		.height_mm = 97,
++	},
++	.reg = {
++		.invtr = 0x02,
++		.pwctrl1 = { 0x11, 0x77, 0x03, 0x09, 0x07 },
++		.pwctrl9 = { 0x78, 0x78 },
++		.vmctrl = { 0x00, 0x54, 0x00, 0x6f },
++		.lvd = 0x20,
++		.ti = { 0x07, 0x00, 0x08, 0x00 },
++		.regam_p = { 0x00, 0x03, 0x0a, 0x0e, 0x09, 0x18, 0x07, 0x08,
++			     0x03, 0x09, 0x04, 0x03, 0x08, 0x36, 0x31, 0x00 },
++		.regam_n = { 0x00, 0x02, 0x07, 0x0d, 0x05, 0x12, 0x09, 0x08,
++			     0x03, 0x06, 0x09, 0x03, 0x0d, 0x29, 0x22, 0x00 },
++		.gipctrl1 = { 0x21, 0x0a, 0x00, 0x00, 0x01, 0x01, 0x80, 0x06,
++			      0x01, 0x80, 0x00, 0x00, 0x0a, 0x0a, 0x00, 0x00,
++			      0xf0, 0xf4, 0x04, 0x00, 0x00, 0xc0, 0x08, 0x00,
++			      0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.gipctrl2 = { 0x01, 0x23, 0x45, 0x67, 0x01, 0x23, 0x45, 0x67 },
++		.gipctrl3 = { 0x01, 0x11, 0x00, 0xee, 0xff, 0xbb, 0xca, 0xdd,
++			      0xac, 0x76, 0x67, 0x22, 0x22, 0x22, 0x22, 0x22,
++			      0x22 },
++		.gvloctrl = 0x10,
++		.gvhoctrl = 0x10,
++		.pwbctrl = 0x77,
++		.vclctrl = 0x01,
++		.vglregen = 0x22,
++		.timectrl = 0x79,
++	}
++};
++
++static inline struct ili9806e *panel_to_ili9806e(struct drm_panel *panel)
+ {
+ 	return container_of(panel, struct ili9806e, panel);
+ }
+ 
+-#define dcs_write_seq(ctx, cmd, seq...)			\
+-({							\
+-	static const u8 d[] = { seq };			\
+-	mipi_dsi_dcs_write(ctx, cmd, d, ARRAY_SIZE(d));	\
+-})
+-
+ static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
+ {
++	int ret;
+ 	u8 seq[] = { 0xff, 0x98, 0x06, 0x04, page };
+ 	if (page > 7)
+ 		return -1;
+-	return mipi_dsi_dcs_write(ctx->dsi, 0xff, seq, 5);
++	ret = mipi_dsi_dcs_write(ctx->dsi, 0xff, seq, 5);
++	if (ret > 0)
++		ctx->current_page = page;
++	return ret;
++}
++
++static int ili9806e_write_register(struct ili9806e *ctx, u16 reg, u8 value)
++{
++	u8 page = reg >> 8;
++	u8 cmd = reg & 0xffu;
++	if (ctx->current_page != page)
++		ili9806e_switch_page(ctx, page);
++	return mipi_dsi_dcs_write(ctx->dsi, cmd, &value, 1);
++}
++
++static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, const u8 *values)
++{
++	int ret;
++	const u8 *end = values + length;
++	u8 page = reg >> 8;
++	u8 cmd = reg & 0xffu;
++
++	if (ctx->current_page != page)
++		ili9806e_switch_page(ctx, page);
++	while (values < end) {
++		ret = mipi_dsi_dcs_write(ctx->dsi, cmd++, values++, 1);
++		if (ret < 0)
++			return ret;
++	}
++	return 0;
++}
++
++static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
++{
++	ssize_t err;
++	u8 page = reg >> 8;
++	u8 cmd = reg & 0xffu;
++
++	if (ctx->current_page != page)
++		ili9806e_switch_page(ctx, page);
++
++	err = mipi_dsi_dcs_read(ctx->dsi, cmd, value, sizeof(*value));
++
++	if (err <= 0) {
++		if (err == 0)
++			err = -ENODATA;
++
++		return err;
++	}
++
++	return 0;
++}
++
++static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
++{
++	switch (mode->vdisplay) {
++	case 864:
++		return RESCTRL_480x864;
++	case 854:
++		return RESCTRL_480x854;
++	case 800:
++		return RESCTRL_480x800;
++	case 640:
++		return RESCTRL_480x640;
++	case 720:
++		return RESCTRL_480x720;
++	default:
++		DRM_ERROR("%ux%u is not a valid resolution\n",
++			  mode->hdisplay,
++			  mode->vdisplay);
++		return RESCTRL_INVALID;
++	}
++}
++
++static int ili9806e_configure_registers(struct ili9806e *ctx)
++{
++	const struct ili9806e_reg_data *reg = &ctx->panel_data->reg;
++
++	u8 resctrl = ili9806e_resctrl_value(&ctx->panel_data->mode);
++	if (resctrl == RESCTRL_INVALID)
++		return -EINVAL;
++
++	ili9806e_write_register(ctx, IFMODE1, 0x10); /* Output SDA */
++	ili9806e_write_register(ctx, DISCTRL2, 0x01); /* DE -> ACTIVE_LOW */
++	ili9806e_write_register(ctx, RESCTRL, resctrl);
++	ili9806e_write_register(ctx, INVTR, reg->invtr);
++	ili9806e_write_series(ctx, PWCTRL1, sizeof(reg->pwctrl1), reg->pwctrl1);
++	ili9806e_write_series(ctx, PWCTRL9, sizeof(reg->pwctrl9), reg->pwctrl9);
++	ili9806e_write_series(ctx, VMCTRL1, sizeof(reg->vmctrl), reg->vmctrl);
++	ili9806e_write_register(ctx, LVD, reg->lvd);
++	ili9806e_write_series(ctx, TI, sizeof(reg->ti), reg->ti);
++	ili9806e_write_series(ctx, REGAM_P, sizeof(reg->regam_p), reg->regam_p);
++	ili9806e_write_series(ctx, REGAM_N, sizeof(reg->regam_n), reg->regam_n);
++	ili9806e_write_series(ctx, GIPCTRL1, sizeof(reg->gipctrl1), reg->gipctrl1);
++	ili9806e_write_series(ctx, GIPCTRL2, sizeof(reg->gipctrl2), reg->gipctrl2);
++	ili9806e_write_series(ctx, GIPCTRL3, sizeof(reg->gipctrl3), reg->gipctrl3);
++	ili9806e_write_register(ctx, GVLOCTRL, reg->gvloctrl);
++	ili9806e_write_register(ctx, GVHOCTRL, reg->gvhoctrl);
++	ili9806e_write_register(ctx, PWBCTRL, reg->pwbctrl);
++	ili9806e_write_register(ctx, VCLCTRL, reg->vclctrl);
++	ili9806e_write_register(ctx, VGLREGEN, reg->vglregen);
++	ili9806e_write_register(ctx, TIMECTRL, reg->timectrl);
++	/* We do not know default values of these two registers */
++	if (reg->unknown1)
++		ili9806e_write_register(ctx, UNKNOWN1, reg->unknown1);
++	if (reg->unknown2)
++		ili9806e_write_register(ctx, UNKNOWN2, reg->unknown2);
++	return 0;
++}
++
++static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
++{
++	int ret;
++	u8 unknown1, unknown2;
++
++	ret = ili9806e_read_register(ctx, UNKNOWN1, &unknown1);
++	if (ret < 0)
++		DRM_ERROR("Read from UNKNOWN1 failed: %d\n", ret);
++	ret = ili9806e_read_register(ctx, UNKNOWN2, &unknown2);
++	if (ret < 0)
++		DRM_ERROR("Read from UNKNOWN2 failed: %d\n", ret);
++
++	DRM_INFO("UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
+ }
+ 
+-/*
+- * The panel seems to accept some private DCS commands that map
+- * directly to registers.
+- *
+- * It is organised by page, with each page having its own set of
+- * registers, and the first page looks like it's holding the standard
+- * DCS commands.
+- *
+- * So before any attempt at sending a command or data, we have to be
+- * sure if we're in the right page or not.
+- */
+ static int ili9806e_prepare(struct drm_panel *panel)
+ {
+-	struct ili9806e *ctx = panel_to_i9806e(panel);
++	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 	int ret;
+ 
+ 	if (ctx->prepared)
+@@ -85,126 +301,10 @@ static int ili9806e_prepare(struct drm_panel *panel)
+ 	gpiod_set_value(ctx->reset_gpio, 0);
+ 	msleep(120);
+ 
+-	ili9806e_switch_page(ctx, 1);
+-	dcs_write_seq(ctx->dsi, 0x08, 0x10); /* Output SDA */
+-	dcs_write_seq(ctx->dsi, 0x21, 0x01); /* DE -> ACTIVE_LOW */
+-	dcs_write_seq(ctx->dsi, 0x30, 0x02); /* RESCTRL, 480x800 */
+-	dcs_write_seq(ctx->dsi, 0x31, 0x02); /* INVTR, 2-dot column inversion */
+-	dcs_write_seq(ctx->dsi, 0x40, 0x11); /* PWCTRL1, VDH = 2.5xVCI, VDL = -2.5xVCI */
+-	dcs_write_seq(ctx->dsi, 0x41, 0x77); /* PWCTRL2, VDL clamp ->  -5.6V, VDH clamp -> 5.0V */
+-	dcs_write_seq(ctx->dsi, 0x42, 0x03); /* PWCTRL3 */
+-	dcs_write_seq(ctx->dsi, 0x43, 0x09); /* PWCTRL4 */
+-	dcs_write_seq(ctx->dsi, 0x44, 0x07); /* PWCTRL5 */
+-	dcs_write_seq(ctx->dsi, 0x50, 0x78); /* PWCTRL9, VREG1OUT ->  4.5V */
+-	dcs_write_seq(ctx->dsi, 0x51, 0x78); /* PWCTRL10 VREG2OUT -> -4.5V */
+-	dcs_write_seq(ctx->dsi, 0x52, 0x00); /* VMCTRL1 */
+-	dcs_write_seq(ctx->dsi, 0x53, 0x54); /* VMCTRL2, VCOM -> -1.8750V */
+-	dcs_write_seq(ctx->dsi, 0x60, 0x07); /* SDTI, Source SDT timing adjustment ~1.54 us */
+-	dcs_write_seq(ctx->dsi, 0x61, 0x00); /* CRTI, Source CR timing adjustment ~0.88 us */
+-	dcs_write_seq(ctx->dsi, 0x62, 0x08); /* EQTI, Source EQ timing adjustment ~1.76 us */
+-	dcs_write_seq(ctx->dsi, 0x63, 0x00); /* PCTI, Source PC timing adjustment ~0.88 us */
+-
+-
+-	/* Positive Gamma Control 1-16 */
+-	dcs_write_seq(ctx->dsi, 0xa0, 0x00);
+-	dcs_write_seq(ctx->dsi, 0xa1, 0x03);
+-	dcs_write_seq(ctx->dsi, 0xa2, 0x0a);
+-	dcs_write_seq(ctx->dsi, 0xa3, 0x0e);
+-	dcs_write_seq(ctx->dsi, 0xa4, 0x09);
+-	dcs_write_seq(ctx->dsi, 0xa5, 0x18);
+-	dcs_write_seq(ctx->dsi, 0xa6, 0x07);
+-	dcs_write_seq(ctx->dsi, 0xa7, 0x08);
+-	dcs_write_seq(ctx->dsi, 0xa8, 0x03);
+-	dcs_write_seq(ctx->dsi, 0xa9, 0x09);
+-	dcs_write_seq(ctx->dsi, 0xaa, 0x04);
+-	dcs_write_seq(ctx->dsi, 0xab, 0x03);
+-	dcs_write_seq(ctx->dsi, 0xac, 0x08);
+-	dcs_write_seq(ctx->dsi, 0xad, 0x36);
+-	dcs_write_seq(ctx->dsi, 0xae, 0x31);
+-	dcs_write_seq(ctx->dsi, 0xaf, 0x00);
+-
+-	/* Negative Gamma Control 1-16 */
+-	dcs_write_seq(ctx->dsi, 0xc0, 0x00);
+-	dcs_write_seq(ctx->dsi, 0xc1, 0x02);
+-	dcs_write_seq(ctx->dsi, 0xc2, 0x07);
+-	dcs_write_seq(ctx->dsi, 0xc3, 0x0d);
+-	dcs_write_seq(ctx->dsi, 0xc4, 0x05);
+-	dcs_write_seq(ctx->dsi, 0xc5, 0x12);
+-	dcs_write_seq(ctx->dsi, 0xc6, 0x09);
+-	dcs_write_seq(ctx->dsi, 0xc7, 0x08);
+-	dcs_write_seq(ctx->dsi, 0xc8, 0x03);
+-	dcs_write_seq(ctx->dsi, 0xc9, 0x06);
+-	dcs_write_seq(ctx->dsi, 0xca, 0x09);
+-	dcs_write_seq(ctx->dsi, 0xcb, 0x03);
+-	dcs_write_seq(ctx->dsi, 0xcc, 0x0d);
+-	dcs_write_seq(ctx->dsi, 0xcd, 0x29);
+-	dcs_write_seq(ctx->dsi, 0xce, 0x22);
+-	dcs_write_seq(ctx->dsi, 0xcf, 0x00);
+-
+-	/* GIP Setting */
+-	ili9806e_switch_page(ctx, 6);
+-	dcs_write_seq(ctx->dsi, 0x00, 0x21);
+-	dcs_write_seq(ctx->dsi, 0x01, 0x0a);
+-	dcs_write_seq(ctx->dsi, 0x02, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x03, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x04, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x05, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x06, 0x80);
+-	dcs_write_seq(ctx->dsi, 0x07, 0x06);
+-	dcs_write_seq(ctx->dsi, 0x08, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x09, 0x80);
+-	dcs_write_seq(ctx->dsi, 0x0a, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x0b, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x0c, 0x0a);
+-	dcs_write_seq(ctx->dsi, 0x0d, 0x0a);
+-	dcs_write_seq(ctx->dsi, 0x0e, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x0f, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x10, 0xf0);
+-	dcs_write_seq(ctx->dsi, 0x11, 0xf4);
+-	dcs_write_seq(ctx->dsi, 0x12, 0x04);
+-	dcs_write_seq(ctx->dsi, 0x13, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x14, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x15, 0xc0);
+-	dcs_write_seq(ctx->dsi, 0x16, 0x08);
+-	dcs_write_seq(ctx->dsi, 0x17, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x18, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x19, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x1a, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x1b, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x1c, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x1d, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x20, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x21, 0x23);
+-	dcs_write_seq(ctx->dsi, 0x22, 0x45);
+-	dcs_write_seq(ctx->dsi, 0x23, 0x67);
+-	dcs_write_seq(ctx->dsi, 0x24, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x25, 0x23);
+-	dcs_write_seq(ctx->dsi, 0x26, 0x45);
+-	dcs_write_seq(ctx->dsi, 0x27, 0x67);
+-	dcs_write_seq(ctx->dsi, 0x30, 0x01);
+-	dcs_write_seq(ctx->dsi, 0x31, 0x11);
+-	dcs_write_seq(ctx->dsi, 0x32, 0x00);
+-	dcs_write_seq(ctx->dsi, 0x33, 0xee);
+-	dcs_write_seq(ctx->dsi, 0x34, 0xff);
+-	dcs_write_seq(ctx->dsi, 0x35, 0xbb);
+-	dcs_write_seq(ctx->dsi, 0x36, 0xca);
+-	dcs_write_seq(ctx->dsi, 0x37, 0xdd);
+-	dcs_write_seq(ctx->dsi, 0x38, 0xac);
+-	dcs_write_seq(ctx->dsi, 0x39, 0x76);
+-	dcs_write_seq(ctx->dsi, 0x3a, 0x67);
+-	dcs_write_seq(ctx->dsi, 0x3b, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x3c, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x3d, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x3e, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x3f, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x40, 0x22);
+-	dcs_write_seq(ctx->dsi, 0x52, 0x10);
+-	dcs_write_seq(ctx->dsi, 0x53, 0x10);
+-
+-	ili9806e_switch_page(ctx, 7);
+-	dcs_write_seq(ctx->dsi, 0x17, 0x22); /* VGLREG_EN */
+-	dcs_write_seq(ctx->dsi, 0x02, 0x77); /* DDVDH/L clamp bias -> 16 uA */
+-	dcs_write_seq(ctx->dsi, 0xe1, 0x79); /* ??? undocumented */
++	ili9806e_read_unknown_registers(ctx);
++	ret = ili9806e_configure_registers(ctx);
++	if (ret < 0)
++		return ret;
+ 
+ 	ili9806e_switch_page(ctx, 0);
+ 
+@@ -227,7 +327,7 @@ static int ili9806e_prepare(struct drm_panel *panel)
+ 
+ static int ili9806e_enable(struct drm_panel *panel)
+ {
+-	struct ili9806e *ctx = panel_to_i9806e(panel);
++	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 
+ 	msleep(120);
+ 	mipi_dsi_dcs_set_display_on(ctx->dsi);
+@@ -237,14 +337,14 @@ static int ili9806e_enable(struct drm_panel *panel)
+ 
+ static int ili9806e_disable(struct drm_panel *panel)
+ {
+-	struct ili9806e *ctx = panel_to_i9806e(panel);
++	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 
+ 	return mipi_dsi_dcs_set_display_off(ctx->dsi);
+ }
+ 
+ static int ili9806e_unprepare(struct drm_panel *panel)
+ {
+-	struct ili9806e *ctx = panel_to_i9806e(panel);
++	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 
+ 	if (!ctx->prepared)
+ 		return 0;
+@@ -259,43 +359,24 @@ static int ili9806e_unprepare(struct drm_panel *panel)
+ 	return 0;
+ }
+ 
+-static const struct drm_display_mode default_mode = {
+-	.clock		= 19800,
+-	.vrefresh	= 45,
+-
+-	.hdisplay	= 480,
+-	.hsync_start	= 480 + 25,
+-	.hsync_end	= 480 + 25 + 10,
+-	.htotal		= 480 + 25 + 10 + 10,
+-
+-	.vdisplay	= 800,
+-	.vsync_start	= 800 + 34,
+-	.vsync_end	= 800 + 34 + 10,
+-	.vtotal		= 800 + 34 + 10 + 8,
+-};
+-
+ static int ili9806e_get_modes(struct drm_panel *panel,
+ 			      struct drm_connector *connector)
+ {
++	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 	struct drm_display_mode *mode;
+ 
+-	mode = drm_mode_duplicate(connector->dev, &default_mode);
++	mode = drm_mode_duplicate(connector->dev, &ctx->panel_data->mode);
+ 	if (!mode) {
+-		DRM_ERROR("failed to add mode %ux%ux@%u\n",
+-			default_mode.hdisplay,
+-			default_mode.vdisplay,
+-			default_mode.vrefresh);
++		DRM_ERROR("failed to duplicate a display mode\n");
+ 		return -ENOMEM;
+ 	}
+-
++	connector->display_info.width_mm = ctx->panel_data->mode.width_mm;
++	connector->display_info.height_mm = ctx->panel_data->mode.height_mm;
+ 	drm_mode_set_name(mode);
+ 
+ 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+ 	drm_mode_probed_add(connector, mode);
+ 
+-	connector->display_info.width_mm = 57;
+-	connector->display_info.height_mm = 97;
+-
+ 	return 1;
+ }
+ 
+@@ -321,6 +402,7 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+ 		return -ENOMEM;
+ 	mipi_dsi_set_drvdata(dsi, ctx);
+ 	ctx->dsi = dsi;
++	ctx->panel_data = of_device_get_match_data(&dsi->dev);
+ 
+ 	ctx->power_supply = devm_regulator_get(&dsi->dev, "power");
+ 	if (IS_ERR(ctx->power_supply)) {
+@@ -361,7 +443,7 @@ static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
+ }
+ 
+ static const struct of_device_id ili9806e_of_match[] = {
+-	{ .compatible = "tdo,tl040wv27ct3" },
++	{ .compatible = "tdo,tl040wv27ct3", .data = &tl040wv27ct3_data },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, ili9806e_of_match);
+-- 
+2.30.2
+
+
+From d48da283e6845a92699231c658c0eb5e4ac91d58 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 16 Mar 2021 04:48:55 +0100
+Subject: [PATCH 3/4] drm/panel: ili9806e: Use dev_ based logging
+
+---
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+index a3c70ea52cbb..8efd80f508cc 100644
+--- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
++++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+@@ -17,7 +17,6 @@
+ #include <drm/drm_mipi_dsi.h>
+ #include <drm/drm_modes.h>
+ #include <drm/drm_panel.h>
+-#include <drm/drm_print.h>
+ 
+ #include <linux/of_device.h>
+ 
+@@ -220,9 +219,6 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
+ 	case 720:
+ 		return RESCTRL_480x720;
+ 	default:
+-		DRM_ERROR("%ux%u is not a valid resolution\n",
+-			  mode->hdisplay,
+-			  mode->vdisplay);
+ 		return RESCTRL_INVALID;
+ 	}
+ }
+@@ -232,8 +228,12 @@ static int ili9806e_configure_registers(struct ili9806e *ctx)
+ 	const struct ili9806e_reg_data *reg = &ctx->panel_data->reg;
+ 
+ 	u8 resctrl = ili9806e_resctrl_value(&ctx->panel_data->mode);
+-	if (resctrl == RESCTRL_INVALID)
++	if (resctrl == RESCTRL_INVALID) {
++		dev_err(ctx->dev, "%ux%u is not a valid resolution\n",
++			ctx->panel_data->mode.hdisplay,
++			ctx->panel_data->mode.vdisplay);
+ 		return -EINVAL;
++	}
+ 
+ 	ili9806e_write_register(ctx, IFMODE1, 0x10); /* Output SDA */
+ 	ili9806e_write_register(ctx, DISCTRL2, 0x01); /* DE -> ACTIVE_LOW */
+@@ -270,12 +270,12 @@ static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
+ 
+ 	ret = ili9806e_read_register(ctx, UNKNOWN1, &unknown1);
+ 	if (ret < 0)
+-		DRM_ERROR("Read from UNKNOWN1 failed: %d\n", ret);
++		dev_err(ctx->dev, "Read from UNKNOWN1 failed: %d\n", ret);
+ 	ret = ili9806e_read_register(ctx, UNKNOWN2, &unknown2);
+ 	if (ret < 0)
+-		DRM_ERROR("Read from UNKNOWN2 failed: %d\n", ret);
++		dev_err(ctx->dev, "Read from UNKNOWN2 failed: %d\n", ret);
+ 
+-	DRM_INFO("UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
++	dev_info(ctx->dev, "UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
+ }
+ 
+ static int ili9806e_prepare(struct drm_panel *panel)
+@@ -367,7 +367,7 @@ static int ili9806e_get_modes(struct drm_panel *panel,
+ 
+ 	mode = drm_mode_duplicate(connector->dev, &ctx->panel_data->mode);
+ 	if (!mode) {
+-		DRM_ERROR("failed to duplicate a display mode\n");
++		dev_err(ctx->dev, "failed to duplicate a display mode\n");
+ 		return -ENOMEM;
+ 	}
+ 	connector->display_info.width_mm = ctx->panel_data->mode.width_mm;
+-- 
+2.30.2
+
+
+From c5e7a372b118878b1f8e0ffb6d64216b1603b3e5 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 16 Mar 2021 05:22:20 +0100
+Subject: [PATCH 4/4] drm/panel: ili9806e: harmonization
+
+---
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 80 ++++++++++++-------
+ 1 file changed, 49 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+index 8efd80f508cc..b8cde6efe749 100644
+--- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
++++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+@@ -20,16 +20,16 @@
+ 
+ #include <linux/of_device.h>
+ 
+-struct ili9806e_panel_data;
++struct ili9806e_panel_desc;
+ 
+ struct ili9806e {
++	struct device		*dev;
+ 	struct drm_panel	panel;
+-	struct mipi_dsi_device	*dsi;
+ 
+ 	struct regulator	*power_supply;
+ 	struct gpio_desc	*reset_gpio;
+ 
+-	const struct ili9806e_panel_data *panel_data;
++	const struct ili9806e_panel_desc *panel_desc;
+ 
+ 	u8 current_page;
+ 
+@@ -94,12 +94,12 @@ struct ili9806e_reg_data {
+ 	u8 timectrl;
+ };
+ 
+-struct ili9806e_panel_data {
++struct ili9806e_panel_desc {
+ 	struct drm_display_mode mode;
+ 	struct ili9806e_reg_data reg;
+ };
+ 
+-static const struct ili9806e_panel_data tl040wv27ct3_data = {
++static const struct ili9806e_panel_desc tl040wv27ct3_data = {
+ 	.mode = {
+ 		.clock = 19800,
+ 		.hdisplay = 480,
+@@ -148,11 +148,12 @@ static inline struct ili9806e *panel_to_ili9806e(struct drm_panel *panel)
+ 
+ static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
+ {
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 	int ret;
+ 	u8 seq[] = { 0xff, 0x98, 0x06, 0x04, page };
+ 	if (page > 7)
+ 		return -1;
+-	ret = mipi_dsi_dcs_write(ctx->dsi, 0xff, seq, 5);
++	ret = mipi_dsi_dcs_write(dsi, 0xff, seq, 5);
+ 	if (ret > 0)
+ 		ctx->current_page = page;
+ 	return ret;
+@@ -160,15 +161,17 @@ static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
+ 
+ static int ili9806e_write_register(struct ili9806e *ctx, u16 reg, u8 value)
+ {
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 	u8 page = reg >> 8;
+ 	u8 cmd = reg & 0xffu;
+ 	if (ctx->current_page != page)
+ 		ili9806e_switch_page(ctx, page);
+-	return mipi_dsi_dcs_write(ctx->dsi, cmd, &value, 1);
++	return mipi_dsi_dcs_write(dsi, cmd, &value, 1);
+ }
+ 
+ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, const u8 *values)
+ {
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 	int ret;
+ 	const u8 *end = values + length;
+ 	u8 page = reg >> 8;
+@@ -177,7 +180,7 @@ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, c
+ 	if (ctx->current_page != page)
+ 		ili9806e_switch_page(ctx, page);
+ 	while (values < end) {
+-		ret = mipi_dsi_dcs_write(ctx->dsi, cmd++, values++, 1);
++		ret = mipi_dsi_dcs_write(dsi, cmd++, values++, 1);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+@@ -186,6 +189,7 @@ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, c
+ 
+ static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
+ {
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 	ssize_t err;
+ 	u8 page = reg >> 8;
+ 	u8 cmd = reg & 0xffu;
+@@ -193,7 +197,7 @@ static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
+ 	if (ctx->current_page != page)
+ 		ili9806e_switch_page(ctx, page);
+ 
+-	err = mipi_dsi_dcs_read(ctx->dsi, cmd, value, sizeof(*value));
++	err = mipi_dsi_dcs_read(dsi, cmd, value, sizeof(*value));
+ 
+ 	if (err <= 0) {
+ 		if (err == 0)
+@@ -225,13 +229,13 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
+ 
+ static int ili9806e_configure_registers(struct ili9806e *ctx)
+ {
+-	const struct ili9806e_reg_data *reg = &ctx->panel_data->reg;
++	const struct ili9806e_reg_data *reg = &ctx->panel_desc->reg;
+ 
+-	u8 resctrl = ili9806e_resctrl_value(&ctx->panel_data->mode);
++	u8 resctrl = ili9806e_resctrl_value(&ctx->panel_desc->mode);
+ 	if (resctrl == RESCTRL_INVALID) {
+ 		dev_err(ctx->dev, "%ux%u is not a valid resolution\n",
+-			ctx->panel_data->mode.hdisplay,
+-			ctx->panel_data->mode.vdisplay);
++			ctx->panel_desc->mode.hdisplay,
++			ctx->panel_desc->mode.vdisplay);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -281,6 +285,7 @@ static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
+ static int ili9806e_prepare(struct drm_panel *panel)
+ {
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 	int ret;
+ 
+ 	if (ctx->prepared)
+@@ -308,13 +313,13 @@ static int ili9806e_prepare(struct drm_panel *panel)
+ 
+ 	ili9806e_switch_page(ctx, 0);
+ 
+-	ret = mipi_dsi_dcs_exit_sleep_mode(ctx->dsi);
++	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
+ 	if (ret)
+ 		return ret;
+ 
+ 	msleep(120);
+ 
+-	ret = mipi_dsi_dcs_set_display_on(ctx->dsi);
++	ret = mipi_dsi_dcs_set_display_on(dsi);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -328,9 +333,10 @@ static int ili9806e_prepare(struct drm_panel *panel)
+ static int ili9806e_enable(struct drm_panel *panel)
+ {
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 
+ 	msleep(120);
+-	mipi_dsi_dcs_set_display_on(ctx->dsi);
++	mipi_dsi_dcs_set_display_on(dsi);
+ 
+ 	return 0;
+ }
+@@ -338,18 +344,20 @@ static int ili9806e_enable(struct drm_panel *panel)
+ static int ili9806e_disable(struct drm_panel *panel)
+ {
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 
+-	return mipi_dsi_dcs_set_display_off(ctx->dsi);
++	return mipi_dsi_dcs_set_display_off(dsi);
+ }
+ 
+ static int ili9806e_unprepare(struct drm_panel *panel)
+ {
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
+ 
+ 	if (!ctx->prepared)
+ 		return 0;
+ 
+-	mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
++	mipi_dsi_dcs_enter_sleep_mode(dsi);
+ 	msleep(120);
+ 
+ 	regulator_disable(ctx->power_supply);
+@@ -365,13 +373,13 @@ static int ili9806e_get_modes(struct drm_panel *panel,
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
+ 	struct drm_display_mode *mode;
+ 
+-	mode = drm_mode_duplicate(connector->dev, &ctx->panel_data->mode);
++	mode = drm_mode_duplicate(connector->dev, &ctx->panel_desc->mode);
+ 	if (!mode) {
+ 		dev_err(ctx->dev, "failed to duplicate a display mode\n");
+ 		return -ENOMEM;
+ 	}
+-	connector->display_info.width_mm = ctx->panel_data->mode.width_mm;
+-	connector->display_info.height_mm = ctx->panel_data->mode.height_mm;
++	connector->display_info.width_mm = ctx->panel_desc->mode.width_mm;
++	connector->display_info.height_mm = ctx->panel_desc->mode.height_mm;
+ 	drm_mode_set_name(mode);
+ 
+ 	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+@@ -390,19 +398,17 @@ static const struct drm_panel_funcs ili9806e_funcs = {
+ 
+ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+ {
++	struct device *dev = &dsi->dev;
+ 	struct ili9806e *ctx;
+ 	int ret;
+ 
+-	dsi->mode_flags = MIPI_DSI_MODE_VIDEO;
+-	dsi->format = MIPI_DSI_FMT_RGB888;
+-	dsi->lanes = 2;
+-
+ 	ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+-	mipi_dsi_set_drvdata(dsi, ctx);
+-	ctx->dsi = dsi;
+-	ctx->panel_data = of_device_get_match_data(&dsi->dev);
++
++	ctx->panel_desc = of_device_get_match_data(&dsi->dev);
++	if (!ctx->panel_desc)
++		return -EINVAL;
+ 
+ 	ctx->power_supply = devm_regulator_get(&dsi->dev, "power");
+ 	if (IS_ERR(ctx->power_supply)) {
+@@ -418,6 +424,14 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+ 		return PTR_ERR(ctx->reset_gpio);
+ 	}
+ 
++	mipi_dsi_set_drvdata(dsi, ctx);
++
++	ctx->dev = dev;
++
++	dsi->lanes = 2;
++	dsi->format = MIPI_DSI_FMT_RGB888;
++	dsi->mode_flags = MIPI_DSI_MODE_VIDEO;
++
+ 	drm_panel_init(&ctx->panel, &dsi->dev, &ili9806e_funcs,
+ 		       DRM_MODE_CONNECTOR_DSI);
+ 
+@@ -425,11 +439,16 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = drm_panel_add(&ctx->panel);
+-	if (ret < 0)
++	drm_panel_add(&ctx->panel);
++
++	ret = mipi_dsi_attach(dsi);
++	if (ret < 0) {
++		dev_err(dev, "mipi_dsi_attach failed: %d\n", ret);
++		drm_panel_remove(&ctx->panel);
+ 		return ret;
++	}
+ 
+-	return mipi_dsi_attach(dsi);
++	return 0;
+ }
+ 
+ static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)

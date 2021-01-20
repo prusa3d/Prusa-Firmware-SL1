@@ -21,7 +21,7 @@ LINUX_VERSION = "${PV}"
 
 SRC_URI="\
 	git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH} \
-	file://0001-drm-panel-Add-TDO-TL040WV27CT3-support.patch \
+	file://0001-drm-panel-Add-Ilitek-ILI9806e-panel-driver.patch \
 	file://0002-2K-display-over-TC358870.patch \
 	file://0003-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
 	file://0004-tc358870-added-DSI-init-sequence-for-RV059FBB.patch \
