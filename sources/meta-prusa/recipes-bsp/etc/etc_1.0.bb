@@ -41,6 +41,9 @@ FILES_${PN} = "							\
 	${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf \
 "
 
+FILES_${PN}_remove = "${sysconfdir}/debug"
+FILES_${PN}-dev = "${sysconfdir}/debug"
+
 do_install() {
 	install -d ${D}${sysconfdir}
 	install -m 644 ${WORKDIR}/profile			${D}${sysconfdir}/
@@ -69,6 +72,7 @@ do_install() {
 	install -d ${D}${systemd_system_unitdir}/sshd.socket.d
 	install -m 644 ${WORKDIR}/ssh-override.conf ${D}${systemd_system_unitdir}/sshd.socket.d/condition-enabled.conf
 	touch ${D}/usr/share/factory/defaults/factory_mode_enabled
+	touch ${D}${sysconfdir}/debug
 }
 
 PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
