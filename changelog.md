@@ -1,3 +1,11 @@
+# Version 1.5.0-rc.0
+
+## Summary (relative to 1.5.0-beta.0)
+- translations update
+- Fix upload log with new token
+- properly handle the close button on the notification list
+- Fix acces to the wifi settings page
+
 # Version 1.5.0-beta.0
 
 ## Summary (relative to 1.5.0-alpha.8)
