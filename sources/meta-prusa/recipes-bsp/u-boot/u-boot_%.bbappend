@@ -14,6 +14,7 @@ SRC_URI_append = " \
 	file://0012-backlight.patch \
 	file://0013-exposure-panel-identification.patch \
 	file://0014-include-edid_bootarg-in-default-env.patch \
+	file://0015-tc358870-switch-VC-if-requested-panel-IC.patch \
 	file://fw_env.config \
 "
 

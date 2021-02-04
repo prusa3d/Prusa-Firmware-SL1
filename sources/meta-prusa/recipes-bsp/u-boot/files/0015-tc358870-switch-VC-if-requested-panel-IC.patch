@@ -1,0 +1,192 @@
+From 61effa18267bf635c1168b206422faaf5e8b8517 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 4 Feb 2021 13:36:25 +0100
+Subject: [PATCH] tc358870: switch VC if requested panel IC
+
+---
+ board/sunxi/tc358870.c | 85 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 73 insertions(+), 12 deletions(-)
+
+diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
+index f6e5e59554..a85c423016 100644
+--- a/board/sunxi/tc358870.c
++++ b/board/sunxi/tc358870.c
+@@ -27,6 +27,7 @@ static inline void kfreep(void *p) {
+ struct tc358870_priv {
+ 	struct gpio_desc bridge_reset;
+ 	struct gpio_desc panel_reset;
++	u8 vc;
+ };
+ 
+ enum i2c_xfer {
+@@ -42,10 +43,10 @@ static void tc358870_print_xfer(enum i2c_xfer rw, u8 *reg, u8 *data, size_t len)
+ 	};
+ 	int i;
+ 
+-	printf("%s [0x%02x%02x]: 0x", labels[rw], reg[rw ? 0 : 1], reg[rw ? 1 : 0]);
++	dev_info(dev, "%s [0x%02x%02x]: 0x", labels[rw], reg[rw ? 0 : 1], reg[rw ? 1 : 0]);
+ 	for (i = (int)len - 1; i >= 0; i--)
+-		printf("%02x", data[i]);
+-	printf("\n");
++		dev_info(dev, "%02x", data[i]);
++	dev_info(dev, "\n");
+ }
+ 
+ static int tc358870_write(struct udevice *dev, u16 reg, const void* buf, size_t len)
+@@ -220,9 +221,9 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 		u8 rxvc:2;
+ 		u8 reserved;
+ 	} __attribute__((packed)) rxhdr;
+-
+ 	u16 word_count;
+ 	int ret;
++	struct tc358870_priv *priv = dev_get_priv(dev);
+ 
+ 	tc358870_read(dev, RX_HEADER + iface * 0x0200u, &rxhdr, sizeof(rxhdr));
+ 	switch (rxhdr.rxdt) {
+@@ -238,6 +239,13 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 	case MIPI_DSI_RX_GENERIC_LONG_READ_RESPONSE:
+ 		word_count = rxhdr.rxwc.wc;
+ 		break;
++	case MIPI_DSI_RX_ACKNOWLEDGE_AND_ERROR_REPORT:
++		dev_warn(dev, "Received ACK & Error Report 0x%04x, VC=%d\n", rxhdr.rxwc.wc, rxhdr.rxvc);
++		if (!(rxhdr.rxwc.wc & BIT(12))) return -EFAULT;
++		dev_warn(dev, "Updating VC to %d.\n", rxhdr.rxvc);
++		if (priv->vc == rxhdr.rxvc) return -EBADMSG;
++		priv->vc = rxhdr.rxvc;
++		return -EAGAIN;
+ 	default:
+ 		word_count = 0;
+ 		break;
+@@ -270,8 +278,10 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 	return word_count;
+ }
+ 
+-static inline u16 packet_header(u8 type)
++static inline u16 packet_header(struct udevice *dev, u8 type)
+ {
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	u8 vc = ((priv->vc & 0x3) << 6);
+ 	switch (type) {
+ 	case MIPI_DSI_GENERIC_READ_REQUEST_0_PARAM:
+ 	case MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM:
+@@ -282,10 +292,10 @@ static inline u16 packet_header(u8 type)
+ 	case MIPI_DSI_DCS_READ:
+ 	case MIPI_DSI_DCS_SHORT_WRITE:
+ 	case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
+-		return type;
++		return type | vc;
+ 	case MIPI_DSI_GENERIC_LONG_WRITE:
+ 	case MIPI_DSI_DCS_LONG_WRITE:
+-		return 0x8000u | type;
++		return 0x8000u | type | vc;
+ 	default:
+ 		return 0;
+ 	}
+@@ -297,12 +307,16 @@ static ssize_t tc358870_dsi_read(struct udevice *dev, u8 iface, u8 type, u8 addr
+ 	if (iface > 1) return -EINVAL;
+ 	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
+ 	if (ret) return ret;
+-	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(type));
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, type));
+ 	if (ret < 0) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q, address);
+ 	if (ret < 0) return ret;
+ 	mdelay(1);
+-	return tc358870_fetch_rx(dev, iface, out);
++	ret = tc358870_fetch_rx(dev, iface, out);
++	if (ret == -EAGAIN) {
++		return tc358870_dsi_read(dev, iface, type, address, out);
++	}
++	return ret;
+ }
+ 
+ static ssize_t tc358870_dsi_dcs_read(struct udevice *dev, u8 iface, u8 address, u8 **out)
+@@ -315,19 +329,61 @@ static ssize_t tc358870_dsi_generic_read_short(struct udevice *dev, u8 iface, u8
+ 	return tc358870_dsi_read(dev, iface, MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM, address, out);
+ }
+ 
++static int tc358870_dsi_dcs_write(struct udevice *dev, u8 iface, u8 cmd)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, MIPI_DSI_DCS_SHORT_WRITE));
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, cmd);
++	return ret;
++}
++
+ static int tc358870_dsi_generic_write_short(struct udevice *dev, u8 iface, u8 address, u8 param)
+ {
+ 	int ret;
+ 	if (iface > 1) return -EINVAL;
+-	ret = tc358870_write_u16(dev, CMD_SEL, iface);
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
+ 	if (ret) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q,
+-			  	 packet_header(MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM));
++				 packet_header(dev, MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM));
+ 	if (ret) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q, address | (param << 8u));
+ 	return ret;
+ }
+ 
++static int tc358870_dsi_write_long(struct udevice *dev, u8 type, u8 cmd, u8 const* data, ssize_t len)
++{
++	u16 buf;
++	int i, ret;
++
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, type));
++	if (ret < 0) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, (u16)len + 1);
++	if (ret < 0) return ret;
++	for (i = -1; i < len; i += 2) {
++		buf = (i == -1) ? cmd : data[i];
++		if ((len - (i + 2)) >= 0) {
++			buf |= (u16)(data[i + 1] << 8u);
++		}
++		ret = tc358870_write_u16(dev, DCSCMD_Q, buf);
++		if (ret < 0) return ret;
++	}
++	return 0;
++}
++
++static int tc358870_dsi_generic_write_long(struct udevice *dev, u8 iface, u8 cmd, u8 const* data, ssize_t len)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
++	if (ret) return ret;
++
++	return tc358870_dsi_write_long(dev, MIPI_DSI_GENERIC_LONG_WRITE, cmd, data, len);
++}
++
+ static void tc358870_dsi_init(struct udevice *dev)
+ {
+ 	tc358870_write_u16(dev, ConfCtl0,		0x0004u);
+@@ -355,7 +411,7 @@ static void tc358870_dsi_init(struct udevice *dev)
+ 	tc358870_write_u32(dev, DSI_PR_TO_COUNT,	0x00001000u);
+ 	tc358870_write_u32(dev, DSI_LRX_H_TO_COUNT,	0x00010000u);
+ 	tc358870_write_u32(dev, FUNC_MODE,		0x00000160u);
+-	tc358870_write_u32(dev, DSIRX_VC_ENABLE,	0x00000001u);
++	tc358870_write_u32(dev, DSIRX_VC_ENABLE,	0x0000000fu);
+ 	tc358870_write_u32(dev, IND_TO_COUNT,		0x000000c8u);
+ 	tc358870_write_u32(dev, DSI_HSYNC_STOP_COUNT,	0x0000002au);
+ 	tc358870_write_u32(dev, DSITX_MODE,		0x00000081u);
+@@ -396,6 +452,11 @@ static bool tc358870_match_ls055r1sx04(struct udevice *dev)
+ 	cleanup_free u8 *out = NULL;
+ 	ssize_t len;
+ 
++	len = tc358870_dsi_dcs_read(dev, 0, MIPI_DCS_GET_POWER_MODE, &out);
++	if (len > 0 && out != NULL) {
++		dev_info(dev, "%s: get_power_mode returned 0x%02x.\n", __func__, out[0]);
++		kfree(out);
++	}
+ 	tc358870_dsi_generic_write_short(dev, 0, 0xb0u, 0x00u);
+ 
+ 	len = tc358870_dsi_generic_read_short(dev, 0, 0xbfu, &out);
+-- 
+2.30.0
+
