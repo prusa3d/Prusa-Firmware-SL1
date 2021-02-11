@@ -1,3 +1,8 @@
+# Version 1.5.0-rc.1
+
+## Summary (relative to 1.5.0-rc.0)
+- Fix uvcalibration cleanup on factory reset
+
 # Version 1.5.0-rc.0
 
 ## Summary (relative to 1.5.0-beta.0)
