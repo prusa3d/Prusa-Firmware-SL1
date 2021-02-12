@@ -1,3 +1,8 @@
+# Version 1.5.0-rc.2
+
+## Summary (relative to 1.5.0-rc.1)
+- Fix unboxing stucked on finished page
+
 # Version 1.5.0-rc.1
 
 ## Summary (relative to 1.5.0-rc.0)
