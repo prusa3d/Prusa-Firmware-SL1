@@ -110,9 +110,9 @@ index eba2978991..57d1f38d6f 100644
          int r;
  
          assert(s);
-@@ -227,20 +252,36 @@ static int mdns_scope_process_query(DnsScope *s, DnsPacket *p) {
-                         return log_debug_errno(r, "Failed to extend answer: %m");
-         }
+@@ -230,17 +255,33 @@ static int mdns_scope_process_query(DnsScope *s, DnsPacket *p) {
+         if (dns_answer_isempty(full_answer))
+                 return 0;
  
 +        if (is_legacy)
 +                for (int j = 0; j < full_answer->n_rrs; ++j) {
@@ -120,9 +120,6 @@ index eba2978991..57d1f38d6f 100644
 +                        full_answer->items[j].rr->ttl = 10;
 +                }
 +
-         if (dns_answer_isempty(full_answer))
-                 return 0;
- 
 -        r = dns_scope_make_reply_packet(s, DNS_PACKET_ID(p), DNS_RCODE_SUCCESS, NULL, full_answer, NULL, false, &reply);
 +        r = dns_scope_make_reply_packet(s, DNS_PACKET_ID(p), DNS_RCODE_SUCCESS, is_legacy ? p->question : NULL, full_answer, NULL, false, &reply);
 +
