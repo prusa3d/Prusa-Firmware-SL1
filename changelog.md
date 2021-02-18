@@ -1,3 +1,9 @@
+# Version 1.5.0-rc.3
+
+## Summary (relative to 1.5.0-rc.2)
+- Fix countdown timer in uvcalibration
+- Fix reloading of the projects page in Prusa Connect Local
+
 # Version 1.5.0-rc.2
 
 ## Summary (relative to 1.5.0-rc.1)
