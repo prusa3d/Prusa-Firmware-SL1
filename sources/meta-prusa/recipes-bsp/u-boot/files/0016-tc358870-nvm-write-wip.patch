@@ -1,4 +1,4 @@
-From 8922f609b3335f2466388ffe6f2fcfcf2a51e1c1 Mon Sep 17 00:00:00 2001
+From 186e08391b3d39c6cae15dee10fbddc25b95a1b8 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 11 Feb 2021 09:56:38 +0100
 Subject: [PATCH] tc358870: nvm write wip
@@ -6,8 +6,8 @@ Subject: [PATCH] tc358870: nvm write wip
 ---
  board/sunxi/panel-detector-uclass.c |  92 ++++++++++
  board/sunxi/panel_detector.h        |  12 ++
- board/sunxi/tc358870.c              | 250 ++++++++++++++++++++++------
- 3 files changed, 301 insertions(+), 53 deletions(-)
+ board/sunxi/tc358870.c              | 251 ++++++++++++++++++++++------
+ 3 files changed, 302 insertions(+), 53 deletions(-)
 
 diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
 index e37231e8f8..c6ed7b62d4 100644
@@ -146,7 +146,7 @@ index 65294be844..1e8b2e76ba 100644
  
  #endif
 diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
-index a85c423016..30751851a6 100644
+index a85c423016..bdf8f5a250 100644
 --- a/board/sunxi/tc358870.c
 +++ b/board/sunxi/tc358870.c
 @@ -18,15 +18,33 @@
@@ -240,7 +240,7 @@ index a85c423016..30751851a6 100644
  static ssize_t tc358770_fetch_from_fifo(struct udevice *dev, u8 iface, u8* data, int word_count)
  {
  	int i, len;
-@@ -567,37 +542,185 @@ static int tc358870_enable(struct udevice *dev)
+@@ -567,37 +542,186 @@ static int tc358870_enable(struct udevice *dev)
  	return 0;
  }
  
@@ -310,6 +310,7 @@ index a85c423016..30751851a6 100644
 +	cpu_to_be64s(&value);
 +	memcpy(reg + 6, &value, sizeof(value));
 +
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x04u); /* Switch to page 4 */
 +	tc358870_dsi_generic_write_long(nvm->dev, 1, 0xb1u, reg, sizeof(reg)); /* Set B1 function register */
 +
 +	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x01u); /* Switch to page 1 */
@@ -435,7 +436,7 @@ index a85c423016..30751851a6 100644
  		if (ret < 0) {
  			dev_err(dev, "%s: Failed to enable power: ret=%d\n", __func__, ret);
  			return ret;
-@@ -607,8 +730,27 @@ static int tc358870_probe(struct udevice *dev)
+@@ -607,8 +731,27 @@ static int tc358870_probe(struct udevice *dev)
  		return ret;
  	}
  
@@ -464,7 +465,7 @@ index a85c423016..30751851a6 100644
  }
  
  static const struct udevice_id tc358870_ids[] = {
-@@ -620,6 +762,8 @@ U_BOOT_DRIVER(toshiba_tc358870) = {
+@@ -620,6 +763,8 @@ U_BOOT_DRIVER(toshiba_tc358870) = {
  	.name	= "toshiba_tc358870",
  	.id	= UCLASS_PANEL_DETECTOR,
  	.of_match = tc358870_ids,
