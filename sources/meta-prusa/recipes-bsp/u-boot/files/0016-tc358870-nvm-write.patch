@@ -1,13 +1,13 @@
-From 186e08391b3d39c6cae15dee10fbddc25b95a1b8 Mon Sep 17 00:00:00 2001
+From 7e7983813303b5b457b8ce3ef48c8bf10895cb98 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 11 Feb 2021 09:56:38 +0100
-Subject: [PATCH] tc358870: nvm write wip
+Subject: [PATCH] tc358870: nvm write
 
 ---
  board/sunxi/panel-detector-uclass.c |  92 ++++++++++
  board/sunxi/panel_detector.h        |  12 ++
- board/sunxi/tc358870.c              | 251 ++++++++++++++++++++++------
- 3 files changed, 302 insertions(+), 53 deletions(-)
+ board/sunxi/tc358870.c              | 267 +++++++++++++++++++++-------
+ 3 files changed, 310 insertions(+), 61 deletions(-)
 
 diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
 index e37231e8f8..c6ed7b62d4 100644
@@ -146,7 +146,7 @@ index 65294be844..1e8b2e76ba 100644
  
  #endif
 diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
-index a85c423016..bdf8f5a250 100644
+index a85c423016..513337b2cc 100644
 --- a/board/sunxi/tc358870.c
 +++ b/board/sunxi/tc358870.c
 @@ -18,15 +18,33 @@
@@ -240,6 +240,53 @@ index a85c423016..bdf8f5a250 100644
  static ssize_t tc358770_fetch_from_fifo(struct udevice *dev, u8 iface, u8* data, int word_count)
  {
  	int i, len;
+@@ -461,17 +436,17 @@ static bool tc358870_match_ls055r1sx04(struct udevice *dev)
+ 
+ 	len = tc358870_dsi_generic_read_short(dev, 0, 0xbfu, &out);
+ 	if (len <= 0 || !out) {
+-		dev_err(dev, "%s: DSI read from BFh address failed (%ld)\n", __func__, len);
++		dev_warn(dev, "%s: DSI read from BFh address failed (%ld)\n", __func__, len);
+ 		return false;
+ 	}
+ 	tc358870_save_match_data(dev, out, len);
+ 	if (len >= sizeof(ALMID) && memcmp(out, ALMID, sizeof(ALMID)) == 0) {
+-		printf("%s: matched ALMID: SHARP LS055R1SX04\n", __func__);
++		dev_info("%s: matched ALMID: SHARP LS055R1SX04\n", __func__);
+ 		return true;
+ 	}
+-	dev_err(dev, "%s: ALMID doesn't match an R63419 driver.\n", __func__);
++	dev_warn(dev, "%s: ALMID doesn't match an R63419 driver.\n", __func__);
+ 	if (len == 0x1f) {
+-		dev_err(dev, "%s: response length is correct though: PASS\n", __func__);
++		dev_warn(dev, "%s: response length is correct though: PASS\n", __func__);
+ 		return true;
+ 	}
+ 	return false;
+@@ -486,20 +461,20 @@ static bool tc358870_match_rv059fbb(struct udevice *dev)
+ 	len = tc358870_dsi_dcs_read(dev, 1, 0xa1u, &out);
+ 
+ 	if (len <= 0 || !out) {
+-		printf("%s: DSI read from A1h address failed\n", __func__);
++		dev_warn("%s: DSI read from A1h address failed\n", __func__);
+ 		return false;
+ 	}
+ 	tc358870_save_match_data(dev, out, len);
+ 	if (len >= sizeof(ID) && memcmp(out, ID, sizeof(ID)) == 0) {
+-		printf("%s: matched RV059FBB by descriptor block (112233445566)\n", __func__);
++		dev_info("%s: matched RV059FBB by descriptor block (112233445566)\n", __func__);
+ 		return true;
+ 	}
+ 	if (out[6] == 0xffu) {
+-		printf("%s: matched RV059FBB by Exit Code (0xff) at the end of A1h response\n", __func__);
++		dev_warn("%s: matched RV059FBB by Exit Code (0xff) at the end of A1h response\n", __func__);
+ 		return true;
+ 	}
+ 	if (len == 7) {
+-		printf("%s: matched RV059FBB by the length (7) of its response to A1h\n", __func__);
++		dev_warn("%s: matched RV059FBB by the length (7) of its response to A1h\n", __func__);
+ 		return true;
+ 	}
+ 
 @@ -567,37 +542,186 @@ static int tc358870_enable(struct udevice *dev)
  	return 0;
  }
