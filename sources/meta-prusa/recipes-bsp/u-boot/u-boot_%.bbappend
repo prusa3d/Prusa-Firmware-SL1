@@ -15,7 +15,7 @@ SRC_URI_append = " \
 	file://0013-exposure-panel-identification.patch \
 	file://0014-include-edid_bootarg-in-default-env.patch \
 	file://0015-tc358870-switch-VC-if-requested-panel-IC.patch \
-	file://0016-tc358870-nvm-write-wip.patch \
+	file://0016-tc358870-nvm-write.patch \
 	file://fw_env.config \
 "
 
