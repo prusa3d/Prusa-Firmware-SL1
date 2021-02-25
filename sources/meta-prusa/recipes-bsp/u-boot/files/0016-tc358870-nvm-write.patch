@@ -1,16 +1,16 @@
-From 7e7983813303b5b457b8ce3ef48c8bf10895cb98 Mon Sep 17 00:00:00 2001
+From 54e7193a527e3d0c78c752d418af86e468bb78ee Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 11 Feb 2021 09:56:38 +0100
 Subject: [PATCH] tc358870: nvm write
 
 ---
- board/sunxi/panel-detector-uclass.c |  92 ++++++++++
+ board/sunxi/panel-detector-uclass.c | 107 ++++++++++
  board/sunxi/panel_detector.h        |  12 ++
- board/sunxi/tc358870.c              | 267 +++++++++++++++++++++-------
- 3 files changed, 310 insertions(+), 61 deletions(-)
+ board/sunxi/tc358870.c              | 292 ++++++++++++++++++++++------
+ 3 files changed, 350 insertions(+), 61 deletions(-)
 
 diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
-index e37231e8f8..c6ed7b62d4 100644
+index e37231e8f8..87e23829d3 100644
 --- a/board/sunxi/panel-detector-uclass.c
 +++ b/board/sunxi/panel-detector-uclass.c
 @@ -5,6 +5,7 @@
@@ -21,7 +21,7 @@ index e37231e8f8..c6ed7b62d4 100644
  #include "panel_detector.h"
  
  const char* panel_detector_get_panel_name(struct udevice *dev)
-@@ -19,8 +20,99 @@ u64 panel_detector_get_match_data(struct udevice *dev)
+@@ -19,8 +20,114 @@ u64 panel_detector_get_match_data(struct udevice *dev)
  	return uc_priv->match_data;
  }
  
@@ -60,13 +60,28 @@ index e37231e8f8..c6ed7b62d4 100644
 +	if (err == CMD_RET_USAGE)
 +		return CMD_RET_USAGE;
 +
-+	if (err) {
++	if (err < 0) {
 +		printf("Command failed: Error %d\n", err);
 +		return CMD_RET_FAILURE;
 +	}
 +
-+	printf("OK\n");
-+	return CMD_RET_SUCCESS;
++	if (err == 0) {
++		printf("OK\n");
++		return CMD_RET_SUCCESS;
++	}
++
++	return CMD_RET_FAILURE;
++}
++
++static int do_panel_is_writable(struct udevice *dev)
++{
++	int ret = panel_detector_has_writable_nvm(dev);
++	if (ret == 1) {
++		printf("The ID region of the OTP has already been written to.\n");
++	} else if (ret == 0) {
++		printf("The ID region of the OTP is empty and writable.\n");
++	}
++	return ret;
 +}
 +
 +static int do_panel_id_read(struct udevice *dev)
@@ -104,7 +119,7 @@ index e37231e8f8..c6ed7b62d4 100644
 +		return handle_error(r);
 +
 +	if (!strcmp(cmd, "is_writable") && argc == 0)
-+		return panel_detector_has_writable_nvm(dev);
++		return handle_error(do_panel_is_writable(dev));
 +	else if (!strcmp(cmd, "read") && argc == 0)
 +		return handle_error(do_panel_id_read(dev));
 +	else if (!strcmp(cmd, "write") && argc == 1)
@@ -146,7 +161,7 @@ index 65294be844..1e8b2e76ba 100644
  
  #endif
 diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
-index a85c423016..513337b2cc 100644
+index a85c423016..6e9ec8c2fc 100644
 --- a/board/sunxi/tc358870.c
 +++ b/board/sunxi/tc358870.c
 @@ -18,15 +18,33 @@
@@ -287,7 +302,7 @@ index a85c423016..513337b2cc 100644
  		return true;
  	}
  
-@@ -567,37 +542,186 @@ static int tc358870_enable(struct udevice *dev)
+@@ -567,37 +542,211 @@ static int tc358870_enable(struct udevice *dev)
  	return 0;
  }
  
@@ -381,9 +396,34 @@ index a85c423016..513337b2cc 100644
 +	return 0;
 +}
 +
++static u8 rv059fbb_nvm_read_otp(struct rv059fbb_nvm *nvm, u16 index)
++{
++	cleanup_free u8 *out = NULL;
++	ssize_t len;
++
++	if (index > 1008) return 0;
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x01u); /* Switch to page 4 */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb4u, (u8)(index >> 8u)); /* Upper bits of OTP index */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb5u, index & 0xffu); /* Lower bits of OTP index */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb3u, 0x02u); /* Start read */
++	udelay(10);
++	len = tc358870_dsi_generic_read_short(nvm->dev, 1, 0xb6u, &out);
++	if (len < 1) return 0;
++	return out[0];
++}
++
 +static int tc358870_has_writable_nvm(struct udevice *dev)
 +{
-+	return tc358870_is_rv059fbb_connected(dev) ? 0 : 1;
++	u8 out;
++	if (!tc358870_is_rv059fbb_connected(dev))
++		return -ENODEV;
++
++	cleanup(rv059fbb_nvm_freep) struct rv059fbb_nvm* nvm = rv059fbb_nvm_alloc(dev);
++	if (nvm == NULL)
++		return -EACCES;
++
++	out = rv059fbb_nvm_read_otp(nvm, 432);
++	return out >> 7; /* the highest bit is 1 if written */
 +}
 +
 +static int tc358870_write_id_to_nvm(struct udevice *dev, u64 id)
@@ -483,7 +523,7 @@ index a85c423016..513337b2cc 100644
  		if (ret < 0) {
  			dev_err(dev, "%s: Failed to enable power: ret=%d\n", __func__, ret);
  			return ret;
-@@ -607,8 +731,27 @@ static int tc358870_probe(struct udevice *dev)
+@@ -607,8 +756,27 @@ static int tc358870_probe(struct udevice *dev)
  		return ret;
  	}
  
@@ -512,7 +552,7 @@ index a85c423016..513337b2cc 100644
  }
  
  static const struct udevice_id tc358870_ids[] = {
-@@ -620,6 +763,8 @@ U_BOOT_DRIVER(toshiba_tc358870) = {
+@@ -620,6 +788,8 @@ U_BOOT_DRIVER(toshiba_tc358870) = {
  	.name	= "toshiba_tc358870",
  	.id	= UCLASS_PANEL_DETECTOR,
  	.of_match = tc358870_ids,
