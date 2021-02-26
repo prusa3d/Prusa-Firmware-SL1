@@ -13,4 +13,4 @@ add_global_arguments('-D_GNU_SOURCE', language : 'c')
 
 libsystemd = dependency('libsystemd')
 executable('usbmount', 'usbmount.c', dependencies: [libsystemd], install: true)
-executable('usbremount', 'usbremount.cpp', dependencies: [libsystemd], install: true)
+executable('usbremount', 'usbremount.cpp', dependencies: [libsystemd], install: true, install_mode: 'rwsr-sr-x')
