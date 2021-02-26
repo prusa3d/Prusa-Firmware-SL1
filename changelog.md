@@ -1,3 +1,84 @@
+# Version 1.6.0-alpha.0
+
+## Summary (relative to 1.5.0)
+- Direct Wayland support in a64-fw
+- Errors based on Prusa-Error-Codes
+- Redesigned error pages
+- Self-detected printer model
+- Fixed project file close
+- mDNS/zeroconf now handled by systemd-resolved
+- Improved USB automounting
+- Support for new panels, autodetection
+- UI fixes
+- Redesigned settings structure
+- Redesigned notifications
+- Improved a64-fw tests
+- Persistent preloader
+- Support for SL1S
+- Reimplemented admin menu
+- Fixed stuck recovery
+- Improved internal pre-print checks structure
+- Added feature Profiles Sets
+- API based display-test, self-test, calibration wizards
+- Dropped support for websocket in UI, backend <-> frontend now uses only DBus
+- Tune tilt menu fixed, tilt tune up extended
+- Data privacy defaults to enabled
+- Fixed API compatibility with Octoprint
+- Fixed local web UI project listing order
+- Random fixes in Prusa connect
+- System wide file manager
+- Lots of rewrites in a64-fw and touch UI regarding transition to DBus
+- Lots of small bug fixes
+
+# Version 1.5.0-rc.3
+
+## Summary (relative to 1.5.0-rc.2)
+- Fix countdown timer in uvcalibration
+- Fix reloading of the projects page in Prusa Connect Local
+
+# Version 1.5.0-rc.2
+
+## Summary (relative to 1.5.0-rc.1)
+- Fix unboxing stucked on finished page
+
+# Version 1.5.0-rc.1
+
+## Summary (relative to 1.5.0-rc.0)
+- Fix uvcalibration cleanup on factory reset
+
+# Version 1.5.0-rc.0
+
+## Summary (relative to 1.5.0-beta.0)
+- translations update
+- Fix upload log with new token
+- properly handle the close button on the notification list
+- Fix acces to the wifi settings page
+
+# Version 1.5.0-beta.0
+
+## Summary (relative to 1.5.0-alpha.8)
+- default backlight 50 %
+- fixed strings in slicer and web-ui regarding printer security
+- refreshed Dockerfile and gitlab CI scripts (new buildserver in use)
+- fixes in web-ui (oneclick is displayed everywhere, show popup window before start print, fixed texts where to find credentials)
+- add licences for web-ui
+- fix timezone offset in time estimation for web-ui
+- New Errors are used to generate unique Prusa style error screens
+- printer identification in QR codes
+- delete only wifi connections on ethernet (bugfix)
+- Open projects are deleted, but still occupy space (bugfix)
+- improve reliability due to forking of the preloader (bugfix)
+- error codes available in new admin menu
+- Error apge new (hopefully final) design with smartphone icon and red
+- Avoid repeatedly showing Finishewd page
+- Advanced settings merged with settings and deleted (new design)
+- notifications are white
+- finsihed page and new firmware pages are normal pages. Not in top bar
+- do not show notifications on splashscreen
+- touch button behaviour unifications
+- fixed preloader process -> thread
+- fixed saving data into factory partition un uvcalibration
+
 # Version 1.5.0-alpha.8
 
 ## Summary (relative to 1.5.0-alpha.7)
