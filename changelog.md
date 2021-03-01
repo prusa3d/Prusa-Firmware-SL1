@@ -1,3 +1,14 @@
+# Version 1.6.6-alpha.1
+
+## Summary (relative to 1.6.0-alpha.0)
+- Fixed admin net update
+- Fixed admin exposure, hardware units
+- Fixed error display in touch ui
+- Disable seteppers in settings
+- Set language and timezone at the first start
+- Fixed back button on change exposure times
+- Replace the qrcode-generator with a modified one(keeps the same qrcode image size)
+
 # Version 1.6.0-alpha.0
 
 ## Summary (relative to 1.5.0)
