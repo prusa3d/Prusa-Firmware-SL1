@@ -1,12 +1,12 @@
 SRC_URI = "\
-	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;name=touch-ui;branch=master \
+	git://git@gitlab.com/prusa3d/sl1/touch-ui.git;protocol=ssh;name=touch-ui;branch=1.5 \
 	git://git@github.com/M4rtinK/qqr.js.git;protocol=ssh;branch=master;name=qrcode-generator;destsuffix=git/3rdparty/qrcode-generator\
 	git://git@github.com/martin357/maddy.git;protocol=ssh;branch=master;name=maddy;destsuffix=git/3rdparty/maddy\
 	file://touch-ui.service \
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV_touch-ui = "440b06f0b40684d4d1c7fa52b0765282076bf26b"
+SRCREV_touch-ui = "8d6977887da20d839c3f5384dbec3dcf609cdc6e"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 
