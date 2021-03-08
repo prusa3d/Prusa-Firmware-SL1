@@ -1,238 +1,230 @@
-# Version 1.5.0-rc.3
+## Summary
+- QR Error codes
+- Redesigned Settings menu
+- Advanced Prusa Connect Local
+- One-click print functionality
+- Top bar notifications
+- Firmware upgrade & downgrade
+- Backlight and screensaver control
+- Project files thumbnails
+- Log upload improved
+- Print statistics
+- Others
+- Fixed bugs
 
-## Summary (relative to 1.5.0-rc.2)
-- Fix countdown timer in uvcalibration
-- Fix reloading of the projects page in Prusa Connect Local
+This is the first public release candidate of the upcoming firmware 1.5.0. There are major changes to the code, user interface, new features, and multiple improvements across the entire firmware.
 
-# Version 1.5.0-rc.2
+Compared to the previous release 1.4.2, there are 819 commits, 267 merge requests, and 38 bug fixes. Kudos to the community for reporting the issues.
 
-## Summary (relative to 1.5.0-rc.1)
-- Fix unboxing stucked on finished page
+### QR Error codes
+We always keep working on improvements to the user experience - and the QR Error codes are the next evolution step. Until now, if the printer experienced an error, a short description was displayed on the screen, and the user had to open either the Handbook or search the Prusa knowledgebase (help.prusa3d.com) for a solution.
 
-# Version 1.5.0-rc.1
+With this firmware release, the printer will display more information: the name of the error followed by a brief description and a QR code. Take your phone, scan the code, and you will be immediately redirected to an article, which will in detail explain what happened to your printer and how to fix the problem.
 
-## Summary (relative to 1.5.0-rc.0)
-- Fix uvcalibration cleanup on factory reset
+Each error code comes with a short URL containing a code. This is useful in case you can't scan the QR code. Open help.prusa3d.com, type in the error code (e.g., #10308), or use the displayed short link, and get access to the required article. Moreover, all the articles are translated into seven languages.
 
-# Version 1.5.0-rc.0
+![Error code #10308](https://user-images.githubusercontent.com/31956337/110255285-34f00f80-7f93-11eb-8ee0-bfbf072864ea.png)
 
-## Summary (relative to 1.5.0-beta.0)
-- translations update
-- Fix upload log with new token
-- properly handle the close button on the notification list
-- Fix acces to the wifi settings page
+How are the codes created? Let's use error #10308 again as an example. The code consists of five numbers with the following pattern: XXYZZ.
 
-# Version 1.5.0-beta.0
+- XX -> ID of the printer based on the USB PID (for SL1 it is “10”)
+- Y -> the category of the error (3 is used for the electronics errors category)
+- ZZ -> specific error code (08 is used for a printer without UV calibration)
 
-## Summary (relative to 1.5.0-alpha.8)
-- default backlight 50 %
-- fixed strings in slicer and web-ui regarding printer security
-- refreshed Dockerfile and gitlab CI scripts (new buildserver in use)
-- fixes in web-ui (oneclick is displayed everywhere, show popup window before start print, fixed texts where to find credentials)
-- add licences for web-ui
-- fix timezone offset in time estimation for web-ui
-- New Errors are used to generate unique Prusa style error screens
-- printer identification in QR codes
-- delete only wifi connections on ethernet (bugfix)
-- Open projects are deleted, but still occupy space (bugfix)
-- improve reliability due to forking of the preloader (bugfix)
-- error codes available in new admin menu
-- Error apge new (hopefully final) design with smartphone icon and red
-- Avoid repeatedly showing Finishewd page
-- Advanced settings merged with settings and deleted (new design)
-- notifications are white
-- finsihed page and new firmware pages are normal pages. Not in top bar
-- do not show notifications on splashscreen
-- touch button behaviour unifications
-- fixed preloader process -> thread
-- fixed saving data into factory partition un uvcalibration
+More information about the types of printers, categories, and a full list of the error codes can be found in the following [GitHub repository](https://github.com/prusa3d/Prusa-Error-Codes).
 
-# Version 1.5.0-alpha.8
+The URL link embedded in the QR code may contain an optional "device hash" (this can be enabled/disabled in the Settings -> Settings & Sensors). Including this information enables us to check whether you are running the latest version of firmware - and if not, we will inform you at the top of the article. The information provided in the URL is stored in our database to help us better understand which errors are the most common and how many errors each printer experienced.
 
-## Summary (relative to 1.5.0-alpha.7)
-- fix firstboot service (dependent on machine-id)
-- fix touch-ui can bootup after bootstrap
-- fix bootstrap partition order
-- New ssh, uart handling
-- fix selective silence of avahi logs
-- fix default brightness to 100 %
-- fix exposure time change (isn't this introducing the delay?)
-- new merge setting and advanced settings into one page
-- fix sl1fw.service failed to start due to weston framebuffer not started
-- new exception page redesing
-- fix refresh raucb files on FW update page
-- fix unify design QR code pages
-- new prusa-errors using yaml
+Example of the URL in the QR code: https://help.prusa3d.com/en/10308/OI6HB7H6/150
+- en -> a language of the landing page with the article
+- 10308 -> the unique error code sequence
+- OI6HB7H6 -> device hash
+- 150 -> firmware version in your 3D printer
 
-# Version 1.5.0-alpha.7
+![Error page example](https://user-images.githubusercontent.com/31956337/110255442-07f02c80-7f94-11eb-9f34-20dda12ea20e.png)
 
-## Summary (relative to 1.5.0-alpha.6)
-- Changed set login button property invisible to disable
-- Removed Prusa Connect and filemanager objects
-- Fixed reprint for out of range exposure times
-- Fixed fixing out of range exposure values
-- Fixed project load error handling
-- New factory mode switch support
-- Updated remote services
-- Bump Yocto layers - fixes haveged boot issue
-- touch-ui.service: change WorkingDirectory & HOME to /run/touch-ui
+The device hash cannot be used to recover anything sensitive like a serial number and isn't used for anything more than the QR codes feature. Therefore, there is no reason for security concerns. This feature is turned ON by default. In case you don't want to use this enhanced feature, you can switch it off in the printer's menu by setting the "Device hash in QR" to OFF.
 
-# Version 1.5.0-alpha.6
+Once you turn it off, the QR code URL will contain only the following: https://help.prusa3d.com/en/10308/
 
-## Summary (relative to 1.5.0-alpha.5)
-- Fixed admin based loglevel switching
-- Fixed general pritner failure on broken project open
-- Make a64-fw a DBus service, improve startup stability
-- Fixed http digest enable
-- Refactored a64-fw logs
-- YAML based prusa error codes
-- Final logs upload url
-- Fixed unknown preprint warning display
-- Fixed a64-fw documentation
-- filemanager refactoring
-- Fixed Remote API without internet
-- Fixed touch-ui: forgotten references to pages that are no longer instantiated
-- Fixed touch-ui: automatically pushing PageWizard to the stack if printer0.state changes to WIZARD
+### Redesigned Settings menu
+This firmware release contains many new features. More will come in the upcoming versions, which means it was necessary to redesign the settings menu. Individual settings were regrouped and sorted based on their use. Most commonly used are on the top.
 
-# Version 1.5.0-alpha.5
+![Settings menu](https://user-images.githubusercontent.com/13433018/102616896-9218b980-4138-11eb-9564-83e35e1bdb01.png)
 
-## Summary (relative to 1.5.0-alpha.4)
-- Yocto updated to Dunfell (LTS)
-- Fix UV calibration boost
-- New a64-fw wizard API
-- New a64-fw uv display counter
-- New a64-fw add statistics
-- New a64-fw store old exposure objects. It may allow reprinting 
-- Overall codebase cleanup
-- Using Lima (gpu driver) instead of mali blob
-- Fixed shallow git fetch
-- Using Wayland compositor (Weston)
-- Prusa connect via Dbus (registration, status reporting and telemetry)
-- Fix web-ui one-click (works only if you are ok "Projects" page. To work everywhere needs refactoring)
-- Fix slicer upload texts (slices displays more descriptive texts on error)
-- Fix web-ui feed me response and project cancel
-- Fix web-ui works properly with both http digest and API key
-- Fix web-ui notifies when printer is busy or uncalibrated
-- New filemanager0 dbus service. It should handle all the files management (for now lists the projects and extracts metadata)
-- New admin API (new admin using dbus API. Now works in parallel with the old one)
-- Fix a64-fw wait for dbus event from Weston. Still some delay before the picture is shown, but should not be a problem for SL1.
-- New a64-fw project format support
-- Fix a64-fw deleting projects, wizard resin volume, uv calibration save statistics
-- New pages handled by touch-ui (finished, time and date pages, advanced settings, )
-- Fix a64-fw cover check while printing
-- New logs upload API
-older projects. Not used now.
-- Fix a64-fw force cover close after resin refill
-- Fix uv calibration only one guide (needs to be fixed in touch-ui)
-- Fix mc-fw as a submodule of a64-fw
-- New mc-fw version 1.0.0 (older MC revisions discontinued)
-- Fix a64-fw turn on the NTP on factory reset
-- Fix touch-ui rotated since we use Weston
-- Fix touch-ui dbus service name
-- New touch-ui advanced settings squash
-- Fix touch-ui high cpu consumption
-- Fix display backlight blink
-- Fix web-ui modal window timeout
- 
-# Version 1.5.0-alpha.4
+The top-level menu Settings menu now contains:
+- _Calibration_ - Contains self-test, axis, and UV calibration and display test. All assisted guides the printer offers.  
+- _Network_ - Everything regarding network and **remote access**.
+- _Platform & Resin Tank_ - Axis movement and various settings for achieving optimal print results, such as 'Limit for Fast Tilt' or 'Tower Offset.'
+- _Firmware_ - New section allowing the user to upgrade/downgrade or choose the 'update channel.' Read further for more detailed info. 
+- _Settings & sensors_ - General settings of the printer and Sensors management.
+- _Touchscreen_ - New section with backlight control. For more information, read further.
+- _Language & Time_ - Localization and time options such as 'Timezone' or 'NTP settings.'
+- _System Logs_ - Export logs to the USB or export them to the cloud for easier communication with support in case of any issue.
+- _Support_ - Contains 'Download examples,' 'System Information,' and useful links to manuals or videos.
 
-## Summary (relative to 1.5.0-alpha.3)
-- Touch screen blink removal
-- Screen saver
-- Cancelable log upload/export and FW download
-- Harmonize names for Qt (touch-ui)
-- Prusa errors specified in separate repository
-- RTC tested
-- mount USB read only and remount only when needed
-- Omaha statistics displays OS version instread of UUID
-- Printer summary is exported at the end of the logs
-- UV calibration in only one guide
-- Printer statistics (total print time, resin consumed, ...)
-- Fixed covercheck after resin refill
-- Increase serial port write timeout
-- Exposition display counter
-- Counters of replacements for LED set and expo display
-- Fixed http digest
-- Add mc-fw and other components as submodules
-- wizard API (new unboxing)
-- Exposure objects being pickled (can be used after restart)
-- Various fixes on dbus API
-- Virtual printer moved into folder
-- Scripts for tests
-- Finished page displayed as notification
-- Nemo removal
+### Advanced Prusa Connect Local
+The online web user interface (web UI) called Prusa Connect Local is getting a major update today. In the previous release, the interface was read-only, providing information about the printer without the ability for the user to change anything. Starting with this release, the web UI is getting more advanced, enabling the user to take control over the printer remotely.
 
-# Version 1.5.0-alpha.3
+![Prusa Connect Local - web UI](https://user-images.githubusercontent.com/31956337/110255559-ada39b80-7f94-11eb-8511-cc676fbe0c2e.png)
 
-## Summary (relative to 1.5.0-alpha.2)
-- Fixed ambient temp warning confirm
-- Don't hightlight advanced settings items on press
-- Shorter timeout for properties reload
-- Fixed short flicker back to advancedsettings after save cofiguration page
-- Removed reading of config0 value limits from backend
-- Disabled switch from firmwareupdate to networksetting page
-- Touch-UI code refactoring
-- Fixed beeping and highlighting for DelegateRef items
-- Hotfix log export/upload
-- Fixed beeping on text buttons, notification list
-- FIxed caching of PageConfirm messed up with rollUp header->disabled
-- Fixed double logs upload call
+The user can browse and manage internal and USB storage, upload new projects simply by dragging the project file into the web page. Prusa Connect Local also supports the start of a new print from web UI and additional print management, such as changing the exposure times or resin refill requests.
 
-# Version 1.5.0-alpha.2
+The system is now equipped with an HTTP digest for improved printer security, which is set as a default option. In case the user wants to enter the web UI, they must provide login credentials. The username and password can be found and adjusted in the printer's menu -> Settings -> Login credentials.
 
-## Summary (relative to 1.5.0-alpha.1)
-- flush mount option for USB
-- custom rm_dir replaced by rmdir (should prevent for deleting files on USB)
-- wifi correctly loads nvram and uses host interrupt
-- added firstboot recipe (RTC can be tested)
-- One click print + model preview
-- automatic growfs on dev image
-- reading of revision GPIOs rewritten
-- prepared support in Yocto for sftp/webDAV/cifs fuse modules
-- improved error displayed by slicer when http digest is ON + bugfix
-- change log level to debug if admin or factory mode detected
-- cancel print does not hang in confirm page
-- show correct data (layer num/height, print times, ...) on next print, if previous print was canceled
-- changed lower limit of UV PWM since some printers failed in UV claibration
-- allow UV meter to reconnect due to EMI surge
-- fixed config export in admin
-- support for 2mm screw (couldn't home in calibration)
-- virtual printer fixed + tests for virtual printer added
-- logs upload to sever (only development version TODO: change to production server)
-- notification are on correct dbus name cz.prusa3d.sl1.Notify1
-- Fixed timezone names
-- Fixed text overflow on error page
-- show admin while printing
-- Rotating clock on wait page
-- log upload, export and poweroff via API
-- Advanced settings using API
-- Added counter for exposition display (both counters can be erased in admin->display)
-- Integrated prusa errors
-- Fixed preprint check warnings (thrown ASAP)
+Besides controlling the printer from the web UI, the user can also use the login credentials in PrusaSlicer 2.3.0 to connect the printer for direct upload of the sliced models. On the home screen called "Plater," click on the cogwheel icon next to the printer and select "Add physical printer." More information is provided in the Prusa knowledge base article.
 
-# Version 1.5.0
+The HTTP digest can be turned off, which causes the system to use a simpler version of an API key, popular with the OctoPrint solution. However, this option is not recommended due to the low security as the key is sent over the network unencrypted.
+
+Prusa Connect Local is designed to be used on a local (internal) network. It is not recommended to access the printer from the internet over a port forward on the router. Instead, use an encrypted VPN.
+
+### One-click print functionality
+Similarly to the Prusa MINI+, the SL1 now offers a user-friendly functionality, where the printer automatically shows up the project ready for immediate print if:
+- The USB flash drive with the project was inserted. 
+- The project was successfully uploaded from Prusa Slicer or Prusa Connect Local.
+
+![One Click Print](https://user-images.githubusercontent.com/31956337/110256093-49360b80-7f97-11eb-9e19-2ac636db2088.png)
+
+This feature is supported by both touch UI and Prusa Connect Local.
+
+### Top bar notifications
+The firmware 1.5.0 introduces a new system of notifications regarding various events, shown in the top bar. There is an 'envelope' icon if any notification is waiting for the user to be displayed. To show all available notifications **swipe down from the top bar** (similar to smartphones). 
+
+![Top bar notifications](https://user-images.githubusercontent.com/13433018/102616481-e96a5a00-4137-11eb-856d-85fb2e3de51e.png)
+
+Currently, three notification types are supported:
+- _New firmware update_ - When a new firmware is released, the SL1 automatically informs the user. The printer shows a page with simplified release notes if the user clicks on the notification. Note that your SL1 must be connected to the internet.
+- _Project upload_ - if a new project is being uploaded into the printer (from PrusaSlicer or Prusa Connect Local), the notification informs the user about the upload progress. It displays an error if something goes wrong.
+- _Result of the print job_ - The printer notifies the user about finished, canceled, or failed print jobs. The printer shows a "finished page" with statistics regarding a particular print job if the user clicks on the notification.
+
+### Firmware upgrade & downgrade
+The section of the Settings menu with Firmware update was redesigned and now offers more functionality. It informs the user about the currently installed version and enables a manual check with the Prusa update server.
+
+#### Firmware upgrade
+By default, the printer is set to check only for a stable version of the firmware. However, we would like to offer the community a chance to join us in testing and developing the firmware at earlier stages. Starting this release of the firmware, you will be able to switch ON the option "Receive Beta Updates."
+
+* Stable versions
+Final and thoroughly tested versions of the firmware recommended for the general audience and production environment. Original Prusa SL1 uses [semantic versioning](https://semver.org/). Stable versions include only three digits, for example, 1.4.2.
+
+* Beta versions
+This release is also tested and brings the latest features for the user to enjoy as soon as possible. However, there still might be some bugs and small glitches. It is important to note that even with the beta version, the printer is fully operational and ready to print. For example, the current version (1.5.0-RC.4) is a beta release.
+
+![Firmware upgrade/downgrade page](https://user-images.githubusercontent.com/13433018/102614426-7f03ea80-4134-11eb-9495-880ba08040c8.png)
+
+#### Firmware downgrade
+There is a new option enabling the user to downgrade to the previous system version if the newly installed firmware is not working as expected. It is a safer and more convenient option than installing an older version.
+
+The user can downgrade only once from the currently installed version. For example, from 1.5.0-RC.4 to 1.4.2, but further downgrades aren't possible.
+
+### Backlight and screensaver control
+On your SL1 printer, you can manually set the backlight intensity. Starting this release, you can also set a timeout used for the screensaver (turn off the display completely). This will come in handy for the overnight prints. The timer can be set from 10 seconds to 30 minutes. To turn ON the screen with an activated screensaver, simply tap the screen.
+
+![Touchscreen backlight settings](https://user-images.githubusercontent.com/13433018/102618329-db6a0880-413a-11eb-8472-58f36b2b7f7c.png)
+
+The default backlight intensity will now be set to 50 %, and the screensaver is by default turned off. The power button stays ON even when the display is turned OFF to indicate that the printer is running.
+
+### Project files thumbnails
+For a better user experience, the Original Prusa SL1 displays thumbnails of the project files.
+
+![Project thumbnails](https://user-images.githubusercontent.com/13433018/102622103-df992480-4140-11eb-91c3-b1f1b4fcf50e.png)
+
+### Log upload improved
+Previous firmware releases brought an option to extract a system log from the printer, save it on a USB drive and send it to Prusa support for further investigation. This firmware release improves handling the logs one step further.
+
+![Log_upload_finished](https://user-images.githubusercontent.com/31956337/110256422-1db42080-7f99-11eb-95ff-2bc81a111c6c.png)
+
+If the printer is connected to the internet, the user is able to upload the log directly to a dedicated Prusa server. Once the system log is uploaded to the server, a "token" is sent back to the printer and displayed on the screen. Use this token while communicating with the support team. In case you forgot the token, the printer always remembers the one from the latest successful upload.
+
+The structure of the logs archived was also improved. Now the archive contains a folder with the following content:
+- _log.txt_ - standard system log split by reboots.
+- _summary.json_ - all printer parameters and settings (only the current state)
+- _user_data_ folder - contains records from wizards and calibrations in user mode
+- _factory_data_ folder - contains records from wizards and calibrations while the printer was in factory mode
+
+### Print statistics
+This release extends the printer statistics, which now include items such as: 
+- Counters of the usage for exposition display and also UV LED set.
+- Statistics regarding prints such as total print time, number of started or successfully finished prints.
+- Total amount of consumed resin.
+
+![System information page - printer statistics](https://user-images.githubusercontent.com/13433018/102618741-9a262880-413b-11eb-8845-5b43af135804.png)
+
+# Others
+- New Wayland compositor (touch UI is now rotated in the code properly)
+- Yocto LTS version Dunfell
+- Using Open Source Lima GPU driver instead of BSP Mali blob
+- System updated to Linux kernel 5.6.2
+- New motion controller version 1.0.0 (older MC revisions discontinued)
+- USB flash mounted rear-only and remounted only when needed
+- Unboxing uses the new "wizard API." This API will be used to create all guides in the printer
+- Cancelable FW download
+- UV calibration unified into one guide. Apply boosted results to calibrate 410 um wavelength properly. Allow UV calibrator to reconnect after EMI surge.
+- Virtual printer improved + unit tests added
+- Preprint warnings are displayed ASAP.
+
+# Fixed bugs
+- After resin refill, the printer sometimes didn't ask the user to close the cover. This message is now fixed.
+- High CPU usage by touch UI in some scenarios, the bug was fixed, and the usage is now optimized.
+- Backlight of the touch display blinked upon the boot-up sequence. This is now fixed.
+- Ambient temperature warning wasn't working correctly in some situations. This is now fixed.
+- Reprint from USB was misbehaving. The current FW release saves the file to the printer and enables reprint.
+
+# Version 1.4.2
 
 ## Summary
-- Linux 5.6.4
-- Patches cleanup regarding HDMI hotplug and eFUSES
-- Errors defined in separate repository
-- Prevent downgrades (if not in factory mode)
-- Set update channel without restart
-- Firmware update page facelift
-- Option to select stable or beta update channel
-- New web UI (upload project, browse both storages, manage print process)
-- http digest security (recomended only for LAN)
-- New richer remote API
-- Popup notifications on touch display
-- Backlight control
-- Dump printers config while saving the logs
+- UV calibration algorithm updated
+- Fixed cover check after resin refill
 
-## Fixed bugs
-- Reprint from USB
+## Detailed description
+
+### UV calibration algorithm updated
+The SL1 LED array has a wavelength of 405 nm, however, some units might have a slight manufacturing tolerance. This doesn't affect the print itself, but in some scenarios, the UV calibration process wouldn’t finish correctly. The calibration algorithm is now updated and this issue fixed.
+
+### Fixed cover check after resin refill
+After resin refilling, the printer should check whether the acrylic lid is closed and if not, inform the user. This feature wasn't always working correctly and is now fixed.
+
+# Version 1.4.1
+
+## Summary
+- Fixed missing timezones
+- Fixed UV calibrator disconnection
+- Fixed data corruption on USB
+- Fixed resin volume warning
+- Fixed preprint warning delay
+- Fixed message "printer is not calibrated" during calibration
+- Fixed title overflow on some pages by sliding the title
+
+## Detailed description
+
+### Fixed missing timezones
+Based on the customer feedback there were several missing major cities across the world. These cities were added to the list. Also, the underscore sign was removed from the city names.
+
+### Fixed UV calibrator disconnection
+In a rare situation, the USB bus had to reconnect the UV calibrator due to the EMI surge. Now, the firmware correctly reconnects the device and calibration will continue without any interruption.
+
+### Fixed data corruption on the USB drive
+This release brings improved behavior of handling the USB drives. It is now mounted with a `flush` flag which ensures data are written into the memory sooner. The potential cause of deleting of the files was eliminated by using standard `rmdir` command which will not delete the non-empty directory in any situation.
+
+### Fixed resin volume warning
+The Original Prusa SL1 printer is equipped with the resin level sensor, which measures the volume of the resin in the tank before the print is started and compares it to the amount required by the printed model.
+
+During the printing process, the printer calculates the amount of the remaining resin and ensures a minimum level of the resin. If this level is reached, the print stops and the user is asked to refill the tank. This feature wasn't properly working in the 1.4.0 due to the major code refactoring and is fixed in this release.
+
+### Fixed message "printer is not calibrated" during calibration
+After replacing the print display and performing the UV calibration or during recalibration using the same display, the user was informed in the very beginning, that the printer is not calibrated, which wasn't true. The printer had at that moment the calibration information of the previous successful calibration. This is now fixed and the message is now not displayed.
 
 ## Others
-- Show precise resin volume in resin sensor test
-
+- Fixed scrollbar is now shown only when needed
+- Fixed race condition between warnings being displayed
+- Fixed hang on cancel print page if HW button was used
+- Fixed incorrect data displayed from previous print
+- Fixed turn off motors, fans and UV when the exception occurs during print
+- Fixed exposure time increment only dispayed for calibration projects
+- Translations updated
+- Updated company name and copyright
+- Improvements to the Wi-Fi service (faster initialization)
+- Printer summary printed at the end of the logs
+- Silence avahi logs
 
 # Version 1.4.0
 
