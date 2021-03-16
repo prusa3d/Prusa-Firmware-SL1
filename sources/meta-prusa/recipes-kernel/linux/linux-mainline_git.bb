@@ -11,12 +11,12 @@ LOCALVERSION ?= ""
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "linux-5.6.y"
+KBRANCH ?= "linux-5.11.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "v5.6.2"
-PV = "v5.6.2"
+SRCREV_pn-${PN} = "v5.11.6"
+PV = "v5.11.6"
 LINUX_VERSION = "${PV}"
 
 SRC_URI="\

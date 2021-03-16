@@ -1,4 +1,4 @@
-From 8a50ed3ffad4f871be239fd9f111803832ff1803 Mon Sep 17 00:00:00 2001
+From b4f843e367d8c3243b473d913605e1b0ceea8227 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 1 Sep 2020 18:25:17 +0200
 Subject: [PATCH] dts: prusa64-sl1: add reserved-memory node for lima
@@ -8,10 +8,10 @@ Subject: [PATCH] dts: prusa64-sl1: add reserved-memory node for lima
  1 file changed, 13 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-index 549fa97d106f..541529e2681d 100644
+index 7e2f7d79eca7..ed7422fe92d4 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -75,6 +75,19 @@ backlight: backlight {
+@@ -78,6 +78,19 @@ backlight: backlight {
  		default-brightness-level = <0>;
  		power-supply = <&reg_dldo2>;
  	};
@@ -32,5 +32,5 @@ index 549fa97d106f..541529e2681d 100644
  
  &pio {
 -- 
-2.28.0
+2.30.2
 

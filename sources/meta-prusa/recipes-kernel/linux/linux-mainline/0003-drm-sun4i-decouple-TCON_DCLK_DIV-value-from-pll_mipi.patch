@@ -1,4 +1,4 @@
-From d7a532adf61147fb0e49c974220197404af84120 Mon Sep 17 00:00:00 2001
+From bdd3f29c24d1f570cde9ac2dcad13be7ba229a21 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 6 Apr 2020 15:12:22 +0200
 Subject: [PATCH] drm: sun4i: decouple TCON_DCLK_DIV value from
@@ -21,10 +21,10 @@ that the sun4i_dotclock driver can remain untouched.
  1 file changed, 25 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
-index c81cdce6ed55..e61d8da5bbd3 100644
+index 9f06dec0fc61..4c4f255f1f69 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
 +++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
-@@ -265,18 +265,6 @@ static int sun4i_tcon_get_clk_delay(const struct drm_display_mode *mode,
+@@ -290,18 +290,6 @@ static int sun4i_tcon_get_clk_delay(const struct drm_display_mode *mode,
  	return delay;
  }
  
@@ -43,7 +43,7 @@ index c81cdce6ed55..e61d8da5bbd3 100644
  static void sun4i_tcon0_mode_set_dithering(struct sun4i_tcon *tcon,
  					   const struct drm_connector *connector)
  {
-@@ -344,7 +332,14 @@ static void sun4i_tcon0_mode_set_cpu(struct sun4i_tcon *tcon,
+@@ -369,7 +357,14 @@ static void sun4i_tcon0_mode_set_cpu(struct sun4i_tcon *tcon,
  	tcon->dclk_min_div = SUN6I_DSI_TCON_DIV;
  	tcon->dclk_max_div = SUN6I_DSI_TCON_DIV;
  
@@ -59,7 +59,7 @@ index c81cdce6ed55..e61d8da5bbd3 100644
  
  	/* Set dithering if needed */
  	sun4i_tcon0_mode_set_dithering(tcon, sun4i_tcon_get_connector(encoder));
-@@ -368,9 +363,7 @@ static void sun4i_tcon0_mode_set_cpu(struct sun4i_tcon *tcon,
+@@ -393,9 +388,7 @@ static void sun4i_tcon0_mode_set_cpu(struct sun4i_tcon *tcon,
  	 * The datasheet says that this should be set higher than 20 *
  	 * pixel cycle, but it's not clear what a pixel cycle is.
  	 */
@@ -70,7 +70,7 @@ index c81cdce6ed55..e61d8da5bbd3 100644
  	block_space -= mode->hdisplay + 40;
  
  	regmap_write(tcon->regs, SUN4I_TCON0_CPU_TRI0_REG,
-@@ -412,7 +405,14 @@ static void sun4i_tcon0_mode_set_lvds(struct sun4i_tcon *tcon,
+@@ -437,7 +430,14 @@ static void sun4i_tcon0_mode_set_lvds(struct sun4i_tcon *tcon,
  
  	tcon->dclk_min_div = 7;
  	tcon->dclk_max_div = 7;
@@ -86,7 +86,7 @@ index c81cdce6ed55..e61d8da5bbd3 100644
  
  	/* Set dithering if needed */
  	sun4i_tcon0_mode_set_dithering(tcon, sun4i_tcon_get_connector(encoder));
-@@ -491,7 +491,14 @@ static void sun4i_tcon0_mode_set_rgb(struct sun4i_tcon *tcon,
+@@ -514,7 +514,14 @@ static void sun4i_tcon0_mode_set_rgb(struct sun4i_tcon *tcon,
  
  	tcon->dclk_min_div = tcon->quirks->dclk_min_div;
  	tcon->dclk_max_div = 127;
@@ -103,5 +103,5 @@ index c81cdce6ed55..e61d8da5bbd3 100644
  	/* Set dithering if needed */
  	sun4i_tcon0_mode_set_dithering(tcon, connector);
 -- 
-2.26.0
+2.30.2
 

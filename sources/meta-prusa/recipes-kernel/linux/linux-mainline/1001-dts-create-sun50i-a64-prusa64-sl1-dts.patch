@@ -1,32 +1,32 @@
-From bfc010893e8b5909d79c5cc985895a2442c2a802 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
+From 7e30904556d06c60d8436f1b0c94936ff8e6d845 Mon Sep 17 00:00:00 2001
+From: =?utf-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
 Date: Wed, 7 Nov 2018 17:53:49 +0100
 Subject: [PATCH] dts: create sun50i-a64-prusa64-sl1 dts
 
 ---
  arch/arm64/boot/dts/allwinner/Makefile        |   1 +
- .../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 511 ++++++++++++++++++
- 2 files changed, 512 insertions(+)
+ .../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 503 ++++++++++++++++++
+ 2 files changed, 504 insertions(+)
  create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 
 diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
-index cf4f78617c3f..afa34f22e053 100644
+index 211d1e9d4701..936dc882b0f7 100644
 --- a/arch/arm64/boot/dts/allwinner/Makefile
 +++ b/arch/arm64/boot/dts/allwinner/Makefile
-@@ -9,6 +9,7 @@ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-orangepi-win.dtb
- dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pine64-lts.dtb
- dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pine64-plus.dtb sun50i-a64-pine64.dtb
- dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pinebook.dtb
+@@ -13,6 +13,7 @@ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pinephone-1.0.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pinephone-1.1.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pinephone-1.2.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-pinetab.dtb
 +dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-prusa64-sl1.dtb
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-sopine-baseboard.dtb
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a64-teres-i.dtb
- dtb-$(CONFIG_ARCH_SUNXI) += sun50i-h5-bananapi-m2-plus.dtb
+ dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a100-allwinner-perf1.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 new file mode 100644
-index 000000000000..cbb620a532ae
+index 000000000000..8e5031ff4182
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -0,0 +1,508 @@
+@@ -0,0 +1,506 @@
 +/*
 + * Copyright (C) 2018 Roman Beranek <roman.beranek@prusa3d.com>
 + * based on sun50i-a64-olinuxino.dts by Jagan Teki <jteki@openedev.com>
@@ -47,6 +47,9 @@ index 000000000000..cbb620a532ae
 +	compatible = "prusa,prusa64-sl1", "allwinner,sun50i-a64";
 +
 +	aliases {
++		mmc0 = &mmc0;
++		mmc1 = &mmc1;
++		mmc2 = &mmc2;
 +		serial0 = &uart0;
 +	};
 +
@@ -116,11 +119,6 @@ index 000000000000..cbb620a532ae
 +		function = "gpio_in";
 +		bias-pull-up;
 +	};
-+
-+	i2c2_pins: i2c2_pins {
-+		pins = "PE14", "PE15";
-+		function = "i2c2";
-+	};
 +};
 +
 +&codec {
@@ -128,7 +126,7 @@ index 000000000000..cbb620a532ae
 +};
 +
 +&codec_analog {
-+	hpvcc-supply = <&reg_eldo1>;
++	cpvdd-supply = <&reg_eldo1>;
 +	status = "okay";
 +};
 +
@@ -475,8 +473,8 @@ index 000000000000..cbb620a532ae
 +	status = "okay";
 +	simple-audio-card,widgets = "Speaker", "Internal Speaker";
 +	simple-audio-card,routing =
-+		"Left DAC", "AIF1 Slot 0 Left",
-+		"Right DAC", "AIF1 Slot 0 Right",
++		"Left DAC", "DACL",
++		"Right DAC", "DACR",
 +		"Internal Speaker", "HP";
 +};
 +
@@ -536,5 +534,5 @@ index 000000000000..cbb620a532ae
 +	status = "okay";
 +};
 -- 
-2.26.0
+2.30.2
 
