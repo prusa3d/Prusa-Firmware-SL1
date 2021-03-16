@@ -36,6 +36,7 @@ SRC_URI="\
 	file://1004-prusa-boot-logo.patch \
 	file://1005-a64-increase-mali-frequency.patch \
 	file://1006-dts-prusa64-sl1-add-reserved-memory-node-for-lima.patch \
+	file://1007-dts-prusa64-sl1-add-SPI-node.patch \
 	file://defconfig \
 "
 
