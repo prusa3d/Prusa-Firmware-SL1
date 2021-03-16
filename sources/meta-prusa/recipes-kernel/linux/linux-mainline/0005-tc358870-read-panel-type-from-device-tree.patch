@@ -1,4 +1,4 @@
-From 26a22fb0418121df51157f64f3775f71e49b1090 Mon Sep 17 00:00:00 2001
+From 61b72387ab56184a94756dfddc43a4b9577220fe Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 10 Dec 2020 15:31:52 +0100
 Subject: [PATCH] tc358870: read panel type from device tree
@@ -74,5 +74,5 @@ index 9aac05a7ec40..05e7c92fbe70 100644
  
  	ret = tc358870_init(tc_data);
 -- 
-2.29.2
+2.30.2
 

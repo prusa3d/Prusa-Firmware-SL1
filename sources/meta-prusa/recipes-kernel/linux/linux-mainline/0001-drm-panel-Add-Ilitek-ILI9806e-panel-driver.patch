@@ -1,4 +1,4 @@
-From cc7d90d30b15a7f135171bf85595e86aa1e7633c Mon Sep 17 00:00:00 2001
+From 6a220703020da53dec4ff266fd77bc9da0b7d186 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 30 Aug 2018 04:39:09 +0200
 Subject: [PATCH 1/4] drm/panel: Add Ilitek ILI9806e panel driver
@@ -15,10 +15,10 @@ MIPI-DSI interface.
  create mode 100644 drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 
 diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
-index ae44ac2ec106..b3fddb4691f7 100644
+index b4e021ea30f9..f87df1105f47 100644
 --- a/drivers/gpu/drm/panel/Kconfig
 +++ b/drivers/gpu/drm/panel/Kconfig
-@@ -67,6 +67,15 @@ config DRM_PANEL_ILITEK_IL9322
+@@ -114,6 +114,15 @@ config DRM_PANEL_ILITEK_IL9322
  	  Say Y here if you want to enable support for Ilitek IL9322
  	  QVGA (320x240) RGB, YUV and ITU-T BT.656 panels.
  
@@ -35,11 +35,11 @@ index ae44ac2ec106..b3fddb4691f7 100644
  	tristate "Ilitek ILI9881C-based panels"
  	depends on OF
 diff --git a/drivers/gpu/drm/panel/Makefile b/drivers/gpu/drm/panel/Makefile
-index 7c4d3c581fd4..05524ebf26b7 100644
+index ebbf488c7eac..ae9cbbc4e33c 100644
 --- a/drivers/gpu/drm/panel/Makefile
 +++ b/drivers/gpu/drm/panel/Makefile
-@@ -5,6 +5,7 @@ obj-$(CONFIG_DRM_PANEL_LVDS) += panel-lvds.o
- obj-$(CONFIG_DRM_PANEL_SIMPLE) += panel-simple.o
+@@ -10,6 +10,7 @@ obj-$(CONFIG_DRM_PANEL_ELIDA_KD35T133) += panel-elida-kd35t133.o
+ obj-$(CONFIG_DRM_PANEL_FEIXIN_K101_IM2BA02) += panel-feixin-k101-im2ba02.o
  obj-$(CONFIG_DRM_PANEL_FEIYANG_FY07024DI26A30D) += panel-feiyang-fy07024di26a30d.o
  obj-$(CONFIG_DRM_PANEL_ILITEK_IL9322) += panel-ilitek-ili9322.o
 +obj-$(CONFIG_DRM_PANEL_ILITEK_ILI9806E) += panel-ilitek-ili9806e.o
@@ -434,14 +434,14 @@ index 000000000000..e503c35645c0
 +MODULE_DESCRIPTION("Ilitek ILI9806E Controller Driver");
 +MODULE_LICENSE("GPL v2");
 -- 
-2.30.0
+2.30.2
 
 
-From 5391e103497bba89fb15c1bb1a76597875035440 Mon Sep 17 00:00:00 2001
+From ad43724dfcf854cf868cef56d979ede923eed678 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 04:54:10 +0100
-Subject: [PATCH 2/4] drm/panel: ili9806e: prepare for adding support for
- extra panels
+Subject: [PATCH 2/4] drm/panel: ili9806e: prepare for adding support for extra
+ panels
 
 ---
  drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 420 +++++++++++-------
@@ -967,7 +967,7 @@ index e503c35645c0..a3c70ea52cbb 100644
 2.30.2
 
 
-From d48da283e6845a92699231c658c0eb5e4ac91d58 Mon Sep 17 00:00:00 2001
+From eaeb5f3cb80f1a59cd4121580fb31b73fbdf0d56 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 04:48:55 +0100
 Subject: [PATCH 3/4] drm/panel: ili9806e: Use dev_ based logging
@@ -1041,17 +1041,17 @@ index a3c70ea52cbb..8efd80f508cc 100644
 2.30.2
 
 
-From c5e7a372b118878b1f8e0ffb6d64216b1603b3e5 Mon Sep 17 00:00:00 2001
+From 8ff1624b5569935e6214ccf7efb928a0f6fbcd9f Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 05:22:20 +0100
 Subject: [PATCH 4/4] drm/panel: ili9806e: harmonization
 
 ---
- drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 80 ++++++++++++-------
- 1 file changed, 49 insertions(+), 31 deletions(-)
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 81 ++++++++++++-------
+ 1 file changed, 50 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-index 8efd80f508cc..b8cde6efe749 100644
+index 8efd80f508cc..547fc50cb976 100644
 --- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 +++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 @@ -20,16 +20,16 @@
@@ -1302,3 +1302,6 @@ index 8efd80f508cc..b8cde6efe749 100644
  }
  
  static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
+-- 
+2.30.2
+

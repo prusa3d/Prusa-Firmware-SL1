@@ -13,7 +13,7 @@ UBOOT_INITIAL_ENV = "u-boot-initial-env"
 SPL_BINARY = "spl/sunxi-spl.bin"
 SPL_BINARYNAME = "sunxi-spl.bin"
 
-PREFERRED_VERSION_linux-mainline = "v5.6%"
+PREFERRED_VERSION_linux-mainline = "v5.11%"
 
 USE_LIMA ?= "1"
 MACHINEOVERRIDES_append = ":gl-${@ 'lima' if d.getVar('USE_LIMA') == '1' else 'mali'}"

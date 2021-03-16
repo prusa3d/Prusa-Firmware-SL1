@@ -1,4 +1,4 @@
-From 497bc6d283dcdf854e65979e7ca4666c216e3fd8 Mon Sep 17 00:00:00 2001
+From f0d474cc1e2e59293ac4be8815c2e2528bc434ca Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 17 Dec 2019 10:56:45 +0100
 Subject: [PATCH] prusa64-sl1: work around mistakenly written eFUSEs
@@ -16,12 +16,12 @@ This fix a) reverts back to reversing the byte-order of words
 read from the eFUSES and b) gives the thermal driver ability
 to reverse already reversed data back to its native form.
 ---
- drivers/nvmem/sunxi_sid.c                     | 8 ++++++--
- drivers/thermal/sun8i_thermal.c               | 9 +++++++--
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ drivers/nvmem/sunxi_sid.c       |  8 ++++++--
+ drivers/thermal/sun8i_thermal.c | 10 ++++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/nvmem/sunxi_sid.c b/drivers/nvmem/sunxi_sid.c
-index e26ef1bbf198..4fc095a92c94 100644
+index e26ef1bbf198..9e0a8ee3821f 100644
 --- a/drivers/nvmem/sunxi_sid.c
 +++ b/drivers/nvmem/sunxi_sid.c
 @@ -65,8 +65,10 @@ static int sun8i_sid_register_readout(const struct sunxi_sid *sid,
@@ -51,10 +51,10 @@ index e26ef1bbf198..4fc095a92c94 100644
  		offset += 4;
  		bytes -= 4;
 diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
-index 0de9a56c3775..b5ad52754817 100644
+index 8c80bd06dd9f..93b215081c9e 100644
 --- a/drivers/thermal/sun8i_thermal.c
 +++ b/drivers/thermal/sun8i_thermal.c
-@@ -287,7 +287,7 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
+@@ -282,7 +282,7 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
  {
  	struct nvmem_cell *calcell;
  	struct device *dev = tmdev->dev;
@@ -63,7 +63,7 @@ index 0de9a56c3775..b5ad52754817 100644
  	size_t callen;
  	int ret = 0;
  
-@@ -317,7 +317,13 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
+@@ -312,7 +312,13 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
  		goto out;
  	}
  
@@ -79,5 +79,5 @@ index 0de9a56c3775..b5ad52754817 100644
  	kfree(caldata);
  out:
 -- 
-2.24.1
+2.30.2
 

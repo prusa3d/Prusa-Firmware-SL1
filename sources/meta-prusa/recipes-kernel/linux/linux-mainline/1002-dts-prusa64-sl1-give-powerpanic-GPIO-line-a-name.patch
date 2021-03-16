@@ -1,4 +1,4 @@
-From 45ecc7a11b1addebd01adcbe5816a09cd1046115 Mon Sep 17 00:00:00 2001
+From cba207bcb3319e860e7308359c85a15302862c54 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 17 Dec 2019 17:00:09 +0100
 Subject: [PATCH] dts: prusa64-sl1: give powerpanic GPIO line a name
@@ -8,10 +8,10 @@ Subject: [PATCH] dts: prusa64-sl1: give powerpanic GPIO line a name
  1 file changed, 18 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-index 0fe60820ca02..c619365bd66e 100644
+index e3bb5d05a899..7e2f7d79eca7 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -82,6 +82,24 @@
+@@ -85,6 +85,24 @@ &pio {
  	clock-names = "apb", "hosc", "losc";
  	input-debounce = <1 0 0>;
  
@@ -37,5 +37,5 @@ index 0fe60820ca02..c619365bd66e 100644
  		pins = "PB2";
  		function = "gpio_in";
 -- 
-2.24.1
+2.30.2
 

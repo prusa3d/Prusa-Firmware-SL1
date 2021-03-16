@@ -12,27 +12,28 @@ diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm
 index d5ad57ed5b7d..46716ffc7ca5 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -540,3 +540,11 @@ &r_pwm {
+@@ -535,3 +535,12 @@ &usbphy {
+ &r_pwm {
  	status = "okay";
  };
- 
++
 +&spi0 {
 +	status = "okay";
 +	led@0 {
 +		compatible = "prusa,sl1-uv-led";
 +		reg = <0>;
-+		spi-max-frequency = <4000000>;
++		spi-max-frequency = <200000000>;
 +	};
 +};
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
 index 2ab6e782f14c..04a1c4babd2c 100644
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
-@@ -675,6 +675,7 @@ static const struct of_device_id spidev_dt_ids[] = {
- 	{ .compatible = "lwn,bk4" },
- 	{ .compatible = "dh,dhcom-board" },
- 	{ .compatible = "menlo,m53cpld" },
+@@ -675,6 +675,7 @@ static struct class *spidev_class;
+ 
+ #ifdef CONFIG_OF
+ static const struct of_device_id spidev_dt_ids[] = {
 +	{ .compatible = "prusa,sl1-uv-led" },
- 	{},
- };
- MODULE_DEVICE_TABLE(of, spidev_dt_ids);
+ 	{ .compatible = "rohm,dh2228fv" },
+ 	{ .compatible = "lineartechnology,ltc2488" },
+ 	{ .compatible = "ge,achc" },
