@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/KDAB/GammaRay;branch=master"
 SRCREV = "c3966178389527c59f1dd6b0510cba269e4ea8c2"
 PV = "2.12.0+git${SRCPV}"
 
-DEPENDS = "qtdeclarative"
+DEPENDS = "elfutils qtdeclarative"
 
 S = "${WORKDIR}/git"
 
