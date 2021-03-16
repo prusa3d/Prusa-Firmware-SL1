@@ -1,0 +1,38 @@
+From 1a04b6a3472833e9a3aeb6c518509c90575226cb Mon Sep 17 00:00:00 2001
+From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
+Date: Tue, 16 Mar 2021 11:49:26 +0100
+Subject: [PATCH] dts: prusa64-sl1: add SPI node
+
+---
+ arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts | 8 ++++++++
+ drivers/spi/spidev.c                                     | 1 +
+ 2 files changed, 9 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
+index d5ad57ed5b7d..46716ffc7ca5 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
+@@ -540,3 +540,11 @@ &r_pwm {
+ 	status = "okay";
+ };
+ 
++&spi0 {
++	status = "okay";
++	spidev@0 {
++		compatible = "prusa64-sl1,spidev";
++		reg = <0>;
++		spi-max-frequency = <50000000>;
++	};
++};
+diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
+index 2ab6e782f14c..04a1c4babd2c 100644
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -675,6 +675,7 @@ static const struct of_device_id spidev_dt_ids[] = {
+ 	{ .compatible = "lwn,bk4" },
+ 	{ .compatible = "dh,dhcom-board" },
+ 	{ .compatible = "menlo,m53cpld" },
++	{ .compatible = "prusa64-sl1,spidev" },	// get rid of the error message. commit 956b200a846e324322f6211034c734c65a38e550
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, spidev_dt_ids);

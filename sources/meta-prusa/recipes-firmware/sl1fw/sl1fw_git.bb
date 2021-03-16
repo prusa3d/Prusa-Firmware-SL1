@@ -46,6 +46,7 @@ RDEPENDS_${PN} += " \
 	python3-aiohttp \
 	prusa-errors \
 	python3-pywayland \
+	python3-spidev \
 "
 
 FILES_${PN} += "\
