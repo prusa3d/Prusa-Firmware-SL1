@@ -1,3 +1,17 @@
+From 0646d7753f5bcd495a5b8fc3bd52e6fa02235f4a Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 16 Mar 2021 06:03:09 +0100
+Subject: [PATCH] prusa boot logo
+
+---
+ drivers/video/logo/Kconfig                |     5 +
+ drivers/video/logo/Makefile               |     1 +
+ drivers/video/logo/logo.c                 |     4 +
+ drivers/video/logo/logo_prusa_clut224.ppm | 15203 ++++++++++++++++++++
+ include/linux/linux_logo.h                |     1 +
+ 5 files changed, 15214 insertions(+)
+ create mode 100644 drivers/video/logo/logo_prusa_clut224.ppm
+
 diff --git a/drivers/video/logo/Kconfig b/drivers/video/logo/Kconfig
 index 6d6f8c08792d..5c7416f46ec4 100644
 --- a/drivers/video/logo/Kconfig
@@ -15262,3 +15276,6 @@ index d4d5b93efe84..b7128101d0ad 100644
  extern const struct linux_logo logo_sgi_clut224;
  extern const struct linux_logo logo_sun_clut224;
  extern const struct linux_logo logo_superh_mono;
+-- 
+2.30.2
+
