@@ -18,10 +18,10 @@ index d5ad57ed5b7d..46716ffc7ca5 100644
  
 +&spi0 {
 +	status = "okay";
-+	spidev@0 {
-+		compatible = "prusa64-sl1,spidev";
++	led@0 {
++		compatible = "prusa,sl1-uv-led";
 +		reg = <0>;
-+		spi-max-frequency = <50000000>;
++		spi-max-frequency = <4000000>;
 +	};
 +};
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
@@ -32,7 +32,7 @@ index 2ab6e782f14c..04a1c4babd2c 100644
  	{ .compatible = "lwn,bk4" },
  	{ .compatible = "dh,dhcom-board" },
  	{ .compatible = "menlo,m53cpld" },
-+	{ .compatible = "prusa64-sl1,spidev" },	// get rid of the error message. commit 956b200a846e324322f6211034c734c65a38e550
++	{ .compatible = "prusa,sl1-uv-led" },
  	{},
  };
  MODULE_DEVICE_TABLE(of, spidev_dt_ids);
