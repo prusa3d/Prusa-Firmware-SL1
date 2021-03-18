@@ -1,0 +1,33 @@
+From c94270250f89fb0a3b7172ac907915476b6189d2 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 18 Mar 2021 12:28:57 +0100
+Subject: [PATCH] spi-sun6i: always set parent to 200 MHz
+
+---
+ drivers/spi/spi-sun6i.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/spi/spi-sun6i.c b/drivers/spi/spi-sun6i.c
+index cc8401980125..7f54a846ad69 100644
+--- a/drivers/spi/spi-sun6i.c
++++ b/drivers/spi/spi-sun6i.c
+@@ -346,12 +346,11 @@ static int sun6i_spi_transfer_one(struct spi_master *master,
+ 
+ 	sun6i_spi_write(sspi, SUN6I_TFR_CTL_REG, reg);
+ 
+-	/* Ensure that we have a parent clock fast enough */
++	/* Always set parent to 200 MHz, in order to obtain finer resolution
++	 * in the 0.4-10MHz range.
++	 */
++	clk_set_rate(sspi->mclk, 200000000);
+ 	mclk_rate = clk_get_rate(sspi->mclk);
+-	if (mclk_rate < (2 * tfr->speed_hz)) {
+-		clk_set_rate(sspi->mclk, 2 * tfr->speed_hz);
+-		mclk_rate = clk_get_rate(sspi->mclk);
+-	}
+ 
+ 	/*
+ 	 * Setup clock divider.
+-- 
+2.31.0
+
