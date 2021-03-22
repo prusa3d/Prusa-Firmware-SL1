@@ -5,7 +5,7 @@ Subject: [PATCH] exposure panel identification
 
 ---
  .../dts/sun50i-a64-prusa64-sl1-u-boot.dtsi    |  35 ++
- arch/arm/dts/sun50i-a64-prusa64-sl1.dts       |  24 +-
+ arch/arm/dts/sun50i-a64-prusa64-sl1.dts       |  23 +-
  arch/arm/mach-sunxi/Kconfig                   |  11 +
  board/sunxi/Makefile                          |   6 +
  board/sunxi/board.c                           |  89 ++-
@@ -16,7 +16,7 @@ Subject: [PATCH] exposure panel identification
  configs/prusa64-sl1_defconfig                 |   6 +-
  include/configs/sunxi-common.h                |   4 +-
  include/dm/uclass-id.h                        |   1 +
- 12 files changed, 861 insertions(+), 11 deletions(-)
+ 12 files changed, 861 insertions(+), 10 deletions(-)
  create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
  create mode 100644 board/sunxi/panel-detector-uclass.c
  create mode 100644 board/sunxi/panel_detector.h
@@ -68,15 +68,7 @@ diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts b/arch/arm/dts/sun50i-a64-p
 index 89cc5b2f94..ca7bb92206 100644
 --- a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
-@@ -24,7 +24,6 @@
- 	backlight: backlight {
- 		compatible = "pwm-backlight";
- 		pwms = <&r_pwm 0 50000 0>;
--		brightness-levels = <0 5 10 15 20 30 40 55 70 85 100>;
- 		default-brightness-level = <0>;
- 	};
- 
-@@ -78,6 +77,13 @@
+@@ -78,6 +78,13 @@
  	snps,reset-delays-us = <1000 20000 20000>;
  };
  
@@ -90,7 +82,7 @@ index 89cc5b2f94..ca7bb92206 100644
  &mdio {
  	status = "disabled";
  	ext_rmii_phy1: ethernet-phy@1 {
-@@ -186,6 +192,12 @@
+@@ -186,6 +193,12 @@
  
  /* DCDC3 is polyphased with DCDC2 */
  
@@ -103,7 +95,7 @@ index 89cc5b2f94..ca7bb92206 100644
  &reg_dcdc5 {
  	regulator-always-on;
  	regulator-min-microvolt = <1360000>;
-@@ -209,13 +221,13 @@
+@@ -209,13 +222,13 @@
  &reg_dldo2 {
  	regulator-min-microvolt = <3300000>;
  	regulator-max-microvolt = <3300000>;
@@ -121,7 +113,7 @@ index 89cc5b2f94..ca7bb92206 100644
  };
  
  &reg_dldo4 {
-@@ -238,7 +250,7 @@
+@@ -238,7 +251,7 @@
  &reg_eldo2 {
  	regulator-min-microvolt = <1800000>;
  	regulator-max-microvolt = <1800000>;
