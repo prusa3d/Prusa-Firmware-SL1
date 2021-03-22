@@ -82,7 +82,7 @@ index 587f15b2e4..511459f806 100644
 +#ifdef CONFIG_DM_VIDEO
 +	struct udevice *backlight;
 +	int ret = uclass_get_device(UCLASS_PANEL_BACKLIGHT, 0, &backlight);
-+        if (!ret)
++	if (!ret)
 +		backlight_enable(backlight);
 +#endif
 +}

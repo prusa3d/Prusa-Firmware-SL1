@@ -8,7 +8,7 @@ Subject: [PATCH] exposure panel identification
  arch/arm/dts/sun50i-a64-prusa64-sl1.dts       |  23 +-
  arch/arm/mach-sunxi/Kconfig                   |  11 +
  board/sunxi/Makefile                          |   6 +
- board/sunxi/board.c                           |  89 ++-
+ board/sunxi/board.c                           |  87 ++-
  board/sunxi/panel-detector-uclass.c           |  26 +
  board/sunxi/panel_detector.h                  |  18 +
  board/sunxi/tc358870.c                        | 564 ++++++++++++++++++
@@ -16,7 +16,7 @@ Subject: [PATCH] exposure panel identification
  configs/prusa64-sl1_defconfig                 |   6 +-
  include/configs/sunxi-common.h                |   4 +-
  include/dm/uclass-id.h                        |   1 +
- 12 files changed, 861 insertions(+), 10 deletions(-)
+ 12 files changed, 860 insertions(+), 9 deletions(-)
  create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
  create mode 100644 board/sunxi/panel-detector-uclass.c
  create mode 100644 board/sunxi/panel_detector.h
@@ -169,15 +169,6 @@ index 511459f806..09cb9712ac 100644
  
  #if defined CONFIG_VIDEO_LCD_PANEL_I2C && !(defined CONFIG_SPL_BUILD)
  /* So that we can use pin names in Kconfig and sunxi_name_to_gpio() */
-@@ -226,7 +227,7 @@ static void sunxi_enable_backlight(void)
- {
- #ifdef CONFIG_DM_VIDEO
- 	struct udevice *backlight;
--	int ret = uclass_get_device(UCLASS_PANEL_BACKLIGHT, 0, &backlight);
-+	int ret = uclass_first_device(UCLASS_PANEL_BACKLIGHT, &backlight);
-         if (!ret)
- 		backlight_enable(backlight);
- #endif
 @@ -892,6 +893,38 @@ static void setup_environment(const void *fdt)
  	}
  }
