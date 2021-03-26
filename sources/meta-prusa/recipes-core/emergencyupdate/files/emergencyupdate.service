@@ -29,9 +29,9 @@ Description=Emergency update service
 [Service]
 Type=simple
 RemainAfterExit=yes
-Environment=EMERGENCY_PATTERN="/dev/.* /run/media/root/.*"
-Environment=EMERGENCY_PATH="/run/media/root/*"
-Environment=EMERGENCY_FILE="/run/media/root/**/sla-emergency-update.raucb"
+Environment=EMERGENCY_PATTERN="/dev/.* /run/media/system/.*"
+Environment=EMERGENCY_PATH="/run/media/system/*"
+Environment=EMERGENCY_FILE="/run/media/system/**/sla-emergency-update.raucb"
 ExecStart=/usr/bin/sh -c 'while ! cat /proc/mounts | grep -q "${EMERGENCY_PATTERN}" ; do sleep 5; ls ${EMERGENCY_PATH} > /dev/null 2>&1; done; if [ -f ${EMERGENCY_FILE} ]; then rauc install ${EMERGENCY_FILE} && systemctl reboot; fi;'
  
 [Install]
