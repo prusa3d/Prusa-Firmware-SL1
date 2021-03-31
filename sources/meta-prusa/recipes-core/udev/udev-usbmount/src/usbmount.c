@@ -135,7 +135,6 @@ static int transient_automount_set_properties(sd_bus_message *m) {
 
 static int reset_failed_unit(sd_bus *bus, const char *unit) {
 	_cleanup_(sd_bus_message_unrefp) sd_bus_message *m = NULL;
-	_cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
 	int ret;
 
 	BUS(sd_bus_message_new_method_call(bus, &m, "org.freedesktop.systemd1",
@@ -145,11 +144,7 @@ static int reset_failed_unit(sd_bus *bus, const char *unit) {
 	BUS(sd_bus_message_set_allow_interactive_authorization(m, false));
 	BUS(sd_bus_message_append(m, "s", unit));
 
-	ret = sd_bus_call(bus, m, 0, &error, NULL);
-	if (ret < 0)
-		log_info("Reset of %s failed: %s (%s)", unit, error.message, error.name);
-
-	return ret;
+	return sd_bus_call(bus, m, 0, NULL, NULL);
 }
 
 static int start_transient_automount(sd_bus *bus, sd_bus_error *error) {
