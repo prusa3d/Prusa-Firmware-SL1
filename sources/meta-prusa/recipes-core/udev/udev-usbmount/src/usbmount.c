@@ -120,13 +120,6 @@ static int transient_automount_set_properties(sd_bus_message *m) {
                                   "Wants", "as", 1, rmdir_on_exit,
                                   "After", "as", 1, rmdir_on_exit));
 
-        _cleanup_free_ char *mount_notification = NULL;
-        asprintf(&mount_notification, "mount-notification@%s.service", arg_mount_where_escaped);
-        RET_IF_ERR(sd_bus_message_append(m,
-                                  "(sv)(sv)",
-                                  "Wants",  "as", 1, mount_notification,
-                                  "Before", "as", 1, mount_notification));
-
         RET_IF_ERR(sd_bus_message_append(m, "(sv)", "TimeoutIdleUSec", "t", arg_timeout_idle));
         return 0;
 }
@@ -135,7 +128,6 @@ static int transient_automount_set_properties(sd_bus_message *m) {
 
 static int reset_failed_unit(sd_bus *bus, const char *unit) {
 	_cleanup_(sd_bus_message_unrefp) sd_bus_message *m = NULL;
-	int ret;
 
 	BUS(sd_bus_message_new_method_call(bus, &m, "org.freedesktop.systemd1",
 					   "/org/freedesktop/systemd1",

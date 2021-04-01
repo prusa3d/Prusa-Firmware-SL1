@@ -31,14 +31,6 @@ on .systemd1.Manager with the following message as an example:
 			  VARIANT "as" { ARRAY "s" { STRING "rmdir-on-exit@run-media-system-sda1.service"; }; };
 		  };
 		  STRUCT "sv" {
-			  STRING "Wants";
-			  VARIANT "as" { ARRAY "s" { STRING "mount-notification@run-media-system-sda1.service"; }; };
-		  };
-		  STRUCT "sv" {
-			  STRING "Before";
-			  VARIANT "as" { ARRAY "s" { STRING "mount-notification@run-media-system-sda1.service"; }; };
-		  };
-		  STRUCT "sv" {
 			  STRING "TimeoutIdleUSec";
 			  VARIANT "t" { UINT64 3000000; };
 		  };
@@ -91,8 +83,6 @@ Which creates these two transient units:
 [Unit]
 Wants=rmdir-on-exit@run-media-system-sdc1.service
 After=rmdir-on-exit@run-media-system-sdc1.service
-Wants=mount-notification@run-media-system-sdc1.service
-Before=mount-notification@run-media-system-sdc1.service
 After=dev-sdc1.device
 BindsTo=dev-sdc1.device
 CollectMode=inactive-or-failed
