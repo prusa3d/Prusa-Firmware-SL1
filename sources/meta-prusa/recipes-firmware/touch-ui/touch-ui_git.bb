@@ -6,7 +6,7 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV_touch-ui = "8d6977887da20d839c3f5384dbec3dcf609cdc6e"
+SRCREV_touch-ui = "db79d5be573045bff1d4083b23a580ac434e0af8"
 SRCREV_qrcode-generator = "bbeeba6e5367f889ac6aa68c0e2219f0479d21a7"
 SRCREV_maddy = "51d61b68fed1784d5f587d1969ffe2754563644c"
 LICENSE = "GPLv3+" 

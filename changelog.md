@@ -1,3 +1,5 @@
+# Version 1.5.0
+
 ## Summary
 - QR Error codes
 - Redesigned Settings menu
