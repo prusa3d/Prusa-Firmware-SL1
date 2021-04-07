@@ -208,7 +208,7 @@ index 511459f806..09cb9712ac 100644
  int misc_init_r(void)
  {
  	uint boot;
-@@ -919,6 +952,44 @@ int misc_init_r(void)
+@@ -919,6 +952,45 @@ int misc_init_r(void)
  
  #ifdef CONFIG_USB_ETHER
  	usb_ether_init();
@@ -228,6 +228,7 @@ index 511459f806..09cb9712ac 100644
 +		edid_arg_length = 37 + strlen(panel_name);
 +		edid_arg = kmalloc(edid_arg_length, GFP_KERNEL);
 +		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
++		printf("panel_detector: found %s panel\n", panel_name);
 +	} else {
 +		edid_arg = "video=HDMI-A-1:d";
 +	}
@@ -253,12 +254,7 @@ index 511459f806..09cb9712ac 100644
  #endif
  
  	return 0;
-@@ -933,11 +1004,25 @@ int ft_board_setup(void *blob, bd_t *bd)
- 	 * ethernet aliases the u-boot copy does not have.
- 	 */
- 	setup_environment(blob);
--
- #ifdef CONFIG_VIDEO_DT_SIMPLEFB
+@@ -938,6 +1010,21 @@ int ft_board_setup(void *blob, bd_t *bd)
  	r = sunxi_simplefb_setup(blob);
  	if (r)
  		return r;
