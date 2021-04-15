@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "\
 
 inherit cmake_kf5 systemd python3native
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia nemo-qml-plugin-dbus-qt5 networkmanager-qt prusa-errors-native qtdeclarative-native"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
 
 RDEPENDS_${PN} += "\
 	bash \
@@ -27,7 +27,6 @@ RDEPENDS_${PN} += "\
 	qtmultimedia-qmlplugins \
 	qtmultimedia-plugins \
 	qtgraphicaleffects \
-	nemo-qml-plugin-dbus-qt5 \
 	networkmanager-qt \
 	gstreamer1.0-plugins-bad-modplug \
 "
