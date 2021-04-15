@@ -11,4 +11,5 @@ RDEPENDS_packagegroup-prusa-fs = "\
 	sshfs-fuse \
 	cifs-utils \
 	davfs2 \
+	rsync \
 "
