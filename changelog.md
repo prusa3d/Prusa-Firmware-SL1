@@ -1,4 +1,18 @@
-# Version 1.6.6-alpha.1
+# Version 1.6.0-alpha.2
+
+## Summary (relative to 1.6.0-alpha.1)
+- Wizards uses dbus API and are callable from settings menu
+- Low resin "!" icon fixed
+- Fixed turn off action after print finishes
+- Ask before calibration (was throwing just error message before)
+- Printer can be updated even when printer0 is in ADMIN
+
+## Known issues
+- Unexpected error occures on bootup (just click on "back" and continue)
+- When USB is inserted, splashscreen is displayed (touch-ui restarts)
+
+
+# Version 1.6.0-alpha.1
 
 ## Summary (relative to 1.6.0-alpha.0)
 - Fixed admin net update
