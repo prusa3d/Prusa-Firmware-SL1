@@ -4,7 +4,7 @@ LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/filemanager.git;protocol=ssh;branch=master"
-SRCREV_pn-${PN} = "8861dc8b583253101611f1c0725e089145cf21dc"
+SRCREV_pn-${PN} = "3e22e40c814d5db86d0aa005e31365fa9cdd1635"
 
 S = "${WORKDIR}/git"
 

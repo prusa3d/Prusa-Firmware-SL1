@@ -6,6 +6,7 @@
 - Fixed turn off action after print finishes
 - Ask before calibration (was throwing just error message before)
 - Printer can be updated even when printer0 is in ADMIN
+- show thumbnail and other metadata for previous-prints
 
 ## Known issues
 - Unexpected error occures on bootup (just click on "back" and continue)
