@@ -2,17 +2,35 @@
 
 ## Summary (relative to 1.6.0-alpha.1)
 - printer does not stuck when selecting project
-- Wizards uses dbus API and are callable from settings menu
+- Wizards uses dbus API and are callable from the settings menu
 - Low resin "!" icon fixed
 - Fixed turn off action after print finishes
 - Ask before calibration (was throwing just error message before)
 - Printer can be updated even when printer0 is in ADMIN
 - show thumbnail and other metadata for previous-prints
 - resin low warning in PCL
+- Fixed printing time (during the print and on the finished page)
+- Fixed calibration (proper values are stored so the printer accepts passed calibration wizard)
+- Printer starts without calling the old pages API (if a problem occurs it throws an error)
+- UV fan controlled by UV LED temperature while printing
+- Removed camera trigger
+- Support for SL1s (booster v2 board)
+- Turn off all HW components on wizard failure
 
 ## Known issues
-- Unexpected error occures on bootup (just click on "back" and continue)
-- When USB is inserted, splashscreen is displayed (touch-ui restarts)
+- Unexpected error occurs on bootup (just click on "back" and continue)
+- When USB is inserted, a splash screen is displayed (touch-ui restarts)
+- When a project is selected, a splash screen is displayed (touch-ui restarts)
+- Unexpected wait screen may occur on wizard failure (just click on "back" and continue)
+- No notification for the user about MC being updated
+- Wrong print time estimates (at least for examples for SL1)
+- Touch display has a visual noise on top of the screen (visible on error pages)
+- Music does not play in self-test
+- Checks are not being correctly updated during the wizards (the page with checks list and progress bars)
+- Tilt is released in calibration before tower axis check
+- Tilt is released in UV calibration when a user inserts the UV meter (tilt needs to be levelled for proper UV calibration)
+- Blank screen in UV calibration
+- UV calibration results have a really small font
 
 
 # Version 1.6.0-alpha.1

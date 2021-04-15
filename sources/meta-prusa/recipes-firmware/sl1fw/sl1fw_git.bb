@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "9eda6c026cff7a3851679595fd0adb3adddc6785"
+SRCREV_pn-${PN} = "797ec54090d29a438e8a92e36cf949030ceed109"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -47,6 +47,7 @@ RDEPENDS_${PN} += " \
 	prusa-errors \
 	python3-pywayland \
 	python3-spidev \
+	python3-smbus2 \
 "
 
 FILES_${PN} += "\
