@@ -16,6 +16,7 @@
 - Removed camera trigger
 - Support for SL1s (booster v2 board)
 - Turn off all HW components on wizard failure
+- added rsync for remote_sync.sh script
 
 ## Known issues
 - Unexpected error occurs on bootup (just click on "back" and continue)
