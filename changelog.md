@@ -1,12 +1,14 @@
 # Version 1.6.0-alpha.2
 
 ## Summary (relative to 1.6.0-alpha.1)
+- printer does not stuck when selecting project
 - Wizards uses dbus API and are callable from settings menu
 - Low resin "!" icon fixed
 - Fixed turn off action after print finishes
 - Ask before calibration (was throwing just error message before)
 - Printer can be updated even when printer0 is in ADMIN
 - show thumbnail and other metadata for previous-prints
+- resin low warning in PCL
 
 ## Known issues
 - Unexpected error occures on bootup (just click on "back" and continue)
