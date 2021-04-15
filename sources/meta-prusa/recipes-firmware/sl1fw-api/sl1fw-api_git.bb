@@ -3,12 +3,12 @@ HOMEPAGE = "https://gitlab.com/prusa3d/sl1/remote-api"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=master"
+SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;nobranch=1"
 
-SRCREV_pn-${PN} = "8902a67f5175f7f79b6a6a8804de81986476509f"
+SRCREV_pn-${PN} = "b4ffe4a7aa60439177f73a08443329156c09c560"
 PACKAGES = "${PN}-dev ${PN}"
 
-DEPENDS += "sl1fw"
+DEPENDS += "sl1fw gettext-native"
 RDEPENDS_${PN} += " \
 	python3 \
 	python3-flask \
@@ -41,7 +41,7 @@ FILES_${PN} += " \
 FILES_${PN}_remove = "${localstatedir}/sl1fw_api/loggerConfig.json"
 FILES_${PN}-dev = "${localstatedir}/sl1fw_api/loggerConfig.json"
 
-S = "${WORKDIR}/git/prusa_sl1_api"
+S = "${WORKDIR}/git/sl1fw_api"
 inherit setuptools3 systemd useradd
 
 USERADD_PACKAGES = "${PN}"

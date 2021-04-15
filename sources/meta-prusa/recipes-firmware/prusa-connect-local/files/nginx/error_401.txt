@@ -1,1 +1,0 @@
-The printer uses HTTP digest security. Please enable it also in the Slicer (recommended), or turn this security option off in the printer. You can find it in Settings > Network > Login credentials.
