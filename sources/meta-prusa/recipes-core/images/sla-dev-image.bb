@@ -76,8 +76,10 @@ rootfs_set_api_key () {
 	systemctl --root=$D mask api-keygen.service
 }
 
-rootfs_enable_ssh () {
+rootfs_enable_ssh_and_serial_unconditionally () {
 	systemctl --root=$D enable sshd.socket
+	rm $D${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf
+	rm $D${systemd_system_unitdir}/sshd.socket.d/condition-enabled.conf
 }
 
 UBOOT_DEV_CMD := "${THISDIR}/files/dev.cmd"
@@ -86,6 +88,8 @@ rootfs_insert_boot_scr () {
 	mkimage -C none -A arm -T script -d ${UBOOT_DEV_CMD} $D/boot.scr
 }
 
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_set_api_key ; rootfs_enable_ssh ; rootfs_insert_boot_scr ; "
+ROOTFS_POSTPROCESS_COMMAND += " \
+	rootfs_set_api_key ; rootfs_insert_boot_scr ; \
+	rootfs_enable_ssh_and_serial_unconditionally ; "
 IMAGE_NAME = "${IMAGE_BASENAME}-${MACHINE}-${DISTRO_VERSION}${IMAGE_VERSION_SUFFIX}"
 
