@@ -33,21 +33,22 @@ slot-post-install)
 		cp -av /etc/sl1fw ${RAUC_SLOT_MOUNT_POINT}/
 		cp -av /etc/touch-ui ${RAUC_SLOT_MOUNT_POINT}/
 
-		# update http digest
-		NGINX_FILE=${RAUC_SLOT_MOUNT_POINT}/nginx/sites-available/sl1fw
-		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/http_digest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
-			sed -i 's/include\s*\/etc\/nginx/# include \/etc\/nginx/' $NGINX_FILE
-		else
-			sed -i 's/.*include\s*\/etc\/nginx/\tinclude \/etc\/nginx/' $NGINX_FILE
+		# update http digest (default is enabled)
+		NGINX_FILE=/etc/nginx/sites-available/sl1fw
+		NGINX_FILE_HTTP_DIGEST=/etc/nginx/sites-available/sl1fw_http_digest
+		NGINX_FILE_ENABLED=/etc/nginx/sites-enabled/sl1fw
+		NGINX_ENABLED=true
+		# 1.6+
+		if  [ -f ${NGINX_FILE_HTTP_DIGEST} ] && [[ $(readlink -f ${NGINX_FILE_ENABLED} ) != ${NGINX_FILE_HTTP_DIGEST} ]]; then
+			NGINX_ENABLED=false
 		fi
-
-		if  [ -f "/etc/sl1fw/remoteConfig.toml" ]; then
-			chmod 664 /etc/sl1fw/remoteConfig.toml
-			chgrp remote_config /etc/sl1fw/remoteConfig.toml
-		else
-			touch /etc/sl1fw/remoteConfig.toml
-			chmod 664 /etc/sl1fw/remoteConfig.toml
-			chgrp remote_config /etc/sl1fw/remoteConfig.toml
+		# only to 1.5
+		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/http_digest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
+			NGINX_ENABLED=false
+		fi
+		if [ "${NGINX_ENABLED}" = false ] ; then
+			rm -f ${RAUC_SLOT_MOUNT_POINT}${NGINX_FILE_ENABLED}
+			ln -s ${NGINX_FILE} ${RAUC_SLOT_MOUNT_POINT}${NGINX_FILE_ENABLED}
 		fi
 
 		# Copy update channel override
