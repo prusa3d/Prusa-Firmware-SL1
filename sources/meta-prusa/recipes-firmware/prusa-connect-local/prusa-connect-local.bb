@@ -8,6 +8,7 @@ SRC_URI = " \
 	file://dnssd/octoprint.dnssd \
 	file://nginx/prusa-auth.conf \
 	file://nginx/sl1fw \
+	file://nginx/sl1fw_http_digest \
 "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
@@ -23,8 +24,10 @@ RDEPENDS_${PN} += "\
 "
 FILES_${PN} += " \
 	/srv/http/intranet \
+	/srv/http/old-projects \
 	${sysconfdir}/nginx/prusa-auth.conf \
 	${sysconfdir}/nginx/sites-available/sl1fw\
+	${sysconfdir}/nginx/sites-available/sl1fw_http_digest\
 	${sysconfdir}/nginx/sites-enabled/sl1fw\
 	${systemd_unitdir}/dnssd/http.dnssd \
 	${systemd_unitdir}/dnssd/octoprint.dnssd \
@@ -54,6 +57,9 @@ do_install_append () {
 	cp -R --no-preserve=ownership ${S}/dist/* ${D}/srv/http/intranet/
 	chmod -R 755 ${D}/srv/http/intranet/
 	chown www:www-data -R ${D}/srv/http/intranet/
+	install -m 755 -d ${D}/srv/http/old-projects/
+	chmod -R 755 ${D}/srv/http/old-projects/
+	chown www:www-data -R ${D}/srv/http/old-projects/
 
 	# Nginx htdigest configuration
 	install -d ${D}${sysconfdir}/nginx
@@ -63,5 +69,6 @@ do_install_append () {
 	install --mode 755 -d ${D}${sysconfdir}/nginx/sites-available
 	install --mode 755 -d ${D}${sysconfdir}/nginx/sites-enabled
 	install --mode 644 ${WORKDIR}/nginx/sl1fw ${D}${sysconfdir}/nginx/sites-available/sl1fw
-	ln -s ${sysconfdir}/nginx/sites-available/sl1fw ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
+	install --mode 644 ${WORKDIR}/nginx/sl1fw_http_digest ${D}${sysconfdir}/nginx/sites-available/sl1fw_http_digest
+	ln -s ${sysconfdir}/nginx/sites-available/sl1fw_http_digest ${D}${sysconfdir}/nginx/sites-enabled/sl1fw
 }
