@@ -17,6 +17,7 @@ SRC_URI_append = " \
 	file://0015-tc358870-switch-VC-if-requested-panel-IC.patch \
 	file://0016-lib-sscanf-add-sscanf-implementation.patch \
 	file://0016-tc358870-nvm-write.patch \
+	file://0017-rauc-update-toggle-eMMC-bootpart-on-slot-flip.patch \
 	file://fw_env.config \
 "
 
