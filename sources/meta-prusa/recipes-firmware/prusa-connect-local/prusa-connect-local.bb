@@ -24,7 +24,7 @@ RDEPENDS_${PN} += "\
 "
 FILES_${PN} += " \
 	/srv/http/intranet \
-	/srv/http/old-projects \
+	${localstatedir}/sl1fw/old-projects \
 	${sysconfdir}/nginx/prusa-auth.conf \
 	${sysconfdir}/nginx/sites-available/sl1fw\
 	${sysconfdir}/nginx/sites-available/sl1fw_http_digest\
@@ -57,9 +57,9 @@ do_install_append () {
 	cp -R --no-preserve=ownership ${S}/dist/* ${D}/srv/http/intranet/
 	chmod -R 755 ${D}/srv/http/intranet/
 	chown www:www-data -R ${D}/srv/http/intranet/
-	install -m 755 -d ${D}/srv/http/old-projects/
-	chmod -R 755 ${D}/srv/http/old-projects/
-	chown www:www-data -R ${D}/srv/http/old-projects/
+	install -m 755 -d ${D}${localstatedir}/sl1fw/old-projects
+	chmod -R 755 ${D}${localstatedir}/sl1fw/old-projects
+	chown www:www-data -R ${D}${localstatedir}/sl1fw/old-projects
 
 	# Nginx htdigest configuration
 	install -d ${D}${sysconfdir}/nginx
