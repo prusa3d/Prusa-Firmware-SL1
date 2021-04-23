@@ -43,6 +43,8 @@ b:raucb-development:
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${VERSION}.dev-key.raucb
     - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${VERSION}.initramfs.manifest
     - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/Image-initramfs--*.bin .
+    - mv Image-initramfs--* `ls Image-initramfs--* | sed 's#^Image-initramfs--v\([^-]\+\)-.*$#Image-\1#'`
     - mv changelog.md ${VERSION}.changelog.md
     - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
 
@@ -54,6 +56,7 @@ b:raucb-development:
       - ./*.manifest
       - ./*.changelog.md
       - ./log.txt.xz
+      - ./Image-*
 
 b:raucb-production:
   stage: build
