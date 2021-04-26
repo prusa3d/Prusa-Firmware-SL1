@@ -23,6 +23,7 @@ do_compile() {
 		${BUILD_CC} -c -DCRC="0x00" -o ${B}/${edid}.nosum.o ${WORKDIR}/${edid}.S
 		${OBJCOPY} -Obinary ${B}/${edid}.nosum.o ${B}/${edid}.nosum.bin
 		crc=$(${B}/checksum < ${B}/${edid}.nosum.bin)
+		rm ${B}/${edid}.nosum.bin
 		${BUILD_CC} -c -DCRC="${crc}" -o ${B}/${edid}.o ${WORKDIR}/${edid}.S
 		${OBJCOPY} -Obinary ${B}/${edid}.o ${B}/${edid}.bin
 	done

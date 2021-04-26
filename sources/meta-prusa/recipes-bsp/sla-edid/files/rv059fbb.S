@@ -1,12 +1,12 @@
 /* Display */
-#define CLOCK 82610 /* kHz */
+#define CLOCK 148500 /* kHz */
 #define XPIX 540
 #define YPIX 2560
-#define XBLANK 95
-#define XOFFSET 50
+#define XBLANK 588
+#define XOFFSET 522
 #define XPULSE 10
-#define YBLANK 42
-#define YOFFSET 20
+#define YBLANK 73
+#define YOFFSET 42
 #define YPULSE 10
 #define DPI 518
 #define VFREQ 50 /* Hz */
