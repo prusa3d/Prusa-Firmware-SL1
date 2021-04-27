@@ -9,6 +9,7 @@ SRC_URI_append = "\
 	file://max_use.conf \
 	file://logind-no-auto-vt.conf \
 	file://logind-no-auto-off.conf \
+	file://remount-root-rw.conf \
 "
 
 RDEPENDS_${PN}_remove = "volatile-binds"
@@ -38,4 +39,12 @@ do_install_append() {
 	install --mode 644 ${WORKDIR}/logind-no-auto-off.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-off.conf
 
 	rm -f ${D}${sysconfdir}/tmpfiles.d/00-create-volatile.conf
+
+	# systemd-remount-fs.service gets normally pulled in by systemd-fstab-generator
+	install -d ${D}${systemd_system_unitdir}/local-fs.target.wants
+	ln -s ../systemd-remount-fs.service ${D}${systemd_system_unitdir}/local-fs.target.wants/
+
+	# in the absence of /etc/fstab systemd-remount-fs looks for SYSTEMD_REMOUNT_ROOT_RW in its environment
+	install -d ${D}${systemd_system_unitdir}/systemd-remount-fs.service.d
+	install -m 644 ${WORKDIR}/remount-root-rw.conf	${D}${systemd_system_unitdir}/systemd-remount-fs.service.d/
 }
