@@ -36,4 +36,6 @@ do_install_append() {
 
 	# No poweroff on power button
 	install --mode 644 ${WORKDIR}/logind-no-auto-off.conf ${D}${libdir}/systemd/logind.conf.d/no-auto-off.conf
+
+	rm -f ${D}${sysconfdir}/tmpfiles.d/00-create-volatile.conf
 }
