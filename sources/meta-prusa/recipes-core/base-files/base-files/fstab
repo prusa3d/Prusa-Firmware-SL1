@@ -1,0 +1,2 @@
+# skeleton fstab - every other mount is declared using .mount systemd units
+/dev/root            /                    auto       defaults              1  1
