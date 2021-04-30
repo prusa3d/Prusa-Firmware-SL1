@@ -5,6 +5,7 @@ SRC_URI_append = "\
 	file://0002-timesyncd-google.patch \
 	file://0003-resolve-implement-Legacy-Unicast-Response.patch \
 	file://0004-send-shdn-cmd-to-mc-during-poweroff.patch \
+	file://0006-resolve-remove-RRs-from-zones-before-an-update.patch \
 	file://journal.conf \
 	file://max_use.conf \
 	file://logind-no-auto-vt.conf \
