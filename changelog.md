@@ -1,3 +1,15 @@
+# Version 1.6.0-alpha.3
+
+## Summary (relative to 1.6.0-alpha.2)
+- Prusa Connect Local renamed to Prusa Link
+- bugfix: Prusa Link: project upload error, translations, print time estimate, date
+- bugfix:
+
+
+## Known issues
+
+
+
 # Version 1.6.0-alpha.2
 
 ## Summary (relative to 1.6.0-alpha.1)
