@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 SRC_URI = " \
 	git://github.com/prusa3d/Prusa-Error-Codes.git;protocol=https;branch=master \
 "
-SRCREV_pn-${PN} = "543f3bcd8d41ea177a32a7102351b1bbe35a8634"
+SRCREV_pn-${PN} = "cbb4c5455f4734e0604295b136c8efa0bd342264"
 
 DEPENDS += "python3"
 RDEPENDS_${PN} += "python3-pyyaml"
