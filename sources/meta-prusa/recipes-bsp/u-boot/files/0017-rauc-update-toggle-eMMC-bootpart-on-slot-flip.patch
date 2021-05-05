@@ -1,4 +1,4 @@
-From e4c7999ea7472478e410424c2fd32e53e01c498a Mon Sep 17 00:00:00 2001
+From 466d4631fed1e40c24b5b5d1ffba81c2155fa321 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 22 Apr 2021 17:02:51 +0200
 Subject: [PATCH] rauc update: toggle eMMC bootpart on slot flip
@@ -7,15 +7,15 @@ Subject: [PATCH] rauc update: toggle eMMC bootpart on slot flip
 - update_active_rootfs_slot kept backward-compatible with u-boot
   lacking aforementioned command
 ---
- cmd/mmc.c                      | 47 ++++++++++++++++++++++++++++++++++
- include/configs/sunxi-common.h | 19 ++++++++++----
- 2 files changed, 61 insertions(+), 5 deletions(-)
+ cmd/mmc.c                      | 49 ++++++++++++++++++++++++++++++++++
+ include/configs/sunxi-common.h | 19 +++++++++----
+ 2 files changed, 63 insertions(+), 5 deletions(-)
 
 diff --git a/cmd/mmc.c b/cmd/mmc.c
-index 6f3cb85cc0..f7540a9229 100644
+index 6f3cb85cc0..5094247f6d 100644
 --- a/cmd/mmc.c
 +++ b/cmd/mmc.c
-@@ -784,6 +784,50 @@ static int do_mmc_partconf(cmd_tbl_t *cmdtp, int flag,
+@@ -784,6 +784,52 @@ static int do_mmc_partconf(cmd_tbl_t *cmdtp, int flag,
  	/* acknowledge to be sent during boot operation */
  	return mmc_set_part_conf(mmc, ack, part_num, access);
  }
@@ -60,13 +60,15 @@ index 6f3cb85cc0..f7540a9229 100644
 +		printk("eMMC bootpart switch failed: %d\n", ret);
 +		return CMD_RET_FAILURE;
 +	}
++
++	mmc->part_config = part_conf;
 +	return CMD_RET_SUCCESS;
 +}
 +
  static int do_mmc_rst_func(cmd_tbl_t *cmdtp, int flag,
  			   int argc, char * const argv[])
  {
-@@ -893,6 +937,7 @@ static cmd_tbl_t cmd_mmc[] = {
+@@ -893,6 +939,7 @@ static cmd_tbl_t cmd_mmc[] = {
  	U_BOOT_CMD_MKENT(bootbus, 5, 0, do_mmc_bootbus, "", ""),
  	U_BOOT_CMD_MKENT(bootpart-resize, 4, 0, do_mmc_boot_resize, "", ""),
  	U_BOOT_CMD_MKENT(partconf, 5, 0, do_mmc_partconf, "", ""),
@@ -74,7 +76,7 @@ index 6f3cb85cc0..f7540a9229 100644
  	U_BOOT_CMD_MKENT(rst-function, 3, 0, do_mmc_rst_func, "", ""),
  #endif
  #if CONFIG_IS_ENABLED(CMD_MMC_RPMB)
-@@ -960,6 +1005,8 @@ U_BOOT_CMD(
+@@ -960,6 +1007,8 @@ U_BOOT_CMD(
  	" - Change sizes of boot and RPMB partitions of specified device\n"
  	"mmc partconf dev [boot_ack boot_partition partition_access]\n"
  	" - Show or change the bits of the PARTITION_CONFIG field of the specified device\n"
