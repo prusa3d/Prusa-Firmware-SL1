@@ -10,6 +10,7 @@ SRC_URI = " \
 	file://sshd_config	\
 	file://usr-share-factory-defaults.mount \
 	file://backlight.conf			\
+	file://log-level-warning.conf		\
 	file://resolved-mdns.conf		\
 	file://serial-override.conf \
 	file://ssh-override.conf \
@@ -37,6 +38,7 @@ FILES_${PN} = "							\
 	${systemd_system_unitdir}/systemd-backlight@.service.d/override.conf \
 	${systemd_unitdir}/resolved.conf.d/mdns.conf \
 	/usr/share/factory/defaults \
+	${systemd_system_unitdir}/systemd-resolved.service.d/log-level-warning.conf \
 	${systemd_system_unitdir}/sshd.socket.d/condition-enabled.conf \
 	${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf \
 "
@@ -67,6 +69,8 @@ do_install() {
 	install -m 644 ${WORKDIR}/resolved-mdns.conf		${D}${systemd_unitdir}/resolved.conf.d/mdns.conf
 	install -d ${D}${systemd_system_unitdir}/systemd-backlight@.service.d
 	install -m 644 ${WORKDIR}/backlight.conf ${D}${systemd_system_unitdir}/systemd-backlight@.service.d/override.conf
+	install -d ${D}${systemd_system_unitdir}/systemd-resolved.service.d
+	install -m 644 ${WORKDIR}/log-level-warning.conf ${D}${systemd_system_unitdir}/systemd-resolved.service.d/
 	install -d ${D}${systemd_system_unitdir}/serial-getty@ttyS0.service.d
 	install -m 644 ${WORKDIR}/serial-override.conf ${D}${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf
 	install -d ${D}${systemd_system_unitdir}/sshd.socket.d
