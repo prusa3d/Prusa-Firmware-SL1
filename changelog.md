@@ -7,6 +7,8 @@
 - sl1fw: truncate logs, export logs with miliseconds, dbus method to get printer ready to print, retry in wizard is not allowed, SL1 fast tilt = SL1s slow tilt, self-test for booster board V2, new wizard group for showing the results
 - sl1fw-fs: deprecated (incompatible) projects, support for listing .raucb files, average extraction time
 - bugfix: sl1fw-fs: inotify
+- touch-ui: handling plurals and localized dates
+- bugfix: touch-ui: deleting files and folders, sort projects and folders, wait for printer to be ready (do not show unexpected error), music in self-test, wait page when MC is being updated, list of checks refreshed properly, empty pages in wizards, page stacks, respect cover check in wizards
 
 
 ## Known issues
