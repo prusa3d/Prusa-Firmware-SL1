@@ -8,7 +8,7 @@
 - sl1fw-fs: deprecated (incompatible) projects, support for listing .raucb files, average extraction time
 - bugfix: sl1fw-fs: inotify
 - touch-ui: handling plurals and localized dates
-- bugfix: touch-ui: deleting files and folders, sort projects and folders, wait for printer to be ready (do not show unexpected error), music in self-test, wait page when MC is being updated, list of checks refreshed properly, empty pages in wizards, page stacks, respect cover check in wizards
+- bugfix: touch-ui: deleting files and folders, sort projects and folders, wait for printer to be ready (do not show unexpected error), music in self-test, wait page when MC is being updated, list of checks refreshed properly, empty pages in wizards, page stacks, respect cover check in wizards, screenshots, exposition times updated with 0.1s step
 
 
 ## Known issues
