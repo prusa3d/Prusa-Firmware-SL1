@@ -3,7 +3,7 @@
 ## Summary (relative to 1.6.0-alpha.2)
 - Prusa Connect Local renamed to Prusa Link
 - bugfix: Prusa Link: project upload error, translations, print time estimate, remove SDK printer as dependency, /error page
-- bugfix: sl1fw: expo display counter, wizard checks properly turns of the HW (cleans the dishes), fan check in self-test, tilt time measurement, unittests, property changed signal from printerConfig0, logs cleanup, printer model detection error
+- bugfix: sl1fw: expo display counter, wizard checks properly turns of the HW (cleans the dishes), fan check in self-test, tilt time measurement, unittests, property changed signal from printerConfig0, logs cleanup, printer model detection error show even when printer needs calibration
 - sl1fw: truncate logs, export logs with miliseconds, dbus method to get printer ready to print, retry in wizard is not allowed, SL1 fast tilt = SL1s slow tilt, self-test for booster board V2, new wizard group for showing the results
 - sl1fw-fs: deprecated (incompatible) projects, support for listing .raucb files, average extraction time
 - bugfix: sl1fw-fs: inotify
