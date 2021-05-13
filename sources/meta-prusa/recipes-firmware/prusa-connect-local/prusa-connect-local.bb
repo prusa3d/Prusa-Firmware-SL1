@@ -1,7 +1,7 @@
 SUMMARY = "web ui - static web files firmware part running on a64 board" 
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Connect-Local"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV_pn-${PN} = "bf53ed9fff16ef3e9c0582b5b43b46334147d86c"
+SRCREV_pn-${PN} = "8b638b592b542103bb91e158526cd8ecbabe743c"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Connect-Local.git;protocol=ssh;nobranch=1 \
 	file://dnssd/http.dnssd \
