@@ -1,8 +1,8 @@
 # Version 1.6.0-alpha.4
 
 ## Summary (relative to 1.6.0-alpha.3)
-- bugfix: touch-ui: show wait screen when MC FW is updated, project time estimate
-- touch-ui: add listing of .raucb update files from USB
+- bugfix: touch-ui: show wait screen when MC FW is updated, project time estimate, scroling long project names, short print time estimate
+- touch-ui: add listing of .raucb update files from USB, enhance up/downgrade wizard, multiple design improvements
 - bugfix: prusa-connect-local: project time estimate
 
 
