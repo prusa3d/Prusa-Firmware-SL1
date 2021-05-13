@@ -1,3 +1,12 @@
+# Version 1.6.0-alpha.4
+
+## Summary (relative to 1.6.0-alpha.3)
+- bugfix: touch-ui: show wait screen when MC FW is updated, project time estimate
+- touch-ui: add listing of .raucb update files from USB
+
+
+## Known issues
+
 # Version 1.6.0-alpha.3
 
 ## Summary (relative to 1.6.0-alpha.2)
@@ -13,7 +22,8 @@
 
 
 ## Known issues
-
+- tilt value not visible in calibration
+- tilt times are not refreshed properly
 
 
 # Version 1.6.0-alpha.2
