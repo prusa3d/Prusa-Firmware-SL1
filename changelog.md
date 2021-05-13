@@ -4,9 +4,8 @@
 - bugfix: touch-ui: show wait screen when MC FW is updated, project time estimate, scroling long project names, short print time estimate
 - touch-ui: add listing of .raucb update files from USB, enhance up/downgrade wizard, multiple design improvements
 - bugfix: prusa-connect-local: project time estimate
-
-
-## Known issues
+- bugfix: sl1fw: resin refill, log export, virtual and admin fixes, tilt is not released during the wizards, up to date rauc calls
+- sl1fw: up/downgrade wizard, optional UV PWM save in booster board
 
 # Version 1.6.0-alpha.3
 
@@ -20,12 +19,6 @@
 - bugfix: sl1fw-fs: inotify, old projects reported also os LS1 if SL1s projects found
 - touch-ui: handling plurals and localized dates
 - bugfix: touch-ui: deleting files and folders, sort projects and folders, wait for printer to be ready (do not show unexpected error), music in self-test, wait page when MC is being updated, list of checks refreshed properly, empty pages in wizards, page stacks, respect cover check in wizards, screenshots, exposition times updated with 0.1s step
-
-
-## Known issues
-- tilt value not visible in calibration
-- tilt times are not refreshed properly
-
 
 # Version 1.6.0-alpha.2
 
