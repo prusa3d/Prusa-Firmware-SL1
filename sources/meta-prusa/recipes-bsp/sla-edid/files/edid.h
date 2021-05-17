@@ -269,4 +269,4 @@ start3:		.ascii	TIMING_NAME
 end3:		.byte	0x0a	/* End marker */
 		.fill	12-(end3-start3), 1, 0x20 /* Padded spaces */
 extensions:	.byte	0	/* Number of extensions to follow */
-checksum:	.byte	CRC	/* Sum of all bytes must be 0 */
+checksum:	.byte	0x00	/* Sum of all bytes must be 0 (placeholder) */

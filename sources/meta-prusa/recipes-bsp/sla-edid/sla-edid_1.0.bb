@@ -10,22 +10,19 @@ SRC_URI = " \
 	file://dxq608.S \
 	file://ls055r1sx04.S \
 	file://rv059fbb.S \
-	file://checksum.c \
+	file://checksum.cpp \
 "
 
 FILES_${PN} = "${base_libdir}/firmware/edid/*.bin"
 
 do_compile() {
 	mkdir -p ${B}
-	${BUILD_CC} -o ${B}/checksum ${WORKDIR}/checksum.c
+	${BUILD_CXX} -o ${B}/checksum ${WORKDIR}/checksum.cpp
 	for edid in dxq608 ls055r1sx04 rv059fbb
 	do
-		${BUILD_CC} -c -DCRC="0x00" -o ${B}/${edid}.nosum.o ${WORKDIR}/${edid}.S
-		${OBJCOPY} -Obinary ${B}/${edid}.nosum.o ${B}/${edid}.nosum.bin
-		crc=$(${B}/checksum < ${B}/${edid}.nosum.bin)
-		rm ${B}/${edid}.nosum.bin
-		${BUILD_CC} -c -DCRC="${crc}" -o ${B}/${edid}.o ${WORKDIR}/${edid}.S
-		${OBJCOPY} -Obinary ${B}/${edid}.o ${B}/${edid}.bin
+		${BUILD_CC} -c -o ${B}/${edid}.o ${WORKDIR}/${edid}.S
+		${OBJCOPY} -j .data -Obinary ${B}/${edid}.o ${B}/${edid}.bin
+		${B}/checksum ${B}/${edid}.bin
 	done
 }
 
