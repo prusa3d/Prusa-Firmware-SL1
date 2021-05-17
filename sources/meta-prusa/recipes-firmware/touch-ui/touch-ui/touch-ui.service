@@ -1,6 +1,6 @@
 [Unit]
 Description=SL1 Client
-After=sl1fw.service weston.service
+After=weston.service
 BindsTo=weston.service
 
 [Service]
