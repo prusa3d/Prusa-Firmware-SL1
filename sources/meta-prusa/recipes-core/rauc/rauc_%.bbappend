@@ -13,6 +13,12 @@ SRC_URI_append = " \
 
 RDEPENDS_${PN} += "python3-semver python3-pydbus"
 
+FILES_${PN} += " slot.raucs "
+
+do_compile_append () {
+    echo -e "[slot]\nbundle.version=${DISTRO_VERSION}" > ${WORKDIR}/slot.raucs
+}
+
 do_install_append () {
     install -d ${D}${datadir}/rauc/
     install -m 0644 ${WORKDIR}/system.conf ${D}${datadir}/rauc/system.conf
@@ -23,4 +29,6 @@ do_install_append () {
     install -m 0644 ${WORKDIR}/ca-prod.cert.pem ${D}${sysconfdir}/rauc/ca.cert.pem
     install -d ${D}${libdir}/rauc/
     install -m 0755 ${WORKDIR}/pre_install.py ${D}${libdir}/rauc/pre_install.py
+    install -m 0644 ${WORKDIR}/slot.raucs ${D}/slot.raucs
+    install -m 0644 ${WORKDIR}/slot.raucs ${D}${sysconfdir}/slot.raucs
 }
