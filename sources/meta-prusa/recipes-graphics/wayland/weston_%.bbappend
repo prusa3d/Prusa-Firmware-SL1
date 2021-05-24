@@ -3,6 +3,7 @@ SRC_URI:append = " \
 	   file://0001-kiosk-bg-shell.patch \
 	   file://0002-fix-dependencies.patch \
 	   file://0003-Revert-kiosk-shell-Add-a-border-fill-to-non-fullscre.patch \
+	   file://0004-gl-renderer-added-RGB888-and-R8-pixel-formats.patch \
 	   file://prusa_logo.webp \
 "
 SRC_URI:remove = " \
