@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;nobranch=1"
 
-SRCREV_pn-${PN} = "30470010b0d02f3280f280269baaeea1524cb51c"
+SRCREV_pn-${PN} = "a08bfcb8e138e863fd9b4bb222f29a6d87129afe"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "sl1fw gettext-native"
