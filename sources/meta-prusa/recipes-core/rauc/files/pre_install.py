@@ -28,9 +28,8 @@ try:
         admin = False
         print("Admin query via DBus failed. Considering admin disabled.")
 
-    # Downgrade bundle check
-    path = bundle_path / "downgrade_enabled"
-    enabled = path.exists()
+    # Downgrade always allowed
+    downgrade_enabled = True
 
     # Obtain bundle version
     manifest = configparser.ConfigParser()
@@ -40,7 +39,7 @@ try:
     # Obtain system version
     system_version = distro.version()
 
-    print(f"Checking update: {system_version} -> {bundle_version}, admin: {admin}, downgrade bundle: {enabled}")
+    print(f"Checking update: {system_version} -> {bundle_version}, admin: {admin}, downgrade bundle: {downgrade_enabled}")
 
     try:
         system_semver = VersionInfo.parse(system_version)
@@ -58,7 +57,7 @@ try:
         print("Same version install not allowed !!!")
         exit(2)
 
-    if bundle_semver < system_semver and not admin and not enabled:
+    if bundle_semver < system_semver and not admin and not downgrade_enabled:
         print("Downgrades not allowed")
         exit(1)
 
