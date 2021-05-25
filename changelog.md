@@ -1,3 +1,51 @@
+# Version 1.6.0-alpha.5
+
+## Summary (relative to 1.6.0-alpha.4)
+
+- Reverted tilt position information removal
+- SL1SW-1324: increased the first layer exposure time granularity to 1s
+- use PrusaPage in UpdatingFirmwarePage
+- extend the set of states in which firmware update is allowed
+- Always push the FirmwareUpdate page to the main stack
+- Removed invokable methods
+- Change to overheating page when exposure0 or printer0 state is overheating
+- Show printer model it in SysInfo
+- Show a fan warning page
+- Fixed missing image on PageUvCalibrationWizard
+- Fixed cover check
+- Use config0.tiltSlowTime
+- Restrict precision of UV calibration results
+- Reset menu positon when admin page content is changed
+- Added dedicated properties for each of the temperatures
+- Avoid poweroff in case of factory packaging wizard failure
+- Enable UV calibration process cancel
+- Fixed UV meter close on wizard end
+- Resin sensor, unboxing, temperature check now async (interruptable)
+- Fixed UV, motors, fans off
+- Avoid config write if not changed
+- Fixed save wizard history
+- Fixed upgrade wizard (system info BEFORE cleanups, reset UV LED and display
+  counters, delete display usage, restart after all data is written)
+- Make sure firstboot model detect runs before a64-fw
+- Fixed MC flash when not repsponding
+- Fixed calibartion on media insert
+- Overheaing exposure state
+- Create an alert (warning) when the fan dectects an error
+- Added printer0.printer_model -> int property
+- Fixed right temperature limit for SL1S
+- Provide constant UV PWM for SL1S
+- Disabled shudown on rejected SL1S upgrade (this is temporary to avoid
+  recalibration on development printers)
+- Fixed temperature readings by on_change event
+- Fixed error definition to exception consistency
+- Sort files by mtime
+- Install Rauc slot status file
+- Fixed sound test
+- u-boot: rauc update: toggle eMMC bootpart on slot flip
+- touch-ui does not need to wait for sl1fw
+- Show warning in touch-ui if user wants to downgrade via .rauc
+- Added warning about new resin tank and platform
+
 # Version 1.6.0-alpha.4
 
 ## Summary (relative to 1.6.0-alpha.3)
