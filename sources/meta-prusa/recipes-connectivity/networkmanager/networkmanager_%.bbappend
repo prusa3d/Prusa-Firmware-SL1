@@ -3,12 +3,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = "\
         file://hotspot_scan.patch \
 	file://mdns.conf \
+	file://wifi.conf \
 "
 
 FILES_${PN} += "\
 	${systemd_system_unitdir}/multi-user.target.wants/NetworkManager.service \
 	${systemd_system_unitdir}/network-online.target.wants/NetworkManager-wait-online.service \
-	${noarch_libdir}/NetworkManager/conf.d/mdns.conf \
+	${noarch_libdir}/NetworkManager/conf.d/ \
 "
 
 PACKAGECONFIG_remove_pn-networkmanager = "polkit dhclient dnsmasq ifupdown"
@@ -24,6 +25,7 @@ do_install_append() {
 
 	install -d ${D}${libdir}/NetworkManager/conf.d
 	install -m 644 ${WORKDIR}/mdns.conf ${D}${libdir}/NetworkManager/conf.d/
+	install -m 644 ${WORKDIR}/wifi.conf ${D}${libdir}/NetworkManager/conf.d/
 
 
 }
