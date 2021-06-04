@@ -21,10 +21,8 @@ RDEPENDS_${PN} += " \
 	api-keygen \
 	udev-usbmount \
 	wifi-config \
-	python3-websocket-server \
 	python3-pyserial \
 	python3-numpy \
-	python3-jinja2 \
 	python3-gpio \
 	python3-pydbus \
 	python3-misc \
