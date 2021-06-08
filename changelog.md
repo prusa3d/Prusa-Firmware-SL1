@@ -30,6 +30,10 @@
     - Do not force user to re-run wizards
     - Added direct UV power measure to admin
     - Display UV calibration data in admin
+  - prusa-connect-local
+    - Fix reload project preview to refresh metadata properly (exposure change)
+    - Fix expo times first layer step 1 s
+    - Fix always show decimal point in expo times
 
 # Version 1.6.0-alpha.5
 
