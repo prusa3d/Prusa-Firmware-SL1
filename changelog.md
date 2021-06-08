@@ -37,6 +37,8 @@
   - sl1fw-api
     - Fix feed me: refill resin only of user clicked on "Resin fully refilled"
     - Fix handle interrupted project upload
+  - sl1fw-fs
+    - Fix run filemanager easier on development PC
 
 # Version 1.6.0-alpha.5
 
