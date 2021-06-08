@@ -34,6 +34,9 @@
     - Fix reload project preview to refresh metadata properly (exposure change)
     - Fix expo times first layer step 1 s
     - Fix always show decimal point in expo times
+  - sl1fw-api
+    - Fix feed me: refill resin only of user clicked on "Resin fully refilled"
+    - Fix handle interrupted project upload
 
 # Version 1.6.0-alpha.5
 
