@@ -1,3 +1,36 @@
+# Version 1.6.0-alpha.6
+
+## Summary (relative to 1.6.0-alpha.5)
+- a64-fw
+    - Fix print time for failed prints
+    - Add oneclick inhibitor support
+    - Improve resin sensor error handling, use tower poistion instead of volume in sel-test, fises support for different vats.
+    - Fixed self-test temperatures for SL1S
+    - Fixed SL1S factory UV PWM, now everything defaults to 208
+    - Fixed plastic vat on SL1S firstboot
+    - Added new picures for upgrade downgrade wizards
+    - Fixed wizard names, fixes factory reset, data no more missing
+    - UV calibration now explictly forbiden for SL1S
+    - Optimized performance for long admin lists
+    - Fixed admin error handling
+    - Fixed reprint exposure ritme handling
+    - Added support for dev server logs upload
+    - Fixed calibration to use current tilt height value
+    - Factory reset axis movements now async actions
+    - Fix preprint check race condition
+    - Reverted moving tank up after finish
+    - Added SL1S downgrade test to admin menu
+    - Added tilt time only wizard to admin menu
+    - Cleanup incompatible exaples on first boot
+    - Added display usage heatmap into exported logs + printer model parameters refactoring
+    - Fix print time estimation and estimated, exposure times value refresh
+    - Added booster SN to system info
+    - SL1s: min UV pwm: set minimal UV PWM to 30
+    - Fixed feed me: refill resin only if user clicked on "Done"
+    - Do not force user to re-run wizards
+    - Added direct UV power measure to admin
+    - Display UV calibration data in admin
+
 # Version 1.6.0-alpha.5
 
 ## Summary (relative to 1.6.0-alpha.4)
@@ -251,7 +284,7 @@
 - New a64-fw wizard API
 - New a64-fw uv display counter
 - New a64-fw add statistics
-- New a64-fw store old exposure objects. It may allow reprinting 
+- New a64-fw store old exposure objects. It may allow reprinting
 - Overall codebase cleanup
 - Using Lima (gpu driver) instead of mali blob
 - Fixed shallow git fetch
@@ -282,7 +315,7 @@ older projects. Not used now.
 - Fix touch-ui high cpu consumption
 - Fix display backlight blink
 - Fix web-ui modal window timeout
- 
+
 # Version 1.5.0-alpha.4
 
 ## Summary (relative to 1.5.0-alpha.3)
@@ -462,7 +495,7 @@ An alternative option is to use a USB flash drive and download the firmware usin
 ## Detailed description
 
 ### New web interface
-The web interface has been completely redesigned. Now, the page displays the printer's telemetry allowing the user to monitor:   
+The web interface has been completely redesigned. Now, the page displays the printer's telemetry allowing the user to monitor:
 printer status
 speed of the fans
 status of the cover (lid)
@@ -604,7 +637,7 @@ An option was added to download example models to the printers internal storage.
 - MQTT: collect 'generic' data right before send
 - MQTT: check calibration is done
 - MQTT: success confirm in Factory mode wizard
-- Test the black display throughput at the end of UV calibration 
+- Test the black display throughput at the end of UV calibration
 - Do not ask whenever to show calibration data at the end of UV Calibration process
 - Differentiated factory reset for factor mode and normal mode
 - Factory mode indication
@@ -643,7 +676,7 @@ An option was added to download example models to the printers internal storage.
 - MQTT: collect 'generic' data right before send
 - MQTT: check calibration is done
 - MQTT: success confirm in Factory mode wizard
-- Test the black display throughput at the end of UV calibration 
+- Test the black display throughput at the end of UV calibration
 - Do not ask whenever to show calibration data at the end of UV Calibration process
 - Different factory reset for factory mode and normal mode
 - Factory mode indication in version string
@@ -943,7 +976,7 @@ An option was added to download example models to the printers internal storage.
 - pre-release UI changes
 - page start with fill resin,...
 - fix: do not display projects with invalid name
-- manual, videos, about URLs 
+- manual, videos, about URLs
 - u-boot patch for arch timer erratum
 
 # Version v0.10.0-r0
@@ -1037,7 +1070,7 @@ An option was added to download example models to the printers internal storage.
 # Version 0.9.2-rc0
 - Calibration UI fixes
 - Support for rev04 and rev05 MC boards
-- Half - auto calibration + infinity test 
+- Half - auto calibration + infinity test
 - Search for tilt homing profiles and tuning tilt while printing
 - Fixed log access
 - Added new UI screens (network, printing, support, ...)
