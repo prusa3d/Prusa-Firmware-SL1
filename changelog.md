@@ -30,6 +30,8 @@
     - Do not force user to re-run wizards
     - Added direct UV power measure to admin
     - Display UV calibration data in admin
+    - UV PWM fine tune parameter
+    - light version of setting PWM based on display transmittance
   - prusa-connect-local
     - Fix reload project preview to refresh metadata properly (exposure change)
     - Fix expo times first layer step 1 s
