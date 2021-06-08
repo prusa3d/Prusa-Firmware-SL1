@@ -4,8 +4,8 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV = "ab4464583368645039a596cb272aabc517081d9f"
-LICENSE = "GPLv3+" 
+SRCREV = "5cd76c767df42e1b6bbf03fe0fcdd751462769e6"
+LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
 "
@@ -43,7 +43,7 @@ S="${WORKDIR}/git"
 do_install_append () {
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/touch-ui.service ${D}${systemd_system_unitdir}/
-	
+
 	install -d ${D}/usr/share/dbus-1/system.d
 	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.Notify1.conf ${D}${datadir}/dbus-1/system.d/
 }

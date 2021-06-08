@@ -39,6 +39,22 @@
     - Fix handle interrupted project upload
   - sl1fw-fs
     - Fix run filemanager easier on development PC
+  - touch-ui
+    - add exposure panel SN, booster board SN and transmittance properties of printer0
+    - Fix situation where wizard was not shown even if backend was in WIZARD state
+    - Fix show waitscreen when the user opens cover during print
+    - Fix disable notifications on init pages
+    - add a common powerOff dialog, connect it to the power button
+    - modify UpgradeWizard warning text + picture of UV calibrator
+    - language select page is hown above errors
+    - add http_digest disable dialog
+    - update exposure times on PageChange if they are changed in the backend(i.e. via web-ui)
+    - Fix UV Calibration should not be displayed for SL1S
+    - Fix continue after stuck print
+    - Fix localisation (clock, finish print time)
+    - Allow for running without wifi
+    - Fix upload project notification
+    - screensaver improvement: wakeup if current page changes
 
 # Version 1.6.0-alpha.5
 
