@@ -51,6 +51,9 @@
     - fix: propagate user profile on reprint
 - sl1fw-api
     - fix: add path to the touch-ui file upload notification call
+- sl1fw-fs
+    - feature: Add some more log calls
+    - fix: Fail single file on broken filename (broken file is just skipped but the filemanages still runs)
 
 # Version 1.6.0-alpha.6
 
