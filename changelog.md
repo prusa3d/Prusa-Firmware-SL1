@@ -22,6 +22,33 @@
     - fix misleading label in the SettingsFirmware menu
     - fix: short PictureButton clicks
     - fix: print preview: inform about correct amount of required resin
+- sl1fw
+    - fix: Introduce partly magical time estimation
+    - fix: enable powerOff in  Printer0State.ADMIN
+    - fix: Examples check moved to factory reset + UV PWM computation checked in factory reset
+    - optimization: Improve error test menu
+    - fix: tilt: simplify readout of all tilt profiles
+    - feature: admin: new wizard - vat cleaner (whole display exposure)
+    - fix: Remove Dev hacks
+    - feature: Compute UV PWM on SL1S start
+    - fix: Move tower up after resin sensor test
+    - feature: admin: new test - simulate disconnected display
+    - fix: notify about menu change after all work is done
+    - feature: exposure: new project parameter for user preferenced exposure settings (user_profile)
+    - fix: raise an exception if model is unknown instead of doing display initialization
+    - feature: exposure: Use slow tilt on first layers
+    - feature: exposure: log tilt profiles during exposure
+    - feature: exposure: force slow tilt on layer area transition
+    - fix: vat revision on factory reset
+    - feature: Update Dockerfile for future static analysis
+    - fix: SL1S does not have UV calibration, don't try to send it's data on factory_reset
+    - fix: Remove power button handling from pages
+    - fix: hw infinite test converted to new admin api
+    - fix: factorytest: API
+    - fix: Provide axis position updates (tilt position is updated correctly in calibration)
+    - feature: Improve motion controller tests
+    - optimization: single check wizard and single check group
+    - fix: propagate user profile on reprint
 
 # Version 1.6.0-alpha.6
 
