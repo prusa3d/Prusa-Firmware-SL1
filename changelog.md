@@ -49,6 +49,8 @@
     - feature: Improve motion controller tests
     - optimization: single check wizard and single check group
     - fix: propagate user profile on reprint
+- sl1fw-api
+    - fix: add path to the touch-ui file upload notification call
 
 # Version 1.6.0-alpha.6
 
