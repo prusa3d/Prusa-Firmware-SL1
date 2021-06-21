@@ -1,3 +1,12 @@
+# Version 1.6.0-beta.0
+
+## Summary (relative to 1.6.0-alpha.6)
+- prusa-connect-local (Prusa Link)
+    - fix: welcome text to be printer model neutral
+    - fix: Do not attempt digest re-authentication (prevents flood of authentication failed error messages)
+    - fix: Expo calibration increment time step and limit
+    - update: texts: Translations updated (should be final)
+
 # Version 1.6.0-alpha.6
 
 ## Summary (relative to 1.6.0-alpha.5)
