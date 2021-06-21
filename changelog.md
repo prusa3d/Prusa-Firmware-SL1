@@ -6,6 +6,22 @@
     - fix: Do not attempt digest re-authentication (prevents flood of authentication failed error messages)
     - fix: Expo calibration increment time step and limit
     - update: texts: Translations updated (should be final)
+- touch-ui
+    - update: texts: both texts in QT project and Error-Codes were updated. first translations update (still missing some keys)
+    - fix: power button
+    - fix: exposure setting of first layer should have step of 1s
+    - fix: Show raw error names. When an unknown error is displayed, display also a raw error name.
+    - fix: logging of filenames is no longer needed
+    - fix: ask for language only when default is selected, timezone settings is still kept in touch-ui configuration, because it lacks a recognizable default value.
+    - feature: PageException: swap reboot button for firmware update
+    - fix: exposure: Use new text on buttons + change icons
+    - feature: change exposure times: support for new user_profile parameter + new design
+    - fix: apply changed exposure times only on page destruction
+    - feature: start print when the user clicks on upload notification
+    - fix: read ip address directly, don't use backend
+    - fix misleading label in the SettingsFirmware menu
+    - fix: short PictureButton clicks
+    - fix: print preview: inform about correct amount of required resin
 
 # Version 1.6.0-alpha.6
 
