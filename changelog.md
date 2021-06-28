@@ -6,6 +6,8 @@
   - update: modify images for the selftest and calibration wizard(SL1S)
   - fix: packing wizard identifier
   - fix: resin sensor check: change allowed limits
+- sl1fw-api:
+  - bump: Prusa-Error-Codes
 
 # Version 1.6.0-beta.0
 
