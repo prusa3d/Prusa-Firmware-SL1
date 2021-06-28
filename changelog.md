@@ -10,6 +10,8 @@
   - bump: Prusa-Error-Codes
 - sl1fw-fs:
   - bump: Prusa-Error-Codes
+- prusa-error-codes:
+  - fix: #10501 use model neutral text
 
 # Version 1.6.0-beta.0
 
