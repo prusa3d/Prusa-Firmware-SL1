@@ -12,6 +12,23 @@
   - bump: Prusa-Error-Codes
 - prusa-error-codes:
   - fix: #10501 use model neutral text
+- touch-ui:
+  - fix: remove the redundant display test(duplicated)
+  - fix: language selection will not be requested on factory reset(locale set to "C", but on the boot after that
+  - fix: enable the "back" button on PageFinished if it was entered by the user from the notification list
+  - fix: short time duration format on PageFinished
+  - fix: Changes to the wizards for SL1S
+    - different way to test resin sensor for SL1S
+    - new text for display_test
+    - remove obsole PageCalibrationPlatform.qml
+    - new text for prepare_calibration_finish step of calibration for SL1S
+  - fix: DelegatePlusMinus: do not override the original value of property by the delegate's default
+  - fix: Change text to printer model neutral on PageManual and PageVideos
+  - fix: user manual link generation
+  - fix: Handle insert foam wizard state
+  - fix: DelegatePlusMinus: use arrows instead of (+),(-) where appropriate
+  - fix: PictureButton background
+  - fix: PageException: show text of the error
 
 # Version 1.6.0-beta.0
 
