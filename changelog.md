@@ -8,6 +8,8 @@
   - fix: resin sensor check: change allowed limits
 - sl1fw-api:
   - bump: Prusa-Error-Codes
+- sl1fw-fs:
+  - bump: Prusa-Error-Codes
 
 # Version 1.6.0-beta.0
 
