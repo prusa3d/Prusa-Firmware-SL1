@@ -1,3 +1,12 @@
+# Version 1.6.0-rc.0
+
+## Summary (relative to 1.6.0-beta.0)
+- sl1fw:
+  - fix: print settings: time estimation on print profile change
+  - update: modify images for the selftest and calibration wizard(SL1S)
+  - fix: packing wizard identifier
+  - fix: resin sensor check: change allowed limits
+
 # Version 1.6.0-beta.0
 
 ## Summary (relative to 1.6.0-alpha.6)
