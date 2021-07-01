@@ -1,4 +1,4 @@
-# Version 1.6.0
+# Version 1.6.0-rc.1
 
 ## Summary (relative to 1.6.0-rc.0)
 - prusa-connect-local:
@@ -9,6 +9,7 @@
   - fix: translations for user profiles
 - sl1fw:
   - fix: appropriate picture unboxing-remove_foam.jpg for SL1S
+  - fix: Fail factory data send on not-completed wizard
 
 # Version 1.6.0-rc.0
 
