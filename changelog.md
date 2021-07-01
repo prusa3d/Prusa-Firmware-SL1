@@ -1,3 +1,9 @@
+# Version 1.6.0-rc.2
+
+## Summary (relative to 1.6.0-rc.1)
+- sl1fw:
+  - Force 1 sec delay before exposure when using slow move of the tilt
+
 # Version 1.6.0-rc.1
 
 ## Summary (relative to 1.6.0-rc.0)
