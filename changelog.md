@@ -3,6 +3,10 @@
 ## Summary (relative to 1.6.0-rc.0)
 - prusa-connect-local:
   - fix: show extensions for both printers
+- touch-ui:
+  - fix: short time format on PagePrint
+  - fix: use current locale on PageError & PageException
+  - fix: translations for user profiles
 
 # Version 1.6.0-rc.0
 
