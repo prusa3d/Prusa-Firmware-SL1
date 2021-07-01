@@ -7,6 +7,8 @@
   - fix: short time format on PagePrint
   - fix: use current locale on PageError & PageException
   - fix: translations for user profiles
+- sl1fw:
+  - fix: appropriate picture unboxing-remove_foam.jpg for SL1S
 
 # Version 1.6.0-rc.0
 
