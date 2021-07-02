@@ -1,3 +1,31 @@
+# Version 1.6.0
+
+## Summary (relative to 1.5.0)
+- SL1 vs SL1S SPEED
+- Updated Wizards
+- Updated Selftest wizard
+- SL1S SPEED print profiles
+- First layers speed
+- Automatic print adjustments (large objects)
+- New power button behavior
+- Transition to dbus for IPC
+- Improved translations and localisations
+- Improved screensaver
+- Improved logging procedure
+- PrusaLink updates
+- Display exposure counter
+- Improved cooling
+- Support for Wayland
+- Redesigned error pages
+- Improved USB automounting
+- Bug fixes
+
+This is the final release of firmware 1.6.0, which is the first firmware release with support for both SL1 and the upcoming SL1S SPEED. The firmware is universal and able to automatically recognize between both types of printers and set the system parameters accordingly. Differences between SL1 and SL1S SPEED are described below.
+
+There are major changes to the firmware’s code. Compared to the previous release 1.5.0, there are 689 commits, and 127 bug fixes. Kudos to the community for reporting the issues.
+
+For detailed information about all the changes in this release, please visit GitHub (https://github.com/prusa3d/Prusa-Firmware-SL1/releases/tag/1.6.0)
+
 # Version 1.6.0-rc.2
 
 ## Summary (relative to 1.6.0-rc.1)
