@@ -64,14 +64,5 @@ do_configure:prepend() {
 }
 
 do_install:append() {
-	install -d ${D}/${KERNEL_IMAGEDEST}
-	install -d ${D}/boot
-
-	for dtbf in ${KERNEL_DEVICETREE}; do
-		dtb=`normalize_dtb "$dtbf"`
-		install -d -m 0755 ${D}/${KERNEL_IMAGEDEST}/`dirname ${dtb}`
-		install -m 0644 ${B}/arch/${ARCH}/boot/dts/${dtb} ${D}/${KERNEL_IMAGEDEST}/${dtb}
-	done
-
-	rm ${D}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
+	rm -f ${D}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 }
