@@ -1,0 +1,26 @@
+From 095c09570046619cea0ee3533497bdddbd6358f8 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 18 Mar 2021 07:33:34 +0100
+Subject: [PATCH 1/2] plat/allwinner: set ACIN current limit to 3.5 A
+
+---
+ drivers/allwinner/axp/common.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/allwinner/axp/common.c b/drivers/allwinner/axp/common.c
+index 582ab17d9..5f318203a 100644
+--- a/drivers/allwinner/axp/common.c
++++ b/drivers/allwinner/axp/common.c
+@@ -150,6 +150,9 @@ void axp_setup_regulators(const void *fdt)
+ 		return;
+ 	}
+ 
++	/* set ACIN current limit to 3.5 A */
++	axp_clrsetbits(0x3a, BIT(1) | BIT(0), BIT(2));
++
+ 	/* This applies to AXP803 only. */
+ 	if (fdt_getprop(fdt, node, "x-powers,drive-vbus-en", NULL) &&
+ 	    board_uses_usb0_host_mode(fdt)) {
+-- 
+2.31.0
+

@@ -1,6 +1,6 @@
 DESCRIPTION = "Arm Trusted Firmware (ATF)"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://license.rst;md5=c709b197e22b81ede21109dbffd5f363"
+LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
 inherit deploy
 
@@ -8,12 +8,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = " \
 	git://github.com/ARM-software/arm-trusted-firmware.git;branch=master \
-	file://0002-drivevbus.patch \
-	file://0003-aldo1-regulator.patch \
-	file://0004-set-current-limit.patch \
-	file://0005-dcdc4-eldo2-for-tc358870.patch \
+	file://0001-plat-allwinner-set-ACIN-current-limit-to-3.5-A.patch \
+	file://0002-axp803-add-aldo1-dcdc4-and-eldo2-regulators.patch \
 "
-SRCREV = "9a25f98261c134e3af4c1610c4afc74b01201fa2"
+SRCREV = "v2.6"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
@@ -28,7 +26,6 @@ AS[unexport] = "1"
 LD[unexport] = "1"
 
 do_configure[noexec] = "1"
-#do_install[noexec] = "1"
 
 EXTRA_OEMAKE = 'BUILD_BASE=${B} LD=${TARGET_PREFIX}ld.bfd CROSS_COMPILE=${TARGET_PREFIX} PLAT=${PLATFORM}'
 
