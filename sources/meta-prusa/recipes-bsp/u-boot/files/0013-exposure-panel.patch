@@ -1,0 +1,3050 @@
+From cf3bc6ead43b91dda47439857d8fb52067bf40b8 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 17 Dec 2020 08:56:07 +0100
+Subject: [PATCH 1/4] exposure panel identification
+
+---
+ .../dts/sun50i-a64-prusa64-sl1-u-boot.dtsi    |  35 ++
+ arch/arm/dts/sun50i-a64-prusa64-sl1.dts       |  23 +-
+ arch/arm/mach-sunxi/Kconfig                   |   6 +
+ board/sunxi/Makefile                          |   6 +
+ board/sunxi/board.c                           |  37 +-
+ board/sunxi/panel-detector-uclass.c           |  26 +
+ board/sunxi/panel_detector.h                  |  18 +
+ board/sunxi/tc358870.c                        | 564 ++++++++++++++++++
+ board/sunxi/tc358870.h                        |  88 +++
+ configs/prusa64-sl1_defconfig                 |   6 +-
+ include/dm/uclass-id.h                        |   1 +
+ 12 files changed, 803 insertions(+), 7 deletions(-)
+ create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
+ create mode 100644 board/sunxi/panel-detector-uclass.c
+ create mode 100644 board/sunxi/panel_detector.h
+ create mode 100644 board/sunxi/tc358870.c
+ create mode 100644 board/sunxi/tc358870.h
+
+diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi b/arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
+new file mode 100644
+index 0000000000..7f6efb04ed
+--- /dev/null
++++ b/arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
+@@ -0,0 +1,35 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (C) 2020 Prusa Development, a.s.
++ * Written by Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#include "sunxi-u-boot.dtsi"
++
++/ {
++	avdd_lcd: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "dsi1-lcd-avdd";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&pio 4 7 GPIO_ACTIVE_HIGH>; /* PE7 */
++		enable-active-high;
++	};
++
++};
++
++/* The Toshiba TC358870 HDMI-bridge is on r_i2c */
++&i2c0 {
++	tc358870: hdmi-bridge@f {
++		compatible = "toshiba,tc358870";
++		reg = <0x0f>;
++		vdd33_hdmi-supply = <&reg_dldo1>;
++		vdd12_mipi-supply = <&reg_fldo1>;
++		vdd11_hdmi-supply = <&reg_dcdc4>;
++		iovdd_lcd-supply = <&reg_eldo2>;
++		avdd_lcd-supply = <&avdd_lcd>;
++		bridge-reset-gpios = <&pio 4 1 GPIO_ACTIVE_LOW>; /* PE1 */
++		panel-reset-gpios = <&pio 3 24 GPIO_ACTIVE_LOW>; /* PD24 */
++		status = "okay";
++	};
++};
+diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
+index 89cc5b2f94..ca7bb92206 100644
+--- a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
++++ b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
+@@ -78,6 +78,13 @@
+ 	snps,reset-delays-us = <1000 20000 20000>;
+ };
+ 
++/* The Toshiba TC358870 HDMI bridge is on i2c0 */
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins>;
++	status = "okay";
++};
++
+ &mdio {
+ 	status = "disabled";
+ 	ext_rmii_phy1: ethernet-phy@1 {
+@@ -186,6 +193,12 @@
+ 
+ /* DCDC3 is polyphased with DCDC2 */
+ 
++&reg_dcdc4 {
++	regulator-min-microvolt = <1150000>;
++	regulator-max-microvolt = <1150000>;
++	regulator-name = "dsi1-1.15V-hdmi";
++};
++
+ &reg_dcdc5 {
+ 	regulator-always-on;
+ 	regulator-min-microvolt = <1360000>;
+@@ -209,13 +222,13 @@
+ &reg_dldo2 {
+ 	regulator-min-microvolt = <3300000>;
+ 	regulator-max-microvolt = <3300000>;
+-	regulator-name = "vcc-mipi";
++	regulator-name = "dsi0-3.3v-mipi";
+ };
+ 
+ &reg_dldo3 {
+-	regulator-min-microvolt = <2800000>;
+-	regulator-max-microvolt = <2800000>;
+-	regulator-name = "vcc-avdd-csi";
++	regulator-min-microvolt = <3300000>;
++	regulator-max-microvolt = <3300000>;
++	regulator-name = "dsi0-3.3v-ctp";
+ };
+ 
+ &reg_dldo4 {
+@@ -238,7 +251,7 @@
+ &reg_eldo2 {
+ 	regulator-min-microvolt = <1800000>;
+ 	regulator-max-microvolt = <1800000>;
+-	regulator-name = "vcc-dvdd-csi";
++	regulator-name = "dsi1-1.8v";
+ };
+ 
+ &reg_fldo1 {
+diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
+index 16d41b83af..13665fe44e 100644
+--- a/arch/arm/mach-sunxi/Kconfig
++++ b/arch/arm/mach-sunxi/Kconfig
+@@ -1009,4 +1009,10 @@ config PINE64_DT_SELECTION
+ 	  option, the device tree selection code specific to Pine64 which
+ 	  utilizes the DRAM size will be enabled.
+ 
++config BRIDGED_PANEL_DETECTION
++	bool "Detect panel connected to a TC358870 bridge"
++	default n
++	depends on MACH_SUN50I
++	select DM_I2C
++
+ endif
+diff --git a/board/sunxi/Makefile b/board/sunxi/Makefile
+index ed3553254e..6ec648996d 100644
+--- a/board/sunxi/Makefile
++++ b/board/sunxi/Makefile
+@@ -14,4 +14,10 @@ obj-$(CONFIG_MACH_SUN7I)	+= dram_sun5i_auto.o
+ 
+ ifndef CONFIG_SPL_BUILD
+ obj-$(CONFIG_EFI_PARTITION)	+= grow_sd.o
++
++ifdef CONFIG_BRIDGED_PANEL_DETECTION
++obj-y	+= panel-detector-uclass.o
++obj-y	+= tc358870.o
++endif
++
+ endif
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 511459f806..09cb9712ac 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -39,6 +39,7 @@
+ #include <spl.h>
+ #include <sy8106a.h>
+ #include <asm/setup.h>
++#include "panel_detector.h"
+ 
+ #if defined CONFIG_VIDEO_LCD_PANEL_I2C && !(defined CONFIG_SPL_BUILD)
+ /* So that we can use pin names in Kconfig and sunxi_name_to_gpio() */
+@@ -919,6 +920,27 @@ int misc_init_r(void)
+ 
+ #ifdef CONFIG_USB_ETHER
+ 	usb_ether_init();
++#endif
++#ifdef CONFIG_BRIDGED_PANEL_DETECTION
++	int r;
++	struct udevice *detector;
++	char const *panel_name;
++	char *edid_arg;
++	size_t edid_arg_length;
++
++	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
++	if (r)
++		return r;
++	panel_name = panel_detector_get_panel_name(detector);
++	if (strlen(panel_name)) {
++		edid_arg_length = 37 + strlen(panel_name);
++		edid_arg = kmalloc(edid_arg_length, GFP_KERNEL);
++		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
++		printf("panel_detector: found %s panel\n", panel_name);
++	} else {
++		edid_arg = "video=HDMI-A-1:d";
++	}
++	env_set("edid_bootarg", edid_arg);
+ #endif
+ 
+ 	return 0;
+@@ -938,6 +960,21 @@ int ft_board_setup(void *blob, bd_t *bd)
+ 	r = sunxi_simplefb_setup(blob);
+ 	if (r)
+ 		return r;
++#endif
++#ifdef CONFIG_BRIDGED_PANEL_DETECTION
++	int offset;
++	struct udevice *detector;
++
++	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
++	if (r)
++		return r;
++	offset = fdt_node_offset_by_compatible(blob, -1, "toshiba,tc358870");
++	if (offset < 0)
++		return offset;
++	r = fdt_setprop_string(blob, offset, "panel-name", panel_detector_get_panel_name(detector));
++	r = fdt_setprop_u64(blob, offset, "match-data", panel_detector_get_match_data(detector));
++	if (r)
++		return r;
+ #endif
+ 	return 0;
+ }
+diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
+new file mode 100644
+index 0000000000..e37231e8f8
+--- /dev/null
++++ b/board/sunxi/panel-detector-uclass.c
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2020 Prusa Development, a.s.
++ * Written by Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#include <dm.h>
++#include "panel_detector.h"
++
++const char* panel_detector_get_panel_name(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	return uc_priv->panel_name;
++}
++
++u64 panel_detector_get_match_data(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	return uc_priv->match_data;
++}
++
++UCLASS_DRIVER(panel_detector) = {
++	.id				= UCLASS_PANEL_DETECTOR,
++	.name				= "panel_detector",
++	.per_device_auto_alloc_size	= sizeof(struct panel_detector_priv),
++};
+diff --git a/board/sunxi/panel_detector.h b/board/sunxi/panel_detector.h
+new file mode 100644
+index 0000000000..65294be844
+--- /dev/null
++++ b/board/sunxi/panel_detector.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2020 Prusa Development, a.s.
++ * Written by Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#ifndef __PANEL_DETECTOR
++#define __PANEL_DETECTOR
++
++struct panel_detector_priv {
++	char const* panel_name;
++	u64 match_data;
++};
++
++const char* panel_detector_get_panel_name(struct udevice *dev);
++u64 panel_detector_get_match_data(struct udevice *dev);
++
++#endif
+diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
+new file mode 100644
+index 0000000000..f6e5e59554
+--- /dev/null
++++ b/board/sunxi/tc358870.c
+@@ -0,0 +1,564 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2020 Prusa Development, a.s.
++ * Written by Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <errno.h>
++#include <i2c.h>
++#include <log.h>
++#include <mipi_display.h>
++#include <asm/gpio.h>
++#include <linux/delay.h>
++#include <power/regulator.h>
++#include <hexdump.h>
++
++#include "panel_detector.h"
++#include "tc358870.h"
++
++static inline void kfreep(void *p) {
++	kfree(*(void**) p);
++}
++#define cleanup(x) __attribute__((__cleanup__(x)))
++#define cleanup_free cleanup(kfreep)
++
++struct tc358870_priv {
++	struct gpio_desc bridge_reset;
++	struct gpio_desc panel_reset;
++};
++
++enum i2c_xfer {
++	I2C_READ = 0,
++	I2C_WRITE = 1,
++};
++
++static void tc358870_print_xfer(enum i2c_xfer rw, u8 *reg, u8 *data, size_t len)
++{
++	static const char* const labels[] = {
++		[I2C_READ] = "I2C READ ",
++		[I2C_WRITE] = "I2C_WRITE",
++	};
++	int i;
++
++	printf("%s [0x%02x%02x]: 0x", labels[rw], reg[rw ? 0 : 1], reg[rw ? 1 : 0]);
++	for (i = (int)len - 1; i >= 0; i--)
++		printf("%02x", data[i]);
++	printf("\n");
++}
++
++static int tc358870_write(struct udevice *dev, u16 reg, const void* buf, size_t len)
++{
++	cleanup_free u8 *xfer = NULL;
++	struct i2c_msg msg;
++	int ret;
++	size_t size;
++	struct dm_i2c_chip *chip = dev_get_parent_platdata(dev);
++
++	size = 2 + len;
++	xfer = kmalloc(size, GFP_KERNEL);
++	if (!xfer)
++		return -ENOMEM;
++
++	cpu_to_be16s(&reg);
++
++	msg.addr = chip->chip_addr;
++	msg.flags = 0;
++	memcpy(xfer, &reg, sizeof(reg));
++	memcpy(xfer + 2, buf, len);
++	msg.buf = xfer;
++	msg.len = size;
++
++	tc358870_print_xfer(I2C_WRITE, xfer, xfer + 2, len);
++	ret = dm_i2c_xfer(dev, &msg, 1);
++	if (xfer[0] == 0x01u || xfer[0] == 0x02u) {
++		xfer[0] += 0x02u;
++		tc358870_print_xfer(I2C_WRITE, xfer, xfer + 2, len);
++		ret = dm_i2c_xfer(dev, &msg, 1);
++	}
++
++	if (ret < 0) {
++		dev_err(dev, "%s: write failed, reg=%#x, ret=%d\n", __func__, reg, ret);
++		return ret;
++	}
++
++	return 0;
++}
++
++static int tc358870_read(struct udevice *dev, u16 reg_addr, void *data, size_t len)
++{
++	struct i2c_msg msg[2];
++	int ret;
++	struct dm_i2c_chip *chip = dev_get_parent_platdata(dev);
++
++	/* TODO WTF? Register address is somehow being sent backwards. I2C driver bug? (mvtwsi) */
++	cpu_to_le16s(&reg_addr);
++
++	msg[0].addr = chip->chip_addr;
++	msg[0].flags = 0;
++	msg[0].buf = (u8*)&reg_addr;
++	msg[0].len = sizeof(reg_addr);
++	msg[1].addr = chip->chip_addr;
++	msg[1].flags = I2C_M_RD;
++	msg[1].buf = data;
++	msg[1].len = len;
++	ret = dm_i2c_xfer(dev, msg, 2);
++
++	if (ret < 0) {
++		dev_err(dev, "%s: read failed, reg=%.2x, ret=%d\n", __func__, (int)reg_addr, ret);
++		return ret;
++	}
++	tc358870_print_xfer(I2C_READ, msg[0].buf, msg[1].buf, len);
++
++	return 0;
++}
++
++static int tc358870_write_u16(struct udevice *dev, u16 reg_addr, u16 value)
++{
++	cpu_to_le16s(&value);
++	return tc358870_write(dev, reg_addr, &value, sizeof(value));
++}
++
++static int tc358870_write_u32(struct udevice *dev, u16 reg_addr, u32 value)
++{
++	cpu_to_le32s(&value);
++	return tc358870_write(dev, reg_addr, &value, sizeof(value));
++}
++
++#if 0
++static int tc358870_read_u16(struct udevice *dev, u16 reg_addr, u16 *value)
++{
++	int ret = tc358870_read(dev, reg_addr, value, sizeof(*value));
++	if (ret < 0) {
++		return ret;
++	}
++	le16_to_cpus(value);
++	return 0;
++}
++#endif
++
++static int tc358870_read_u32(struct udevice *dev, u16 reg_addr, u32 *value)
++{
++	int ret;
++	ret = tc358870_read(dev, reg_addr, value, sizeof(*value));
++	if (ret < 0) {
++		return ret;
++	}
++	le32_to_cpus(value);
++	return 0;
++}
++
++#if 0 /* TODO: Why does RX_STATE_INT_STAT stay 0? */
++static int tc358870_wait_for_lprx_done(struct udevice *dev, u8 iface)
++{
++#define LPRX_PKT_START		(1u << 3u)
++#define LPRX_PKT_DONE		(1u << 2u)
++#define LPRX_PKT_THRESH_HIT	(1u << 1u)
++	int i, ret = 0;
++	u32 mask = LPRX_PKT_START | LPRX_PKT_DONE | LPRX_PKT_THRESH_HIT;
++	u32 out = 0;
++	for (i = 50; ((out & LPRX_PKT_DONE) == 0) && (i > 0) && (ret >= 0); i--)
++	{
++		ret = tc358870_read_u32(dev, RX_STATE_INT_STAT + iface * 0x0200u, &out);
++		mdelay(5);
++	}
++	if (ret < 0) {
++		dev_err(dev, "%s: read error %d\n", __func__, ret);
++		return ret;
++	}
++	if ((out & mask) == 0) {
++		dev_err(dev, "%s: waiting for LPRX packet reception timed out\n", __func__);
++		return 0;
++	}
++	if (!(out & LPRX_PKT_DONE)) {
++		dev_err(dev, "%s: not DONE yet!\n", __func__);
++	}
++	/* clear out the interrupt register */
++	tc358870_write_u32(dev, RX_STATE_INT_STAT + iface * 0x0200u, mask);
++	return 0;
++}
++#endif
++
++static ssize_t tc358770_fetch_from_fifo(struct udevice *dev, u8 iface, u8* data, int word_count)
++{
++	int i, len;
++	u32 fifo_level = 0;
++	u8 buf[4];
++
++	for (i = 50; i >= 0 && ((fifo_level + 1) * 4) < word_count; i--) {
++		tc358870_read_u32(dev, LPRX_FIFO_LEVEL + iface * 0x0200u, &fifo_level);
++		mdelay(10);
++	}
++	for (i = 0; fifo_level > 0; fifo_level--) {
++		if (i >= word_count) {
++			dev_err(dev, "%s: unexpected data in RXFIFO\n", __func__);
++			return -EINVAL;
++		}
++		tc358870_read(dev, RXFIFO + iface * 0x0200u, data + i, 4);
++		i += 4;
++	}
++	if (i < word_count) {
++		len = word_count - i;
++		debug("%s: reading last %d bytes from FIFO\n", __func__, len);
++		if (len >= 4) dev_err(dev, "%s: expected more data in FIFO\n", __func__);
++		tc358870_read(dev, RXFIFO + iface * 0x0200u, buf, 4);
++		memcpy(data + i, buf, len);
++		i += len;
++	}
++	return i;
++}
++
++static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
++{
++	struct {
++		union {
++			u16 wc;
++			u8 data[2];
++		} rxwc;
++		u8 rxdt:6;
++		u8 rxvc:2;
++		u8 reserved;
++	} __attribute__((packed)) rxhdr;
++
++	u16 word_count;
++	int ret;
++
++	tc358870_read(dev, RX_HEADER + iface * 0x0200u, &rxhdr, sizeof(rxhdr));
++	switch (rxhdr.rxdt) {
++	case MIPI_DSI_RX_GENERIC_SHORT_READ_RESPONSE_1BYTE:
++	case MIPI_DSI_RX_DCS_SHORT_READ_RESPONSE_1BYTE:
++		word_count = 1;
++		break;
++	case MIPI_DSI_RX_GENERIC_SHORT_READ_RESPONSE_2BYTE:
++	case MIPI_DSI_RX_DCS_SHORT_READ_RESPONSE_2BYTE:
++		word_count = 2;
++		break;
++	case MIPI_DSI_RX_DCS_LONG_READ_RESPONSE:
++	case MIPI_DSI_RX_GENERIC_LONG_READ_RESPONSE:
++		word_count = rxhdr.rxwc.wc;
++		break;
++	default:
++		word_count = 0;
++		break;
++	}
++
++	if (!word_count) return 0;
++
++	*buf = kmalloc(word_count, GFP_KERNEL);
++	if (!*buf)
++		return -ENOMEM;
++
++	switch (rxhdr.rxdt) {
++	case MIPI_DSI_RX_GENERIC_SHORT_READ_RESPONSE_1BYTE:
++	case MIPI_DSI_RX_DCS_SHORT_READ_RESPONSE_1BYTE:
++	case MIPI_DSI_RX_GENERIC_SHORT_READ_RESPONSE_2BYTE:
++	case MIPI_DSI_RX_DCS_SHORT_READ_RESPONSE_2BYTE:
++		memcpy(*buf, rxhdr.rxwc.data, word_count);
++		break;
++	case MIPI_DSI_RX_DCS_LONG_READ_RESPONSE:
++	case MIPI_DSI_RX_GENERIC_LONG_READ_RESPONSE:
++		ret = tc358770_fetch_from_fifo(dev, iface, *buf, word_count);
++		if (ret != word_count)
++			dev_err(dev, "%s: mismatch: number of bytes fetched from FIFO(%d) != WC(%d)\n",
++	   			__func__, ret, word_count);
++		break;
++	default:
++		break;
++	}
++
++	return word_count;
++}
++
++static inline u16 packet_header(u8 type)
++{
++	switch (type) {
++	case MIPI_DSI_GENERIC_READ_REQUEST_0_PARAM:
++	case MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM:
++	case MIPI_DSI_GENERIC_READ_REQUEST_2_PARAM:
++	case MIPI_DSI_GENERIC_SHORT_WRITE_0_PARAM:
++	case MIPI_DSI_GENERIC_SHORT_WRITE_1_PARAM:
++	case MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM:
++	case MIPI_DSI_DCS_READ:
++	case MIPI_DSI_DCS_SHORT_WRITE:
++	case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
++		return type;
++	case MIPI_DSI_GENERIC_LONG_WRITE:
++	case MIPI_DSI_DCS_LONG_WRITE:
++		return 0x8000u | type;
++	default:
++		return 0;
++	}
++}
++
++static ssize_t tc358870_dsi_read(struct udevice *dev, u8 iface, u8 type, u8 address, u8 **out)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(type));
++	if (ret < 0) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, address);
++	if (ret < 0) return ret;
++	mdelay(1);
++	return tc358870_fetch_rx(dev, iface, out);
++}
++
++static ssize_t tc358870_dsi_dcs_read(struct udevice *dev, u8 iface, u8 address, u8 **out)
++{
++	return tc358870_dsi_read(dev, iface, MIPI_DSI_DCS_READ, address, out);
++}
++
++static ssize_t tc358870_dsi_generic_read_short(struct udevice *dev, u8 iface, u8 address, u8 **out)
++{
++	return tc358870_dsi_read(dev, iface, MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM, address, out);
++}
++
++static int tc358870_dsi_generic_write_short(struct udevice *dev, u8 iface, u8 address, u8 param)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface);
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q,
++			  	 packet_header(MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM));
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, address | (param << 8u));
++	return ret;
++}
++
++static void tc358870_dsi_init(struct udevice *dev)
++{
++	tc358870_write_u16(dev, ConfCtl0,		0x0004u);
++	tc358870_write_u16(dev, SysCtl,			0x1200u);
++	udelay(1000);
++	tc358870_write_u16(dev, SysCtl,			0x0000u);
++	tc358870_write_u16(dev, ConfCtl1,		0x0008u);
++
++	tc358870_write_u32(dev, DSITX_CLKEN,		0x00000001u);
++	tc358870_write_u32(dev, PPI_CLKSEL,		0x00000001u);
++	tc358870_write_u32(dev, MIPI_PLL_CTRL,		0x00000001u);
++	tc358870_write_u32(dev, MIPI_PLL_CONF,		0x00006d90u);
++	udelay(1500);
++	tc358870_write_u32(dev, MIPI_PLL_CTRL,		0x00000003u);
++	tc358870_write_u32(dev, LANE_ENABLE,		0x00000014u);
++	tc358870_write_u32(dev, LINE_INIT_COUNT,	0x00000e34u);
++	tc358870_write_u32(dev, HSTX_TO_COUNT,		0x00000000u);
++	tc358870_write_u32(dev, FUNC_ENABLE,		0x00000101u);
++	tc358870_write_u32(dev, DSI_TATO_COUNT,		0x00010000u);
++	tc358870_write_u32(dev, DSI_PRESP_BTA_COUNT,	0x00005000u);
++	tc358870_write_u32(dev, DSI_PRESP_LPR_COUNT,	0x00010000u);
++	tc358870_write_u32(dev, DSI_PRESP_LPW_COUNT,	0x00010000u);
++	tc358870_write_u32(dev, DSI_PRESP_HSR_COUNT,	0x00010000u);
++	tc358870_write_u32(dev, DSI_PRESP_HSW_COUNT,	0x00010000u);
++	tc358870_write_u32(dev, DSI_PR_TO_COUNT,	0x00001000u);
++	tc358870_write_u32(dev, DSI_LRX_H_TO_COUNT,	0x00010000u);
++	tc358870_write_u32(dev, FUNC_MODE,		0x00000160u);
++	tc358870_write_u32(dev, DSIRX_VC_ENABLE,	0x00000001u);
++	tc358870_write_u32(dev, IND_TO_COUNT,		0x000000c8u);
++	tc358870_write_u32(dev, DSI_HSYNC_STOP_COUNT,	0x0000002au);
++	tc358870_write_u32(dev, DSITX_MODE,		0x00000081u);
++	tc358870_write_u32(dev, APF_VDELAYCNT,		0x000001e8u);
++	tc358870_write_u32(dev, DSI_HSYNC_WIDTH,	0x00000021u);
++	tc358870_write_u32(dev, DSI_HBPR,		0x00000091u);
++	tc358870_write_u32(dev, DSI_RX_STATE_INT_MASK,	0x00000000u);
++	tc358870_write_u32(dev, DSI_LPRX_THRESH_COUNT,	0x00000015u);
++	tc358870_write_u32(dev, APP_SIDE_ERR_INT_MASK,	0x00000000u);
++	tc358870_write_u32(dev, DSI_RX_ERR_INT_MASK,	0x00000080u);
++	tc358870_write_u32(dev, PPI_DPHY_LPTXTIMECNT,	0x00000003u);
++	tc358870_write_u32(dev, PPI_DPHY_TCLK_HEADERCNT,0x00180203u);
++	tc358870_write_u32(dev, PPI_DPHY_TCLK_TRAILCNT,	0x00080007u);
++	tc358870_write_u32(dev, PPI_DPHY_THS_HEADERCNT,	0x000c0005u);
++	tc358870_write_u32(dev, PPI_DPHY_TWAKEUPCNT,	0x00004709u);
++	tc358870_write_u32(dev, PPI_DPHY_TCLK_POSTCNT,	0x0000000bu);
++	tc358870_write_u32(dev, PPI_DPHY_THSTRAILCNT,	0x00080006u);
++	tc358870_write_u32(dev, PPI_DPHY_HSTXVREGCNT,	0x00000020u);
++	tc358870_write_u32(dev, PPI_DPHY_HSTXVREGEN,	0x0000001fu);
++	tc358870_write_u32(dev, PPI_DSI_BTA_COUNT,	0x00030003u);
++	tc358870_write_u32(dev, PPI_DPHYTX_ADJUST,	0x00000002u);
++	tc358870_write_u32(dev, PPI_DPHY_CAP,		0x000002aau);
++	tc358870_write_u32(dev, DSITX_START,		0x00000001u);
++	tc358870_write_u32(dev, MODE_CONFIG,		0x00000016u);
++	udelay(1000);
++}
++
++static int tc358870_save_match_data(struct udevice *dev, const u8* data, size_t len)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	memcpy(&uc_priv->match_data, data, min(len, 8ul));
++	return 0;
++}
++
++static bool tc358870_match_ls055r1sx04(struct udevice *dev)
++{
++	static const u8 ALMID[] = { 0x01, 0x22, 0x34, 0x19 };
++	cleanup_free u8 *out = NULL;
++	ssize_t len;
++
++	tc358870_dsi_generic_write_short(dev, 0, 0xb0u, 0x00u);
++
++	len = tc358870_dsi_generic_read_short(dev, 0, 0xbfu, &out);
++	if (len <= 0 || !out) {
++		dev_err(dev, "%s: DSI read from BFh address failed (%ld)\n", __func__, len);
++		return false;
++	}
++	tc358870_save_match_data(dev, out, len);
++	if (len >= sizeof(ALMID) && memcmp(out, ALMID, sizeof(ALMID)) == 0) {
++		printf("%s: matched ALMID: SHARP LS055R1SX04\n", __func__);
++		return true;
++	}
++	dev_err(dev, "%s: ALMID doesn't match an R63419 driver.\n", __func__);
++	if (len == 0x1f) {
++		dev_err(dev, "%s: response length is correct though: PASS\n", __func__);
++		return true;
++	}
++	return false;
++}
++
++static bool tc358870_match_rv059fbb(struct udevice *dev)
++{
++	static const u8 ID[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 };
++	cleanup_free u8 *out = NULL;
++	ssize_t len;
++
++	len = tc358870_dsi_dcs_read(dev, 1, 0xa1u, &out);
++
++	if (len <= 0 || !out) {
++		printf("%s: DSI read from A1h address failed\n", __func__);
++		return false;
++	}
++	tc358870_save_match_data(dev, out, len);
++	if (len >= sizeof(ID) && memcmp(out, ID, sizeof(ID)) == 0) {
++		printf("%s: matched RV059FBB by descriptor block (112233445566)\n", __func__);
++		return true;
++	}
++	if (out[6] == 0xffu) {
++		printf("%s: matched RV059FBB by Exit Code (0xff) at the end of A1h response\n", __func__);
++		return true;
++	}
++	if (len == 7) {
++		printf("%s: matched RV059FBB by the length (7) of its response to A1h\n", __func__);
++		return true;
++	}
++
++	return false;
++}
++
++static int tc358870_panel_init(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++
++	if (tc358870_match_ls055r1sx04(dev)) {
++		uc_priv->panel_name = "ls055r1sx04";
++	} else if (tc358870_match_rv059fbb(dev)) {
++		uc_priv->panel_name = "rv059fbb";
++	} else {
++		dev_err(dev, "Couldn't identify any panel connected to the bridge.\n");
++	}
++
++	return 0;
++}
++
++static int tc358870_check_chipid(struct udevice *dev)
++{
++	struct __attribute__((packed)) {
++		u8 revid;
++		u8 chipid;
++	} chipid;
++	int ret;
++
++	ret = tc358870_read(dev, ChipID, &chipid, sizeof(chipid));
++	if (ret < 0) {
++		dev_err(dev, "%s: read id failed: %d\n", __func__, ret);
++		return ret;
++	}
++	if (chipid.chipid != 0x47u) {
++		dev_err(dev, "Chip ID mismatch! Expected 0x47 but received 0x%02x\n", chipid.chipid);
++		return -EINVAL;
++	}
++	return 0;
++}
++
++static int tc358870_enable(struct udevice *dev)
++{
++	int ret;
++	struct tc358870_priv *priv = dev_get_priv(dev);
++
++	/* Reset */
++	dm_gpio_set_value(&priv->bridge_reset, true);
++	udelay(10);
++	dm_gpio_set_value(&priv->bridge_reset, false);
++	mdelay(100);
++
++	dm_gpio_set_value(&priv->panel_reset, true);
++	udelay(10);
++	dm_gpio_set_value(&priv->panel_reset, false);
++	mdelay(200);
++
++	ret = tc358870_check_chipid(dev);
++	if (ret) return -EINVAL;
++
++	tc358870_dsi_init(dev);
++	ret = tc358870_panel_init(dev);
++	if (ret < 0) return ret;
++
++	return 0;
++}
++
++static int tc358870_probe(struct udevice *dev)
++{
++	int ret;
++	struct udevice *reg;
++
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++
++	if (device_get_uclass_id(dev->parent) != UCLASS_I2C)
++		return -EPROTONOSUPPORT;
++
++	ret = gpio_request_by_name(dev, "bridge-reset-gpios", 0, &priv->bridge_reset,
++				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++	if (ret) {
++		dev_err(dev, "%s: Could not decode bridge-reset-gpios (%d)\n", __func__, ret);
++		if (ret != -ENOENT)
++			return ret;
++	}
++
++	ret = gpio_request_by_name(dev, "panel-reset-gpios", 0, &priv->panel_reset,
++				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++	if (ret) {
++		dev_err(dev, "%s: Could not decode panel-reset-gpios (%d)\n", __func__, ret);
++		if (ret != -ENOENT)
++			return ret;
++	}
++
++	ret = uclass_get_device_by_phandle(UCLASS_REGULATOR, dev,
++					   "avdd_lcd-supply", &reg);
++	if (!ret) {
++		ret = regulator_set_enable(reg, true);
++		if (ret < 0) {
++			dev_err(dev, "%s: Failed to enable power: ret=%d\n", __func__, ret);
++			return ret;
++		}
++	} else if (ret != -ENOENT) {
++		dev_err(dev, "%s: Failed to enable power: ret=%d\n", __func__, ret);
++		return ret;
++	}
++
++	uc_priv->panel_name = "";
++	return tc358870_enable(dev);
++}
++
++static const struct udevice_id tc358870_ids[] = {
++	{ .compatible = "toshiba,tc358870", },
++	{ }
++};
++
++U_BOOT_DRIVER(toshiba_tc358870) = {
++	.name	= "toshiba_tc358870",
++	.id	= UCLASS_PANEL_DETECTOR,
++	.of_match = tc358870_ids,
++	.probe	= tc358870_probe,
++	.priv_auto_alloc_size = sizeof(struct tc358870_priv),
++};
+diff --git a/board/sunxi/tc358870.h b/board/sunxi/tc358870.h
+new file mode 100644
+index 0000000000..2ea0e1e643
+--- /dev/null
++++ b/board/sunxi/tc358870.h
+@@ -0,0 +1,88 @@
++#ifndef TC358870_H
++#define TC358870_H
++
++enum {
++	/* Global Control */
++	ChipID			= 0x0000u,
++	SysCtl			= 0x0002u,
++	ConfCtl0		= 0x0004u,
++	ConfCtl1		= 0x0006u,
++	/* DSI-TX0 TX Control */
++	DSITX_CLKEN		= 0x0108u,
++	PPI_CLKSEL		= 0x010cu,
++	MODE_CONFIG		= 0x0110u,
++	LANE_ENABLE		= 0x0118u,
++	DSITX_START		= 0x011cu,
++	LINE_INIT_COUNT		= 0x0120u,
++	HSTX_TO_COUNT		= 0x0124u,
++	FUNC_ENABLE		= 0x0128u,
++	DSI_TATO_COUNT		= 0x0130u,
++	DSI_PRESP_BTA_COUNT	= 0x0134u,
++	DSI_PRESP_LPR_COUNT	= 0x0138u,
++	DSI_PRESP_LPW_COUNT	= 0x013cu,
++	DSI_PRESP_HSR_COUNT	= 0x0140u,
++	DSI_PRESP_HSW_COUNT	= 0x0144u,
++	DSI_PR_TO_COUNT		= 0x0148u,
++	DSI_LRX_H_TO_COUNT	= 0x014cu,
++	FUNC_MODE		= 0x0150u,
++	DSIRX_VC_ENABLE		= 0x0154u,
++	IND_TO_COUNT		= 0x0158u,
++	INIT_INT_STAT		= 0x0160u,
++	DSI_HSYNC_STOP_COUNT	= 0x0168u,
++	/* DSI-TX0 APF Configuration */
++	APF_VDELAYCNT		= 0x0170u,
++	DSITX_MODE		= 0x017cu,
++	DSI_HSYNC_WIDTH		= 0x018cu,
++	DSI_HBPR		= 0x0190u,
++	/* DSI-TX0 RX Event */
++	RX_STATE_INT_STAT	= 0x01a0u,
++	DSI_RX_STATE_INT_MASK	= 0x01a4u,
++	TX_INTERNAL_STAT	= 0x01b0u,
++	ACKERROR		= 0x01b4u,
++	RXFIFO			= 0x01b8u,
++	RX_HEADER		= 0x01bcu,
++	LPRX_FIFO_LEVEL		= 0x01c4u,
++	DSI_LPRX_THRESH_COUNT	= 0x01c0u,
++	DSI_PRTO_INT_STAT	= 0x0208u,
++	APP_SIDE_ERR_INT_STAT	= 0x0210u,
++	APP_SIDE_ERR_INT_MASK	= 0x0214u,
++	DSI_RX_ERR_INT_STAT	= 0x0218u,
++	DSI_RX_ERR_INT_MASK	= 0x021cu,
++	/* DSI-TX0 LPTX */
++	DSI_LPTX_INT_MASK	= 0x0224u,
++	PPI_DPHY_LPRXCALCNTRL	= 0x0248u,
++	PPI_DPHY_LPRXAUTOCALST	= 0x024cu,
++	/* DSI-TX0 D-PHY Control */
++	PPI_DPHY_LPTXTIMECNT	= 0x0254u,
++	PPI_DPHY_TCLK_HEADERCNT	= 0x0258u,
++	PPI_DPHY_TCLK_TRAILCNT	= 0x025cu,
++	PPI_DPHY_THS_HEADERCNT	= 0x0260u,
++	PPI_DPHY_TWAKEUPCNT	= 0x0264u,
++	PPI_DPHY_TCLK_POSTCNT	= 0x0268u,
++	PPI_DPHY_THSTRAILCNT	= 0x026cu,
++	PPI_DPHY_HSTXVREGCNT	= 0x0270u,
++	PPI_DPHY_HSTXVREGEN	= 0x0274u,
++	PPI_DSI_BTA_COUNT	= 0x0278u,
++	PPI_DPHYTX_ADJUST	= 0x027cu,
++	PPI_DPHY_CAP		= 0x0288u,
++	/* DSI-TX0 MIPI PLL Control */
++	MIPI_PLL_CTRL		= 0x02a0u,
++	MIPI_PLL_CONF		= 0x02acu,
++	/* CDSI-TX Wrapper */
++	CMD_SEL			= 0x0500u,
++	DCSCMD_ST		= 0x0502u,
++	DCSCMD_Q		= 0x0504u,
++
++	/* HDMI RX Audio Control */
++	PHY_CTL			= 0x8410u,
++	PHY_ENB			= 0x8413u,
++	APLL_CTL		= 0x84f0u,
++	DDCIO_CTL		= 0x84f4u,
++	SYS_STATUS		= 0x8520u,
++	SYS_FREQ0		= 0x8540u,
++	SYS_FREQ1		= 0x8541u,
++	DDC_CTL			= 0x8543u,
++	HPD_CTL			= 0x8544u,
++};
++
++#endif
+diff --git a/configs/prusa64-sl1_defconfig b/configs/prusa64-sl1_defconfig
+index eaa2d33b52..63d8605b55 100644
+--- a/configs/prusa64-sl1_defconfig
++++ b/configs/prusa64-sl1_defconfig
+@@ -8,6 +8,9 @@ CONFIG_RESERVE_ALLWINNER_BOOT0_HEADER=y
+ CONFIG_MMC_SUNXI_SLOT_EXTRA=2
+ CONFIG_USB0_VBUS_DET="PH6"
+ CONFIG_USB0_ID_DET="PH9"
++CONFIG_I2C0_ENABLE=y
++# CONFIG_VIDEO_DE2 is not set
++CONFIG_BRIDGED_PANEL_DETECTION=y
+ # CONFIG_PSCI_RESET is not set
+ # CONFIG_DISTRO_DEFAULTS is not set
+ CONFIG_ENV_VARS_UBOOT_CONFIG=y
+@@ -47,9 +50,10 @@ CONFIG_ENV_IS_IN_MMC=y
+ CONFIG_ENV_FAT_DEVICE_AND_PART="0:1"
+ # CONFIG_NET is not set
+ CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
+ CONFIG_DM_PWM=y
+ CONFIG_PWM_SUNXI=y
+-# CONFIG_VIDEO_DT_SIMPLEFB is not set
++CONFIG_DM_VIDEO=y
+ CONFIG_REGEX=y
+ # CONFIG_EFI_LOADER is not set
+ CONFIG_SUPPORT_EMMC_BOOT=y
+diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
+index 0c563d898b..5d845bc511 100644
+--- a/include/dm/uclass-id.h
++++ b/include/dm/uclass-id.h
+@@ -71,6 +71,7 @@ enum uclass_id {
+ 	UCLASS_NVME,		/* NVM Express device */
+ 	UCLASS_PANEL,		/* Display panel, such as an LCD */
+ 	UCLASS_PANEL_BACKLIGHT,	/* Backlight controller for panel */
++	UCLASS_PANEL_DETECTOR,
+ 	UCLASS_PCH,		/* x86 platform controller hub */
+ 	UCLASS_PCI,		/* PCI bus */
+ 	UCLASS_PCI_EP,		/* PCI endpoint device */
+-- 
+2.30.0
+
+
+From 61effa18267bf635c1168b206422faaf5e8b8517 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 4 Feb 2021 13:36:25 +0100
+Subject: [PATCH 2/4] tc358870: switch VC if requested panel IC
+
+---
+ board/sunxi/tc358870.c | 85 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 73 insertions(+), 12 deletions(-)
+
+diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
+index f6e5e59554..a85c423016 100644
+--- a/board/sunxi/tc358870.c
++++ b/board/sunxi/tc358870.c
+@@ -27,6 +27,7 @@ static inline void kfreep(void *p) {
+ struct tc358870_priv {
+ 	struct gpio_desc bridge_reset;
+ 	struct gpio_desc panel_reset;
++	u8 vc;
+ };
+ 
+ enum i2c_xfer {
+@@ -42,10 +43,10 @@ static void tc358870_print_xfer(enum i2c_xfer rw, u8 *reg, u8 *data, size_t len)
+ 	};
+ 	int i;
+ 
+-	printf("%s [0x%02x%02x]: 0x", labels[rw], reg[rw ? 0 : 1], reg[rw ? 1 : 0]);
++	dev_info(dev, "%s [0x%02x%02x]: 0x", labels[rw], reg[rw ? 0 : 1], reg[rw ? 1 : 0]);
+ 	for (i = (int)len - 1; i >= 0; i--)
+-		printf("%02x", data[i]);
+-	printf("\n");
++		dev_info(dev, "%02x", data[i]);
++	dev_info(dev, "\n");
+ }
+ 
+ static int tc358870_write(struct udevice *dev, u16 reg, const void* buf, size_t len)
+@@ -220,9 +221,9 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 		u8 rxvc:2;
+ 		u8 reserved;
+ 	} __attribute__((packed)) rxhdr;
+-
+ 	u16 word_count;
+ 	int ret;
++	struct tc358870_priv *priv = dev_get_priv(dev);
+ 
+ 	tc358870_read(dev, RX_HEADER + iface * 0x0200u, &rxhdr, sizeof(rxhdr));
+ 	switch (rxhdr.rxdt) {
+@@ -238,6 +239,13 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 	case MIPI_DSI_RX_GENERIC_LONG_READ_RESPONSE:
+ 		word_count = rxhdr.rxwc.wc;
+ 		break;
++	case MIPI_DSI_RX_ACKNOWLEDGE_AND_ERROR_REPORT:
++		dev_warn(dev, "Received ACK & Error Report 0x%04x, VC=%d\n", rxhdr.rxwc.wc, rxhdr.rxvc);
++		if (!(rxhdr.rxwc.wc & BIT(12))) return -EFAULT;
++		dev_warn(dev, "Updating VC to %d.\n", rxhdr.rxvc);
++		if (priv->vc == rxhdr.rxvc) return -EBADMSG;
++		priv->vc = rxhdr.rxvc;
++		return -EAGAIN;
+ 	default:
+ 		word_count = 0;
+ 		break;
+@@ -270,8 +278,10 @@ static ssize_t tc358870_fetch_rx(struct udevice *dev, u8 iface, u8** buf)
+ 	return word_count;
+ }
+ 
+-static inline u16 packet_header(u8 type)
++static inline u16 packet_header(struct udevice *dev, u8 type)
+ {
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	u8 vc = ((priv->vc & 0x3) << 6);
+ 	switch (type) {
+ 	case MIPI_DSI_GENERIC_READ_REQUEST_0_PARAM:
+ 	case MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM:
+@@ -282,10 +292,10 @@ static inline u16 packet_header(u8 type)
+ 	case MIPI_DSI_DCS_READ:
+ 	case MIPI_DSI_DCS_SHORT_WRITE:
+ 	case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
+-		return type;
++		return type | vc;
+ 	case MIPI_DSI_GENERIC_LONG_WRITE:
+ 	case MIPI_DSI_DCS_LONG_WRITE:
+-		return 0x8000u | type;
++		return 0x8000u | type | vc;
+ 	default:
+ 		return 0;
+ 	}
+@@ -297,12 +307,16 @@ static ssize_t tc358870_dsi_read(struct udevice *dev, u8 iface, u8 type, u8 addr
+ 	if (iface > 1) return -EINVAL;
+ 	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
+ 	if (ret) return ret;
+-	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(type));
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, type));
+ 	if (ret < 0) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q, address);
+ 	if (ret < 0) return ret;
+ 	mdelay(1);
+-	return tc358870_fetch_rx(dev, iface, out);
++	ret = tc358870_fetch_rx(dev, iface, out);
++	if (ret == -EAGAIN) {
++		return tc358870_dsi_read(dev, iface, type, address, out);
++	}
++	return ret;
+ }
+ 
+ static ssize_t tc358870_dsi_dcs_read(struct udevice *dev, u8 iface, u8 address, u8 **out)
+@@ -315,19 +329,61 @@ static ssize_t tc358870_dsi_generic_read_short(struct udevice *dev, u8 iface, u8
+ 	return tc358870_dsi_read(dev, iface, MIPI_DSI_GENERIC_READ_REQUEST_1_PARAM, address, out);
+ }
+ 
++static int tc358870_dsi_dcs_write(struct udevice *dev, u8 iface, u8 cmd)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, MIPI_DSI_DCS_SHORT_WRITE));
++	if (ret) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, cmd);
++	return ret;
++}
++
+ static int tc358870_dsi_generic_write_short(struct udevice *dev, u8 iface, u8 address, u8 param)
+ {
+ 	int ret;
+ 	if (iface > 1) return -EINVAL;
+-	ret = tc358870_write_u16(dev, CMD_SEL, iface);
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
+ 	if (ret) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q,
+-			  	 packet_header(MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM));
++				 packet_header(dev, MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM));
+ 	if (ret) return ret;
+ 	ret = tc358870_write_u16(dev, DCSCMD_Q, address | (param << 8u));
+ 	return ret;
+ }
+ 
++static int tc358870_dsi_write_long(struct udevice *dev, u8 type, u8 cmd, u8 const* data, ssize_t len)
++{
++	u16 buf;
++	int i, ret;
++
++	ret = tc358870_write_u16(dev, DCSCMD_Q, packet_header(dev, type));
++	if (ret < 0) return ret;
++	ret = tc358870_write_u16(dev, DCSCMD_Q, (u16)len + 1);
++	if (ret < 0) return ret;
++	for (i = -1; i < len; i += 2) {
++		buf = (i == -1) ? cmd : data[i];
++		if ((len - (i + 2)) >= 0) {
++			buf |= (u16)(data[i + 1] << 8u);
++		}
++		ret = tc358870_write_u16(dev, DCSCMD_Q, buf);
++		if (ret < 0) return ret;
++	}
++	return 0;
++}
++
++static int tc358870_dsi_generic_write_long(struct udevice *dev, u8 iface, u8 cmd, u8 const* data, ssize_t len)
++{
++	int ret;
++	if (iface > 1) return -EINVAL;
++	ret = tc358870_write_u16(dev, CMD_SEL, iface << 1u);
++	if (ret) return ret;
++
++	return tc358870_dsi_write_long(dev, MIPI_DSI_GENERIC_LONG_WRITE, cmd, data, len);
++}
++
+ static void tc358870_dsi_init(struct udevice *dev)
+ {
+ 	tc358870_write_u16(dev, ConfCtl0,		0x0004u);
+@@ -355,7 +411,7 @@ static void tc358870_dsi_init(struct udevice *dev)
+ 	tc358870_write_u32(dev, DSI_PR_TO_COUNT,	0x00001000u);
+ 	tc358870_write_u32(dev, DSI_LRX_H_TO_COUNT,	0x00010000u);
+ 	tc358870_write_u32(dev, FUNC_MODE,		0x00000160u);
+-	tc358870_write_u32(dev, DSIRX_VC_ENABLE,	0x00000001u);
++	tc358870_write_u32(dev, DSIRX_VC_ENABLE,	0x0000000fu);
+ 	tc358870_write_u32(dev, IND_TO_COUNT,		0x000000c8u);
+ 	tc358870_write_u32(dev, DSI_HSYNC_STOP_COUNT,	0x0000002au);
+ 	tc358870_write_u32(dev, DSITX_MODE,		0x00000081u);
+@@ -396,6 +452,11 @@ static bool tc358870_match_ls055r1sx04(struct udevice *dev)
+ 	cleanup_free u8 *out = NULL;
+ 	ssize_t len;
+ 
++	len = tc358870_dsi_dcs_read(dev, 0, MIPI_DCS_GET_POWER_MODE, &out);
++	if (len > 0 && out != NULL) {
++		dev_info(dev, "%s: get_power_mode returned 0x%02x.\n", __func__, out[0]);
++		kfree(out);
++	}
+ 	tc358870_dsi_generic_write_short(dev, 0, 0xb0u, 0x00u);
+ 
+ 	len = tc358870_dsi_generic_read_short(dev, 0, 0xbfu, &out);
+-- 
+2.30.0
+
+
+From 63e3d20a0cc017094cf92bd990eba34293963446 Mon Sep 17 00:00:00 2001
+From: Andrii Anisov <andrii_anisov@epam.com>
+Date: Thu, 6 Aug 2020 12:42:52 +0300
+Subject: [PATCH 3/4] lib: sscanf: add sscanf implementation
+
+Port sscanf implementation from mini-os and introduce new
+Kconfig option to enable it: CONFIG_SSCANF. Disable by default.
+
+Signed-off-by: Andrii Anisov <andrii_anisov@epam.com>
+Signed-off-by: Anastasiia Lukianenko <anastasiia_lukianenko@epam.com>
+Signed-off-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+---
+ include/vsprintf.h |   8 +
+ lib/Kconfig        |   4 +
+ lib/Makefile       |   1 +
+ lib/sscanf.c       | 823 +++++++++++++++++++++++++++++++++++++++++++++
+ test/lib/Makefile  |   1 +
+ test/lib/sscanf.c  | 174 ++++++++++
+ 6 files changed, 1011 insertions(+)
+ create mode 100644 lib/sscanf.c
+ create mode 100644 test/lib/sscanf.c
+
+diff --git a/include/vsprintf.h b/include/vsprintf.h
+index 56844dd2de..04db7d1e60 100644
+--- a/include/vsprintf.h
++++ b/include/vsprintf.h
+@@ -222,4 +222,12 @@ bool str2long(const char *p, ulong *num);
+  * @hz: Value to convert
+  */
+ char *strmhz(char *buf, unsigned long hz);
++
++/**
++ * sscanf - Unformat a buffer into a list of arguments
++ * @buf:	input buffer
++ * @fmt:	formatting of buffer
++ * @...:	resulting arguments
++ */
++int sscanf(const char *buf, const char *fmt, ...);
+ #endif
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 965cf7bc03..82d47bb4f6 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -57,6 +57,10 @@ config SPL_SPRINTF
+ config TPL_SPRINTF
+ 	bool
+ 
++config SSCANF
++	bool
++	default y
++
+ config STRTO
+ 	bool
+ 	default y
+diff --git a/lib/Makefile b/lib/Makefile
+index 1fb650cd90..fd11b8bb40 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -117,6 +117,7 @@ obj-$(CONFIG_$(SPL_TPL_)STRTO) += strto.o
+ else
+ # Main U-Boot always uses the full printf support
+ obj-y += vsprintf.o strto.o
++obj-$(CONFIG_SSCANF) += sscanf.o
+ endif
+ 
+ obj-y += date.o
+diff --git a/lib/sscanf.c b/lib/sscanf.c
+new file mode 100644
+index 0000000000..d1e2dc272c
+--- /dev/null
++++ b/lib/sscanf.c
+@@ -0,0 +1,823 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 1990, 1993
++ * The Regents of the University of California. All rights reserved.
++ *
++ * This code is derived from software contributed to Berkeley by
++ * Chris Torek.
++ *
++ * Copyright (c) 2011 The FreeBSD Foundation
++ * All rights reserved.
++ * Portions of this software were developed by David Chisnall
++ * under sponsorship from the FreeBSD Foundation.
++ *
++ * Author: Juergen Gross <jgross@suse.com>
++ * Date: Jun 2016
++ */
++
++#if !defined HAVE_LIBC
++
++#include <os.h>
++#include <linux/kernel.h>
++#include <linux/ctype.h>
++#include <vsprintf.h>
++#include <linux/string.h>
++#include <malloc.h>
++#define __DECONST(type, var)    ((type)(uintptr_t)(const void *)(var))
++
++/**
++ * struct str_info - Input string parameters
++ * @neg: negative number or not
++ *	 0 - not negative
++ *	 1 - negative
++ * @any: set any if any `digits' consumed; make it negative to indicate
++ *	 overflow
++ * @acc: accumulated value
++ */
++struct str_info {
++	int neg, any;
++	u64 acc;
++};
++
++/**
++ * str_to_int_convert() - Write string data to structure
++ * @nptr: pointer to string
++ * @base: number's base
++ * @unsign: describes what integer is expected
++ *	    0 - not unsigned
++ *	    1 - unsigned
++ *
++ * Ignores `locale' stuff.  Assumes that the upper and lower case
++ * alphabets and digits are each contiguous.
++ *
++ * Return: struct str_info *, which contains string data to future process
++ */
++static struct str_info *
++str_to_int_convert(const char **nptr, int base, unsigned int unsign)
++{
++	const char *s = *nptr;
++	u64 acc;
++	unsigned char c;
++	u64 cutoff;
++	int neg, any, cutlim;
++	u64 qbase;
++	struct str_info *info;
++
++	/*
++	 * Skip white space and pick up leading +/- sign if any.
++	 * If base is 0, allow 0x for hex and 0 for octal, else
++	 * assume decimal; if base is already 16, allow 0x.
++	 */
++	info = (struct str_info *)malloc(sizeof(struct str_info));
++	if (!info)
++		return NULL;
++
++	do {
++		c = *s++;
++	} while (isspace(c));
++	if (c == '-') {
++		neg = 1;
++		c = *s++;
++	} else {
++		neg = 0;
++		if (c == '+')
++			c = *s++;
++	}
++	if ((base == 0 || base == 16) &&
++	    c == '0' && (*s == 'x' || *s == 'X')) {
++		c = s[1];
++		s += 2;
++		base = 16;
++	}
++	if (base == 0)
++		base = c == '0' ? 8 : 10;
++
++	/*
++	 * Compute the cutoff value between legal numbers and illegal
++	 * numbers.  That is the largest legal value, divided by the
++	 * base.  An input number that is greater than this value, if
++	 * followed by a legal input character, is too big.  One that
++	 * is equal to this value may be valid or not; the limit
++	 * between valid and invalid numbers is then based on the last
++	 * digit.  For instance, if the range for quads is
++	 * [-9223372036854775808..9223372036854775807] and the input base
++	 * is 10, cutoff will be set to 922337203685477580 and cutlim to
++	 * either 7 (neg==0) or 8 (neg==1), meaning that if we have
++	 * accumulated a value > 922337203685477580, or equal but the
++	 * next digit is > 7 (or 8), the number is too big, and we will
++	 * return a range error.
++	 *
++	 * Set any if any `digits' consumed; make it negative to indicate
++	 * overflow.
++	 */
++	qbase = (unsigned int)base;
++
++	if (!unsign) {
++		cutoff = neg ? (u64)-(LLONG_MIN + LLONG_MAX) + LLONG_MAX : LLONG_MAX;
++		cutlim = cutoff % qbase;
++		cutoff /= qbase;
++	} else {
++		cutoff = (u64)ULLONG_MAX / qbase;
++		cutlim = (u64)ULLONG_MAX % qbase;
++	}
++
++	for (acc = 0, any = 0;; c = *s++) {
++		if (!isascii(c))
++			break;
++		if (isdigit(c))
++			c -= '0';
++		else if (isalpha(c))
++			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
++		else
++			break;
++		if (c >= base)
++			break;
++		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
++			any = -1;
++		} else {
++			any = 1;
++			acc *= qbase;
++			acc += c;
++		}
++	}
++
++	info->any = any;
++	info->neg = neg;
++	info->acc = acc;
++
++	*nptr = s;
++
++	return info;
++}
++
++/**
++ * strtoq() - Convert a string to a quad integer
++ * @nptr: pointer to string
++ * @endptr: pointer to number's end in the string
++ * @base: number's base
++ *
++ * Return: s64 quad integer number converted from input string
++ */
++static s64
++strtoq(const char *nptr, char **endptr, int base)
++{
++	const char *s = nptr;
++	u64 acc;
++	int unsign = 0;
++	struct str_info *info;
++
++	info = str_to_int_convert(&s, base, unsign);
++	if (!info)
++		return -1;
++
++	acc = info->acc;
++
++	if (info->any < 0)
++		acc = info->neg ? LLONG_MIN : LLONG_MAX;
++	else if (info->neg)
++		acc = -acc;
++	if (endptr != 0)
++		*endptr = __DECONST(char *, info->any ? s - 1 : nptr);
++
++	free(info);
++
++	return acc;
++}
++
++/**
++ * strtouq() - Convert a string to an unsigned quad integer
++ * @nptr: pointer to string
++ * @endptr: pointer to number's end in the string
++ * @base: number's base
++ *
++ * Return: s64 unsigned quad integer number converted from
++ *         input string
++ */
++u64
++strtouq(const char *nptr, char **endptr, int base)
++{
++		const char *s = nptr;
++	u64 acc;
++	int unsign = 1;
++	struct str_info *info;
++
++	info = str_to_int_convert(&s, base, unsign);
++	if (!info)
++		return -1;
++
++	acc = info->acc;
++
++	if (info->any < 0)
++		acc = ULLONG_MAX;
++	else if (info->neg)
++		acc = -acc;
++	if (endptr != 0)
++		*endptr = __DECONST(char *, info->any ? s - 1 : nptr);
++
++	free(info);
++
++	return acc;
++}
++
++/**
++ * __sccl() - Fill in the given table from the scanset at the given format
++ * (just after `[')
++ * @tab: table to fill in
++ * @fmt: format of buffer
++ *
++ * The table has a 1 wherever characters should be considered part of the
++ * scanset.
++ *
++ * Return: pointer to the character past the closing `]'
++ */
++static const u_char *
++__sccl(char *tab, const u_char *fmt)
++{
++	int c, n, v;
++
++	/* first `clear' the whole table */
++	c = *fmt++;             /* first char hat => negated scanset */
++	if (c == '^') {
++		v = 1;          /* default => accept */
++		c = *fmt++;     /* get new first char */
++	} else {
++		v = 0;          /* default => reject */
++	}
++
++	/* XXX: Will not work if sizeof(tab*) > sizeof(char) */
++	for (n = 0; n < 256; n++)
++		tab[n] = v;        /* memset(tab, v, 256) */
++
++	if (c == 0)
++		return (fmt - 1);/* format ended before closing ] */
++
++	/*
++	 * Now set the entries corresponding to the actual scanset
++	 * to the opposite of the above.
++	 *
++	 * The first character may be ']' (or '-') without being special;
++	 * the last character may be '-'.
++	 */
++	v = 1 - v;
++	for (;;) {
++		tab[c] = v;             /* take character c */
++doswitch:
++		n = *fmt++;             /* and examine the next */
++		switch (n) {
++		case 0:                 /* format ended too soon */
++			return (fmt - 1);
++
++		case '-':
++			/*
++			 * A scanset of the form
++			 *      [01+-]
++			 * is defined as `the digit 0, the digit 1,
++			 * the character +, the character -', but
++			 * the effect of a scanset such as
++			 *      [a-zA-Z0-9]
++			 * is implementation defined.  The V7 Unix
++			 * scanf treats `a-z' as `the letters a through
++			 * z', but treats `a-a' as `the letter a, the
++			 * character -, and the letter a'.
++			 *
++			 * For compatibility, the `-' is not considerd
++			 * to define a range if the character following
++			 * it is either a close bracket (required by ANSI)
++			 * or is not numerically greater than the character
++			 * we just stored in the table (c).
++			 */
++			n = *fmt;
++			if (n == ']' || n < c) {
++				c = '-';
++				break;  /* resume the for(;;) */
++			}
++			fmt++;
++			/* fill in the range */
++			do {
++				tab[++c] = v;
++			} while (c < n);
++			c = n;
++			/*
++			 * Alas, the V7 Unix scanf also treats formats
++			 * such as [a-c-e] as `the letters a through e'.
++			 * This too is permitted by the standard....
++			 */
++			goto doswitch;
++			break;
++
++		case ']':               /* end of scanset */
++			return (fmt);
++
++		default:                /* just another character */
++			c = n;
++			break;
++		}
++	}
++	/* NOTREACHED */
++}
++
++/**
++ * vsscanf - Unformat a buffer into a list of arguments
++ * @buf:	input buffer
++ * @fmt:	format of buffer
++ * @args:	arguments
++ */
++#define BUF             32      /* Maximum length of numeric string. */
++
++/*
++ * Flags used during conversion.
++ */
++#define LONG            0x01    /* l: long or double */
++#define SHORT           0x04    /* h: short */
++#define SUPPRESS        0x08    /* suppress assignment */
++#define POINTER         0x10    /* weird %p pointer (`fake hex') */
++#define NOSKIP          0x20    /* do not skip blanks */
++#define QUAD            0x400
++#define SHORTSHORT      0x4000  /** hh: char */
++
++/*
++ * The following are used in numeric conversions only:
++ * SIGNOK, NDIGITS, DPTOK, and EXPOK are for floating point;
++ * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
++ */
++#define SIGNOK          0x40    /* +/- is (still) legal */
++#define NDIGITS         0x80    /* no digits detected */
++
++#define DPTOK           0x100   /* (float) decimal point is still legal */
++#define EXPOK           0x200   /* (float) exponent (e+3, etc) still legal */
++
++#define PFXOK           0x100   /* 0x prefix is (still) legal */
++#define NZDIGITS        0x200   /* no zero digits detected */
++
++/*
++ * Conversion types.
++ */
++#define CT_CHAR         0       /* %c conversion */
++#define CT_CCL          1       /* %[...] conversion */
++#define CT_STRING       2       /* %s conversion */
++#define CT_INT          3       /* integer, i.e., strtoq or strtouq */
++typedef u64 (*ccfntype)(const char *, char **, int);
++
++int
++vsscanf(const char *inp, char const *fmt0, va_list ap)
++{
++	int inr;
++	const u_char *fmt = (const u_char *)fmt0;
++	int c;                  /* character from format, or conversion */
++	size_t width;           /* field width, or 0 */
++	char *p;                /* points into all kinds of strings */
++	int n;                  /* handy integer */
++	int flags;              /* flags as defined above */
++	char *p0;               /* saves original value of p when necessary */
++	int nassigned;          /* number of fields assigned */
++	int nconversions;       /* number of conversions */
++	int nread;              /* number of characters consumed from fp */
++	int base;               /* base argument to strtoq/strtouq */
++	ccfntype ccfn;          /* conversion function (strtoq/strtouq) */
++	char ccltab[256];       /* character class table for %[...] */
++	char buf[BUF];          /* buffer for numeric conversions */
++
++	/* `basefix' is used to avoid `if' tests in the integer scanner */
++	static short basefix[17] = { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
++				     12, 13, 14, 15, 16 };
++
++	inr = strlen(inp);
++
++	nassigned = 0;
++	nconversions = 0;
++	nread = 0;
++	base = 0;               /* XXX just to keep gcc happy */
++	ccfn = NULL;            /* XXX just to keep gcc happy */
++	for (;;) {
++		c = *fmt++;
++		if (c == 0)
++			return (nassigned);
++		if (isspace(c)) {
++			while (inr > 0 && isspace(*inp))
++				nread++, inr--, inp++;
++			continue;
++		}
++		if (c != '%')
++			goto literal;
++		width = 0;
++		flags = 0;
++		/*
++		 * switch on the format.  continue if done;
++		 * break once format type is derived.
++		 */
++again:          c = *fmt++;
++		switch (c) {
++		case '%':
++literal:
++			if (inr <= 0)
++				goto input_failure;
++			if (*inp != c)
++				goto match_failure;
++			inr--, inp++;
++			nread++;
++			continue;
++
++		case '*':
++			flags |= SUPPRESS;
++			goto again;
++		case 'l':
++			if (flags & LONG) {
++				flags &= ~LONG;
++				flags |= QUAD;
++			} else {
++				flags |= LONG;
++			}
++			goto again;
++		case 'q':
++			flags |= QUAD;
++			goto again;
++		case 'h':
++			if (flags & SHORT) {
++				flags &= ~SHORT;
++				flags |= SHORTSHORT;
++			} else {
++				flags |= SHORT;
++			}
++			goto again;
++
++		case '0': case '1': case '2': case '3': case '4':
++		case '5': case '6': case '7': case '8': case '9':
++			width = width * 10 + c - '0';
++			goto again;
++
++		/*
++		 * Conversions.
++		 *
++		 */
++		case 'd':
++			c = CT_INT;
++			ccfn = (ccfntype)strtoq;
++			base = 10;
++			break;
++
++		case 'i':
++			c = CT_INT;
++			ccfn = (ccfntype)strtoq;
++			base = 0;
++			break;
++
++		case 'o':
++			c = CT_INT;
++			ccfn = strtouq;
++			base = 8;
++			break;
++
++		case 'u':
++			c = CT_INT;
++			ccfn = strtouq;
++			base = 10;
++			break;
++
++		case 'x':
++			flags |= PFXOK; /* enable 0x prefixing */
++			c = CT_INT;
++			ccfn = strtouq;
++			base = 16;
++			break;
++
++		case 's':
++			c = CT_STRING;
++			break;
++
++		case '[':
++			fmt = __sccl(ccltab, fmt);
++			flags |= NOSKIP;
++			c = CT_CCL;
++			break;
++
++		case 'c':
++			flags |= NOSKIP;
++			c = CT_CHAR;
++			break;
++
++		case 'p':       /* pointer format is like hex */
++			flags |= POINTER | PFXOK;
++			c = CT_INT;
++			ccfn = strtouq;
++			base = 16;
++			break;
++
++		case 'n':
++			nconversions++;
++			if (flags & SUPPRESS)   /* ??? */
++				continue;
++			if (flags & SHORTSHORT)
++				*va_arg(ap, char *) = nread;
++			else if (flags & SHORT)
++				*va_arg(ap, short *) = nread;
++			else if (flags & LONG)
++				*va_arg(ap, long *) = nread;
++			else if (flags & QUAD)
++				*va_arg(ap, s64 *) = nread;
++			else
++				*va_arg(ap, int *) = nread;
++			continue;
++		}
++
++		/*
++		 * We have a conversion that requires input.
++		 */
++		if (inr <= 0)
++			goto input_failure;
++
++		/*
++		 * Consume leading white space, except for formats
++		 * that suppress this.
++		 */
++		if ((flags & NOSKIP) == 0) {
++			while (isspace(*inp)) {
++				nread++;
++				if (--inr > 0)
++					inp++;
++				else
++					goto input_failure;
++			}
++			/*
++			 * Note that there is at least one character in
++			 * the buffer, so conversions that do not set NOSKIP
++			 * can no longer result in an input failure.
++			 */
++		}
++
++		/*
++		 * Do the conversion.
++		 */
++		switch (c) {
++		case CT_CHAR:
++			/* scan arbitrary characters (sets NOSKIP) */
++			if (width == 0)
++				width = 1;
++			if (flags & SUPPRESS) {
++				size_t sum = 0;
++
++				if ((n = inr) < width) {
++					sum += n;
++					width -= n;
++					inp += n;
++					if (sum == 0)
++						goto input_failure;
++				} else {
++					sum += width;
++					inr -= width;
++					inp += width;
++				}
++				nread += sum;
++			} else {
++				memcpy(va_arg(ap, char *), inp, width);
++				inr -= width;
++				inp += width;
++				nread += width;
++				nassigned++;
++			}
++			nconversions++;
++			break;
++
++		case CT_CCL:
++			/* scan a (nonempty) character class (sets NOSKIP) */
++			if (width == 0)
++				width = (size_t)~0;     /* `infinity' */
++			/* take only those things in the class */
++			if (flags & SUPPRESS) {
++				n = 0;
++				while (ccltab[(unsigned char)*inp]) {
++					n++, inr--, inp++;
++					if (--width == 0)
++						break;
++					if (inr <= 0) {
++						if (n == 0)
++							goto input_failure;
++						break;
++					}
++				}
++				if (n == 0)
++					goto match_failure;
++			} else {
++				p = va_arg(ap, char *);
++				p0 = p;
++				while (ccltab[(unsigned char)*inp]) {
++					inr--;
++					*p++ = *inp++;
++					if (--width == 0)
++						break;
++					if (inr <= 0) {
++						if (p == p0)
++							goto input_failure;
++						break;
++					}
++				}
++				n = p - p0;
++				if (n == 0)
++					goto match_failure;
++				*p = 0;
++				nassigned++;
++			}
++			nread += n;
++			nconversions++;
++			break;
++
++		case CT_STRING:
++			/* like CCL, but zero-length string OK, & no NOSKIP */
++			if (width == 0)
++				width = (size_t)~0;
++			if (flags & SUPPRESS) {
++				n = 0;
++				while (!isspace(*inp)) {
++					n++, inr--, inp++;
++					if (--width == 0)
++						break;
++					if (inr <= 0)
++						break;
++				}
++				nread += n;
++			} else {
++				p = va_arg(ap, char *);
++				p0 = p;
++				while (!isspace(*inp)) {
++					inr--;
++					*p++ = *inp++;
++					if (--width == 0)
++						break;
++					if (inr <= 0)
++						break;
++				}
++				*p = 0;
++				nread += p - p0;
++				nassigned++;
++			}
++			nconversions++;
++			continue;
++
++		case CT_INT:
++			/* scan an integer as if by strtoq/strtouq */
++#ifdef hardway
++			if (width == 0 || width > sizeof(buf) - 1)
++				width = sizeof(buf) - 1;
++#else
++			/* size_t is unsigned, hence this optimisation */
++			if (--width > sizeof(buf) - 2)
++				width = sizeof(buf) - 2;
++			width++;
++#endif
++			flags |= SIGNOK | NDIGITS | NZDIGITS;
++			for (p = buf; width; width--) {
++				c = *inp;
++				/*
++				 * Switch on the character; `goto ok'
++				 * if we accept it as a part of number.
++				 */
++				switch (c) {
++				/*
++				 * The digit 0 is always legal, but is
++				 * special.  For %i conversions, if no
++				 * digits (zero or nonzero) have been
++				 * scanned (only signs), we will have
++				 * base==0.  In that case, we should set
++				 * it to 8 and enable 0x prefixing.
++				 * Also, if we have not scanned zero digits
++				 * before this, do not turn off prefixing
++				 * (someone else will turn it off if we
++				 * have scanned any nonzero digits).
++				 */
++				case '0':
++					if (base == 0) {
++						base = 8;
++						flags |= PFXOK;
++					}
++					if (flags & NZDIGITS)
++						flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
++					else
++						flags &= ~(SIGNOK | PFXOK | NDIGITS);
++					goto ok;
++
++				/* 1 through 7 always legal */
++				case '1': case '2': case '3':
++				case '4': case '5': case '6': case '7':
++					base = basefix[base];
++					flags &= ~(SIGNOK | PFXOK | NDIGITS);
++					goto ok;
++
++				/* digits 8 and 9 ok iff decimal or hex */
++				case '8': case '9':
++					base = basefix[base];
++					if (base <= 8)
++						break;  /* not legal here */
++					flags &= ~(SIGNOK | PFXOK | NDIGITS);
++					goto ok;
++
++				/* letters ok iff hex */
++				case 'A': case 'B': case 'C':
++				case 'D': case 'E': case 'F':
++				case 'a': case 'b': case 'c':
++				case 'd': case 'e': case 'f':
++					/* no need to fix base here */
++					if (base <= 10)
++						break;  /* not legal here */
++					flags &= ~(SIGNOK | PFXOK | NDIGITS);
++					goto ok;
++
++				/* sign ok only as first character */
++				case '+': case '-':
++					if (flags & SIGNOK) {
++						flags &= ~SIGNOK;
++						goto ok;
++						}
++					break;
++
++				/* x ok iff flag still set & 2nd char */
++				case 'x': case 'X':
++					if (flags & PFXOK && p == buf + 1) {
++						base = 16;      /* if %i */
++						flags &= ~PFXOK;
++						goto ok;
++					}
++					break;
++				}
++
++				/*
++				 * If we got here, c is not a legal character
++				 * for a number.  Stop accumulating digits.
++				 */
++				break;
++ok:
++				/*
++				 * c is legal: store it and look at the next.
++				 */
++				*p++ = c;
++				if (--inr > 0)
++					inp++;
++				else
++					break;          /* end of input */
++			}
++			/*
++			 * If we had only a sign, it is no good; push
++			 * back the sign.  If the number ends in `x',
++			 * it was [sign] '' 'x', so push back the x
++			 * and treat it as [sign] ''.
++			 */
++			if (flags & NDIGITS) {
++				if (p > buf) {
++					inp--;
++					inr++;
++				}
++				goto match_failure;
++			}
++			c = ((u_char *)p)[-1];
++			if (c == 'x' || c == 'X') {
++				--p;
++				inp--;
++				inr++;
++			}
++			if ((flags & SUPPRESS) == 0) {
++				u64 res;
++
++				*p = 0;
++				res = (*ccfn)(buf, (char **)NULL, base);
++				if (flags & POINTER)
++					*va_arg(ap, void **) =
++					(void *)(uintptr_t)res;
++				else if (flags & SHORTSHORT)
++					*va_arg(ap, char *) = res;
++				else if (flags & SHORT)
++					*va_arg(ap, short *) = res;
++				else if (flags & LONG)
++					*va_arg(ap, long *) = res;
++				else if (flags & QUAD)
++					*va_arg(ap, s64 *) = res;
++				else
++					*va_arg(ap, int *) = res;
++				nassigned++;
++			}
++			nread += p - buf;
++			nconversions++;
++			break;
++		}
++	}
++input_failure:
++		return (nconversions != 0 ? nassigned : -1);
++match_failure:
++		return (nassigned);
++}
++
++/**
++ * sscanf - Unformat a buffer into a list of arguments
++ * @buf:	input buffer
++ * @fmt:	formatting of buffer
++ * @...:	resulting arguments
++ */
++int sscanf(const char *buf, const char *fmt, ...)
++{
++	va_list args;
++	int i;
++
++	va_start(args, fmt);
++	i = vsscanf(buf, fmt, args);
++	va_end(args);
++	return i;
++}
++
++#endif
+diff --git a/test/lib/Makefile b/test/lib/Makefile
+index 72d2ec74b5..e5ae2fe6c8 100644
+--- a/test/lib/Makefile
++++ b/test/lib/Makefile
+@@ -5,6 +5,7 @@
+ obj-y += cmd_ut_lib.o
+ obj-y += hexdump.o
+ obj-y += lmb.o
++obj-y += sscanf.o
+ obj-y += string.o
+ obj-$(CONFIG_ERRNO_STR) += test_errno_str.o
+ obj-$(CONFIG_UT_LIB_ASN1) += asn1.o
+diff --git a/test/lib/sscanf.c b/test/lib/sscanf.c
+new file mode 100644
+index 0000000000..772e4b9204
+--- /dev/null
++++ b/test/lib/sscanf.c
+@@ -0,0 +1,174 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (c) 2002, Uwe Bonnes
++ * Copyright (c) 2001-2004, Roger Dingledine.
++ * Copyright (c) 2004-2006, Roger Dingledine, Nick Mathewson.
++ * Copyright (c) 2007-2016, The Tor Project, Inc.
++ * Copyright (c) 2020, EPAM Systems Inc.
++ *
++ * Unit tests for sscanf() function
++ */
++
++#include <common.h>
++#include <command.h>
++#include <log.h>
++#include <test/lib.h>
++#include <test/test.h>
++#include <test/ut.h>
++
++#define EOF -1
++
++/**
++ * lib_sscanf() - unit test for sscanf()
++ * @uts: unit test state
++ *
++ * Test sscanf() with varied parameters in different combinations passed
++ * as arguments.
++ *
++ * Return: 0 - success
++ *	   1 - failure
++ */
++static int lib_sscanf(struct unit_test_state *uts)
++{
++	char buffer[100], buffer1[100];
++	int result, ret;
++	static const char pname[] = " Hello World!\n";
++	int hour = 21, min = 59, sec = 20;
++	int number, number_so_far;
++	unsigned int u1, u2, u3;
++	char s1[20], s2[10], s3[10], ch;
++	int r, int1, int2;
++	long lng1;
++
++	/* check EOF */
++	strcpy(buffer, "");
++	ret = sscanf(buffer, "%d", &result);
++	ut_asserteq(ret, EOF);
++
++	/* check %x */
++	strcpy(buffer, "0x519");
++	ut_asserteq(sscanf(buffer, "%x", &result), 1);
++	ut_asserteq(result, 0x519);
++
++	strcpy(buffer, "0x51a");
++	ut_asserteq(sscanf(buffer, "%x", &result), 1);
++	ut_asserteq(result, 0x51a);
++
++	strcpy(buffer, "0x51g");
++	ut_asserteq(sscanf(buffer, "%x", &result), 1);
++	ut_asserteq(result, 0x51);
++
++	/* check strings */
++	ret = sprintf(buffer, " %s", pname);
++	ret = sscanf(buffer, "%*c%[^\n]", buffer1);
++	ut_asserteq(ret, 1);
++	ut_asserteq(strncmp(pname, buffer1, strlen(buffer1)), 0);
++
++	/* check digits */
++	ret = sprintf(buffer, "%d:%d:%d", hour, min, sec);
++	ret = sscanf(buffer, "%d%n", &number, &number_so_far);
++	ut_asserteq(ret, 1);
++	ut_asserteq(number, hour);
++	ut_asserteq(number_so_far, 2);
++
++	ret = sscanf(buffer + 2, "%*c%n", &number_so_far);
++	ut_asserteq(ret, 0);
++	ut_asserteq(number_so_far, 1);
++
++	/* Check %i */
++	strcpy(buffer, "123");
++	ret = sscanf(buffer, "%i", &result);
++	ut_asserteq(ret, 1);
++	ut_asserteq(result, 123);
++	ret = sscanf(buffer, "%d", &result);
++	ut_asserteq(ret, 1);
++	ut_asserteq(result, 123);
++
++	ut_asserteq(0, sscanf("hello world", "hello world"));
++	ut_asserteq(0, sscanf("hello world", "good bye"));
++	/* Excess data */
++	ut_asserteq(0, sscanf("hello 3", "%u", &u1));  /* have to match the start */
++	ut_asserteq(1, sscanf("3 hello", "%u", &u1));  /* but trailing is alright */
++
++	/* Numbers (ie. %u) */
++	ut_asserteq(0, sscanf("hello world 3", "hello worlb %u", &u1)); /* d vs b */
++	ut_asserteq(1, sscanf("12345", "%u", &u1));
++	ut_asserteq(12345u, u1);
++	ut_asserteq(1, sscanf("0", "%u", &u1));
++	ut_asserteq(0u, u1);
++	ut_asserteq(1, sscanf("0000", "%u", &u2));
++	ut_asserteq(0u, u2);
++	ut_asserteq(0, sscanf("A", "%u", &u1)); /* bogus number */
++
++	/* Numbers with size (eg. %2u) */
++	ut_asserteq(2, sscanf("123456", "%2u%u", &u1, &u2));
++	ut_asserteq(12u, u1);
++	ut_asserteq(3456u, u2);
++	ut_asserteq(1, sscanf("123456", "%8u", &u1));
++	ut_asserteq(123456u, u1);
++	ut_asserteq(1, sscanf("123457  ", "%8u", &u1));
++	ut_asserteq(123457u, u1);
++	ut_asserteq(3, sscanf("!12:3:456", "!%2u:%2u:%3u", &u1, &u2, &u3));
++	ut_asserteq(12u, u1);
++	ut_asserteq(3u, u2);
++	ut_asserteq(456u, u3);
++	ut_asserteq(3, sscanf("67:8:099", "%2u:%2u:%3u", &u1, &u2, &u3)); /* 0s */
++	ut_asserteq(67u, u1);
++	ut_asserteq(8u, u2);
++	ut_asserteq(99u, u3);
++	/* Arbitrary amounts of 0-padding are okay */
++	ut_asserteq(3, sscanf("12:03:000000000000000099", "%2u:%2u:%u", &u1, &u2, &u3));
++	ut_asserteq(12u, u1);
++	ut_asserteq(3u, u2);
++	ut_asserteq(99u, u3);
++
++	/* Hex (ie. %x) */
++	ut_asserteq(3, sscanf("1234 02aBcdEf ff", "%x %x %x", &u1, &u2, &u3));
++	ut_asserteq(0x1234, u1);
++	ut_asserteq(0x2ABCDEF, u2);
++	ut_asserteq(0xFF, u3);
++	/* Width works on %x */
++	ut_asserteq(3, sscanf("f00dcafe444", "%4x%4x%u", &u1, &u2, &u3));
++	ut_asserteq(0xf00d, u1);
++	ut_asserteq(0xcafe, u2);
++	ut_asserteq(444, u3);
++
++	/* Literal '%' (ie. '%%') */
++	ut_asserteq(1, sscanf("99% fresh", "%3u%% fresh", &u1));
++	ut_asserteq(99, u1);
++	ut_asserteq(0, sscanf("99 fresh", "%% %3u %s", &u1, s1));
++	ut_asserteq(1, sscanf("99 fresh", "%3u%% %s", &u1, s1));
++	ut_asserteq(2, sscanf("99 fresh", "%3u %5s %%", &u1, s1));
++	ut_asserteq(99, u1);
++	ut_asserteq_str(s1, "fresh");
++	ut_asserteq(1, sscanf("% boo", "%% %3s", s1));
++	ut_asserteq_str("boo", s1);
++
++	/* Strings (ie. %s) */
++	ut_asserteq(2, sscanf("hello", "%3s%7s", s1, s2));
++	ut_asserteq_str(s1, "hel");
++	ut_asserteq_str(s2, "lo");
++	ut_asserteq(2, sscanf("WD40", "%2s%u", s3, &u1)); /* %s%u */
++	ut_asserteq_str(s3, "WD");
++	ut_asserteq(40, u1);
++	ut_asserteq(2, sscanf("WD40", "%3s%u", s3, &u1)); /* %s%u */
++	ut_asserteq_str(s3, "WD4");
++	ut_asserteq(0, u1);
++	ut_asserteq(2, sscanf("76trombones", "%6u%9s", &u1, s1)); /* %u%s */
++	ut_asserteq(76, u1);
++	ut_asserteq_str(s1, "trombones");
++
++	ut_asserteq(3, sscanf("1.2.3", "%u.%u.%u%c", &u1, &u2, &u3, &ch));
++	ut_asserteq(4, sscanf("1.2.3 foobar", "%u.%u.%u%c", &u1, &u2, &u3, &ch));
++	ut_asserteq(' ', ch);
++
++	r = sscanf("12345 -67890 -1", "%d %ld %d", &int1, &lng1, &int2);
++	ut_asserteq(r, 3);
++	ut_asserteq(int1, 12345);
++	ut_asserteq(lng1, -67890);
++	ut_asserteq(int2, -1);
++
++	return 0;
++}
++
++LIB_TEST(lib_sscanf, 0);
+-- 
+2.31.1
+
+
+From 09ad2f4983ade35ab34092c963ce85ac45a940dd Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 11 Feb 2021 09:56:38 +0100
+Subject: [PATCH 4/4] tc358870: nvm write
+
+---
+ board/sunxi/Makefile                |   1 +
+ board/sunxi/board.c                 |   6 +-
+ board/sunxi/panel-detector-uclass.c | 245 ++++++++++++++++++++++
+ board/sunxi/panel_detector.h        |  15 ++
+ board/sunxi/tc358870.c              | 308 ++++++++++++++++++++++------
+ lib/vsprintf.c                      |   8 +
+ 6 files changed, 518 insertions(+), 65 deletions(-)
+
+diff --git a/board/sunxi/Makefile b/board/sunxi/Makefile
+index 6ec648996d..3e7ccfec07 100644
+--- a/board/sunxi/Makefile
++++ b/board/sunxi/Makefile
+@@ -18,6 +18,7 @@ obj-$(CONFIG_EFI_PARTITION)	+= grow_sd.o
+ ifdef CONFIG_BRIDGED_PANEL_DETECTION
+ obj-y	+= panel-detector-uclass.o
+ obj-y	+= tc358870.o
++CFLAGS_panel-detector-uclass.o := -Wno-packed-bitfield-compat
+ endif
+ 
+ endif
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 09cb9712ac..b8d20b30eb 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -1019,10 +1019,8 @@ int ft_board_setup(void *blob, bd_t *bd)
+ 	offset = fdt_node_offset_by_compatible(blob, -1, "toshiba,tc358870");
+ 	if (offset < 0)
+ 		return offset;
+-	r = fdt_setprop_string(blob, offset, "panel-name", panel_detector_get_panel_name(detector));
+-	r = fdt_setprop_u64(blob, offset, "match-data", panel_detector_get_match_data(detector));
+-	if (r)
+-		return r;
++
++	panel_detector_fill_in_fdt_node(detector, blob, offset);
+ #endif
+ 	return 0;
+ }
+diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
+index e37231e8f8..9f09caf8aa 100644
+--- a/board/sunxi/panel-detector-uclass.c
++++ b/board/sunxi/panel-detector-uclass.c
+@@ -5,8 +5,208 @@
+  */
+ 
+ #include <dm.h>
++#include <command.h>
++#include <vsprintf.h>
++#include <dm/device-internal.h>
+ #include "panel_detector.h"
+ 
++typedef struct __attribute__((packed)) {
++	enum { CZP=0 } origin:4;
++	u32 sequence_number:20;
++	u8 week:6;
++	u8 year:8;
++	u16 ean_pn:10;
++} prusa_serial_number_t; /* 6 bytes */
++
++typedef union lcd_vendor_data {
++	struct __attribute__((packed)) {
++		u16 transmittance;
++		prusa_serial_number_t sn;
++	} structured;
++	u64 numeric;
++} lcd_vendor_data_t; /* 8 bytes */
++
++static enum command_ret_t handle_error(int err)
++{
++	if (err == CMD_RET_USAGE)
++		return CMD_RET_USAGE;
++
++	if (err < 0) {
++		printf("Command failed: Error %d\n", err);
++		return CMD_RET_FAILURE;
++	}
++
++	if (err == 0) {
++		printf("OK\n");
++		return CMD_RET_SUCCESS;
++	}
++
++	return CMD_RET_FAILURE;
++}
++
++static void sn_to_string(char* dst, prusa_serial_number_t const* sn) {
++	snprintf(dst, 20, "%3sX%02hhu%02hhuX%03huX%06u", "CZP",
++		 sn->week, sn->year, sn->ean_pn, sn->sequence_number);
++}
++
++static int parse_sn(prusa_serial_number_t *dst, char const* src)
++{
++	uint8_t week;
++	uint8_t year;
++	uint16_t ean;
++	uint32_t seq;
++
++	sscanf(src, "CZPX%02hhu%02hhuX%03huX%06u", &week, &year, &ean, &seq);
++
++	dst->origin = CZP;
++	dst->week = week;
++	dst->year = year;
++	dst->ean_pn = ean;
++	dst->sequence_number = seq;
++
++	char buf[20];
++	sn_to_string(buf, dst);
++	if (strncmp(src, buf, sizeof(buf)) != 0) return -EINVAL;
++	return 0;
++}
++
++static int load_vendor_data(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	int r;
++	lcd_vendor_data_t data;
++
++	r = panel_detector_read_id_from_nvm(dev, &data.numeric);
++	if (r < 0)
++		return r;
++	sn_to_string(uc_priv->sn_str, &data.structured.sn);
++	uc_priv->transmittance = data.structured.transmittance;
++
++	return 0;
++}
++
++static int do_panel_id_is_writable(struct udevice *dev)
++{
++	int ret = panel_detector_has_writable_nvm(dev);
++	if (ret == 0) {
++		printf("The ID region of the OTP has already been written to.\n");
++		return 1;
++	} else if (ret == 1) {
++		printf("The ID region of the OTP is empty and writable.\n");
++		return 0;
++	}
++	return ret;
++}
++
++static int do_panel_id_read_qword(struct udevice *dev)
++{
++	int r;
++	u64 id;
++
++	r = panel_detector_read_id_from_nvm(dev, &id);
++	if (r < 0)
++		return r;
++	printf("ID = 0x%016llx\n", id);
++	return 0;
++}
++
++static int do_panel_id_write_qword(struct udevice *dev, char * const str_id)
++{
++	u64 id = simple_strtoull(str_id, NULL, 0x10);
++	return panel_detector_write_id_to_nvm(dev, id);
++}
++
++static int do_panel_id_read_vendor_data(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	int ret;
++
++	ret = load_vendor_data(dev);
++	if (ret < 0) return ret;
++
++	int t = uc_priv->transmittance;
++	printf("SN = %s, transmittance = %d.%02d %%\n", uc_priv->sn_str, t/100, t%100);
++	return 0;
++}
++
++static int do_panel_id_write_vendor_data(struct udevice *dev, char * const sn_str,
++					 char * const transmittance_str)
++{
++	int ret;
++	lcd_vendor_data_t data;
++	ret = sscanf(transmittance_str, "%hu", &data.structured.transmittance);
++	if (ret != 1) {
++		printf("ERROR: couldn't parse TRANSMITTANCE argument\n");
++		return -EINVAL;
++	}
++	if (data.structured.transmittance > 10000) {
++		printf("ERROR: invalid transmittance value.\n");
++		return -EINVAL;
++	}
++
++	ret = parse_sn(&data.structured.sn, sn_str);
++	if (ret < 0) {
++		printf("ERROR: couldn't parse SN argument\n");
++		return ret;
++	}
++
++	return panel_detector_write_id_to_nvm(dev, data.numeric);
++}
++
++static int do_panel_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
++{
++	int r;
++	struct udevice *dev;
++
++	if (argc < 2)
++		return CMD_RET_USAGE;
++
++	char * const cmd = argv[1];
++	argc -= 2;
++	argv += 2;
++
++	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &dev);
++	if (r < 0)
++		return handle_error(r);
++
++	if (!strcmp(cmd, "remove") && argc == 0)
++		return handle_error(device_remove(dev, DM_REMOVE_NORMAL));
++	if (!strcmp(cmd, "is_writable") && argc == 0)
++		return handle_error(do_panel_id_is_writable(dev));
++	if (!strcmp(cmd, "read") && argc == 0)
++		return handle_error(do_panel_id_read_vendor_data(dev));
++	if (!strcmp(cmd, "read_qword") && argc == 0)
++		return handle_error(do_panel_id_read_qword(dev));
++	if (!strcmp(cmd, "write") && argc == 2)
++		return handle_error(do_panel_id_write_vendor_data(dev, argv[0], argv[1]));
++	if (!strcmp(cmd, "write_qword") && argc == 1)
++		return handle_error(do_panel_id_write_qword(dev, argv[0]));
++
++	return CMD_RET_USAGE;
++}
++
++U_BOOT_CMD(
++	panel_id,	4,	1,	do_panel_id,
++	"Read/write ID stored in the OTP of an LCD panel",
++	"\nPOWER\n"
++	"panel_id remove                    Deinitialize panel and turn AVDD regulator off\n"
++	"                                   (the complementary operation (probe) happens\n"
++	"                                   automatically when a panel_id command is invoked)\n"
++	"\n"
++	"OTP\n"
++	"panel_id is_writable               Check that a panel hasn't yet been written to\n"
++	"panel_id read                      Read vendor data from the OTP\n"
++	"panel_id read_qword                Read OTP data as a 64-bit word \n"
++	"                                   (0x0020406080a0c0e0 is factory default)\n"
++	"panel_id write <sn> <x-mittance>   Write vendor data into the OTP\n"
++	"                                   SN expected as CZPX[wwyy]X[ean]X[serial]\n"
++	"                                   (i.e. CZPX1721X000X123456)\n"
++	"                                   and transmittance in units of 10^-4\n"
++	"                                   (i.e. an integer lying in the interval [0, 10000])\n"
++	"panel_id write_qword <qword>       Write a 64-bit word (number, actually) into the OTP\n"
++	""
++);
++
+ const char* panel_detector_get_panel_name(struct udevice *dev)
+ {
+ 	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
+@@ -19,6 +219,51 @@ u64 panel_detector_get_match_data(struct udevice *dev)
+ 	return uc_priv->match_data;
+ }
+ 
++int panel_detector_has_writable_nvm(struct udevice *dev)
++{
++	struct panel_detector_ops *ops = panel_detector_get_ops(dev);
++	if (!ops->has_writable_nvm)
++		return -ENOSYS;
++	return ops->has_writable_nvm(dev);
++}
++
++int panel_detector_write_id_to_nvm(struct udevice *dev, u64 id)
++{
++	struct panel_detector_ops *ops = panel_detector_get_ops(dev);
++	if (!ops->write_id_to_nvm)
++		return -ENOSYS;
++	return ops->write_id_to_nvm(dev, id);
++}
++
++int panel_detector_read_id_from_nvm(struct udevice *dev, u64 *id)
++{
++	struct panel_detector_ops *ops = panel_detector_get_ops(dev);
++	if (!ops->read_id_from_nvm)
++		return -ENOSYS;
++	return ops->read_id_from_nvm(dev, id);
++}
++
++int panel_detector_fill_in_fdt_node(struct udevice *dev, void *blob, int offset)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	int ret;
++	ret = fdt_setprop_string(blob, offset, "panel-name", uc_priv->panel_name);
++	if (ret < 0) return ret;
++	ret = fdt_setprop_u64(blob, offset, "match-data", uc_priv->match_data);
++	if (ret < 0) return ret;
++
++	if (strcmp(uc_priv->panel_name, "rv059fbb") != 0 || panel_detector_has_writable_nvm(dev))
++		return 0;
++
++	if (load_vendor_data(dev) < 0) return 0;
++	ret = fdt_setprop_string(blob, offset, "serial-number", uc_priv->sn_str);
++	if (ret < 0) return ret;
++	ret = fdt_setprop_u32(blob, offset, "transmittance", uc_priv->transmittance);
++	if (ret < 0) return ret;
++
++	return 0;
++}
++
+ UCLASS_DRIVER(panel_detector) = {
+ 	.id				= UCLASS_PANEL_DETECTOR,
+ 	.name				= "panel_detector",
+diff --git a/board/sunxi/panel_detector.h b/board/sunxi/panel_detector.h
+index 65294be844..fa86b81410 100644
+--- a/board/sunxi/panel_detector.h
++++ b/board/sunxi/panel_detector.h
+@@ -10,9 +10,24 @@
+ struct panel_detector_priv {
+ 	char const* panel_name;
+ 	u64 match_data;
++	char sn_str[22];
++	u16 transmittance;
+ };
+ 
++struct panel_detector_ops {
++	int (*has_writable_nvm)(struct udevice* dev);
++	int (*write_id_to_nvm)(struct udevice* dev, u64 id);
++	int (*read_id_from_nvm)(struct udevice* dev, u64 *id);
++};
++
++#define panel_detector_get_ops(dev) \
++		((struct panel_detector_ops *)(dev)->driver->ops)
++
+ const char* panel_detector_get_panel_name(struct udevice *dev);
+ u64 panel_detector_get_match_data(struct udevice *dev);
++int panel_detector_has_writable_nvm(struct udevice *dev);
++int panel_detector_write_id_to_nvm(struct udevice *dev, u64 id);
++int panel_detector_read_id_from_nvm(struct udevice *dev, u64 *id);
++int panel_detector_fill_in_fdt_node(struct udevice *dev, void *blob, int offset);
+ 
+ #endif
+diff --git a/board/sunxi/tc358870.c b/board/sunxi/tc358870.c
+index a85c423016..dd7b42e5fb 100644
+--- a/board/sunxi/tc358870.c
++++ b/board/sunxi/tc358870.c
+@@ -18,15 +18,33 @@
+ #include "panel_detector.h"
+ #include "tc358870.h"
+ 
++static const char RV059FBB[] = "rv059fbb";
++
+ static inline void kfreep(void *p) {
+ 	kfree(*(void**) p);
+ }
++
++static inline void free_gpiop(struct gpio_desc *desc) {
++	if (desc->dev == NULL) return;
++	dm_gpio_set_value(desc, true);
++	dm_gpio_free(desc->dev, desc);
++	desc->dev = NULL;
++}
++
++static inline void disable_regp(struct udevice **regp) {
++	if (*regp == NULL) return;
++	regulator_set_enable(*regp, false);
++}
++
+ #define cleanup(x) __attribute__((__cleanup__(x)))
+ #define cleanup_free cleanup(kfreep)
++#define cleanup_gpio cleanup(free_gpiop)
++#define cleanup_reg cleanup(disable_regp)
+ 
+ struct tc358870_priv {
+ 	struct gpio_desc bridge_reset;
+ 	struct gpio_desc panel_reset;
++	struct udevice *lcd_reg;
+ 	u8 vc;
+ };
+ 
+@@ -127,18 +145,6 @@ static int tc358870_write_u32(struct udevice *dev, u16 reg_addr, u32 value)
+ 	return tc358870_write(dev, reg_addr, &value, sizeof(value));
+ }
+ 
+-#if 0
+-static int tc358870_read_u16(struct udevice *dev, u16 reg_addr, u16 *value)
+-{
+-	int ret = tc358870_read(dev, reg_addr, value, sizeof(*value));
+-	if (ret < 0) {
+-		return ret;
+-	}
+-	le16_to_cpus(value);
+-	return 0;
+-}
+-#endif
+-
+ static int tc358870_read_u32(struct udevice *dev, u16 reg_addr, u32 *value)
+ {
+ 	int ret;
+@@ -150,37 +156,6 @@ static int tc358870_read_u32(struct udevice *dev, u16 reg_addr, u32 *value)
+ 	return 0;
+ }
+ 
+-#if 0 /* TODO: Why does RX_STATE_INT_STAT stay 0? */
+-static int tc358870_wait_for_lprx_done(struct udevice *dev, u8 iface)
+-{
+-#define LPRX_PKT_START		(1u << 3u)
+-#define LPRX_PKT_DONE		(1u << 2u)
+-#define LPRX_PKT_THRESH_HIT	(1u << 1u)
+-	int i, ret = 0;
+-	u32 mask = LPRX_PKT_START | LPRX_PKT_DONE | LPRX_PKT_THRESH_HIT;
+-	u32 out = 0;
+-	for (i = 50; ((out & LPRX_PKT_DONE) == 0) && (i > 0) && (ret >= 0); i--)
+-	{
+-		ret = tc358870_read_u32(dev, RX_STATE_INT_STAT + iface * 0x0200u, &out);
+-		mdelay(5);
+-	}
+-	if (ret < 0) {
+-		dev_err(dev, "%s: read error %d\n", __func__, ret);
+-		return ret;
+-	}
+-	if ((out & mask) == 0) {
+-		dev_err(dev, "%s: waiting for LPRX packet reception timed out\n", __func__);
+-		return 0;
+-	}
+-	if (!(out & LPRX_PKT_DONE)) {
+-		dev_err(dev, "%s: not DONE yet!\n", __func__);
+-	}
+-	/* clear out the interrupt register */
+-	tc358870_write_u32(dev, RX_STATE_INT_STAT + iface * 0x0200u, mask);
+-	return 0;
+-}
+-#endif
+-
+ static ssize_t tc358770_fetch_from_fifo(struct udevice *dev, u8 iface, u8* data, int word_count)
+ {
+ 	int i, len;
+@@ -461,17 +436,17 @@ static bool tc358870_match_ls055r1sx04(struct udevice *dev)
+ 
+ 	len = tc358870_dsi_generic_read_short(dev, 0, 0xbfu, &out);
+ 	if (len <= 0 || !out) {
+-		dev_err(dev, "%s: DSI read from BFh address failed (%ld)\n", __func__, len);
++		dev_warn(dev, "%s: DSI read from BFh address failed (%ld)\n", __func__, len);
+ 		return false;
+ 	}
+ 	tc358870_save_match_data(dev, out, len);
+ 	if (len >= sizeof(ALMID) && memcmp(out, ALMID, sizeof(ALMID)) == 0) {
+-		printf("%s: matched ALMID: SHARP LS055R1SX04\n", __func__);
++		dev_info("%s: matched ALMID: SHARP LS055R1SX04\n", __func__);
+ 		return true;
+ 	}
+-	dev_err(dev, "%s: ALMID doesn't match an R63419 driver.\n", __func__);
++	dev_warn(dev, "%s: ALMID doesn't match an R63419 driver.\n", __func__);
+ 	if (len == 0x1f) {
+-		dev_err(dev, "%s: response length is correct though: PASS\n", __func__);
++		dev_warn(dev, "%s: response length is correct though: PASS\n", __func__);
+ 		return true;
+ 	}
+ 	return false;
+@@ -486,20 +461,20 @@ static bool tc358870_match_rv059fbb(struct udevice *dev)
+ 	len = tc358870_dsi_dcs_read(dev, 1, 0xa1u, &out);
+ 
+ 	if (len <= 0 || !out) {
+-		printf("%s: DSI read from A1h address failed\n", __func__);
++		dev_warn("%s: DSI read from A1h address failed\n", __func__);
+ 		return false;
+ 	}
+ 	tc358870_save_match_data(dev, out, len);
+ 	if (len >= sizeof(ID) && memcmp(out, ID, sizeof(ID)) == 0) {
+-		printf("%s: matched RV059FBB by descriptor block (112233445566)\n", __func__);
++		dev_info("%s: matched RV059FBB by descriptor block (112233445566)\n", __func__);
+ 		return true;
+ 	}
+ 	if (out[6] == 0xffu) {
+-		printf("%s: matched RV059FBB by Exit Code (0xff) at the end of A1h response\n", __func__);
++		dev_warn("%s: matched RV059FBB by Exit Code (0xff) at the end of A1h response\n", __func__);
+ 		return true;
+ 	}
+ 	if (len == 7) {
+-		printf("%s: matched RV059FBB by the length (7) of its response to A1h\n", __func__);
++		dev_warn("%s: matched RV059FBB by the length (7) of its response to A1h\n", __func__);
+ 		return true;
+ 	}
+ 
+@@ -518,6 +493,8 @@ static int tc358870_panel_init(struct udevice *dev)
+ 		dev_err(dev, "Couldn't identify any panel connected to the bridge.\n");
+ 	}
+ 
++	printf("Detected panel: %s\n", uc_priv->panel_name);
++
+ 	return 0;
+ }
+ 
+@@ -567,37 +544,215 @@ static int tc358870_enable(struct udevice *dev)
+ 	return 0;
+ }
+ 
++static int tc358870_reset(struct udevice *dev)
++{
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++
++	uc_priv->panel_name = "";
++	regulator_set_enable(priv->lcd_reg, false);
++	mdelay(10);
++	regulator_set_enable(priv->lcd_reg, true);
++	return tc358870_enable(dev);
++}
++
++struct rv059fbb_nvm {
++	struct udevice *dev;
++};
++
++static bool tc358870_is_rv059fbb_connected(struct udevice *dev)
++{
++	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
++	return strncmp(uc_priv->panel_name, RV059FBB, sizeof(RV059FBB)) == 0;
++}
++
++static struct rv059fbb_nvm* rv059fbb_nvm_alloc(struct udevice *dev)
++{
++	if (!tc358870_is_rv059fbb_connected(dev))
++		return NULL;
++
++	struct rv059fbb_nvm* nvm = kmalloc(sizeof(struct rv059fbb_nvm), GFP_KERNEL);
++	nvm->dev = dev;
++	tc358870_dsi_dcs_write(dev, 1, MIPI_DCS_EXIT_SLEEP_MODE);
++	mdelay(25);
++
++	tc358870_dsi_generic_write_short(dev, 1, 0xb0u, 0x00u); /* Switch to page 0 */
++	tc358870_dsi_generic_write_short(dev, 1, 0xbau, 0x4bu); /* Enable VDD_OTP_SW */
++	tc358870_dsi_generic_write_short(dev, 1, 0xc0u, 0x94u); /* Enable VDD_OTP_EN */
++	tc358870_dsi_generic_write_short(dev, 1, 0xb0u, 0x01u); /* Switch to page 1 */
++	tc358870_dsi_generic_write_short(dev, 1, 0xb2u, 0xa5u); /* Set password to 'A5h' */
++
++	return nvm;
++}
++
++static void rv059fbb_nvm_free(struct rv059fbb_nvm *nvm)
++{
++	if (nvm == NULL) return;
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x00u); /* Switch to page 0 */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xbau, 0x43u); /* Disable VDD_OTP_SW */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xc0u, 0x14u); /* Disable VDD_OTP_EN */
++	kfree(nvm);
++}
++
++static void rv059fbb_nvm_freep(struct rv059fbb_nvm **p_nvm)
++{
++	if (p_nvm == NULL) return;
++	rv059fbb_nvm_free(*p_nvm);
++	*p_nvm = NULL;
++}
++
++static int rv059fbb_nvm_write_id(struct rv059fbb_nvm *nvm, u64 value)
++{
++	u8 reg[14] = {
++		0x39, 0x21, 0xff, 0x10, 0x00, 0x02,		/* Default values */
++	};
++
++	cpu_to_be64s(&value);
++	memcpy(reg + 6, &value, sizeof(value));
++
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x04u); /* Switch to page 4 */
++	tc358870_dsi_generic_write_long(nvm->dev, 1, 0xb1u, reg, sizeof(reg)); /* Set B1 function register */
++
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x01u); /* Switch to page 1 */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb1u, 0x0eu); /* Select OTP group 14 */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb3u, 0x01u); /* Start auto-write */
++	mdelay(25);
++
++	return 0;
++}
++
++static int rv059fbb_nvm_read_id(struct rv059fbb_nvm *nvm, u64 *id)
++{
++	cleanup_free u8 *out = NULL;
++	ssize_t len;
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x04u); /* Switch to page 4 */
++	len = tc358870_dsi_generic_read_short(nvm->dev, 1, 0xb1u, &out);
++
++	if (len < 14) return -EINVAL;
++	memcpy(id, out + 6, sizeof(*id));
++	be64_to_cpus(id);
++	return 0;
++}
++
++static u8 rv059fbb_nvm_read_otp(struct rv059fbb_nvm *nvm, u16 index)
++{
++	cleanup_free u8 *out = NULL;
++	ssize_t len;
++
++	if (index > 1008) return 0;
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb0u, 0x01u); /* Switch to page 4 */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb4u, (u8)(index >> 8u)); /* Upper bits of OTP index */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb5u, index & 0xffu); /* Lower bits of OTP index */
++	tc358870_dsi_generic_write_short(nvm->dev, 1, 0xb3u, 0x02u); /* Start read */
++	udelay(10);
++	len = tc358870_dsi_generic_read_short(nvm->dev, 1, 0xb6u, &out);
++	if (len < 1) return 0;
++	return out[0];
++}
++
++static int rv059fbb_nvm_is_writable(struct rv059fbb_nvm *nvm)
++{
++	u8 out = rv059fbb_nvm_read_otp(nvm, 432);
++	return !(out >> 7); /* the highest bit is 1 if written */
++}
++
++static int tc358870_has_writable_nvm(struct udevice *dev)
++{
++	if (!tc358870_is_rv059fbb_connected(dev))
++		return -ENODEV;
++
++	cleanup(rv059fbb_nvm_freep) struct rv059fbb_nvm* nvm = rv059fbb_nvm_alloc(dev);
++	if (nvm == NULL)
++		return -EACCES;
++
++	return rv059fbb_nvm_is_writable(nvm);
++}
++
++static int tc358870_write_id_to_nvm(struct udevice *dev, u64 id)
++{
++	int ret;
++	u64 read_id;
++	if (!tc358870_is_rv059fbb_connected(dev))
++		return -ENODEV;
++
++	cleanup(rv059fbb_nvm_freep) struct rv059fbb_nvm* nvm = rv059fbb_nvm_alloc(dev);
++	if (nvm == NULL)
++		return -EACCES;
++	ret = rv059fbb_nvm_write_id(nvm, id);
++	if (ret < 0)
++		return -EFAULT;
++
++	rv059fbb_nvm_free(nvm);
++	ret = tc358870_reset(dev);
++	if (ret < 0)
++		return -ERESTART;
++	nvm = rv059fbb_nvm_alloc(dev);
++	ret = rv059fbb_nvm_read_id(nvm, &read_id);
++	if (ret < 0)
++		return -EIO;
++	if (id != read_id) {
++		printf("The OTP has already been written.\n");
++		return -EIO;
++	}
++
++	return 0;
++}
++
++static int tc358870_read_id_from_nvm(struct udevice *dev, u64 *id)
++{
++	int ret;
++	if (!tc358870_is_rv059fbb_connected(dev))
++		return -ENODEV;
++
++	cleanup(rv059fbb_nvm_freep) struct rv059fbb_nvm* nvm = rv059fbb_nvm_alloc(dev);
++	if (nvm == NULL)
++		return -EACCES;
++
++	ret = rv059fbb_nvm_read_id(nvm, id);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++static const struct panel_detector_ops tc358870_ops = {
++	.has_writable_nvm = tc358870_has_writable_nvm,
++	.write_id_to_nvm = tc358870_write_id_to_nvm,
++	.read_id_from_nvm = tc358870_read_id_from_nvm,
++};
++
+ static int tc358870_probe(struct udevice *dev)
+ {
+ 	int ret;
+-	struct udevice *reg;
+ 
+ 	struct tc358870_priv *priv = dev_get_priv(dev);
+ 	struct panel_detector_priv *uc_priv = dev_get_uclass_priv(dev);
+ 
++	cleanup_reg struct udevice *lcd_reg = NULL;
++	cleanup_gpio struct gpio_desc panel_reset;
++	cleanup_gpio struct gpio_desc bridge_reset;
++
+ 	if (device_get_uclass_id(dev->parent) != UCLASS_I2C)
+ 		return -EPROTONOSUPPORT;
+ 
+-	ret = gpio_request_by_name(dev, "bridge-reset-gpios", 0, &priv->bridge_reset,
++	ret = gpio_request_by_name(dev, "bridge-reset-gpios", 0, &bridge_reset,
+ 				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+ 	if (ret) {
+ 		dev_err(dev, "%s: Could not decode bridge-reset-gpios (%d)\n", __func__, ret);
+-		if (ret != -ENOENT)
+-			return ret;
++		return ret;
+ 	}
+ 
+-	ret = gpio_request_by_name(dev, "panel-reset-gpios", 0, &priv->panel_reset,
++	ret = gpio_request_by_name(dev, "panel-reset-gpios", 0, &panel_reset,
+ 				   GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+ 	if (ret) {
+ 		dev_err(dev, "%s: Could not decode panel-reset-gpios (%d)\n", __func__, ret);
+-		if (ret != -ENOENT)
+-			return ret;
++		return ret;
+ 	}
+ 
+ 	ret = uclass_get_device_by_phandle(UCLASS_REGULATOR, dev,
+-					   "avdd_lcd-supply", &reg);
++					   "avdd_lcd-supply", &lcd_reg);
+ 	if (!ret) {
+-		ret = regulator_set_enable(reg, true);
++		ret = regulator_set_enable(lcd_reg, true);
+ 		if (ret < 0) {
+ 			dev_err(dev, "%s: Failed to enable power: ret=%d\n", __func__, ret);
+ 			return ret;
+@@ -607,8 +762,37 @@ static int tc358870_probe(struct udevice *dev)
+ 		return ret;
+ 	}
+ 
++	priv->bridge_reset = bridge_reset;
++	priv->panel_reset = panel_reset;
+ 	uc_priv->panel_name = "";
+-	return tc358870_enable(dev);
++
++	ret = tc358870_enable(dev);
++	if (ret >= 0) {
++		priv->lcd_reg = lcd_reg;
++		/* prevent cleanup */
++		bridge_reset.dev = NULL;
++		panel_reset.dev = NULL;
++		lcd_reg = NULL;
++	}
++	return ret;
++}
++
++static int tc358870_disable(struct udevice *dev)
++{
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	dm_gpio_set_value(&priv->bridge_reset, true);
++	dm_gpio_set_value(&priv->panel_reset, true);
++	regulator_set_enable(priv->lcd_reg, false);
++	return 0;
++}
++
++static int tc358870_remove(struct udevice *dev)
++{
++	struct tc358870_priv *priv = dev_get_priv(dev);
++	tc358870_disable(dev);
++	free_gpiop(&priv->bridge_reset);
++	free_gpiop(&priv->panel_reset);
++	return 0;
+ }
+ 
+ static const struct udevice_id tc358870_ids[] = {
+@@ -620,6 +804,8 @@ U_BOOT_DRIVER(toshiba_tc358870) = {
+ 	.name	= "toshiba_tc358870",
+ 	.id	= UCLASS_PANEL_DETECTOR,
+ 	.of_match = tc358870_ids,
++	.ops	= &tc358870_ops,
+ 	.probe	= tc358870_probe,
++	.remove = tc358870_remove,
+ 	.priv_auto_alloc_size = sizeof(struct tc358870_priv),
+ };
+diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+index b4edee29b0..477abd8dc8 100644
+--- a/lib/vsprintf.c
++++ b/lib/vsprintf.c
+@@ -598,6 +598,10 @@ repeat:
+ 				qualifier = 'L';
+ 				++fmt;
+ 			}
++			if (qualifier == 'h' && *fmt == 'h') {
++				qualifier = 'H';
++				++fmt;
++			}
+ 		}
+ 
+ 		/* default base */
+@@ -692,6 +696,10 @@ repeat:
+ 			num = (unsigned short) va_arg(args, int);
+ 			if (flags & SIGN)
+ 				num = (signed short) num;
++		} else if (qualifier == 'H') {
++			num = (unsigned char) va_arg(args, int);
++			if (flags & SIGN)
++				num = (signed char) num;
+ 		} else {
+ 			num = va_arg(args, unsigned int);
+ 			if (flags & SIGN)
+-- 
+2.31.1
