@@ -20,3 +20,5 @@ PACKAGECONFIG:remove:pn-mesa = "virgl elf-tls"
 
 IMAGE_CLASSES += "prusa-image"
 IMAGE_FSTYPES += "etc factory root"
+
+PACKAGE_EXTRA_ARCHS = "${PACKAGE_EXTRA_ARCHS:tune-${DEFAULTTUNE}} sun50i"

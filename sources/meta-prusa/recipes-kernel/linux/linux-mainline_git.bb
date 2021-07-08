@@ -8,6 +8,10 @@ INC_PR = "r0"
 inherit kernel siteinfo
 
 LOCALVERSION ?= ""
+PACKAGE_ARCH = "${SOC_FAMILY}"
+KERNEL_DEVICETREE:sun50i = "\
+	allwinner/sun50i-a64-prusa64-sl1.dtb \
+"
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
