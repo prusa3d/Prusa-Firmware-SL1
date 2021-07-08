@@ -4,11 +4,11 @@ Date: Fri, 18 Sep 2020 12:26:21 +0000
 Subject: [PATCH 06/12] archtimer-freescale-fix
 
 ---
- arch/arm/cpu/armv8/generic_timer.c | 48 +++++++++++++++---------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ arch/arm/cpu/armv8/generic_timer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
-index 46e63294fe..3cc45d704a 100644
+index 46e63294fe..f546dabcf1 100644
 --- a/arch/arm/cpu/armv8/generic_timer.c
 +++ b/arch/arm/cpu/armv8/generic_timer.c
 @@ -21,7 +21,7 @@ unsigned long get_tbclk(void)
@@ -16,7 +16,7 @@ index 46e63294fe..3cc45d704a 100644
  }
  
 -#ifdef CONFIG_SYS_FSL_ERRATUM_A008585
-+//#ifdef CONFIG_SYS_FSL_ERRATUM_A008585
++#if defined(CONFIG_SYS_FSL_ERRATUM_A008585) || defined(CONFIG_SUNXI_A64_TIMER_ERRATUM)
  /*
   * FSL erratum A-008585 says that the ARM generic timer counter "has the
   * potential to contain an erroneous value for a small number of core
@@ -25,64 +25,9 @@ index 46e63294fe..3cc45d704a 100644
  	return cntpct;
  }
 -#elif CONFIG_SUNXI_A64_TIMER_ERRATUM
-+//#elif CONFIG_SUNXI_A64_TIMER_ERRATUM
++#elif 0
  /*
   * This erratum sometimes flips the lower 11 bits of the counter value
   * to all 0's or all 1's, leading to jumps forwards or backwards.
-@@ -60,31 +60,31 @@ unsigned long timer_read_counter(void)
-  * single read, so does not have any significant overhead.
-  * The algorithm was conceived by Samuel Holland.
-  */
--unsigned long timer_read_counter(void)
--{
--	unsigned long cntpct;
--
--	isb();
--	do {
--		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
--	} while (((cntpct + 1) & GENMASK(10, 0)) <= 1);
--
--	return cntpct;
--}
--#else
-+//unsigned long timer_read_counter(void)
-+//{
-+//	unsigned long cntpct;
-+//
-+//	isb();
-+//	do {
-+//		asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-+//	} while (((cntpct + 1) & GENMASK(10, 0)) <= 1);
-+//
-+//	return cntpct;
-+//}
-+//#else
- /*
-  * timer_read_counter() using the Arm Generic Timer (aka arch timer).
-  */
--unsigned long timer_read_counter(void)
--{
--	unsigned long cntpct;
--
--	isb();
--	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
--
--	return cntpct;
--}
--#endif
-+//unsigned long timer_read_counter(void)
-+//{
-+//	unsigned long cntpct;
-+//
-+//	isb();
-+//	asm volatile("mrs %0, cntpct_el0" : "=r" (cntpct));
-+//
-+//	return cntpct;
-+//}
-+//#endif
- 
- uint64_t get_ticks(void)
- {
 -- 
 2.28.0
-
