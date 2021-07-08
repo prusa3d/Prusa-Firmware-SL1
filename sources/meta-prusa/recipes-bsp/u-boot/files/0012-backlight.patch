@@ -17,8 +17,7 @@ it set at 0% duty cycle
  board/sunxi/board.c                     | 13 +++++++++++++
  configs/prusa64-sl1_defconfig           |  3 +++
  drivers/pwm/sunxi_pwm.c                 |  1 +
- include/configs/sunxi-common.h          |  2 +-
- 6 files changed, 30 insertions(+), 1 deletion(-)
+ 5 files changed, 29 insertions(+)
 
 diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
 index 1a2afceacc..89cc5b2f94 100644
@@ -125,18 +124,5 @@ index 8a55e4f461..63b80d7310 100644
  #endif
  	return 0;
  }
-diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index a97fb566e4..76a176ef30 100644
---- a/include/configs/sunxi-common.h
-+++ b/include/configs/sunxi-common.h
-@@ -485,7 +485,7 @@ extern int soft_i2c_gpio_scl;
- 	"\0"
- 
- #define PRUSA_KERNEL_CMDLINE \
--	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin logo.nologo " \
-+	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
- 	"vt.global_cursor_default=0 console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
- 
- 
 -- 
 2.28.0

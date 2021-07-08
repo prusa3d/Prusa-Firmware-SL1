@@ -14,9 +14,8 @@ Subject: [PATCH] exposure panel identification
  board/sunxi/tc358870.c                        | 564 ++++++++++++++++++
  board/sunxi/tc358870.h                        |  88 +++
  configs/prusa64-sl1_defconfig                 |   6 +-
- include/configs/sunxi-common.h                |   4 +-
  include/dm/uclass-id.h                        |   1 +
- 12 files changed, 805 insertions(+), 9 deletions(-)
+ 12 files changed, 803 insertions(+), 7 deletions(-)
  create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
  create mode 100644 board/sunxi/panel-detector-uclass.c
  create mode 100644 board/sunxi/panel_detector.h
@@ -960,21 +959,6 @@ index eaa2d33b52..63d8605b55 100644
  CONFIG_REGEX=y
  # CONFIG_EFI_LOADER is not set
  CONFIG_SUPPORT_EMMC_BOOT=y
-diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index 99bc430cf6..233c15b920 100644
---- a/include/configs/sunxi-common.h
-+++ b/include/configs/sunxi-common.h
-@@ -483,8 +483,8 @@ extern int soft_i2c_gpio_scl;
- 	"\0"
- 
- #define PRUSA_KERNEL_CMDLINE \
--	"rootwait panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
--	"vt.global_cursor_default=0 console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
-+	"rootwait panic=10 video=HDMI-A-1:D ${edid_bootarg} vt.global_cursor_default=0 " \
-+	"console=${console} board_revision=${board_revision} stmmac.quirks=${eth_quirks}"
- 
- 
- #define BOOTCMD_PRUSA \
 diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
 index 0c563d898b..5d845bc511 100644
 --- a/include/dm/uclass-id.h
