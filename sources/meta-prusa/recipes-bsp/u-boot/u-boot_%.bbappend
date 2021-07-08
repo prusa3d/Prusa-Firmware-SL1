@@ -1,15 +1,14 @@
 require u-boot-srcrev.inc
 
 SRC_URI:append = " \
-	file://0001-dts-and-defconfig.patch \
-	file://0002-env-reset-defaults-on-load.patch \
-	file://0003-boot-process.patch \
-	file://0006-archtimer-freescale-fix.patch \
-	file://0009-Ethernet-reconnection-fix.patch \
-	file://0011-grow-partition-on-SD-card-to-its-full-extent.patch \
-	file://0012-backlight.patch \
-	file://0013-exposure-panel.patch \
-	file://0018-tc358870-only-proceed-with-setup-if-sl1-uv-led-found.patch \
+	file://0000-prusa64-sl1-dts-and-defconfig.patch \
+	file://0001-boot-process.patch \
+	file://0002-archtimer-freescale-fix.patch \
+	file://0003-Ethernet-reconnection-fix.patch \
+	file://0004-grow-partition-on-SD-card-to-its-full-extent.patch \
+	file://0005-backlight.patch \
+	file://0006-exposure-panel.patch \
+	file://0007-tc358870-only-proceed-with-setup-if-sl1-uv-led-found.patch \
 	file://fw_env.config \
 	file://sunxi-prusa.h \
 "
