@@ -1,26 +1,13 @@
 From 448db8a9f0cb577b7d435956636192b2b4a8cbd2 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 18 Sep 2020 12:26:21 +0000
-Subject: [PATCH 03/12] boot-process
+Subject: [PATCH 1/5] boot-process
 
 ---
- arch/arm/mach-sunxi/board.c    |   1 +
- board/sunxi/board.c            |   1 +
- include/configs/sunxi-common.h | 113 +++++++++++++++++++++++++++++++--
- 3 files changed, 111 insertions(+), 4 deletions(-)
+ board/sunxi/board.c            | 1 +
+ include/configs/sunxi-common.h | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
-index aa1d2230c9..e81186bc2c 100644
---- a/arch/arm/mach-sunxi/board.c
-+++ b/arch/arm/mach-sunxi/board.c
-@@ -248,6 +248,7 @@ uint32_t sunxi_get_boot_device(void)
- 		return BOOT_DEVICE_BOARD;
- 
- 	boot_source = readb(SPL_ADDR + 0x28);
-+	printf("sunxi_get_boot_device, boot_source = 0x%02x\n", boot_source);
- 	switch (boot_source) {
- 	case SUNXI_BOOTED_FROM_MMC0:
- 	case SUNXI_BOOTED_FROM_MMC0_HIGH:
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
 index b9450a0e36..3ca6b62831 100644
 --- a/board/sunxi/board.c
@@ -34,159 +21,375 @@ index b9450a0e36..3ca6b62831 100644
  	case 0:
  		return ENVL_FAT;
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index 0ef289fd64..b7b3f37445 100644
+index 0ef289fd64..e8f21c1843 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
-@@ -425,6 +425,100 @@ extern int soft_i2c_gpio_scl;
- #define BOOTCMD_SUNXI_COMPAT
- #endif
- 
-+#define SCAN_DEV_FOR_FDT									\
-+	"scan_dev_for_fdt="									\
-+		"for prefix in ${boot_prefixes}; do "						\
-+			"if test -e mmc ${mmc_bootdev}:${mmc_bootpart} ${prefix}${fdtfile}; " \
-+			"then "	\
-+				"setenv boot_prefix ${prefix}; "				\
-+				"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${prefix}${fdtfile}; " \
-+				"then " \
-+					"echo LOAD_FDT_OK; "\
-+					"exit; "\
-+				"else " \
-+					"echo LOAD_FDT_FAIL; " \
-+					"reset; " \
-+				"fi;"	\
-+				"break; "							\
-+			"elif test -e mmc ${mmc_bootdev}:${mmc_bootpart} ${prefix}${basefdt}; " \
-+			"then "	\
-+				"setenv boot_prefix ${prefix}; "				\
-+				"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${prefix}${basefdt}; "\
-+				"then echo LOAD_FDT_OK; exit; " \
-+				"else echo LOAD_FDT_FAIL; reset; " \
-+				"fi;"	\
-+				"break; " \
-+			"fi; "									\
-+		"done\0"
-+
-+
-+#define UPDATE_ACTIVE_ROOTFS_SLOT \
-+	"update_active_rootfs_slot=" \
-+		"test -n \"${BOOT_ORDER}\" || setenv BOOT_ORDER \"A B\"; " \
-+		"test -n \"${BOOT_A_LEFT}\" || setenv BOOT_A_LEFT 3; " \
-+		"test -n \"${BOOT_B_LEFT}\" || setenv BOOT_B_LEFT 3; " \
-+		"setenv boot_prefixes /boot/; " \
-+		"setenv slot; " \
-+		"setenv rootlabel; " \
-+		"for BOOT_SLOT in ${BOOT_ORDER}; do " \
-+			"setenv boots_left \\\\${BOOT_${BOOT_SLOT}_LEFT}; " \
-+			"setexpr num_slot ${BOOT_SLOT} - a; " \
-+			"setenv evaluate_boot_order \"" \
-+				"if test ${boots_left} -le 0; then exit; fi; " \
-+				"setenv slot ${BOOT_SLOT}; " \
-+				"setexpr BOOT_${BOOT_SLOT}_LEFT ${boots_left} - 1; " \
-+				"setenv rootlabel rootfs.${num_slot}; " \
-+				"\"; " \
-+			"run evaluate_boot_order; " \
-+			"if test -n \"${slot}\"; " \
-+			"then " \
-+				"setexpr rootpart ${num_slot} + 2; " \
-+				"saveenv; " \
-+				"exit; " \
-+			"fi; " \
-+		"done; " \
-+		"echo \"No valid slot found, resetting tries to 3\"; " \
-+		"setenv BOOT_A_LEFT 3; " \
-+		"setenv BOOT_B_LEFT 3; " \
-+		"saveenv; " \
-+		"reset; " \
-+	"\0"
-+
-+#define PRUSA_KERNEL_CMDLINE \
-+	"console=${console} root=${rootdev} rootwait " \
-+	"panic=10 video=HDMI-A-1:D drm.edid_firmware=HDMI-A-1:edid/ls055r1sx04_148.5mhz.bin " \
-+	"logo.nologo vt.global_cursor_default=0 ${extra}"
-+
-+
-+#define BOOTCMD_PRUSA \
-+	"bootcmd_prusa=" \
-+		"if test ${mmc_bootdev} -eq 0; then " \
-+			"setenv extra; " \
-+			"setenv rootdev /dev/mmcblk0p1; " \
-+			"setenv mmc_bootpart 1; " \
-+			"if test -e mmc 0:1 boot.scr; then " \
-+				"echo Found U-Boot script; " \
-+				"load mmc 0:1 ${scriptaddr} boot.scr; " \
-+				"source ${scriptaddr}; " \
-+			"fi; " \
-+		"else " \
-+			"run update_active_rootfs_slot; " \
-+			"setenv extra rauc.slot=${slot}; " \
-+			"setenv rootdev PARTLABEL=${rootlabel}; " \
-+			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
-+		"fi; " \
-+		"run scan_dev_for_fdt; " \
-+		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
-+		"" \
-+		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${kernel_addr_r} ${boot_prefix}Image; " \
-+		"then " \
-+			"echo LOAD_KERNEL_OK; " \
-+		"else " \
-+			"reset; " \
-+		"fi; " \
-+		"booti ${kernel_addr_r} - ${fdt_addr_r};" \
-+		"\0"
-+
- #include <config_distro_bootcmd.h>
- 
- #ifdef CONFIG_USB_KEYBOARD
-@@ -465,12 +559,17 @@ extern int soft_i2c_gpio_scl;
- #endif
- 
- #define PARTS_DEFAULT \
--	"name=loader1,start=8k,size=32k,uuid=${uuid_gpt_loader1};" \
--	"name=loader2,size=984k,uuid=${uuid_gpt_loader2};" \
--	"name=esp,size=128M,bootable,uuid=${uuid_gpt_esp};" \
--	"name=system,size=-,uuid=${uuid_gpt_system};"
-+	"name=environment,start=512K,size=512K,type=${uuid_gpt_other};"		\
-+	"name=rootfs.0,start=4M,size=768M,type=${uuid_gpt_system};"		\
-+	"name=rootfs.1,start=772M,size=768M,type=${uuid_gpt_system};"		\
-+	"name=etc.0,start=1540M,size=32M,type=${uuid_gpt_other};"		\
-+	"name=etc.1,start=1572M,size=32M,type=${uuid_gpt_other};"		\
-+	"name=var,start=1668M,size=2000M,type=${uuid_gpt_other};"		\
-+	"name=factory,start=1604M,size=64M,type=${uuid_gpt_other};"		\
- 
- #define UUID_GPT_ESP "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
-+#define UUID_GPT_ENVIRONMENT "bc13c2ff-59e6-4262-a352-b275fd6f7172"
-+#define UUID_GPT_OTHER "0fc63daf-8483-4772-8e79-3d69d8477de4"
- 
- #ifdef CONFIG_ARM64
- #define UUID_GPT_SYSTEM "b921b045-1df0-41c3-af44-4c6f280d3fae"
-@@ -484,6 +583,7 @@ extern int soft_i2c_gpio_scl;
- 
- #ifdef CONFIG_ARM64
- #define FDTFILE "allwinner/" CONFIG_DEFAULT_DEVICE_TREE ".dtb"
-+#define FDTFILE_BASE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
- #else
+@@ -488,6 +488,8 @@ extern int soft_i2c_gpio_scl;
  #define FDTFILE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
  #endif
-@@ -493,13 +593,18 @@ extern int soft_i2c_gpio_scl;
+ 
++#include <configs/sunxi-prusa.h>
++
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+ 	CONSOLE_ENV_SETTINGS \
  	MEM_LAYOUT_ENV_SETTINGS \
- 	DFU_ALT_INFO_RAM \
- 	"fdtfile=" FDTFILE "\0" \
-+	"basefdt=" FDTFILE_BASE "\0" \
- 	"console=ttyS0,115200\0" \
- 	SUNXI_MTDIDS_DEFAULT \
- 	SUNXI_MTDPARTS_DEFAULT \
- 	"uuid_gpt_esp=" UUID_GPT_ESP "\0" \
+@@ -500,6 +502,7 @@ extern int soft_i2c_gpio_scl;
  	"uuid_gpt_system=" UUID_GPT_SYSTEM "\0" \
-+	"uuid_gpt_other=" UUID_GPT_OTHER "\0" \
  	"partitions=" PARTS_DEFAULT "\0" \
  	BOOTCMD_SUNXI_COMPAT \
-+	SCAN_DEV_FOR_FDT \
-+	UPDATE_ACTIVE_ROOTFS_SLOT \
-+	BOOTCMD_PRUSA \
++	PRUSA_ENV_SETTINGS \
  	BOOTENV
  
  #else /* ifndef CONFIG_SPL_BUILD */
 -- 
 2.28.0
 
+
+From bf4e180b65c27f6c6745ca6036b9c41d93e59914 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 18 Sep 2020 12:26:21 +0000
+Subject: [PATCH 2/5] mmc-legacy-only
+
+---
+ drivers/mmc/sunxi_mmc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
+index 9f426661c4..5217bb12e0 100644
+--- a/drivers/mmc/sunxi_mmc.c
++++ b/drivers/mmc/sunxi_mmc.c
+@@ -624,7 +624,7 @@ static int sunxi_mmc_probe(struct udevice *dev)
+ 		cfg->host_caps |= MMC_MODE_8BIT;
+ 	if (bus_width >= 4)
+ 		cfg->host_caps |= MMC_MODE_4BIT;
+-	cfg->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
++	cfg->host_caps |= MMC_CAP(MMC_LEGACY);
+ 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
+ 
+ 	cfg->f_min = 400000;
+-- 
+2.28.0
+
+
+From 9a512d391671750c8199e81321da7f054e9f6a05 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 18 Sep 2020 12:26:21 +0000
+Subject: [PATCH 3/5] mmc-delay-1500
+
+---
+ board/sunxi/board.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 3ca6b62831..0ddb96cd5b 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -573,6 +573,11 @@ int board_mmc_init(bd_t *bis)
+ {
+ 	__maybe_unused struct mmc *mmc0, *mmc1;
+ 
++        // TODO:
++        // HACK:
++        // This is a hack for MMC read problems on prusa-sl1 A64 board
++        mdelay(1500);
++
+ 	mmc_pinmux_setup(CONFIG_MMC_SUNXI_SLOT);
+ 	mmc0 = sunxi_mmc_init(CONFIG_MMC_SUNXI_SLOT);
+ 	if (!mmc0)
+-- 
+2.28.0
+
+
+From 9401b899d8f798ee4fb009d6c05c6ea4f9188ba2 Mon Sep 17 00:00:00 2001
+From: Andrey Yurovsky <yurovsky@gmail.com>
+Date: Wed, 13 Dec 2017 21:06:49 -0800
+Subject: [PATCH 4/5] gpt: add part-uuid and part-num subcommands
+
+It is useful to be able to retrieve a partition UUID or number given the
+partition label when working with disks that have a GPT. For instance
+some systems use the partition label to indicate the purpose of the
+partition (such as "rootfs0" being the 0th root file system in an A/B
+image scheme).
+
+Add "gpt part-uuid" to retrieve the partition UUID for a given label and
+"gpt part-num" to retrieve the partition number for a given label along
+with some documentation.
+
+Signed-off-by: Andrey Yurovsky <yurovsky@gmail.com>
+
+---
+ cmd/gpt.c      | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/README.gpt | 21 ++++++++++++++
+ 2 files changed, 96 insertions(+)
+
+diff --git a/cmd/gpt.c b/cmd/gpt.c
+index 0c4349f4b2..c936b7eef4 100644
+--- a/cmd/gpt.c
++++ b/cmd/gpt.c
+@@ -355,6 +355,72 @@ static int do_get_gpt_info(struct blk_desc *dev_desc)
+ 	}
+ 	return ret;
+ }
++
++static struct disk_part *find_part_by_label(const char *label)
++{
++	struct disk_part *part = NULL;
++	struct disk_part *curr;
++
++	list_for_each_entry(curr, &disk_partitions, list) {
++		/* Check for the first match of the label we're looking
++		 * for against the partition label
++		 */
++		if (!strcmp((const char *)curr->gpt_part_info.name,
++			    label)) {
++			part = curr;
++			break;
++		}
++	}
++
++	return part;
++}
++
++/**
++ * Find a partition UUID by label and save that UUID to the environment
++ * variable specified
++ */
++static int do_get_part_uuid(struct blk_desc *dev_desc, const char *label,
++			    const char *namestr)
++{
++	int ret;
++
++	ret = get_gpt_info(dev_desc);
++	if (ret > 0) {
++		struct disk_part *part = find_part_by_label(label);
++
++		if (part) {
++			env_set(namestr, part->gpt_part_info.uuid);
++			ret = 0;
++		}
++
++		del_gpt_info();
++	}
++
++	return ret;
++}
++
++/**
++ * Find a partition number by label and save that number to the environment
++ * variable specified
++ */
++static int do_get_part_num(struct blk_desc *dev_desc, const char *label,
++			   const char *namestr)
++{
++	int ret = get_gpt_info(dev_desc);
++
++	if (ret > 0) {
++		struct disk_part *part = find_part_by_label(label);
++
++		if (part) {
++			env_set_ulong(namestr, part->partnum);
++			ret = 0;
++		}
++
++		del_gpt_info();
++	}
++
++	return ret;
++}
+ #endif
+ 
+ /**
+@@ -851,6 +917,10 @@ static int do_gpt(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ #ifdef CONFIG_CMD_GPT_RENAME
+ 	} else if (strcmp(argv[1], "read") == 0) {
+ 		ret = do_get_gpt_info(blk_dev_desc);
++	} else if (strcmp(argv[1], "part-uuid") == 0 && argc == 6) {
++		ret = do_get_part_uuid(blk_dev_desc, argv[4], argv[5]);
++	} else if (strcmp(argv[1], "part-num") == 0 && argc == 6) {
++		ret = do_get_part_num(blk_dev_desc, argv[4], argv[5]);
+ 	} else if ((strcmp(argv[1], "swap") == 0) ||
+ 		   (strcmp(argv[1], "rename") == 0)) {
+ 		ret = do_rename_gpt_parts(blk_dev_desc, argv[1], argv[4], argv[5]);
+@@ -885,6 +955,11 @@ U_BOOT_CMD(gpt, CONFIG_SYS_MAXARGS, 1, do_gpt,
+ 	" gpt guid mmc 0\n"
+ 	" gpt guid mmc 0 varname\n"
+ #ifdef CONFIG_CMD_GPT_RENAME
++	"gpt partition label commands:\n"
++	"gpt part-uuid <interface> <dev> <label> <varname>\n"
++	"    - set environment variable to UUID of label\n"
++	"gpt part-num <interface> <dev> <label> <varname>\n"
++	"    - set environment variable to partition number of label\n"
+ 	"gpt partition renaming commands:\n"
+ 	" gpt read <interface> <dev>\n"
+ 	"    - read GPT into a data structure for manipulation\n"
+diff --git a/doc/README.gpt b/doc/README.gpt
+index facd7afc3a..8e6c3bcc5b 100644
+--- a/doc/README.gpt
++++ b/doc/README.gpt
+@@ -273,6 +273,27 @@ Some strings can be also used at the place of known GUID :
+ 
+ They are also used to display the type of partition in "part list" command.
+ 
++Identifying Partitions in U-Boot:
++=================================
++
++Two subcommands may be used to identify partitions by their label. This can be
++useful for determining which partition to use or for setting boot arguments.
++The 'gpt part-uuid' command looks up a partition UUID for a given label and
++stores it in an environment variable. The 'gpt part-num' command looks up a
++partition number for a given label and stores it in an environment variable.
++The first partition with a matching label is used.
++
++For example, to find the UUID of a partition named 'rootfs0' and then use it
++for boot arguments:
++
++U-BOOT> gpt part-uuid mmc 0 rootfs0 rootfsuuid
++U-BOOT> setenv bootargs root=PARTUUID=${rootfsuuid}
++
++Or, for example, to find the partition number for a partition named 'kernel'
++and load a file from it:
++
++U-BOOT> gpt part-num mmc 0 kernel kernelnum
++U-BOOT> fatload mmc 0:${kernelnum} ${loadaddr} zImage
+ 
+ Useful info:
+ ============
+-- 
+2.28.0
+
+
+From 466d4631fed1e40c24b5b5d1ffba81c2155fa321 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 22 Apr 2021 17:02:51 +0200
+Subject: [PATCH 5/5] rauc update: toggle eMMC bootpart on slot flip
+
+- added new subcommand 'mmc toggle-bootpart'
+- update_active_rootfs_slot kept backward-compatible with u-boot
+  lacking aforementioned command
+---
+ cmd/mmc.c                      | 49 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/cmd/mmc.c b/cmd/mmc.c
+index 6f3cb85cc0..5094247f6d 100644
+--- a/cmd/mmc.c
++++ b/cmd/mmc.c
+@@ -784,6 +784,52 @@ static int do_mmc_partconf(cmd_tbl_t *cmdtp, int flag,
+ 	/* acknowledge to be sent during boot operation */
+ 	return mmc_set_part_conf(mmc, ack, part_num, access);
+ }
++
++int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value);
++
++static int do_mmc_toggle_bootpart(cmd_tbl_t *cmdtp, int flag,
++				  int argc, char * const argv[])
++{
++	int dev, ret;
++	u8 part, part_conf;
++	struct mmc *mmc;
++
++	dev = (int)simple_strtoul(argv[1], NULL, 10);
++	mmc = init_mmc_device(dev, false);
++	if (!mmc)
++		return CMD_RET_FAILURE;
++
++	if (IS_SD(mmc)) {
++		puts("PARTITION_CONFIG only exists on eMMC\n");
++		return CMD_RET_FAILURE;
++	}
++
++	if (mmc->part_config == MMCPART_NOAVAILABLE) {
++		printf("No part_config info for ver. 0x%x\n", mmc->version);
++		return CMD_RET_FAILURE;
++	}
++
++	part = EXT_CSD_EXTRACT_BOOT_PART(mmc->part_config);
++	if (part < 1 || part > 2) {
++		printk("Neither BP1 nor BP2 is set as bootpart (%d), doing nothing.\n", part);
++		return CMD_RET_FAILURE;
++	}
++
++	part_conf = mmc->part_config;
++
++	part = part == 2 ? 1 : 2;
++	part_conf = (part_conf & ~EXT_CSD_BOOT_PART_NUM(0x7)) | EXT_CSD_BOOT_PART_NUM(part);
++	ret = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_PART_CONF, part_conf);
++
++	if (ret < 0) {
++		printk("eMMC bootpart switch failed: %d\n", ret);
++		return CMD_RET_FAILURE;
++	}
++
++	mmc->part_config = part_conf;
++	return CMD_RET_SUCCESS;
++}
++
+ static int do_mmc_rst_func(cmd_tbl_t *cmdtp, int flag,
+ 			   int argc, char * const argv[])
+ {
+@@ -893,6 +939,7 @@ static cmd_tbl_t cmd_mmc[] = {
+ 	U_BOOT_CMD_MKENT(bootbus, 5, 0, do_mmc_bootbus, "", ""),
+ 	U_BOOT_CMD_MKENT(bootpart-resize, 4, 0, do_mmc_boot_resize, "", ""),
+ 	U_BOOT_CMD_MKENT(partconf, 5, 0, do_mmc_partconf, "", ""),
++	U_BOOT_CMD_MKENT(toggle-bootpart, 2, 0, do_mmc_toggle_bootpart, "", ""),
+ 	U_BOOT_CMD_MKENT(rst-function, 3, 0, do_mmc_rst_func, "", ""),
+ #endif
+ #if CONFIG_IS_ENABLED(CMD_MMC_RPMB)
+@@ -960,6 +1007,8 @@ U_BOOT_CMD(
+ 	" - Change sizes of boot and RPMB partitions of specified device\n"
+ 	"mmc partconf dev [boot_ack boot_partition partition_access]\n"
+ 	" - Show or change the bits of the PARTITION_CONFIG field of the specified device\n"
++	"mmc toggle-bootpart dev\n"
++	" - If one of the two boot partitions is enabled, switch to the other one\n"
+ 	"mmc rst-function dev value\n"
+ 	" - Change the RST_n_FUNCTION field of the specified device\n"
+ 	"   WARNING: This is a write-once field and 0 / 1 / 2 are the only valid values.\n"
+-- 
+2.31.1
+
+
+From 920956ddf41b3b2304c02ba19f4f203d5cf67e1a Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Mon, 12 Jul 2021 15:44:37 +0200
+Subject: [PATCH] env: reset defaults on load
+
+---
+ env/Kconfig   |  7 +++++++
+ env/common.c  |  4 ++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/env/Kconfig b/env/Kconfig
+index ed12609f6a..6a8d21ad75 100644
+--- a/env/Kconfig
++++ b/env/Kconfig
+@@ -581,6 +581,13 @@ config ENV_VARS_UBOOT_RUNTIME_CONFIG
+ 	  run-time determined information about the hardware to the
+ 	  environment.  These will be named board_name, board_rev.
+ 
++config ENV_RESET_DEFAULTS_ON_LOAD
++	bool "Keep environment fresh"
++	help
++	  Once an environment is loaded from the eMMC, reset it to
++	  defaults. This will keep variables without default values
++	  as they were.
++
+ if SPL_ENV_SUPPORT
+ config SPL_ENV_IS_NOWHERE
+ 	bool "SPL Environment is not stored"
+diff --git a/env/common.c b/env/common.c
+index 1fd1bd01d3..1b50f6c375 100644
+--- a/env/common.c
++++ b/env/common.c
+@@ -240,6 +240,10 @@ void env_relocate(void)
+ #endif
+ 	} else {
+ 		env_load();
++#if defined(CONFIG_ENV_RESET_DEFAULTS_ON_LOAD) && !defined(CONFIG_SPL_BUILD)
++		printf("Resetting environment variables.\n");
++		env_set_default_vars(0, NULL, 0);
++#endif
+ 	}
+ }
+ 
+-- 
+2.32.0

@@ -9,8 +9,7 @@ Subject: [PATCH] tc358870: only proceed with setup if sl1-uv-led found in a
 ---
  board/sunxi/board.c                 | 34 ----------------------
  board/sunxi/panel-detector-uclass.c | 45 +++++++++++++++++++++++++++++
- include/configs/sunxi-common.h      | 11 +++----
- 3 files changed, 49 insertions(+), 41 deletions(-)
+ 2 files changed, 45 insertions(+), 34 deletions(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
 index 8d885abacf..28325d8c50 100644
@@ -127,39 +126,5 @@ index 9f09caf8aa..bcbb7b8830 100644
  	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &dev);
  	if (r < 0)
  		return handle_error(r);
-diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index 561fe56917..dff0b575eb 100644
---- a/include/configs/sunxi-common.h
-+++ b/include/configs/sunxi-common.h
-@@ -504,11 +504,8 @@ extern int soft_i2c_gpio_scl;
- 
- #define BOOTCMD_PRUSA \
- 	"bootcmd_prusa=" \
--		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
--		"setenv bootargs ${bootargs} ${extra}; " \
--		"setenv extra; " \
- 		"if test ${mmc_bootdev} -eq 0; then " \
--			"setenv bootargs ${bootargs} root=/dev/mmcblk0p1; " \
-+			"setenv rootarg root=/dev/mmcblk0p1; " \
- 			"setenv mmc_bootpart 1; " \
- 			"if test -e mmc 0:1 boot.scr; then " \
- 				"echo Found U-Boot script; " \
-@@ -517,12 +514,12 @@ extern int soft_i2c_gpio_scl;
- 			"fi; " \
- 		"else " \
- 			"run update_active_rootfs_slot; " \
--			"setenv bootargs ${bootargs} rauc.slot=${slot}; " \
--			"setenv bootargs ${bootargs} root=PARTLABEL=${rootlabel}; " \
-+			"setenv rootarg rauc.slot=${slot} root=PARTLABEL=${rootlabel}; " \
- 			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
- 		"fi; " \
- 		"run scan_dev_for_fdt; " \
--		"" \
-+		"panel_id setup; " \
-+		"setenv bootargs ${rootarg} " PRUSA_KERNEL_CMDLINE " ${extra}; " \
- 		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${kernel_addr_r} ${boot_prefix}Image; " \
- 		"then " \
- 			"echo LOAD_KERNEL_OK; " \
 -- 
 2.32.0
-
