@@ -8,10 +8,7 @@ SRC_URI:append = " \
 	file://0009-Ethernet-reconnection-fix.patch \
 	file://0011-grow-partition-on-SD-card-to-its-full-extent.patch \
 	file://0012-backlight.patch \
-	file://0013-exposure-panel-identification.patch \
-	file://0015-tc358870-switch-VC-if-requested-panel-IC.patch \
-	file://0016-lib-sscanf-add-sscanf-implementation.patch \
-	file://0016-tc358870-nvm-write.patch \
+	file://0013-exposure-panel.patch \
 	file://0018-tc358870-only-proceed-with-setup-if-sl1-uv-led-found.patch \
 	file://fw_env.config \
 	file://sunxi-prusa.h \
