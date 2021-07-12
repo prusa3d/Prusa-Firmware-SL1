@@ -12,42 +12,13 @@ all at once during pinctrl driver probe, "way" earlier than the pwm driver gets 
 One possible solution is to initialize the pwm registers before Linux takes over and leave
 it set at 0% duty cycle
 ---
- arch/arm/dts/sun50i-a64-prusa64-sl1.dts | 11 +++++++++++
  arch/arm/include/asm/arch-sunxi/gpio.h  |  1 +
  board/sunxi/board.c                     | 13 +++++++++++++
- configs/prusa64-sl1_defconfig           |  3 +++
  drivers/pwm/sunxi_pwm.c                 |  1 +
- 5 files changed, 29 insertions(+)
+ drivers/video/Kconfig                   |  6 +++++-
+ drivers/video/Makefile                  |  2 +-
+ 5 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
-index 1a2afceacc..89cc5b2f94 100644
---- a/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
-+++ b/arch/arm/dts/sun50i-a64-prusa64-sl1.dts
-@@ -21,6 +21,13 @@
- 		serial0 = &uart0;
- 	};
- 
-+	backlight: backlight {
-+		compatible = "pwm-backlight";
-+		pwms = <&r_pwm 0 50000 0>;
-+		brightness-levels = <0 5 10 15 20 30 40 55 70 85 100>;
-+		default-brightness-level = <0>;
-+	};
-+
- 	chosen {
- 		stdout-path = "serial0:115200n8";
- 	};
-@@ -125,6 +132,10 @@
- 	status = "okay";
- };
- 
-+&r_pwm {
-+	status = "okay";
-+};
-+
- &r_rsb {
- 	status = "okay";
- 
 diff --git a/arch/arm/include/asm/arch-sunxi/gpio.h b/arch/arm/include/asm/arch-sunxi/gpio.h
 index a646ea6a3c..550e23d8bc 100644
 --- a/arch/arm/include/asm/arch-sunxi/gpio.h
@@ -61,7 +32,7 @@ index a646ea6a3c..550e23d8bc 100644
  #define SUN9I_GPN_R_RSB		3
  
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 587f15b2e4..511459f806 100644
+index 240794ea27..ea0295764d 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
 @@ -33,6 +33,7 @@
@@ -78,7 +49,7 @@ index 587f15b2e4..511459f806 100644
  
 +static void sunxi_enable_backlight(void)
 +{
-+#ifdef CONFIG_DM_VIDEO
++#ifdef CONFIG_DM_BACKLIGHT
 +	struct udevice *backlight;
 +	int ret = uclass_get_device(UCLASS_PANEL_BACKLIGHT, 0, &backlight);
 +	if (!ret)
@@ -98,20 +69,6 @@ index 587f15b2e4..511459f806 100644
  	/* Uses dm gpio code so do this here and not in i2c_init_board() */
  	return soft_i2c_board_init();
  }
-diff --git a/configs/prusa64-sl1_defconfig b/configs/prusa64-sl1_defconfig
-index 2df11b0338..eaa2d33b52 100644
---- a/configs/prusa64-sl1_defconfig
-+++ b/configs/prusa64-sl1_defconfig
-@@ -46,6 +46,9 @@ CONFIG_DEFAULT_DEVICE_TREE="sun50i-a64-prusa64-sl1"
- CONFIG_ENV_IS_IN_MMC=y
- CONFIG_ENV_FAT_DEVICE_AND_PART="0:1"
- # CONFIG_NET is not set
-+CONFIG_DM_REGULATOR=y
-+CONFIG_DM_PWM=y
-+CONFIG_PWM_SUNXI=y
- # CONFIG_VIDEO_DT_SIMPLEFB is not set
- CONFIG_REGEX=y
- # CONFIG_EFI_LOADER is not set
 diff --git a/drivers/pwm/sunxi_pwm.c b/drivers/pwm/sunxi_pwm.c
 index 8a55e4f461..63b80d7310 100644
 --- a/drivers/pwm/sunxi_pwm.c
@@ -124,5 +81,38 @@ index 8a55e4f461..63b80d7310 100644
  #endif
  	return 0;
  }
+diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+index 50ab3650ee..ec75a30f70 100644
+--- a/drivers/video/Kconfig
++++ b/drivers/video/Kconfig
+@@ -14,9 +14,13 @@ config DM_VIDEO
+ 	  option compiles in the video uclass and routes all LCD/video access
+ 	  through this.
+ 
++config DM_BACKLIGHT
++	bool "Enable driver model support for backlight"
++	depends on DM
++
+ config BACKLIGHT_PWM
+ 	bool "Generic PWM based Backlight Driver"
+-	depends on DM_VIDEO && DM_PWM
++	depends on DM_BACKLIGHT && DM_PWM
+ 	default y
+ 	help
+ 	  If you have a LCD backlight adjustable by PWM, say Y to enable
+diff --git a/drivers/video/Makefile b/drivers/video/Makefile
+index df7119d62a..08c397f8cd 100644
+--- a/drivers/video/Makefile
++++ b/drivers/video/Makefile
+@@ -10,7 +10,7 @@ obj-$(CONFIG_CONSOLE_NORMAL) += console_normal.o
+ obj-$(CONFIG_CONSOLE_ROTATION) += console_rotate.o
+ obj-$(CONFIG_CONSOLE_TRUETYPE) += console_truetype.o fonts/
+ obj-$(CONFIG_DISPLAY) += display-uclass.o
+-obj-$(CONFIG_DM_VIDEO) += backlight-uclass.o
++obj-$(CONFIG_DM_BACKLIGHT) += backlight-uclass.o
+ obj-$(CONFIG_VIDEO_MIPI_DSI) += dsi-host-uclass.o
+ obj-$(CONFIG_DM_VIDEO) += panel-uclass.o simple_panel.o
+ obj-$(CONFIG_DM_VIDEO) += video-uclass.o vidconsole-uclass.o
 -- 
-2.28.0
+2.32.0
+
