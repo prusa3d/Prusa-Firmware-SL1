@@ -22,7 +22,7 @@ diff --git a/drivers/gpu/drm/bridge/Kconfig b/drivers/gpu/drm/bridge/Kconfig
 index e4110d6ca7b3..11abaaee1fde 100644
 --- a/drivers/gpu/drm/bridge/Kconfig
 +++ b/drivers/gpu/drm/bridge/Kconfig
-@@ -258,4 +258,6 @@ source "drivers/gpu/drm/bridge/cadence/Kconfig"
+@@ -323,4 +323,6 @@ source "drivers/gpu/drm/bridge/cadence/Kconfig"
  
  source "drivers/gpu/drm/bridge/synopsys/Kconfig"
  
@@ -33,14 +33,14 @@ diff --git a/drivers/gpu/drm/bridge/Makefile b/drivers/gpu/drm/bridge/Makefile
 index 86e7acc76f8d..5b8f276e659d 100644
 --- a/drivers/gpu/drm/bridge/Makefile
 +++ b/drivers/gpu/drm/bridge/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_DRM_TOSHIBA_TC358764) += tc358764.o
+@@ -22,6 +22,7 @@ obj-$(CONFIG_DRM_TOSHIBA_TC358764) += tc358764.o
  obj-$(CONFIG_DRM_TOSHIBA_TC358767) += tc358767.o
  obj-$(CONFIG_DRM_TOSHIBA_TC358768) += tc358768.o
  obj-$(CONFIG_DRM_TOSHIBA_TC358775) += tc358775.o
 +obj-$(CONFIG_DRM_TOSHIBA_TC358870) += tc358870/
  obj-$(CONFIG_DRM_I2C_ADV7511) += adv7511/
+ obj-$(CONFIG_DRM_TI_SN65DSI83) += ti-sn65dsi83.o
  obj-$(CONFIG_DRM_TI_SN65DSI86) += ti-sn65dsi86.o
- obj-$(CONFIG_DRM_TI_TFP410) += ti-tfp410.o
 diff --git a/drivers/gpu/drm/bridge/tc358870/Kconfig b/drivers/gpu/drm/bridge/tc358870/Kconfig
 new file mode 100644
 index 000000000000..d8afd4334fa8

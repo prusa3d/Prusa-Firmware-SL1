@@ -27,7 +27,7 @@ Suggested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
  1 file changed, 13 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/pwm/pwm-sun4i.c b/drivers/pwm/pwm-sun4i.c
-index 6a133ffbe703..14b59ddbc13a 100644
+index 91ca67651abd..658365d2ed39 100644
 --- a/drivers/pwm/pwm-sun4i.c
 +++ b/drivers/pwm/pwm-sun4i.c
 @@ -89,7 +89,6 @@ struct sun4i_pwm_chip {
@@ -112,7 +112,7 @@ index 6a133ffbe703..14b59ddbc13a 100644
  	return 0;
  }
  
-@@ -482,6 +446,13 @@ static int sun4i_pwm_probe(struct platform_device *pdev)
+@@ -457,6 +421,13 @@ static int sun4i_pwm_probe(struct platform_device *pdev)
  		goto err_bus;
  	}
  
@@ -125,8 +125,8 @@ index 6a133ffbe703..14b59ddbc13a 100644
 +
  	pwm->chip.dev = &pdev->dev;
  	pwm->chip.ops = &sun4i_pwm_ops;
- 	pwm->chip.base = -1;
-@@ -502,6 +473,8 @@ static int sun4i_pwm_probe(struct platform_device *pdev)
+ 	pwm->chip.npwm = pwm->data->npwm;
+@@ -474,6 +445,8 @@ static int sun4i_pwm_probe(struct platform_device *pdev)
  	return 0;
  
  err_pwm_add:
@@ -135,9 +135,9 @@ index 6a133ffbe703..14b59ddbc13a 100644
  	clk_disable_unprepare(pwm->bus_clk);
  err_bus:
  	reset_control_assert(pwm->rst);
-@@ -518,6 +491,7 @@ static int sun4i_pwm_remove(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
+@@ -487,6 +460,7 @@ static int sun4i_pwm_remove(struct platform_device *pdev)
+ 
+ 	pwmchip_remove(&pwm->chip);
  
 +	clk_disable_unprepare(pwm->clk);
  	clk_disable_unprepare(pwm->bus_clk);

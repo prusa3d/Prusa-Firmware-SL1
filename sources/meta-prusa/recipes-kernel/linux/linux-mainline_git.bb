@@ -11,12 +11,12 @@ LOCALVERSION ?= ""
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "linux-5.11.y"
+KBRANCH ?= "linux-5.15.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV:pn-${PN} = "v5.11.6"
-PV = "v5.11.6"
+PV = "v5.15.5"
+SRCREV:pn-${PN} = "${PV}"
 LINUX_VERSION = "${PV}"
 
 SRC_URI="\
@@ -29,8 +29,7 @@ SRC_URI="\
 	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
 	file://0201-Ethernet-reconnection-fix.patch \
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
-	file://0401-backlight-keep-default-brightness-at-0.patch \
-	file://0402-pwm-sun4i-Avoid-waiting-until-the-next-period.patch \
+	file://0401-pwm-sun4i-Avoid-waiting-until-the-next-period.patch \
 	file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \

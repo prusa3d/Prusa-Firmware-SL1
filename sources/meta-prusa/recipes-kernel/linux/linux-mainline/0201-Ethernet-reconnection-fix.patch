@@ -9,10 +9,10 @@ Subject: [PATCH] Ethernet reconnection fix
  1 file changed, 13 insertions(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 26b971cd4da5..270333924ec9 100644
+index 0ab20e2f984b..fc9116610b57 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -96,6 +96,10 @@ module_param(eee_timer, int, 0644);
+@@ -110,6 +110,10 @@ module_param(eee_timer, int, 0644);
  MODULE_PARM_DESC(eee_timer, "LPI tx expiration time in msec");
  #define STMMAC_LPI_T(x) (jiffies + usecs_to_jiffies(x))
  
@@ -23,7 +23,7 @@ index 26b971cd4da5..270333924ec9 100644
  /* By default the driver will use the ring mode to manage tx and rx descriptors,
   * but allow user to force to use the chain instead of the ring
   */
-@@ -132,6 +136,8 @@ static void stmmac_verify_args(void)
+@@ -185,6 +189,8 @@ static void stmmac_verify_args(void)
  		pause = PAUSE_TIME;
  	if (eee_timer < 0)
  		eee_timer = STMMAC_DEFAULT_LPI_TIMER;
@@ -31,8 +31,8 @@ index 26b971cd4da5..270333924ec9 100644
 +		quirks = 0;
  }
  
- /**
-@@ -890,6 +896,13 @@ static void stmmac_validate(struct phylink_config *config,
+ static void __stmmac_disable_all_queues(struct stmmac_priv *priv)
+@@ -999,6 +1005,13 @@ static void stmmac_validate(struct phylink_config *config,
  		phylink_set(mask, 1000baseT_Half);
  	}
  

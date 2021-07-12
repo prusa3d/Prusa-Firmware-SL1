@@ -4,9 +4,9 @@ Date: Tue, 16 Mar 2021 11:49:26 +0100
 Subject: [PATCH] dts: prusa64-sl1: add SPI node
 
 ---
- arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts | 8 ++++++++
- drivers/spi/spidev.c                                     | 1 +
- 2 files changed, 9 insertions(+)
+ arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts | 9 +++++++++
+ drivers/spi/spidev.c                                     | 2 ++
+ 2 files changed, 11 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 index d5ad57ed5b7d..46716ffc7ca5 100644
@@ -29,11 +29,19 @@ diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
 index 2ab6e782f14c..04a1c4babd2c 100644
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
-@@ -675,6 +675,7 @@ static struct class *spidev_class;
+@@ -674,6 +674,7 @@ static const struct file_operations spidev_fops = {
+ static struct class *spidev_class;
+ 
+ static const struct spi_device_id spidev_spi_ids[] = {
++	{ .name = "sl1-uv-led" },
+ 	{ .name = "dh2228fv" },
+ 	{ .name = "ltc2488" },
+ 	{ .name = "sx1301" },
+@@ -688,6 +689,7 @@ MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
  
  #ifdef CONFIG_OF
  static const struct of_device_id spidev_dt_ids[] = {
 +	{ .compatible = "prusa,sl1-uv-led" },
  	{ .compatible = "rohm,dh2228fv" },
  	{ .compatible = "lineartechnology,ltc2488" },
- 	{ .compatible = "ge,achc" },
+ 	{ .compatible = "semtech,sx1301" },
