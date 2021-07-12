@@ -118,6 +118,8 @@
 	"name=factory,start=1604M,size=64M,type=${uuid_gpt_other};"		\
 
 #define PRUSA_ENV_SETTINGS \
+	"board_revision=0\0" \
+	"eth_quirks=0\0" \
 	"uuid_gpt_other=" UUID_GPT_OTHER "\0" \
 	SCAN_DEV_FOR_FDT \
 	UPDATE_ACTIVE_ROOTFS_SLOT \
