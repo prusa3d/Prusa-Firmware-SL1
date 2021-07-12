@@ -14,7 +14,6 @@ UBOOT_BINARY = "u-boot-sunxi-with-spl.bin"
 PREFERRED_VERSION_linux-mainline = "v5.15%"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
-MACHINE_EXTRA_RDEPENDS:append = " kernel-module-lima"
 
 PACKAGECONFIG:append:pn-mesa:class-target = " lima kmsro"
 PACKAGECONFIG:remove:pn-mesa = "virgl elf-tls"
