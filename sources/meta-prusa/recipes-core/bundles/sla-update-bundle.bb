@@ -10,6 +10,7 @@ SRC_URI += " \
 
 BUNDLE_NAME = "${BUNDLE_BASENAME}-${MACHINE}-${DISTRO_VERSION}"
 BUNDLE_ARGS += '--conf= \
+	--mksquashfs-args="-b 1M -comp xz" \
 '
 
 #RAUC_BUNDLE_COMPATIBLE = "prusa64-sl1"
