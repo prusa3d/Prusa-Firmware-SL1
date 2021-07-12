@@ -5,11 +5,11 @@ Subject: [PATCH] Ethernet reconnection fix
 
 - env: board revison recognition system
 ---
- board/sunxi/board.c            | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ board/sunxi/board.c            | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 0ddb96cd5b..35ea6bef47 100644
+index 0ddb96cd5b..861db14599 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
 @@ -774,6 +774,37 @@ static void parse_spl_header(const uint32_t spl_addr)
@@ -21,7 +21,7 @@ index 0ddb96cd5b..35ea6bef47 100644
 + * board_revision = 0 for <= rev1.3a
 + * board_revision = 1 for == rev1.4
 + */
-+static void setup_board_revision(void)
++static void setup_sl1_board_revision(void)
 +{
 +	const int pin_array[] = {231, 229, 228, -1};
 +	int board_revision;
@@ -50,13 +50,15 @@ index 0ddb96cd5b..35ea6bef47 100644
  /*
   * Note this function gets called multiple times.
   * It must not make any changes to env variables which already exist.
-@@ -863,6 +894,7 @@ int misc_init_r(void)
+@@ -863,6 +894,8 @@ int misc_init_r(void)
  	}
  
  	setup_environment(gd->fdt_blob);
-+	setup_board_revision();
++	if (of_machine_is_compatible("prusa,prusa64-sl1"))
++		setup_sl1_board_revision();
  
  #ifdef CONFIG_USB_ETHER
  	usb_ether_init();
 -- 
-2.28.0
+2.32.0
+
