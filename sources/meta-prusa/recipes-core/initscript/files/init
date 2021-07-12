@@ -23,26 +23,22 @@ enter_init() {
 	exec /lib/systemd/systemd
 }
 
-grow_rootfs() {
+grow_fs() {
+	dev=$1
+	mountpoint=$2
+	# systemd-growfs requires /dev/block/${major}:${minor} file
+	# which gets normally created by udev.
 	mkdir /dev/block/
-	major=$(stat -c '%t' ${root_dev})
-	minor=$(stat -c '%T' ${root_dev})
+	major=$(stat -c '%t' ${dev})
+	minor=$(stat -c '%T' ${dev})
 	block_dev=/dev/block/$(printf '%d:%d' 0x${major} 0x${minor})
-	ln -s ${root_dev} ${block_dev}
-	/lib/systemd/systemd-growfs /
+	ln -s ${dev} ${block_dev}
+	/lib/systemd/systemd-growfs ${mountpoint}
 }
 
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev
-mount -o rw,remount /
-
-export root_dev=$(awk -F= -v RS=" " '/^root=/ {print $2}' /proc/cmdline)
-if ! grep 'rauc\.slot=[AB]' /proc/cmdline > /dev/null 2>&1
-then
-	grow_rootfs
-	enter_init
-fi
 
 slot=$(grep -oe 'rauc\.slot=[AB]' /proc/cmdline | cut -d'=' -f2)
 case $slot in
@@ -54,11 +50,30 @@ B)
 	part_root=/dev/mmcblk2p3
 	part_etc=/dev/mmcblk2p5
 	;;
+*)
+	part_root=/dev/mmcblk0p1
+	;;
 esac
 part_var=/dev/mmcblk2p6
 part_factory=/dev/mmcblk2p7
 
 fsck.ext4 -pv $part_root
+mount -o rw,remount /
+
+# Ensure factory is usable
+fsck.ext4 -pv $part_factory
+if [ $? -eq 4 -o $? -eq 8 ]
+then
+	mkfs.ext4 -F $part_factory -E lazy_itable_init=0
+fi
+
+# if booted from MMC, skip /{etc,var} mounts
+if test -z "$slot"
+then
+        grow_fs $part_root /
+	enter_init
+fi
+
 fsck.ext4 -pv $part_etc
 
 # Ensure var is usable
@@ -66,16 +81,6 @@ fsck.ext4 -pv $part_var
 if [ $? -eq 4 -o $? -eq 8 ] || grep -q "erasevar" /proc/cmdline
 then
 	mkfs.ext4 -F $part_var -E lazy_itable_init=0
-fi
-
-# Ensure factory is usable
-if test -b $part_factory
-then
-	fsck.ext4 -pv $part_factory
-	if [ $? -eq 4 -o $? -eq 8 ]
-	then
-		mkfs.ext4 -F $part_factory -E lazy_itable_init=0
-	fi
 fi
 
 if test ! -e /skip-mounts
