@@ -18,8 +18,5 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
 PACKAGECONFIG:append:pn-mesa:class-target = " lima kmsro"
 PACKAGECONFIG:remove:pn-mesa = "virgl elf-tls"
 
-INITRAMFS_IMAGE = "sla-initramfs"
-INITRAMFS_IMAGE_BUNDLE = "1"
-
 IMAGE_CLASSES += "prusa-image"
 IMAGE_FSTYPES += "etc factory root"

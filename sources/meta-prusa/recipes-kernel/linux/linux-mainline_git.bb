@@ -68,13 +68,5 @@ do_install:append() {
 		install -m 0644 ${B}/arch/${ARCH}/boot/dts/${dtb} ${D}/${KERNEL_IMAGEDEST}/${dtb}
 	done
 
-	for imageType in ${KERNEL_IMAGETYPES} ; do
-		rm ${D}/${KERNEL_IMAGEDEST}/${imageType}-${KERNEL_VERSION}
-		install -m 0644 ${KERNEL_OUTPUT_DIR}/${imageType}.initramfs ${D}/${KERNEL_IMAGEDEST}/${imageType}-${KERNEL_VERSION}
-	done
 	rm ${D}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 }
-
-
-deltask bundle_initramfs 
-addtask bundle_initramfs after do_compile_kernelmodules before do_install

@@ -47,4 +47,7 @@ do_install:append() {
 	# in the absence of /etc/fstab systemd-remount-fs looks for SYSTEMD_REMOUNT_ROOT_RW in its environment
 	install -d ${D}${systemd_system_unitdir}/systemd-remount-fs.service.d
 	install -m 644 ${WORKDIR}/remount-root-rw.conf	${D}${systemd_system_unitdir}/systemd-remount-fs.service.d/
+
+	# remove 'init' symlinks to systemd binary
+	rm -f ${D}/init ${D}${sbindir}/init
 }
