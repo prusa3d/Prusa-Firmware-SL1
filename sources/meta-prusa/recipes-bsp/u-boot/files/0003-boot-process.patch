@@ -120,7 +120,7 @@ index 0ef289fd64..b7b3f37445 100644
 +		"else " \
 +			"run update_active_rootfs_slot; " \
 +			"setenv extra rauc.slot=${slot}; " \
-+			"setenv rootdev LABEL=${rootlabel}; " \
++			"setenv rootdev PARTLABEL=${rootlabel}; " \
 +			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
 +		"fi; " \
 +		"run scan_dev_for_fdt; " \

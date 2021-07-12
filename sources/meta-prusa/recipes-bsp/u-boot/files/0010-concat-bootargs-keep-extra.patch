@@ -39,9 +39,9 @@ index f052c0296a..a97fb566e4 100644
  		"else " \
  			"run update_active_rootfs_slot; " \
 -			"setenv extra rauc.slot=${slot}; " \
--			"setenv rootdev LABEL=${rootlabel}; " \
+-			"setenv rootdev PARTLABEL=${rootlabel}; " \
 +			"setenv bootargs ${bootargs} rauc.slot=${slot}; " \
-+			"setenv bootargs ${bootargs} root=LABEL=${rootlabel}; " \
++			"setenv bootargs ${bootargs} root=PARTLABEL=${rootlabel}; " \
  			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
  		"fi; " \
  		"run scan_dev_for_fdt; " \
