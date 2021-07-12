@@ -9,6 +9,8 @@ SRC_URI += " \
 
 
 BUNDLE_NAME = "${BUNDLE_BASENAME}-${MACHINE}-${DISTRO_VERSION}"
+BUNDLE_ARGS += '--conf= \
+'
 
 #RAUC_BUNDLE_COMPATIBLE = "prusa64-sl1"
 RAUC_BUNDLE_VERSION="${DISTRO_VERSION}"
@@ -30,19 +32,9 @@ RAUC_CERT_FILE ?= "${THISDIR}/../../files/ca.cert.pem"
 do_unpack[depends] += "u-boot:do_deploy"
 do_bundle[depends] += "u-boot:do_deploy"
 
-do_bundle() {
-	export OPENSSL_ENGINES=${STAGING_LIBDIR_NATIVE}/engines-1.1
-	export RAUC_PKCS11_MODULE=${RAUC_PKCS11_MODULE}
-	export PKCS11_PROXY_SOCKET=${PKCS11_PROXY_SOCKET}
-	export RAUC_PKCS11_PIN=${RAUC_PKCS11_PIN}
-
-	${STAGING_DIR_NATIVE}${bindir}/rauc bundle \
-		--conf= \
-		--debug \
-		--cert="${RAUC_CERT_FILE}" \
-		--key="${RAUC_KEY_FILE}" \
-		${BUNDLE_DIR} \
-		${B}/bundle.raucb
-}
+export OPENSSL_ENGINES = "${STAGING_LIBDIR_NATIVE}/engines-1.1"
+export PKCS11_PROXY_SOCKET
+export RAUC_PKCS11_MODULE
+export RAUC_PKCS11_PIN
 
 SSTATE_SKIP_CREATION:task-deploy = '1'
