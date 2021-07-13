@@ -1,0 +1,165 @@
+From ab434292fc0d119bcc22fffcc5b7e9444b008999 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 13 Jul 2021 09:18:39 +0200
+Subject: [PATCH] tc358870: only proceed with setup if sl1-uv-led found in a
+ FDT
+
+"prusa,sl1-uv-led" node serves as a proxy for distinguishing between pre- and post-
+1.6.0 systems.
+---
+ board/sunxi/board.c                 | 34 ----------------------
+ board/sunxi/panel-detector-uclass.c | 45 +++++++++++++++++++++++++++++
+ include/configs/sunxi-common.h      | 11 +++----
+ 3 files changed, 49 insertions(+), 41 deletions(-)
+
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 8d885abacf..28325d8c50 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -921,27 +921,6 @@ int misc_init_r(void)
+ #ifdef CONFIG_USB_ETHER
+ 	usb_ether_init();
+ #endif
+-#ifdef CONFIG_BRIDGED_PANEL_DETECTION
+-	int r;
+-	struct udevice *detector;
+-	char const *panel_name;
+-	char *edid_arg;
+-	size_t edid_arg_length;
+-
+-	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
+-	if (r)
+-		return r;
+-	panel_name = panel_detector_get_panel_name(detector);
+-	if (strlen(panel_name)) {
+-		edid_arg_length = 37 + strlen(panel_name);
+-		edid_arg = kmalloc(edid_arg_length, GFP_KERNEL);
+-		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
+-		printf("panel_detector: found %s panel\n", panel_name);
+-	} else {
+-		edid_arg = "video=HDMI-A-1:d";
+-	}
+-	env_set("edid_bootarg", edid_arg);
+-#endif
+ 
+ 	return 0;
+ }
+@@ -960,19 +939,6 @@ int ft_board_setup(void *blob, bd_t *bd)
+ 	r = sunxi_simplefb_setup(blob);
+ 	if (r)
+ 		return r;
+-#endif
+-#ifdef CONFIG_BRIDGED_PANEL_DETECTION
+-	int offset;
+-	struct udevice *detector;
+-
+-	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
+-	if (r)
+-		return r;
+-	offset = fdt_node_offset_by_compatible(blob, -1, "toshiba,tc358870");
+-	if (offset < 0)
+-		return offset;
+-
+-	panel_detector_fill_in_fdt_node(detector, blob, offset);
+ #endif
+ 	return 0;
+ }
+diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
+index 9f09caf8aa..bcbb7b8830 100644
+--- a/board/sunxi/panel-detector-uclass.c
++++ b/board/sunxi/panel-detector-uclass.c
+@@ -153,6 +153,48 @@ static int do_panel_id_write_vendor_data(struct udevice *dev, char * const sn_st
+ 	return panel_detector_write_id_to_nvm(dev, data.numeric);
+ }
+ 
++static int do_panel_id_setup(void)
++{
++	int offset, r;
++	struct udevice *detector;
++	char const *panel_name;
++	char *edid_arg;
++	size_t edid_arg_length;
++
++	void *fdt = (void*) env_get_ulong("fdt_addr_r", 16, 0);
++	if (!fdt)
++		return -ENODATA;
++
++	offset = fdt_node_offset_by_compatible(fdt, -1, "prusa,sl1-uv-led");
++	if (offset < 0) {
++		printf("prusa,sl1-uv-led missing from the loaded FDT, system probably too old for panel detection\n");
++		return 0;
++	}
++
++	offset = fdt_node_offset_by_compatible(fdt, -1, "toshiba,tc358870");
++	if (offset < 0)
++		return offset;
++
++	panel_name = env_get("force_panel");
++	if (panel_name == NULL) {
++		r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
++		if (!r) {
++			panel_name = panel_detector_get_panel_name(detector);
++			panel_detector_fill_in_fdt_node(detector, fdt, offset);
++		}
++	}
++	if (strlen(panel_name)) {
++		edid_arg_length = 37 + strlen(panel_name);
++		edid_arg = kmalloc(edid_arg_length, GFP_KERNEL);
++		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
++	} else {
++		edid_arg = "video=HDMI-A-1:d";
++	}
++	env_set("edid_bootarg", edid_arg);
++
++	return 0;
++}
++
+ static int do_panel_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ {
+ 	int r;
+@@ -165,6 +207,9 @@ static int do_panel_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
+ 	argc -= 2;
+ 	argv += 2;
+ 
++	if (!strcmp(cmd, "setup") && argc == 0)
++		return handle_error(do_panel_id_setup());
++
+ 	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &dev);
+ 	if (r < 0)
+ 		return handle_error(r);
+diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
+index 561fe56917..dff0b575eb 100644
+--- a/include/configs/sunxi-common.h
++++ b/include/configs/sunxi-common.h
+@@ -504,11 +504,8 @@ extern int soft_i2c_gpio_scl;
+ 
+ #define BOOTCMD_PRUSA \
+ 	"bootcmd_prusa=" \
+-		"setenv bootargs " PRUSA_KERNEL_CMDLINE "; " \
+-		"setenv bootargs ${bootargs} ${extra}; " \
+-		"setenv extra; " \
+ 		"if test ${mmc_bootdev} -eq 0; then " \
+-			"setenv bootargs ${bootargs} root=/dev/mmcblk0p1; " \
++			"setenv rootarg root=/dev/mmcblk0p1; " \
+ 			"setenv mmc_bootpart 1; " \
+ 			"if test -e mmc 0:1 boot.scr; then " \
+ 				"echo Found U-Boot script; " \
+@@ -517,12 +514,12 @@ extern int soft_i2c_gpio_scl;
+ 			"fi; " \
+ 		"else " \
+ 			"run update_active_rootfs_slot; " \
+-			"setenv bootargs ${bootargs} rauc.slot=${slot}; " \
+-			"setenv bootargs ${bootargs} root=PARTLABEL=${rootlabel}; " \
++			"setenv rootarg rauc.slot=${slot} root=PARTLABEL=${rootlabel}; " \
+ 			"gpt part-num mmc 1 ${rootlabel} mmc_bootpart; " \
+ 		"fi; " \
+ 		"run scan_dev_for_fdt; " \
+-		"" \
++		"panel_id setup; " \
++		"setenv bootargs ${rootarg} " PRUSA_KERNEL_CMDLINE " ${extra}; " \
+ 		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${kernel_addr_r} ${boot_prefix}Image; " \
+ 		"then " \
+ 			"echo LOAD_KERNEL_OK; " \
+-- 
+2.32.0
+

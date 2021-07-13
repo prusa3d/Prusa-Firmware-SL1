@@ -19,6 +19,7 @@ SRC_URI:append = " \
 	file://0016-lib-sscanf-add-sscanf-implementation.patch \
 	file://0016-tc358870-nvm-write.patch \
 	file://0017-rauc-update-toggle-eMMC-bootpart-on-slot-flip.patch \
+	file://0018-tc358870-only-proceed-with-setup-if-sl1-uv-led-found.patch \
 	file://fw_env.config \
 "
 
