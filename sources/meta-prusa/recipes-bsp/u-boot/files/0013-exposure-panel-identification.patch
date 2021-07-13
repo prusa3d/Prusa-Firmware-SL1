@@ -6,9 +6,9 @@ Subject: [PATCH] exposure panel identification
 ---
  .../dts/sun50i-a64-prusa64-sl1-u-boot.dtsi    |  35 ++
  arch/arm/dts/sun50i-a64-prusa64-sl1.dts       |  23 +-
- arch/arm/mach-sunxi/Kconfig                   |  11 +
+ arch/arm/mach-sunxi/Kconfig                   |   6 +
  board/sunxi/Makefile                          |   6 +
- board/sunxi/board.c                           |  87 ++-
+ board/sunxi/board.c                           |  37 +-
  board/sunxi/panel-detector-uclass.c           |  26 +
  board/sunxi/panel_detector.h                  |  18 +
  board/sunxi/tc358870.c                        | 564 ++++++++++++++++++
@@ -16,7 +16,7 @@ Subject: [PATCH] exposure panel identification
  configs/prusa64-sl1_defconfig                 |   6 +-
  include/configs/sunxi-common.h                |   4 +-
  include/dm/uclass-id.h                        |   1 +
- 12 files changed, 860 insertions(+), 9 deletions(-)
+ 12 files changed, 805 insertions(+), 9 deletions(-)
  create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl1-u-boot.dtsi
  create mode 100644 board/sunxi/panel-detector-uclass.c
  create mode 100644 board/sunxi/panel_detector.h
@@ -126,7 +126,7 @@ diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
 index 16d41b83af..13665fe44e 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -1009,4 +1009,15 @@ config PINE64_DT_SELECTION
+@@ -1009,4 +1009,10 @@ config PINE64_DT_SELECTION
  	  option, the device tree selection code specific to Pine64 which
  	  utilizes the DRAM size will be enabled.
  
@@ -135,11 +135,6 @@ index 16d41b83af..13665fe44e 100644
 +	default n
 +	depends on MACH_SUN50I
 +	select DM_I2C
-+
-+config BRIDGED_PANEL_DETECTION_TEST
-+	bool "Panel detection test (NOT FOR NORMAL USE)"
-+	default n
-+	depends on BRIDGED_PANEL_DETECTION
 +
  endif
 diff --git a/board/sunxi/Makefile b/board/sunxi/Makefile
@@ -169,46 +164,7 @@ index 511459f806..09cb9712ac 100644
  
  #if defined CONFIG_VIDEO_LCD_PANEL_I2C && !(defined CONFIG_SPL_BUILD)
  /* So that we can use pin names in Kconfig and sunxi_name_to_gpio() */
-@@ -892,6 +893,38 @@ static void setup_environment(const void *fdt)
- 	}
- }
- 
-+#ifdef CONFIG_BRIDGED_PANEL_DETECTION_TEST
-+static int backlight_breathe(int period) {
-+	static const int seq[] = {
-+		0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 22, 24, 26, 28,
-+		29, 31, 33, 34, 36, 37, 39, 41, 42, 44, 45, 47, 48, 50, 52,
-+		53, 54, 56, 57, 59, 60, 62, 63, 64, 66, 67, 68, 69, 71, 72,
-+		73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 87,
-+		88, 89, 90, 91, 91, 92, 93, 93, 94, 95, 95, 96, 96, 97, 97,
-+		97, 98, 98, 98, 99, 99, 99, 99, 100, 100, 100, 100, 100, 100
-+	};
-+	int i = 0, r;
-+	struct udevice *backlight;
-+	r = uclass_first_device(UCLASS_PANEL_BACKLIGHT, &backlight);
-+	if (r < 0) return r;
-+	if (period == 0) {
-+		while (r >= 0) {
-+			r = backlight_set_brightness(backlight, 100);
-+			mdelay(1000);
-+		}
-+	}
-+	int step_delay = period / (2 * (int)ARRAY_SIZE(seq) - 1);
-+	while (r >= 0) {
-+		r = backlight_set_brightness(backlight, seq[abs(i)]);
-+		if (++i >= (int)ARRAY_SIZE(seq)) {
-+			i = 1 - (int)ARRAY_SIZE(seq);
-+		}
-+		mdelay(step_delay);
-+	}
-+	return 0;
-+}
-+#endif
-+
- int misc_init_r(void)
- {
- 	uint boot;
-@@ -919,6 +952,45 @@ int misc_init_r(void)
+@@ -919,6 +920,27 @@ int misc_init_r(void)
  
  #ifdef CONFIG_USB_ETHER
  	usb_ether_init();
@@ -233,28 +189,10 @@ index 511459f806..09cb9712ac 100644
 +		edid_arg = "video=HDMI-A-1:d";
 +	}
 +	env_set("edid_bootarg", edid_arg);
-+
-+#ifdef CONFIG_BRIDGED_PANEL_DETECTION_TEST
-+	u64 match_data = panel_detector_get_match_data(detector);
-+	printf("%s: match_data = 0x%016llx\n", __func__, match_data);
-+	if (!strcmp("ls055r1sx04", panel_name)) {
-+		switch (match_data) {
-+		case 0x0000000219342201ul:
-+			backlight_breathe(0);
-+			break;
-+		case 0x0000000000000000ul:
-+			backlight_breathe(2000);
-+			break;
-+		default:
-+			backlight_breathe(300);
-+			break;
-+		}
-+	}
-+#endif
  #endif
  
  	return 0;
-@@ -938,6 +1010,21 @@ int ft_board_setup(void *blob, bd_t *bd)
+@@ -938,6 +960,21 @@ int ft_board_setup(void *blob, bd_t *bd)
  	r = sunxi_simplefb_setup(blob);
  	if (r)
  		return r;
