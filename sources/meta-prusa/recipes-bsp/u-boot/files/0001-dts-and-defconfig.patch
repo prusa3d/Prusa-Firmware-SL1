@@ -305,7 +305,7 @@ new file mode 100644
 index 0000000000..2df11b0338
 --- /dev/null
 +++ b/configs/prusa64-sl1_defconfig
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,54 @@
 +CONFIG_ARM=y
 +CONFIG_ARM_SMCCC=y
 +CONFIG_ARCH_SUNXI=y
@@ -338,6 +338,7 @@ index 0000000000..2df11b0338
 +CONFIG_CMD_SPL=y
 +CONFIG_CMD_ENV_CALLBACK=y
 +CONFIG_CMD_ENV_FLAGS=y
++CONFIG_ENV_RESET_DEFAULTS_ON_LOAD=y
 +# CONFIG_CMD_UNZIP is not set
 +# CONFIG_CMD_FLASH is not set
 +CONFIG_CMD_GPT_RENAME=y

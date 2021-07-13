@@ -72,9 +72,6 @@ slot-post-install)
 						break
 				fi
 		done
-
-		echo "Updating u-boot environment"
-		fw_setenv --config ${RAUC_SLOT_MOUNT_POINT}/fw_env.config --script ${RAUC_SLOT_MOUNT_POINT}/u-boot-initial-env
 	fi;
 	;;
 *)

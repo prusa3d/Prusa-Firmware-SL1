@@ -2,6 +2,7 @@ require u-boot-srcrev.inc
 
 SRC_URI:append = " \
 	file://0001-dts-and-defconfig.patch \
+	file://0002-env-reset-defaults-on-load.patch \
 	file://0003-boot-process.patch \
 	file://0004-mmc-legacy-only.patch \
 	file://0005-mmc-delay-1500.patch \
