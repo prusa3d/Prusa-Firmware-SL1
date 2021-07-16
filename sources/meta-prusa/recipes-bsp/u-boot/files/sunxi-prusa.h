@@ -8,18 +8,12 @@
 #ifndef _SUNXI_PRUSA_CONFIG_H
 #define _SUNXI_PRUSA_CONFIG_H
 
-#define SCAN_DEV_FOR_FDT									\
-	"scan_dev_for_fdt="									\
-		"for prefix in ${boot_prefixes}; do "						\
-			"if test ! -e mmc ${mmc_bootdev}:${mmc_bootpart} ${prefix}${fdtfile}; " \
-			"then continue; " \
-			"fi; " \
-			"setenv boot_prefix ${prefix}; "				\
-			"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${prefix}${fdtfile}; " \
-			"then echo LOAD_FDT_OK; exit; "\
-			"else echo LOAD_FDT_FAIL; reset; " \
-			"fi;" \
-		"done\0"
+#define SCAN_DEV_FOR_FDT \
+	"scan_dev_for_fdt=" \
+		"if load mmc ${mmc_bootdev}:${mmc_bootpart} ${fdt_addr_r} ${boot_prefix}${fdtfile}; " \
+		"then echo LOAD_FDT_OK; exit; "\
+		"else echo LOAD_FDT_FAIL; reset; " \
+		"fi\0"
 
 
 #define UPDATE_ACTIVE_ROOTFS_SLOT \
@@ -118,6 +112,7 @@
 	"name=factory,start=1604M,size=64M,type=${uuid_gpt_other};"		\
 
 #define PRUSA_ENV_SETTINGS \
+	"boot_prefix=/boot/\0" \
 	"board_revision=0\0" \
 	"eth_quirks=0\0" \
 	"uuid_gpt_other=" UUID_GPT_OTHER "\0" \
