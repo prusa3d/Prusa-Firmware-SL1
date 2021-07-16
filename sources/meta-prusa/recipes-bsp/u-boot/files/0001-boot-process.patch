@@ -24,16 +24,22 @@ diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
 index 0ef289fd64..e8f21c1843 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
-@@ -488,6 +488,8 @@ extern int soft_i2c_gpio_scl;
+@@ -482,12 +482,10 @@ extern int soft_i2c_gpio_scl;
+ 	CONSOLE_STDIN_SETTINGS \
+ 	CONSOLE_STDOUT_SETTINGS
+ 
+-#ifdef CONFIG_ARM64
+-#define FDTFILE "allwinner/" CONFIG_DEFAULT_DEVICE_TREE ".dtb"
+-#else
  #define FDTFILE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
- #endif
+-#endif
  
 +#include <configs/sunxi-prusa.h>
 +
  #define CONFIG_EXTRA_ENV_SETTINGS \
  	CONSOLE_ENV_SETTINGS \
  	MEM_LAYOUT_ENV_SETTINGS \
-@@ -500,6 +502,7 @@ extern int soft_i2c_gpio_scl;
+@@ -500,6 +498,7 @@ extern int soft_i2c_gpio_scl;
  	"uuid_gpt_system=" UUID_GPT_SYSTEM "\0" \
  	"partitions=" PARTS_DEFAULT "\0" \
  	BOOTCMD_SUNXI_COMPAT \
