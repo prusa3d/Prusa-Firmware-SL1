@@ -1,6 +1,9 @@
 # Version 1.6.1-rc.0
 
 ## Summary (relative to 1.6.0)
+- system:
+  - fix: make ASCII default VFAT iocharset (support for characters with diacritic)
+  - fix: limit log size (50 % cut. More 384 MB will be free for projects)
 - sl1fw:
   - fix: wizard running state flickering. (Flickering of the list of checks between other screens)
   - CI: add static analisys
@@ -8,7 +11,6 @@
   - fix: Add pour in resin state to exposure
   - fix: Avoid print time estimates overflow
 - touch-ui:
-  - fix: incorrect fan RPM upper limit and control
   - fix: reorder preprint checks and fix PagePrintResinIn Layout
   - fix: PageSettingsPlatformResinTank: update sensitivity if changed
   - fix: generic printer name on FW update screen
