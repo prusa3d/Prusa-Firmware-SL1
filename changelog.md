@@ -1,3 +1,13 @@
+# Version 1.6.1-rc.0
+
+## Summary (relative to 1.6.0)
+- sl1fw:
+  - fix: wizard running state flickering. (Flickering of the list of checks between other screens)
+  - CI: add static analisys
+  - fix: axis sensitivity: update everytime its changed
+  - fix: Add pour in resin state to exposure
+  - fix: Avoid print time estimates overflow
+
 # Version 1.6.0
 
 ## Summary (relative to 1.5.0)
