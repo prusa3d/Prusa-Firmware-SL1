@@ -7,6 +7,14 @@
   - fix: axis sensitivity: update everytime its changed
   - fix: Add pour in resin state to exposure
   - fix: Avoid print time estimates overflow
+- touch-ui:
+  - fix: incorrect fan RPM upper limit and control
+  - fix: reorder preprint checks and fix PagePrintResinIn Layout
+  - fix: PageSettingsPlatformResinTank: update sensitivity if changed
+  - fix: generic printer name on FW update screen
+  - internal: add QtCreator configuration script
+  - improvement: check_translations.py scripts a summary at the end
+  - fix: support for pour in resin exposure state
 
 # Version 1.6.0
 
