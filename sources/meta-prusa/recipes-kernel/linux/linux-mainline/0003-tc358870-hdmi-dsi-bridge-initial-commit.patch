@@ -7,11 +7,11 @@ Subject: [PATCH] tc358870: hdmi->dsi bridge initial commit
  drivers/gpu/drm/bridge/Kconfig                |   2 +
  drivers/gpu/drm/bridge/Makefile               |   1 +
  drivers/gpu/drm/bridge/tc358870/Kconfig       |   9 +
- drivers/gpu/drm/bridge/tc358870/Makefile      |   3 +
- .../gpu/drm/bridge/tc358870/tc358870_drv.c    | 393 ++++++++++++++++++
- .../tc358870/tc358870_init_ls055r1sx04.c      | 149 +++++++
- .../gpu/drm/bridge/tc358870/tc358870_msg.h    |  23 +
- 7 files changed, 580 insertions(+)
+ drivers/gpu/drm/bridge/tc358870/Makefile      |   4 +
+ .../gpu/drm/bridge/tc358870/tc358870_drv.c    | 313 ++++++++++++++++++
+ .../tc358870/tc358870_init_ls055r1sx04.c      | 149 +++++++++
+ .../gpu/drm/bridge/tc358870/tc358870_msg.h    |  23 ++
+ 7 files changed, 501 insertions(+)
  create mode 100644 drivers/gpu/drm/bridge/tc358870/Kconfig
  create mode 100644 drivers/gpu/drm/bridge/tc358870/Makefile
  create mode 100644 drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
@@ -58,377 +58,298 @@ index 000000000000..d8afd4334fa8
 +	  Toshiba TC358870 HDMI->DSI bridge chip driver.
 diff --git a/drivers/gpu/drm/bridge/tc358870/Makefile b/drivers/gpu/drm/bridge/tc358870/Makefile
 new file mode 100644
-index 000000000000..ff2275d9c054
+index 000000000000..be0fce06a82f
 --- /dev/null
 +++ b/drivers/gpu/drm/bridge/tc358870/Makefile
-@@ -0,0 +1,3 @@
+@@ -0,0 +1,4 @@
 +# SPDX-License-Identifier: GPL-2.0-only
 +tc358870-objs := tc358870_drv.o tc358870_init_ls055r1sx04.o
++CFLAGS_tc358870_init_ls055r1sx04.o += -Wno-missing-braces
 +obj-$(CONFIG_DRM_TOSHIBA_TC358870) += tc358870.o
 diff --git a/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c b/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
 new file mode 100644
-index 000000000000..9aac05a7ec40
+index 000000000000..828ca559ecf2
 --- /dev/null
 +++ b/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
-@@ -0,0 +1,393 @@
+@@ -0,0 +1,313 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2018, Filip Kotoucek
 + */
 +
-+#define DEBUG
-+
 +#include <linux/delay.h>
-+#include <linux/err.h>
 +#include <linux/gpio/consumer.h>
 +#include <linux/i2c.h>
-+#include <linux/interrupt.h>
-+#include <linux/irq.h>
-+#include <linux/kernel.h>
 +#include <linux/module.h>
-+#include <linux/mutex.h>
 +#include <linux/regulator/consumer.h>
-+#include <linux/slab.h>
 +#include <linux/string.h>
-+#include <linux/hrtimer.h>
-+#include <linux/sched.h>
-+
-+#include <drm/drm_bridge.h>
-+#include <drm/drm_atomic_helper.h>
-+#include <drm/drm_crtc_helper.h>
-+#include <drm/drm_edid.h>
 +
 +#include "tc358870_msg.h"
 +
-+#define REG_CHIP_ID			0x00, 0x00
-+#define REG_SYS_CTL			0x00, 0x02
-+#define REG_CONF_CTL_0		0x00, 0x04
-+#define REG_CONF_CTL_1		0x00, 0x06
-+
++#define REG_CHIP_ID		0x00, 0x00
 +#define REG_SYS_STATUS		0x85, 0x20
-+#define SYS_STATUS_DDC5V	0x01
 +#define SYS_STATUS_SYNC		0x8F
++
++static const char * const tc358870_supplies[] = {
++	"vdd12_mipi", "vdd11_hdmi", "avdd_lcd", "iovdd_lcd"
++};
 +
 +struct tc358870 {
 +	struct i2c_client *client;
-+	struct drm_bridge bridge;
-+	struct drm_connector connector;
-+	struct device *device;
++	struct device *dev;
 +
-+	struct gpio_desc *tc358870_reset;
++	struct gpio_desc *tc_reset;
 +	struct gpio_desc *lcd_reset;
 +
-+	struct regulator *vdd12_mipi_supply;
-+	struct regulator *vdd11_hdmi_supply;
-+	struct regulator *avdd_lcd_supply;
-+	struct regulator *iovdd_lcd_supply;
++	struct regulator_bulk_data supplies[ARRAY_SIZE(tc358870_supplies)];
 +
-+	struct mutex lock; /* Protects fields below and device registers */
 +	const struct tc358870_msg *dsi_init_data;
 +};
 +
-+/*
-+ * data are sent LSB first
-+ * data are shifted into internal registers in following order:
-+ *		data[7:0], data[15:8], data[23:16], data[31:24]
-+ */
-+struct tc358870_msg tc358870_init_data[] = {
-+		{{0x00, 0x04, 0x04, 0x00}, 4},
-+		{{0x00, 0x02, 0x01, 0x3F}, 4},
-+		{{0x00, 0x02, 0x00, 0x00}, 4},
-+		{{0x00, 0x06, 0x08, 0x00}, 4},
-+		{{0x84, 0x10, 0x03}, 3},            //PHY_CTL Linked with DDC5V detection
-+		{{0x84, 0x13, 0x3F}, 3},
-+		{{0x84, 0xF0, 0x31}, 3},
-+		{{0x84, 0xF4, 0x01}, 3},            //DDCIO
-+		{{0x85, 0x40, 0xC0, 0x12}, 4},      //SYS_FREQ0 refclk setting 48 MHz
-+		{{0x86, 0x30, 0x00}, 3},
-+		{{0x86, 0x31, 0x53, 0x07}, 4},
-+		{{0x86, 0x70, 0x02}, 3},
-+		{{0x8A, 0x0C, 0xC0, 0x12}, 4},      //SCLK_CSC0 refclk setting 48 MHz
-+		{{0x85, 0x02, 0xFF}, 3},            //SYS_INTERRUPT
-+		{{0x85, 0x12, 0xFE}, 3},
-+		{{0x85, 0x14, 0x00}, 3},
-+		{{0x85, 0x15, 0x00}, 3},
-+		{{0x85, 0x16, 0x00}, 3},
-+		{{0x00, 0x14, 0xBF, 0x0F}, 4},
-+		{{0x00, 0x16, 0xFF, 0x0F}, 4},
-+
-+		{{0x85, 0xE0, 0x00}, 3},            //Disable DDC completely
-+
-+		{{0x85, 0xD1, 0x01}, 3},
-+		{{0x85, 0x60, 0x24}, 3},
-+		{{0x85, 0x63, 0x11}, 3},
-+		{{0x85, 0x64, 0x0F}, 3},
-+		{{0x8A, 0x02, 0x42}, 3},
-+		{{0x85, 0x43, 0x02}, 3},            //DDC_CTL try to add DDC_ACTION when init finishes | 0x04
-+		{{0x85, 0x44, 0x11}, 3},
-+		{{0x86, 0x00, 0x00}, 3},
-+		{{0x86, 0x02, 0xF3}, 3},
-+		{{0x86, 0x03, 0x02}, 3},
-+		{{0x86, 0x04, 0x0C}, 3},
-+		{{0x86, 0x06, 0x05}, 3},
-+		{{0x86, 0x07, 0x00}, 3},
-+		{{0x86, 0x52, 0x02}, 3},
-+		{{0x86, 0x71, 0xBA, 0x49, 0x0C, 0x02}, 6},
-+		{{0x86, 0x75, 0x89, 0xB0, 0xE1, 0x01}, 6},
-+		{{0x85, 0x4A, 0x01}, 3}             //INIT_END
-+};
-+
-+static inline struct tc358870 *bridge_to_tc358870(struct drm_bridge *bridge)
-+{
-+	return container_of(bridge, struct tc358870, bridge);
-+}
-+
-+static inline struct tc358870 *connector_to_tc358870(struct drm_connector *con)
-+{
-+	return container_of(con, struct tc358870, connector);
-+}
-+
-+static int i2c_write(struct tc358870 *tc_data, const u8 *buf, int len)
++static int i2c_write(struct tc358870 *priv, const u8 *buf, int len)
 +{
 +	int ret;
-+	mutex_lock(&tc_data->lock);
++	ret = i2c_master_send(priv->client, buf, len);
 +
-+	ret = i2c_master_send(tc_data->client, buf, len);
++	if (ret < 0)
++		dev_err(priv->dev, "I2C write failed with error: %d\n", ret);
 +
-+	if (ret < 0) {
-+			dev_err(tc_data->device, "I2C write failed with error: %d\n", ret);
-+			return ret;
-+	}
-+	mutex_unlock(&tc_data->lock);
-+	return 0;
++	return ret;
 +}
 +
 +
-+static int i2c_read(struct tc358870 *tc_data, char *cmd, char *buf, int len)
++static int i2c_read(struct tc358870 *priv, char *cmd, char *buf, int len)
 +{
 +	int ret;
 +	struct i2c_msg msg[2] = {
 +	    {
-+	        .addr = tc_data->client->addr,
++	        .addr = priv->client->addr,
 +	        .len = 2,
 +	        .buf = cmd,
 +	    },
 +	    {
-+	        .addr = tc_data->client->addr,
++	        .addr = priv->client->addr,
 +	        .flags = I2C_M_RD,
 +	        .len = len,
 +	        .buf = buf,
 +	    }
 +	};
 +
-+	mutex_lock(&tc_data->lock);
-+	ret = i2c_transfer(tc_data->client->adapter, msg, 2);
-+	mutex_unlock(&tc_data->lock);
++	ret = i2c_transfer(priv->client->adapter, msg, 2);
 +
-+	if (ret < 0) {
-+	    dev_err(tc_data->device, "I2C read failed with error: %d\n", ret);
-+	    return ret;
-+	}
-+	return 0;
++	if (ret < 0)
++	    dev_err(priv->dev, "I2C read failed with error: %d\n", ret);
++
++	return ret;
 +}
 +
-+static int tc358870_reset(struct tc358870 *tc_data, int msec)
++static int tc358870_reset(struct tc358870 *priv, int msec)
 +{
-+	gpiod_set_value(tc_data->tc358870_reset, 1);
++	gpiod_set_value(priv->tc_reset, 1);
 +	msleep(msec);
-+	gpiod_set_value(tc_data->tc358870_reset, 0);
++	gpiod_set_value(priv->tc_reset, 0);
 +
-+	if (IS_ERR(tc_data->tc358870_reset)) {
-+		dev_err(tc_data->device, "Failed to reset\n");
-+		return PTR_ERR(tc_data->tc358870_reset);
++	if (IS_ERR(priv->tc_reset)) {
++		dev_err(priv->dev, "Failed to reset\n");
++		return PTR_ERR(priv->tc_reset);
 +	}
 +
-+	msleep(20);	// wait to stabilize
++	msleep(20);	/* wait to stabilize */
 +	return 0;
 +}
 +
-+static int tc358870_wait_for_reg_sys(struct tc358870 *tc_data, int expected_value)
++static int tc358870_wait_for_reg_sys(struct tc358870 *priv, int expected_value)
 +{
 +	char readbuf = 0;
-+	char readaddr[2] = {REG_SYS_STATUS};
-+	int i;
-+	int ret;
++	int i, ret;
 +
-+	// wait max 5 s to receive expected value form REG_SYS_STATUS
-+	for (i = 50; ((readbuf & expected_value) != expected_value) && (i > 0); i--)
++	/* wait max 10 s to receive expected value form REG_SYS_STATUS */
++	for (i = 100; i > 0; i--)
 +	{
-+		readbuf = 0;
-+		ret = i2c_read(tc_data, readaddr, &readbuf, 1);
-+		dev_dbg(tc_data->device, "tc358870 REG_SYS_STATUS: 0x%02x\n", readbuf);
-+		if((readbuf & expected_value) == expected_value) break;
-+		if (ret < 0){
-+			dev_err(tc_data->device, "read error: %d\n", ret);
++		ret = i2c_read(priv, (char[]) {REG_SYS_STATUS}, &readbuf, 1);
++		if (ret < 0)
 +			return ret;
 +
-+		}
++		dev_dbg(priv->dev, "tc358870 REG_SYS_STATUS: 0x%02x\n", readbuf);
++		if ((readbuf & expected_value) == expected_value) return 0;
++
 +		msleep(100);
 +	}
 +
-+	if ((readbuf & expected_value) != expected_value)
-+	{
-+		dev_err(tc_data->device, "tc358870 REG_SYS_STATUS didn't return"
-+			" expected value: %x\n", expected_value);
-+		return -ETIMEDOUT;
-+	}
++	dev_err(priv->dev, "tc358870 REG_SYS_STATUS didn't return"
++		" expected value: %x\n", expected_value);
 +
-+	return 0;
++	return -ETIMEDOUT;
 +}
 +
-+static int tc358870_hdmi_init(struct tc358870 *tc_data)
++static int tc358870_hdmi_init(struct tc358870 *priv)
 +{
-+	// init HDMI
-+	int i;
++	i2c_write(priv, (char[]){0x00, 0x04, 0x04, 0x00}, 4);
++	/* Reset each component */
++	i2c_write(priv, (char[]){0x00, 0x02, 0x01, 0x3f}, 4);
++	fsleep(1000);
++	i2c_write(priv, (char[]){0x00, 0x02, 0x00, 0x00}, 4);
++
++	i2c_write(priv, (char[]){0x00, 0x06, 0x08, 0x00}, 4);	/* Set DSI clock source to Refclk */
++	i2c_write(priv, (char[]){0x84, 0x13, 0x3F}, 3);		/* Wake up PHY */
++	i2c_write(priv, (char[]){0x84, 0xF4, 0x01}, 3);		/* DDCIO_CTL: normal action */
++	i2c_write(priv, (char[]){0x85, 0x40, 0xC0, 0x12}, 4);	/* SYS_FREQ = 0x12C0 = 4800 -> 48 MHz */
++	i2c_write(priv, (char[]){0x8A, 0x0C, 0xC0, 0x12}, 4);	/* SCLK_CSC0 = 0x12C0 = 4800 -> 48 MHz */
++	i2c_write(priv, (char[]){0x00, 0x16, 0xFF, 0x0F}, 4);	/* Disable all interrupts */
++	i2c_write(priv, (char[]){0x85, 0xE0, 0x00}, 3);		/* Disable DDC line */
++	i2c_write(priv, (char[]){0x85, 0x44, 0x01}, 3);		/* HOTPLUG: output H */
++	return i2c_write(priv, (char[]){0x85, 0x4A, 0x01}, 3);	/* INIT_END */
++}
++
++static int tc358870_dsi_init(struct tc358870 *priv)
++{
++	const struct tc358870_msg *p;
 +	int ret;
-+
-+	for(i = 0; i < (sizeof(tc358870_init_data) / sizeof(struct tc358870_msg)); i++)
-+	{
-+		ret = i2c_write(tc_data, tc358870_init_data[i].data, tc358870_init_data[i].len);
-+		if (ret < 0) return ret;
-+	}
-+	return 0;
-+}
-+
-+static int tc358870_dsi_init(struct tc358870 *tc_data)
-+{
-+	int i, ret;
 +	u32 delay;
-+	ret = tc358870_wait_for_reg_sys(tc_data, SYS_STATUS_SYNC);
-+	if (ret < 0) {
-+		return ret;
-+	}
-+	usleep_range(20000, 21000);
 +
-+	// enable iovdd_lcd-supply
-+	ret  = regulator_enable(tc_data->iovdd_lcd_supply);
-+	if (ret < 0) {
-+		dev_err(tc_data->device, "Regulator iovdd_lcd-supply error: %d\n", ret);
-+		return -EIO;
-+	}
-+	usleep_range(20000,21000);
++	gpiod_set_value(priv->lcd_reset, 0);
++	fsleep(20);
 +
-+	// enable avdd_lcd-supply
-+	ret  = regulator_enable(tc_data->avdd_lcd_supply);
-+	if (ret < 0) {
-+		dev_err(tc_data->device, "Regulator avdd_lcd-supply error: %d\n", ret);
-+		return -EIO;
-+	}
-+	msleep(100);
-+
-+	// unreset LCD controller
-+	gpiod_set_value(tc_data->lcd_reset, 0);
-+	usleep_range(20000, 21000);
-+
-+	// write DDC data
-+	for(i = 0; tc_data->dsi_init_data[i].len != 0; i++)
++	for (p = priv->dsi_init_data; p->len != 0; p++)
 +	{
-+		// there need to be some delays between writes
-+		if(tc_data->dsi_init_data[i].len == USLEEP_PAUSE) {
-+			delay = *((u32*)tc_data->dsi_init_data[i].data);
-+			usleep_range(delay, delay + 1000);
++		if (p->len == USLEEP_PAUSE) {
++			delay = *((u32*)p->data);
++			fsleep(delay);
 +			continue;
 +		}
-+		ret = i2c_write(tc_data, tc_data->dsi_init_data[i].data, tc_data->dsi_init_data[i].len);
++		ret = i2c_write(priv, p->data, p->len);
 +		if (ret < 0) return ret;
 +	}
++
++	ret = tc358870_wait_for_reg_sys(priv, SYS_STATUS_SYNC);
++	if (ret < 0) {
++		return ret;
++	}
++	i2c_write(priv, (char[]){0x00, 0x06, 0x00, 0x00}, 4);
++
 +	return 0;
 +}
 +
-+static int tc358870_init(struct tc358870 *tc_data)
++static int tc358870_init(struct tc358870 *priv)
 +{
 +	int ret;
-+	char readaddr[2] = {REG_CHIP_ID};
 +	char version[2];
-+	if (!tc_data->device->of_node) {
-+		dev_err(tc_data->device, "not DT device\n");
-+		return -ENODEV;
-+	}
 +
-+	tc_data->vdd12_mipi_supply = devm_regulator_get(tc_data->device, "vdd12_mipi");
-+	tc_data->vdd11_hdmi_supply = devm_regulator_get(tc_data->device, "vdd11_hdmi");
-+	tc_data->avdd_lcd_supply = devm_regulator_get(tc_data->device, "avdd_lcd");
-+	tc_data->iovdd_lcd_supply = devm_regulator_get(tc_data->device, "iovdd_lcd");
-+	if (IS_ERR(tc_data->vdd12_mipi_supply) || IS_ERR(tc_data->vdd11_hdmi_supply) ||
-+		IS_ERR(tc_data->avdd_lcd_supply) || IS_ERR(tc_data->iovdd_lcd_supply))
-+	{
-+		dev_err(tc_data->device, "regulator_bulk_get failed\n");
-+		return -EPROBE_DEFER;
-+	}
++	ret = regulator_bulk_enable(ARRAY_SIZE(priv->supplies), priv->supplies);
++	if (ret < 0)
++		dev_err(priv->dev, "error enabling regulators (%d)\n", ret);
 +
-+	tc_data->tc358870_reset = devm_gpiod_get(tc_data->device, "tc358870-reset",
-+		GPIOD_OUT_HIGH);
-+	tc_data->lcd_reset = devm_gpiod_get(tc_data->device, "lcd-reset",
-+		GPIOD_OUT_HIGH);
++	msleep(100);
 +
-+	if (IS_ERR(tc_data->tc358870_reset) || IS_ERR(tc_data->lcd_reset))
-+	{
-+		dev_err(tc_data->device, "Failed to get gpios from DT\n");
-+		return -EPROBE_DEFER;
-+	}
-+
-+	// enable vdd12_mipi-supply and vdd11_hdmi-supply
-+	ret  = regulator_enable(tc_data->vdd12_mipi_supply);
-+	ret  = regulator_enable(tc_data->vdd11_hdmi_supply);
-+	if(ret < 0)
-+	{
-+		dev_err(tc_data->device, "Regulator vdd12_mipi-supply or vdd11_hdmi-supply error: %d\n", ret);
-+		return -EIO;
-+	}
-+	else dev_dbg(tc_data->device, "Regulator vdd12_mipi-supply and vdd11_hdmi-supply succesfully enabled\n");
-+
-+	msleep(20);
-+
-+	ret = tc358870_reset(tc_data, 10);
++	ret = tc358870_reset(priv, 10);
 +	if (ret < 0) return ret;
 +
-+	// wait for HDMI DDC5V to come HIGH
-+	ret = tc358870_wait_for_reg_sys(tc_data, SYS_STATUS_DDC5V);
-+	if (ret < 0) {
-+		dev_err(tc_data->device, "prode return\n");
-+		return ret;
-+	}
++	ret = i2c_read(priv, (char[]) {REG_CHIP_ID}, version, 2);
++	if (ret >= 0)
++		dev_dbg(priv->dev, "REG_CHIP_ID: 0x%02x%02x\n", version[0], version[1]);
 +
-+	ret = i2c_read(tc_data, readaddr, version, 2);
-+	if (ret < 0){
-+		dev_err(tc_data->device, "I2C REG_CHIP_ID read error: %d\n", ret);
-+		return ret;
-+	}
-+	dev_dbg(tc_data->device, "REG_CHIP_ID: 0x%02x%02x\n", version[0], version[1]);
++	return ret;
++}
 +
-+	return 0;
++enum panel_type {
++	PANEL_TYPE_UNKNOWN,
++	PANEL_TYPE_LS055R1SX04,
++};
++
++static enum panel_type tc358870_get_panel_type(struct device *dev)
++{
++	int ret;
++	static const char *const names[] = {
++		[PANEL_TYPE_UNKNOWN]		= "",
++		[PANEL_TYPE_LS055R1SX04]	= "ls055r1sx04",
++	};
++	const char *panel_name;
++	ret = of_property_read_string(dev->of_node, "panel-name", &panel_name);
++	if (ret < 0) return PANEL_TYPE_UNKNOWN;
++	ret = match_string(names, ARRAY_SIZE(names), panel_name);
++	return (ret < 0) ? PANEL_TYPE_UNKNOWN : ret;
++}
++
++static int tc358870_get_regulators(struct tc358870 *priv)
++{
++	int i, ret;
++
++	for (i = 0; i < ARRAY_SIZE(priv->supplies); ++i)
++		priv->supplies[i].supply = tc358870_supplies[i];
++
++	ret = devm_regulator_bulk_get(priv->dev, ARRAY_SIZE(priv->supplies),
++				      priv->supplies);
++	if (ret < 0)
++		dev_err(priv->dev, "failed to get regulators: %d\n", ret);
++
++	return ret;
++}
++
++static const struct tc358870_msg *tc358870_get_dsi_init_data(struct device *dev)
++{
++	static const struct tc358870_msg *const init_data[] = {
++		[PANEL_TYPE_UNKNOWN]		= NULL,
++		[PANEL_TYPE_LS055R1SX04]	= ls055r1sx04_dsi_init_data,
++	};
++	enum panel_type type = tc358870_get_panel_type(dev);
++	if (type < 0 || type >= ARRAY_SIZE(init_data))
++		return NULL;
++	return init_data[type];
 +}
 +
 +static int tc358870_probe(struct i2c_client *client, const struct i2c_device_id *id)
 +{
-+	struct tc358870 *tc_data;
-+	struct device *device = &client->dev;
++	struct tc358870 *priv;
++	struct device *dev = &client->dev;
 +	int ret;
 +
-+	tc_data = devm_kzalloc(device, sizeof(*tc_data), GFP_KERNEL);
-+	if (!tc_data) return -ENOMEM;
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv) return -ENOMEM;
 +
-+	tc_data->client = client;
-+	tc_data->device = device;
-+	tc_data->dsi_init_data = ls055r1sx04_dsi_init_data;
-+	mutex_init(&tc_data->lock);
++	priv->client = client;
++	priv->dev = dev;
 +
-+	ret = tc358870_init(tc_data);
++	if (!dev->of_node) {
++		dev_err(dev, "not DT device\n");
++		return -ENODEV;
++	}
++
++	priv->dsi_init_data = tc358870_get_dsi_init_data(dev);
++	if (!priv->dsi_init_data) {
++		dev_err(dev, "Invalid or missing 'panel-name' property\n");
++		return -EINVAL;
++	}
++
++	ret = tc358870_get_regulators(priv);
 +	if (ret)
-+		goto fail;
++		return ret;
 +
-+	ret = tc358870_hdmi_init(tc_data);
-+	if (ret)
-+		goto fail;
++	priv->tc_reset = devm_gpiod_get(dev, "tc358870-reset", GPIOD_OUT_HIGH);
++	if (IS_ERR(priv->tc_reset)) {
++		dev_err(dev, "Failed to find TC358870 reset gpio\n");
++		return PTR_ERR(priv->tc_reset);
++	}
 +
-+	ret = tc358870_dsi_init(tc_data);
-+	if (ret)
-+		goto fail;
++	priv->lcd_reset = devm_gpiod_get(dev, "lcd-reset", GPIOD_OUT_HIGH);
++	if (IS_ERR(priv->lcd_reset)) {
++		dev_err(dev, "Failed to find LCD reset gpio\n");
++		return PTR_ERR(priv->lcd_reset);
++	}
 +
-+	i2c_set_clientdata(client, tc_data);
-+	ret = 0;
-+fail:
-+	mutex_unlock(&tc_data->lock);
++	ret = tc358870_init(priv);
++	if (ret < 0)
++		return ret;
++
++	ret = tc358870_hdmi_init(priv);
++	if (ret < 0)
++		return ret;
++
++	ret = tc358870_dsi_init(priv);
++	if (ret < 0)
++		return ret;
++
++	i2c_set_clientdata(client, priv);
++
 +	return ret;
 +}
 +
@@ -649,5 +570,5 @@ index 000000000000..30d614603d31
 +
 +extern const struct tc358870_msg ls055r1sx04_dsi_init_data[];
 -- 
-2.30.2
+2.32.0
 

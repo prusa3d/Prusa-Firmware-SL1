@@ -14,12 +14,13 @@ diff --git a/drivers/gpu/drm/bridge/tc358870/Makefile b/drivers/gpu/drm/bridge/t
 index ff2275d9c054..623dc02c9e50 100644
 --- a/drivers/gpu/drm/bridge/tc358870/Makefile
 +++ b/drivers/gpu/drm/bridge/tc358870/Makefile
-@@ -1,3 +1,5 @@
+@@ -1,4 +1,6 @@
  # SPDX-License-Identifier: GPL-2.0-only
 -tc358870-objs := tc358870_drv.o tc358870_init_ls055r1sx04.o
 +tc358870-objs := tc358870_drv.o
 +tc358870-objs += tc358870_init_ls055r1sx04.o
 +tc358870-objs += tc358870_init_rv059fbb.o
+ CFLAGS_tc358870_init_ls055r1sx04.o += -Wno-missing-braces
  obj-$(CONFIG_DRM_TOSHIBA_TC358870) += tc358870.o
 diff --git a/drivers/gpu/drm/bridge/tc358870/tc358870_init_rv059fbb.c b/drivers/gpu/drm/bridge/tc358870/tc358870_init_rv059fbb.c
 new file mode 100644
