@@ -1,4 +1,4 @@
-# Version 1.6.1-rc.0
+# Version 1.6.1-rc.1
 
 ## Summary (relative to 1.6.0)
 - system:
