@@ -4,7 +4,7 @@ SRC_URI = "\
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV = "a4476876786c74fa5b0f0f8bfa3be041fbc5bbbe"
+SRCREV = "2856554808bd053e923c7cda32a863ab395ddaa8"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \

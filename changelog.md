@@ -1,9 +1,10 @@
-# Version 1.6.1-rc.0
+# Version 1.6.1-rc.1
 
 ## Summary (relative to 1.6.0)
 - system:
   - fix: make ASCII default VFAT iocharset (support for characters with diacritic)
   - fix: limit log size (50 % cut. More 384 MB will be free for projects)
+  - fix: exposure display driver tuning to avoid occasional flicker
 - sl1fw:
   - fix: wizard running state flickering. (Flickering of the list of checks between other screens)
   - CI: add static analisys
