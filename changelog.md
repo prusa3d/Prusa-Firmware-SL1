@@ -5,6 +5,13 @@
   - fix: Report errors once. Remember reported errors across sessions + avoid multiple callbacks for preview buttons.
 - sl1fw:
   - fix: apply immediately changed RPM of the fans
+- touch-ui:
+  - update: translations
+  - fix: cover the WaitOverlay with a MouseArea to eat touch events
+  - fix: add wait overlay to PageFinished
+  - fix: bigger "view examples" button
+  - update: CI tests (clazy + static analisys)
+  - fix: DBus (supress unneeded signals + improved error handling)
 
 # Version 1.6.1-rc.1
 
