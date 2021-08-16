@@ -3,6 +3,8 @@
 ## Summary (relative to 1.6.1.rc.1)
 - prusa-link-web (prusa-connect-local):
   - fix: Report errors once. Remember reported errors across sessions + avoid multiple callbacks for preview buttons.
+- sl1fw:
+  - fix: apply immediately changed RPM of the fans
 
 # Version 1.6.1-rc.1
 
@@ -17,6 +19,7 @@
   - fix: axis sensitivity: update everytime its changed
   - fix: Add pour in resin state to exposure
   - fix: Avoid print time estimates overflow
+  - fix: wizard for clearing exposure screen counter
 - touch-ui:
   - fix: reorder preprint checks and fix PagePrintResinIn Layout
   - fix: PageSettingsPlatformResinTank: update sensitivity if changed
