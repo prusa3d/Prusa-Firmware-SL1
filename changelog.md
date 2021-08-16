@@ -1,3 +1,9 @@
+# Version 1.6.1-rc.2
+
+## Summary (relative to 1.6.1.rc.1)
+- prusa-link-web (prusa-connect-local):
+  - fix: Report errors once. Remember reported errors across sessions + avoid multiple callbacks for preview buttons.
+
 # Version 1.6.1-rc.1
 
 ## Summary (relative to 1.6.0)
