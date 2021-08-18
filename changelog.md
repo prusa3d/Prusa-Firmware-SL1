@@ -1,3 +1,15 @@
+# Version 1.6.1
+
+## Summary (relative to 1.6.0)
+- New print display driver
+- Support for diacritics in filenames
+- Improved display counter
+- PrusaLink improvement
+- Preprint checks
+- Bug fixes
+
+This is a final release of firmware 1.6.1 focusing on improvements and fixing bugs found during internal extensive testing. The firmware is compatible with both SL1 and SL1S SPEED.
+
 # Version 1.6.1-rc.2
 
 ## Summary (relative to 1.6.1.rc.1)
