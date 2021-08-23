@@ -1,3 +1,9 @@
+# Version 1.6.2-rc.0
+
+## Summary (relative to 1.6.1)
+- sl1fw:
+  - fix: axis sensitivity clear on factory reset
+
 # Version 1.6.1
 
 ## Summary (relative to 1.6.0)
