@@ -1,3 +1,13 @@
+# Version 1.6.2
+
+## Summary
+- Fixed factory reset
+
+The firmware is compatible with both SL1 and SL1S SPEED.
+
+### Fixed factory reset
+During factory reset, the axis sensitivity parameters were cleared incorrectly. Axis sensitivity remained internally stored even after factory reset if it was set to a non-zero value. This bug is now fixed.
+
 # Version 1.6.2-rc.0
 
 ## Summary (relative to 1.6.1)
