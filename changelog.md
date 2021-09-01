@@ -1,3 +1,9 @@
+# Version 1.6.3-rc.0
+
+## Summary (relative to 1.6.2)
+- sl1fw/touch-ui/remote-api/prusa-link:
+  - fix: redesigned pour resin state. Now its separated from preprint checks and is initiated by swiping on the project detail page.
+
 # Version 1.6.2
 
 ## Summary
