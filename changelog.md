@@ -1,3 +1,9 @@
+# Version 1.6.3-rc.1
+
+## Summary (relative to 1.6.3-rc.0)
+- touch-ui:
+  - fix: redesigned pour resin state. Swipe to the black screen.
+
 # Version 1.6.3-rc.0
 
 ## Summary (relative to 1.6.2)
