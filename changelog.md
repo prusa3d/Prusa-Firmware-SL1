@@ -1,3 +1,23 @@
+# Version 1.6.3
+
+## Summary
+- Preprint workflow simplified
+- Print profile selection added to PrusaLink
+
+This is the first public release candidate of the upcoming firmware 1.6.3. There is only one user-facing change.
+Compared to the previous release 1.6.2, there are only five commits and three pull request
+As the issue was risen by our testing team, we consider this a bugfix release
+
+### Preprint workflow simplified
+The preprint workflow is made safer and faster, compared to previous versions. We consider this a bugfix, as experienced users were not happy with the unexpected “pour resin” screen, which appeared after the preprint checks.
+- New users are led to pour resin while the tilt is homed
+- Experienced users are not misled to think the print process has started by the preprint checks.
+
+### Print profile selection added to PrusaLink
+The user can select between the Faster and Slower print profiles from From PrusaLink.
+- The feature was introduced in 1.6.0 but it was only possible to set it in the printer UI. Now it can be controlled from PrusaLink, too.
+- The feature was introduced to support quality printing of unfavorably shaped prints. Just like in the UI, Faster is the default, while Slower adjusts the parameters for safer quality printing of i.e. hollow prints.
+
 # Version 1.6.3-rc.1
 
 ## Summary (relative to 1.6.3-rc.0)
