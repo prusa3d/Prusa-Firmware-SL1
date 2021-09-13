@@ -1,3 +1,12 @@
+# Version 1.6.4-rc.1
+
+## Summary
+- Screenshot now requres longress on header instead of normal one
+- Fixed czech AM/PM capitalization case
+- Touch UI cleanup
+- Support for Medical 1 (M1) printer model
+- Fixed exposure time calibrate step 100ms instead of 500ms to address the UI inconsistency
+
 # Version 1.6.3
 
 ## Summary
