@@ -9,17 +9,17 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
 "
+EXTRA_OECMAKE_append = " -DCMAKE_BUILD_TYPE=Release"
 
 inherit cmake_kf5 systemd python3native
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtwebsockets qtsvg qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtsvg qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
 
 RDEPENDS_${PN} += "\
 	bash \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '' ,d)} \
 	qtquickcontrols-qmlplugins \
 	qtquickcontrols2-qmlplugins \
-	qtwebsockets-qmlplugins \
 	qtvirtualkeyboard-plugins \
 	qtvirtualkeyboard-qmlplugins \
 	qtvirtualkeyboard \
