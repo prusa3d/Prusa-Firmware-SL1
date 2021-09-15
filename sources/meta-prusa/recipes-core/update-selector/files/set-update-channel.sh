@@ -13,6 +13,10 @@ case $1 in
 		CHANNEL="dev"
 		KEYRING="dev"
 		;;
+	medic)
+		CHANNEL="medic"
+		KEYRING="prod"
+		;;
 	*)
 		CHANNEL="stable"
 		KEYRING="prod"
