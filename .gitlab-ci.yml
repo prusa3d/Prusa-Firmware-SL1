@@ -3,6 +3,7 @@ image: prusa/oe
 stages:
   - build
   - deploy
+  - nightly
 
 variables:
   GIT_SUBMODULE_STRATEGY: "recursive"
@@ -10,6 +11,7 @@ variables:
 
 before_script:
   - eval $(ssh-agent -s)
+  - echo "$NIGHTLY_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - echo "$DEV_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - ssh-keyscan github.com >> ~/.ssh/known_hosts
@@ -29,11 +31,14 @@ cache:
 
 b:raucb-development:
   stage: build
-
-  only: 
-    - tags
-    - merge_requests
-    - web
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_COMMIT_REF_NAME =~ /^nightly-.*$/ || $CI_PIPELINE_SOURCE != "push"
+      when: always
+    - when: never
+  dependencies: []
+  needs: []
 
   script:
     - cat build/conf/auto.conf
@@ -60,23 +65,15 @@ b:raucb-development:
 
 b:raucb-production:
   stage: build
-  when: manual
-
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push" && $RAUC_CERT_FILE && $RAUC_KEY_FILE && $RAUC_PKCS11_PIN && $PKCS11_PROXY_SOCKET && $RAUC_PKCS11_MODULE && $CERT_VALID_DAYS
+      when: manual
+      allow_failure: true
+    - when: never
   dependencies: []
-
-  only:
-    refs:
-      - tags
-      - merge_requests
-      - web
-
-    variables:
-      - $RAUC_CERT_FILE
-      - $RAUC_KEY_FILE
-      - $RAUC_PKCS11_PIN
-      - $PKCS11_PROXY_SOCKET
-      - $RAUC_PKCS11_MODULE
-      - $CERT_VALID_DAYS
+  needs: []
 
   script:
     - ./sign_cert_check.sh
@@ -99,14 +96,15 @@ b:raucb-production:
 
 b:tools:
   stage: build
-  when: manual
-
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: manual
+      allow_failure: true
+    - when: never
   dependencies: []
-
-  only:
-    - tags
-    - merge_requests
-    - web
+  needs: []
 
   script:
     - source oe-init-build-env
@@ -130,16 +128,18 @@ b:tools:
 
 d:raucb-development:
   stage: deploy
-  when: manual
   cache: {}
-  
+  rules:
+    - if: $BUMP_ONLY == "1"
+      when: never
+    - if: $CI_COMMIT_REF_NAME =~ /^nightly-.*$/ || $CI_PIPELINE_SOURCE != "push"
+      when: manual
+      allow_failure: true
+    - when: never
   dependencies:
     - b:raucb-development
+  needs: ["b:raucb-development"]
 
-  only:
-    - tags
-    - merge_requests
-    - web
 
   script:
     - >
@@ -154,16 +154,17 @@ d:raucb-development:
 
 d:raucb-production:
   stage: deploy
-  when: manual
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: manual
+      allow_failure: true
+    - when: never
   cache: {}
-
   dependencies:
     - b:raucb-production
-
-  only:
-    - tags
-    - merge_requests
-    - web
+  needs: ["b:raucb-production"]
 
   script:
     - >
@@ -178,19 +179,38 @@ d:raucb-production:
 
 d:tools:
   stage: deploy
-  when: manual
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: manual
+    - when: never
   cache: {}
-
   dependencies:
     - b:tools
-
-  only:
-    - tags
-    - merge_requests
-    - web
+  needs: ["b:tools"]
 
   script:
     - echo "put ${VERSION}.devsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${VERSION}.devsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${VERSION}.bootstrapsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
     - echo "put ${VERSION}.bootstrapsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+
+n:update:
+  stage: nightly
+  cache: {}
+  rules:
+    - if: '$CI_COMMIT_REF_NAME !~ /^nightly-.*$/'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    - when: manual
+      allow_failure: true
+  dependencies: []
+  needs: []
+
+  script:
+    - ./update_project.py $(echo ${CI_COMMIT_REF_NAME} | sed 's/^nightly-//')
+    - git remote set-url --push origin git@gitlab.com:prusa3d/sl1/meta-sl1.git
+    - git push origin HEAD:${CI_COMMIT_REF_NAME}
+

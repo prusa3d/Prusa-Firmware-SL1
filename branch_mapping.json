@@ -1,0 +1,20 @@
+{
+  "prusa-link":{
+    "1.6":"sla_1.6.4"
+  },
+  "sl1fw":{
+    "1.6":"master"
+  },
+  "touch-ui":{
+    "1.6":"master"
+  },
+  "prusa-errors":{
+    "1.6":"master"
+  },
+  "sl1fw-fs":{
+    "1.6":"master"
+  },
+  "sl1fw-api":{
+    "1.6":"master"
+  }
+}
