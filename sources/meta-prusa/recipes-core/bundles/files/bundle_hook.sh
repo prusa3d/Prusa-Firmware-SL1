@@ -34,21 +34,26 @@ slot-post-install)
 		cp -av /etc/touch-ui ${RAUC_SLOT_MOUNT_POINT}/
 
 		# update http digest (default is enabled)
-		NGINX_FILE=/etc/nginx/sites-available/sl1fw
 		NGINX_FILE_HTTP_DIGEST=/etc/nginx/sites-available/sl1fw_http_digest
 		NGINX_FILE_ENABLED=/etc/nginx/sites-enabled/sl1fw
+		NGINX_HTTP_DIGEST_ENABLED=/etc/nginx/http_digest_enabled
 		NGINX_ENABLED=true
-		# 1.6+
+		# 1.6.4+
+		if [ ! -f ${NGINX_HTTP_DIGEST_ENABLED} ]; then
+			NGINX_ENABLED=false
+		fi
+		# 1.5.0 - 1.6.3
 		if  [ -f ${NGINX_FILE_HTTP_DIGEST} ] && [[ $(readlink -f ${NGINX_FILE_ENABLED} ) != ${NGINX_FILE_HTTP_DIGEST} ]]; then
 			NGINX_ENABLED=false
 		fi
-		# only to 1.5
+		# only before 1.5.0
 		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/http_digest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
 			NGINX_ENABLED=false
 		fi
 		if [ "${NGINX_ENABLED}" = false ] ; then
-			rm -f ${RAUC_SLOT_MOUNT_POINT}${NGINX_FILE_ENABLED}
-			ln -s ${NGINX_FILE} ${RAUC_SLOT_MOUNT_POINT}${NGINX_FILE_ENABLED}
+			rm -f ${RAUC_SLOT_MOUNT_POINT}/etc/nginx/http_digest_enabled
+		else
+			touch ${RAUC_SLOT_MOUNT_POINT}/etc/nginx/http_digest_enabled
 		fi
 
 		# Copy update channel override
