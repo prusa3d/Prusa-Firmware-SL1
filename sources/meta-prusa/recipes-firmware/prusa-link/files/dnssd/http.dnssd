@@ -1,4 +1,4 @@
 [Service]
-Name=Original Prusa SL1 "%H"
+Name=Original Prusa "%H"
 Type=_http._tcp
 Port=80
