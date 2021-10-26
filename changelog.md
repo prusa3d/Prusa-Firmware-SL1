@@ -1,3 +1,37 @@
+# Version 1.6.4-rc.6
+
+## Summary (relative to 1.6.4-rc.5)
+- Fixed UI animations - fixes control responsivness
+- Fixed backlight brightness reset on factory reset
+- Fixed #lines from MC logging
+
+# Version 1.6.4-rc.5
+
+## Summary (relative to 1.6.4-rc.4)
+- Fixed Prusa Link Web M1 support
+- Fixed Prusa Link Web project preview
+- Remove word "orange" from translations
+
+# Version 1.6.4-rc.4
+
+## Summary (relative to 1.6.4-rc.5)
+- Various UI fixes
+- Reverted asyncio fix that caused more harm than good
+- Improved handling of missing USB error on log export
+
+# Version 1.6.4-rc.3
+
+## Summary (relative to 1.6.4-rc.2)
+- Fixed tower home check in selftest
+- Fixed screenshots
+- UI fixes for M1
+
+# Version 1.6.4-rc.2
+
+## Summary (relative to 1.6.4-rc.1)
+- Reset hostname to model specific default
+- Support for M1 in Prusa Link Web
+
 # Version 1.6.4-rc.1
 
 ## Summary
