@@ -1,0 +1,135 @@
+From 180d4b00c0d3b32c31f59193e79b2c04e44efe4d Mon Sep 17 00:00:00 2001
+From: Janne Koskinen <janne.p.koskinen@qt.io>
+Date: Tue, 24 Mar 2020 14:22:35 +0200
+Subject: [PATCH] Fix leaking of callback timers
+
+Use two timers to create timeout trigger for framecallback.
+Removes multiple timers approach that is subject to race conditions.
+
+This was mistakenly pushed to 5.12 branch which will not be
+automatically merged upstream, so it has to be cherry-picked.
+
+Fixes: QTBUG-82914
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit d18c29931b0bc889fff66bdbde89133544ba0529)
+Change-Id: I258c0c08f0ac5803192fc0024e40ba72e72c37a8
+Reviewed-by: Janne Koskinen <janne.p.koskinen@qt.io>
+---
+ src/client/qwaylandwindow.cpp | 46 +++++++++++++++--------------------
+ src/client/qwaylandwindow_p.h |  4 ++-
+ 2 files changed, 22 insertions(+), 28 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 0df99d9f..025d70b0 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -255,10 +255,7 @@ void QWaylandWindow::reset(bool sendDestroyEvent)
+         mFrameCallback = nullptr;
+     }
+ 
+-    int timerId  = mFrameCallbackTimerId.fetchAndStoreOrdered(-1);
+-    if (timerId != -1) {
+-        killTimer(timerId);
+-    }
++    mFrameCallbackElapsedTimer.invalidate();
+     mWaitingForFrameCallback = false;
+     mFrameCallbackTimedOut = false;
+ 
+@@ -595,15 +592,11 @@ const wl_callback_listener QWaylandWindow::callbackListener = {
+ 
+ void QWaylandWindow::handleFrameCallback()
+ {
+-    // Stop the timer and stop waiting immediately
+-    int timerId = mFrameCallbackTimerId.fetchAndStoreOrdered(-1);
+     mWaitingForFrameCallback = false;
++    mFrameCallbackElapsedTimer.invalidate();
+ 
+     // The rest can wait until we can run it on the correct thread
+-    auto doHandleExpose = [this, timerId]() {
+-        if (timerId != -1)
+-            killTimer(timerId);
+-
++    auto doHandleExpose = [this]() {
+         bool wasExposed = isExposed();
+         mFrameCallbackTimedOut = false;
+         if (!wasExposed && isExposed()) // Did setting mFrameCallbackTimedOut make the window exposed?
+@@ -638,13 +631,6 @@ bool QWaylandWindow::waitForFrameSync(int timeout)
+         sendExposeEvent(QRect());
+     }
+ 
+-    // Stop current frame timer if any, can't use killTimer directly, because we might be on a diffent thread
+-    // Ordered semantics is needed to avoid stopping the timer twice and not miss it when it's
+-    // started by other writes
+-    int fcbId = mFrameCallbackTimerId.fetchAndStoreOrdered(-1);
+-    if (fcbId != -1)
+-        QMetaObject::invokeMethod(this, [this, fcbId] { killTimer(fcbId); }, Qt::QueuedConnection);
+-
+     return !mWaitingForFrameCallback;
+ }
+ 
+@@ -1081,8 +1067,16 @@ QVariant QWaylandWindow::property(const QString &name, const QVariant &defaultVa
+ 
+ void QWaylandWindow::timerEvent(QTimerEvent *event)
+ {
+-    if (mFrameCallbackTimerId.testAndSetOrdered(event->timerId(), -1)) {
+-        killTimer(event->timerId());
++    if (event->timerId() != mFrameCallbackCheckIntervalTimerId)
++        return;
++
++    bool callbackTimerExpired = mFrameCallbackElapsedTimer.hasExpired(100);
++    if (!mFrameCallbackElapsedTimer.isValid() || callbackTimerExpired ) {
++        killTimer(mFrameCallbackCheckIntervalTimerId);
++        mFrameCallbackCheckIntervalTimerId = -1;
++    }
++    if (mFrameCallbackElapsedTimer.isValid() && callbackTimerExpired) {
++        mFrameCallbackElapsedTimer.invalidate();
+         qCDebug(lcWaylandBackingstore) << "Didn't receive frame callback in time, window should now be inexposed";
+         mFrameCallbackTimedOut = true;
+         mWaitingForUpdate = false;
+@@ -1136,15 +1130,13 @@ void QWaylandWindow::handleUpdate()
+     mWaitingForFrameCallback = true;
+     mWaitingForUpdate = false;
+ 
+-    // Stop current frame timer if any, can't use killTimer directly, see comment above.
+-    int fcbId = mFrameCallbackTimerId.fetchAndStoreOrdered(-1);
+-    if (fcbId != -1)
+-        QMetaObject::invokeMethod(this, [this, fcbId] { killTimer(fcbId); }, Qt::QueuedConnection);
+-
+     // Start a timer for handling the case when the compositor stops sending frame callbacks.
+-    QMetaObject::invokeMethod(this, [this] { // Again; can't do it directly
+-        if (mWaitingForFrameCallback)
+-            mFrameCallbackTimerId = startTimer(100);
++    QMetaObject::invokeMethod(this, [this] {
++        if (mWaitingForFrameCallback) {
++            if (mFrameCallbackCheckIntervalTimerId < 0)
++                mFrameCallbackCheckIntervalTimerId = startTimer(100);
++            mFrameCallbackElapsedTimer.start();
++        }
+     }, Qt::QueuedConnection);
+ }
+ 
+diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
+index 5f15ca30..a165a945 100644
+--- a/src/client/qwaylandwindow_p.h
++++ b/src/client/qwaylandwindow_p.h
+@@ -58,6 +58,7 @@
+ #include <QtGui/QIcon>
+ #include <QtCore/QVariant>
+ #include <QtCore/QLoggingCategory>
++#include <QtCore/QElapsedTimer>
+ 
+ #include <qpa/qplatformwindow.h>
+ 
+@@ -222,7 +223,8 @@ protected:
+     WId mWindowId;
+     bool mWaitingForFrameCallback = false;
+     bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
+-    QAtomicInt mFrameCallbackTimerId = -1; // Started on commit, reset on frame callback
++    int mFrameCallbackCheckIntervalTimerId = -1;
++    QElapsedTimer mFrameCallbackElapsedTimer;
+     struct ::wl_callback *mFrameCallback = nullptr;
+     struct ::wl_event_queue *mFrameQueue = nullptr;
+     QWaitCondition mFrameSyncWait;
+-- 
+2.33.1
+
