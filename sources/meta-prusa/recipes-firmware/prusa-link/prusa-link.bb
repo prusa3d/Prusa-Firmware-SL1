@@ -1,7 +1,7 @@
 SUMMARY = "Prusa Link - static web UI for firmware running on a64 board"
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Link-Web"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV_pn-${PN} = "6a36468e5898292713ad583a283ba6ab02671195"
+SRCREV_pn-${PN} = "db9b0c3b277c54573fe87e7619f8d652f5aa25c7"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Link-Web.git;protocol=ssh;nobranch=1 \
 	file://dnssd/http.dnssd \
@@ -53,6 +53,7 @@ do_compile() {
 	for target in sl1 m1
 	do
 		npm run build:${target}
+		cp -R ${B}/dist ${B}/dist-${target}
 	done
 }
 
