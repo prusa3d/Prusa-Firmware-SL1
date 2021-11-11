@@ -1,0 +1,14 @@
+[Unit]
+Description=Starts klipper on startup
+Requires=klipper-mcu-flash.service
+After=network.target klipper-mcu-flash.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/klippy /usr/share/klipper/config/g0.cfg
+Restart=always
+RestartSec=10

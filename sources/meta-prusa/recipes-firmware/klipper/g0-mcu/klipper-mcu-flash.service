@@ -1,0 +1,12 @@
+[Unit]
+Description=Ensure Klipper MCU is running current firmware
+After=sys-devices-platform-soc-1c28800.serial-tty-ttyS2.device
+Requires=sys-devices-platform-soc-1c28800.serial-tty-ttyS2.device
+
+[Service]
+Type=oneshot
+
+ExecStart=/usr/bin/klipper-mcu-flash.py /lib/firmware/klipper.bin /dev/ttyS2
+
+[Install]
+WantedBy=multi-user.target
