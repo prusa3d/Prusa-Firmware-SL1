@@ -16,10 +16,10 @@ SPL_BINARYNAME = "sunxi-spl.bin"
 PREFERRED_VERSION_linux-mainline = "v5.11%"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
-MACHINE_EXTRA_RDEPENDS_append = " kernel-module-lima"
+MACHINE_EXTRA_RDEPENDS:append = " kernel-module-lima"
 
 
-PACKAGECONFIG_append_pn-mesa_class-target = " lima kmsro"
+PACKAGECONFIG:append:pn-mesa:class-target = " lima kmsro"
 
 INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"

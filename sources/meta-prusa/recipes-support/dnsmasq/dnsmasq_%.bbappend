@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "\
 	file://dnsmasq.conf \
@@ -6,12 +6,12 @@ SRC_URI += "\
 	file://resolved-stub-disable.conf \
 "
 
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 PACKAGECONFIG = ""
 
-CONFFILES_${PN} = ""
-FILES_${PN} += " \
+CONFFILES:${PN} = ""
+FILES:${PN} += " \
 	${datadir}/dnsmasq.conf \
 	/usr/lib/systemd/resolved.conf.d/99-disablestub.conf \
 "

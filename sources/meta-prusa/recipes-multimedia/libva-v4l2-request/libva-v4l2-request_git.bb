@@ -20,4 +20,4 @@ S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
 
-FILES_${PN} += "${libdir}/dri"
+FILES:${PN} += "${libdir}/dri"

@@ -16,4 +16,4 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS_${PN} += "python3-core python3-io python3-requests python3-typing"
+RDEPENDS:${PN} += "python3-core python3-io python3-requests python3-typing"

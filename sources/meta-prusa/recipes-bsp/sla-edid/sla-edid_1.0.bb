@@ -13,7 +13,7 @@ SRC_URI = " \
 	file://checksum.cpp \
 "
 
-FILES_${PN} = "${base_libdir}/firmware/edid/*.bin"
+FILES:${PN} = "${base_libdir}/firmware/edid/*.bin"
 
 do_compile() {
 	mkdir -p ${B}

@@ -1,1 +1,1 @@
-PACKAGECONFIG_CONFARGS_append = " -no-sql-psql"
+PACKAGECONFIG_CONFARGS:append = " -no-sql-psql"

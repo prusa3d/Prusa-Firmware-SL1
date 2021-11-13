@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
 	haveged nano powerpanic rauc readline \
 	tzdata emergencyupdate update-selector \
 	networkmanager go-omaha firstboot\

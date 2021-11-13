@@ -2,7 +2,7 @@ SUMMARY = "Update channel and keyring switch script"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SRC_URI = "\
 	file://set-update-channel.sh \
@@ -25,9 +25,9 @@ do_install() {
 	install --mode 644 ${WORKDIR}/update-selector.service ${D}${systemd_system_unitdir}/update-selector.service
 }
 
-FILES_${PN} = "\
+FILES:${PN} = "\
 	${sysconfdir}/update_channel \
 	${sbindir}/set-update-channel.sh \
 "
 
-SYSTEMD_SERVICE_${PN} = "update-selector.service"
+SYSTEMD_SERVICE:${PN} = "update-selector.service"

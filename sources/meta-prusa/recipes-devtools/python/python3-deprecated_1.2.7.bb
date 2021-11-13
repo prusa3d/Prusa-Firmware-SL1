@@ -10,5 +10,5 @@ SRC_URI[sha256sum] = "408038ab5fdeca67554e8f6742d1521cd3cd0ee0ff9d47f29318a4f4da
 
 PYPI_PACKAGE = "Deprecated"
 
-RDEPENDS_${PN} += "python3-wrapt"
+RDEPENDS:${PN} += "python3-wrapt"
 

@@ -17,10 +17,10 @@ SRC_URI[sha256sum] = "417476cdcfd53966b2dcfaf12455b54f315959b488a89255ab4b445861
 
 inherit autotools useradd gettext pkgconfig
 
-DEPENDS_append = " neon"
+DEPENDS:append = " neon"
 
 PACKAGECONFIG ?= ""
-PACKAGECONFIG_append_class-target = "\
+PACKAGECONFIG:append:class-target = "\
 	${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)}"
 PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 
@@ -31,20 +31,20 @@ PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 PACKAGECONFIG[nls] = ",,po4a-native"
 USE_NLS = "${@bb.utils.contains('PACKAGECONFIG', 'nls', 'yes', 'no', d)}"
 
-EXTRA_OECONF_append = " ssbindir=${sbindir} "
-EXTRA_AUTORECONF_append = " -I ${S}/config "
+EXTRA_OECONF:append = " ssbindir=${sbindir} "
+EXTRA_AUTORECONF:append = " -I ${S}/config "
 
-CONFFILES_${PN}_append = " \
+CONFFILES:${PN}:append = " \
 	${sysconfdir}/davfs2/secrets \ 
 	${sysconfdir}/davfs2/davfs2.conf \ 
 "
-FILES_${PN}_append = " \
+FILES:${PN}:append = " \
 	${sysconfdir}/davfs2 \
 	${datadir}/davfs2 \
 "
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = " \
+USERADD_PARAM:${PN} = " \
     --system \
     --no-create-home \
     --home ${localstatedir}/cache/davfs2 \

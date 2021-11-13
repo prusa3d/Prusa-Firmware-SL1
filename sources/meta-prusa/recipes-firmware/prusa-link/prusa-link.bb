@@ -1,7 +1,7 @@
 SUMMARY = "Prusa Link - static web UI for firmware running on a64 board"
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Link-Web"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV_pn-${PN} = "db9b0c3b277c54573fe87e7619f8d652f5aa25c7"
+SRCREV:pn-${PN} = "db9b0c3b277c54573fe87e7619f8d652f5aa25c7"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Link-Web.git;protocol=ssh;nobranch=1 \
 	file://dnssd/http.dnssd \
@@ -13,19 +13,19 @@ SRC_URI = " \
 "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
-LICENSE_${PN} = "GPL-3.0"
+LICENSE:${PN} = "GPL-3.0"
 
 inherit useradd
 
 DEPENDS += " nodejs-native python3"
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     nginx \
     systemd \
     sl1fw-api \
     bash \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
 	/srv/http/sl1 \
 	/srv/http/m1 \
 	/srv/http/sl1s \
@@ -42,7 +42,7 @@ FILES_${PN} += " \
 S = "${WORKDIR}/git"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = " \
+USERADD_PARAM:${PN} = " \
 	--system --no-create-home \
 	--groups www-data \
 	--user-group www"
@@ -57,7 +57,7 @@ do_compile() {
 	done
 }
 
-do_install_append () {
+do_install:append () {
 	# mDNS service definition
 	install -d ${D}${systemd_unitdir}/dnssd
 	install --mode 644 ${WORKDIR}/dnssd/http.dnssd ${D}${systemd_unitdir}/dnssd/

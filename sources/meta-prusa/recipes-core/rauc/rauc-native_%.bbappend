@@ -1,1 +1,1 @@
-RDEPENDS_${PN}_append = " libp11-native"
+RDEPENDS:${PN}:append = " libp11-native"

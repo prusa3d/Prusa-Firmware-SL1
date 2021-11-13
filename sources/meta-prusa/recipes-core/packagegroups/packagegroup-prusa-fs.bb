@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-prusa-fs = "\
+RDEPENDS:packagegroup-prusa-fs = "\
 	fuse3 \
 	sshfs-fuse \
 	cifs-utils \

@@ -1,1 +1,1 @@
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""

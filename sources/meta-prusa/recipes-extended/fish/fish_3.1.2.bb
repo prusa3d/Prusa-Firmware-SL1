@@ -8,9 +8,9 @@ SRC_URI[sha256sum] = "d5b927203b5ca95da16f514969e2a91a537b2f75bec9b21a584c4cd1c7
 DEPENDS = "ncurses libpcre2"
 inherit cmake
 
-EXTRE_OECMAKE_append = " -DCURSES_NEED_NCURSES=ON -DBUILD_DOCS=OFF -DWITH_GETTEXT=OFF"
+EXTRE_OECMAKE:append = " -DCURSES_NEED_NCURSES=ON -DBUILD_DOCS=OFF -DWITH_GETTEXT=OFF"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	sed -i 's#${TEST_INSTALL_DIR}/${CMAKE_INSTALL_PREFIX}#${TEST_INSTALL_DIR}#' \
 		${S}/cmake/Tests.cmake
 }

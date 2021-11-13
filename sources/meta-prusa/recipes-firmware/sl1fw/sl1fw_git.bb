@@ -8,13 +8,13 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://sl1fw.conf \
 "
-SRCREV_pn-${PN} = "9cbdcd572247bbf8b73b1c95f7ad531fa4cb52af"
+SRCREV:pn-${PN} = "9cbdcd572247bbf8b73b1c95f7ad531fa4cb52af"
 
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "python3 gettext-native"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	python3 \
 	bash \
 	avrdude \
@@ -48,7 +48,7 @@ RDEPENDS_${PN} += " \
 	python3-smbus2 \
 "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
 	${libdir}/systemd/system/sl1fw.service\
 	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
 	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
@@ -60,14 +60,14 @@ FILES_${PN} += "\
 	/usr/share/dbus-1/system.d\
 	/usr/lib/sysusers.d/sl1fw.conf\
 "
-FILES_${PN}_remove = "${sysconfdir}/sl1fw/loggerConfig.json"
-FILES_${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
+FILES:${PN}:remove = "${sysconfdir}/sl1fw/loggerConfig.json"
+FILES:${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
 
 S="${WORKDIR}/git"
 
 inherit setuptools3 systemd
 
-do_install_append () {
+do_install:append () {
 	# Install projects tmpfiles
 	install -d ${D}${libdir}/tmpfiles.d
 	install --mode 644 ${WORKDIR}/projects-tmpfiles.conf ${D}${libdir}/tmpfiles.d/projects.conf
@@ -77,4 +77,4 @@ do_install_append () {
 	install --mode 644 ${WORKDIR}/sl1fw.conf ${D}${libdir}/sysusers.d/sl1fw.conf
 }
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"

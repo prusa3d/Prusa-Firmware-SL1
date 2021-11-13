@@ -14,7 +14,7 @@ IMAGE_FEATURES += "\
 	empty-root-password \
 	post-install-logging \
 "
-IMAGE_FEATURES_remove = "package-management"
+IMAGE_FEATURES:remove = "package-management"
 
 IMAGE_LINGUAS = ""
 

@@ -1,1 +1,1 @@
-EXTRA_OECONF_append = " --disable-capstone "
+EXTRA_OECONF:append = " --disable-capstone "

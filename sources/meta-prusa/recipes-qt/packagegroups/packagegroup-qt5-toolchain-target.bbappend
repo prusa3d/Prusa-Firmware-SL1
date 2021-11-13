@@ -1,9 +1,9 @@
-RDEPENDS_${PN}_remove += " \
+RDEPENDS:${PN}:remove += " \
     qttranslations-qt \
 "
 
 #remove qtwebkit
-RDEPENDS_${PN}_remove = "qtwebkit-dev qtwebkit-mkspecs qtwebkit-qmlplugins"
-RDEPENDS_${PN}_remove = "qtcharts-dev qtcharts-mkspecs qtcharts-qmlplugins"
-RDEPENDS_${PN}_remove = "qttools-dev qttools-mkspecs qttools-staticdev"
+RDEPENDS:${PN}:remove = "qtwebkit-dev qtwebkit-mkspecs qtwebkit-qmlplugins"
+RDEPENDS:${PN}:remove = "qtcharts-dev qtcharts-mkspecs qtcharts-qmlplugins"
+RDEPENDS:${PN}:remove = "qttools-dev qttools-mkspecs qttools-staticdev"
 

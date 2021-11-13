@@ -47,21 +47,21 @@ fakeroot python do_populate_mountpoints() {
     check_size_limits(d)
 }
 
-IMAGE_CMD_root() {
+IMAGE_CMD:root() {
 	dd if=/dev/zero of="${WORKDIR}/root.ext4" count=0 bs=1M seek=${ROOTFS_PART_SIZE_MB}
 	mkfs.ext4 -F -i 4096 "${WORKDIR}/root.ext4" -d "${WORKDIR}/root" -L root
 	install -m 0644 "${WORKDIR}/root.ext4" "${IMGDEPLOYDIR}/${IMAGE_NAME}.root.ext4"
 	ln -sfn "${IMAGE_NAME}.root.ext4" "${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.root.ext4"
 }
 
-IMAGE_CMD_etc() {
+IMAGE_CMD:etc() {
         dd if=/dev/zero of="${WORKDIR}/etc.ext4" count=0 bs=1M seek=${ETC_PART_SIZE_MB}
         mkfs.ext4 -F "${WORKDIR}/etc.ext4" -d "${IMAGE_ROOTFS}/etc" -L etc
         install -m 0644 "${WORKDIR}/etc.ext4" "${IMGDEPLOYDIR}/${IMAGE_NAME}.etc.ext4"
 	ln -sfn "${IMAGE_NAME}.etc.ext4" "${IMGDEPLOYDIR}/${IMAGE_BASENAME}-${MACHINE}.etc.ext4"
 }
 
-IMAGE_CMD_factory() {
+IMAGE_CMD:factory() {
 	dd if=/dev/zero of="${WORKDIR}/factory.ext4" count=0 bs=1M seek=${FACTORY_PART_SIZE_MB}
 	mkfs.ext4 -F "${WORKDIR}/factory.ext4" -d "${IMAGE_ROOTFS}/usr/share/factory/defaults" -L factory
 	install -m 0644 "${WORKDIR}/factory.ext4" "${IMGDEPLOYDIR}/${IMAGE_NAME}.factory.ext4"

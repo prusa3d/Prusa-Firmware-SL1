@@ -10,13 +10,13 @@ SRC_URI = "\
 
 inherit systemd
 
-RDEPENDS_${PN} += "bash coreutils rauc"
+RDEPENDS:${PN} += "bash coreutils rauc"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
 	${libdir}/systemd/system/multi-user.target.wants/emergencyupdate.service \
 "
 
-do_install_append () {
+do_install:append () {
 	# Emergency update service
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/emergencyupdate.service ${D}${systemd_system_unitdir}/
@@ -26,5 +26,5 @@ do_install_append () {
 	ln -s ${libdir}/systemd/system/emergencyupdate.service ${D}${libdir}/systemd/system/multi-user.target.wants/emergencyupdate.service
 }
 
-SYSTEMD_SERVICE_${PN} = "emergencyupdate.service"
+SYSTEMD_SERVICE:${PN} = "emergencyupdate.service"
  

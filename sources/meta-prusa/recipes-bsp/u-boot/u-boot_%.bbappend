@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
 	file://0001-dts-and-defconfig.patch \
 	file://0003-boot-process.patch \
 	file://0004-mmc-legacy-only.patch \
@@ -22,6 +22,6 @@ SRC_URI_append = " \
 "
 
 PACKAGECONFIG[atf] = "BL31=${STAGING_DIR_HOST}/boot/bl31.bin,,arm-trusted-firmware"
-PACKAGECONFIG_append_sun50i = " atf"
+PACKAGECONFIG:append:sun50i = " atf"
 
-EXTRA_OEMAKE_append += " ${PACKAGECONFIG_CONFARGS}"
+EXTRA_OEMAKE:append += " ${PACKAGECONFIG_CONFARGS}"

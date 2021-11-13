@@ -1,1 +1,1 @@
-PACKAGECONFIG_class-nativesdk = ""
+PACKAGECONFIG:class-nativesdk = ""

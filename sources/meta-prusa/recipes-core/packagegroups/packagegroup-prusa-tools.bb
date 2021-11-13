@@ -6,7 +6,7 @@ PR = "r9"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     tmux htop mc man man-pages dtc strace socat iotop minicom \
     i2c-tools tree jq dash fish \
     bash-completion bash-completion-extra \

@@ -9,13 +9,13 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3 systemd
 
-RDEPENDS_${PN} += "python3-pydbus"
-RDEPENDS_${PN} += "python3-core"
-SYSTEMD_SERVICE_${PN} = "\
+RDEPENDS:${PN} += "python3-pydbus"
+RDEPENDS:${PN} += "python3-core"
+SYSTEMD_SERVICE:${PN} = "\
 	firstboot.service \
 	storetime.service \
 "
 
-do_install_append() {
+do_install:append() {
 	rmdir --ignore-fail-on-non-empty ${D}${datadir}
 }

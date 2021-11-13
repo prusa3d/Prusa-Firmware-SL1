@@ -25,7 +25,7 @@ CONFFILES = "							\
 	${sysconfdir}/ssh/sshd_config	\
 "
 
-FILES_${PN} = "							\
+FILES:${PN} = "							\
 	${sysconfdir}/profile					\
 	${sysconfdir}/bash/bashrc				\
 	${sysconfdir}/systemd/network/10-wlan.network		\
@@ -43,8 +43,8 @@ FILES_${PN} = "							\
 	${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf \
 "
 
-FILES_${PN}_remove = "${sysconfdir}/debug"
-FILES_${PN}-dev = "${sysconfdir}/debug"
+FILES:${PN}:remove = "${sysconfdir}/debug"
+FILES:${PN}-dev = "${sysconfdir}/debug"
 
 do_install() {
 	install -d ${D}${sysconfdir}
@@ -79,8 +79,8 @@ do_install() {
 	touch ${D}${sysconfdir}/debug
 }
 
-PACKAGE_WRITE_DEPS_append = " systemd-systemctl-native"
+PACKAGE_WRITE_DEPS:append = " systemd-systemctl-native"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	sed 's,/root:/bin/sh,/root:/bin/bash,' -i $D${sysconfdir}/passwd
 }

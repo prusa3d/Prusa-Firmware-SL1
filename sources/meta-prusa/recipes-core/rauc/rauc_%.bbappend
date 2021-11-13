@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
 	file://0001-add-.bin-image-handler-for-boot-emmc-slots.patch \
 	file://0002-when-extcsd-rw-fails-try-once-more-before-bailing-out.patch \
 	file://0003-fix-omitted-boot-ack-bit-during-extcsd-update.patch \
@@ -11,15 +11,15 @@ SRC_URI_append = " \
 	file://pre_install.py \
 "
 
-RDEPENDS_${PN} += "python3-semver python3-pydbus"
+RDEPENDS:${PN} += "python3-semver python3-pydbus"
 
-FILES_${PN} += " slot.raucs "
+FILES:${PN} += " slot.raucs "
 
-do_compile_append () {
+do_compile:append () {
     echo -e "[slot]\nbundle.version=${DISTRO_VERSION}" > ${WORKDIR}/slot.raucs
 }
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${datadir}/rauc/
     install -m 0644 ${WORKDIR}/system.conf ${D}${datadir}/rauc/system.conf
     install -m 0644 ${WORKDIR}/ca-prod.cert.pem ${D}${datadir}/rauc/ca-prod.cert.pem

@@ -13,7 +13,7 @@ inherit image
 PACKAGE_INSTALL = "initramfs-ab-slots busybox e2fsprogs-e2fsck e2fsprogs-mke2fs"
 ROOTFS_BOOTSTRAP_INSTALL = ""
 KERNELDEPMODDEPEND = ""
-ROOTFS_RO_UNNEEDED_append = " ${VIRTUAL-RUNTIME_update-alternatives}"
+ROOTFS_RO_UNNEEDED:append = " ${VIRTUAL-RUNTIME_update-alternatives}"
 NO_RECOMMENDED = "0"
 
 # Do not pollute the initrd image with rootfs features
