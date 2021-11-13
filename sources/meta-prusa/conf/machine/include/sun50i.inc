@@ -15,20 +15,8 @@ SPL_BINARYNAME = "sunxi-spl.bin"
 
 PREFERRED_VERSION_linux-mainline = "v5.11%"
 
-USE_LIMA ?= "1"
-MACHINEOVERRIDES_append = ":gl-${@ 'lima' if d.getVar('USE_LIMA') == '1' else 'mali'}"
-
-PREFERRED_PROVIDER_virtual/libgles1_gl-mali = "mali-blobs"
-PREFERRED_PROVIDER_virtual/libgles2_gl-mali = "mali-blobs"
-PREFERRED_PROVIDER_virtual/egl_gl-mali = "mali-blobs"
-PREFERRED_PROVIDER_virtual/mesa_gl-mali = "mali-blobs"
-PREFERRED_PROVIDER_virtual/libgbm_gl-mali = "mali-blobs"
-
-KERNEL_MODULE_AUTOLOAD_append_gl-mali = " mali"
-
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
-MACHINE_EXTRA_RDEPENDS_append_gl-mali = " kernel-module-mali mali-blobs"
-MACHINE_EXTRA_RDEPENDS_append_gl-lima = " kernel-module-lima"
+MACHINE_EXTRA_RDEPENDS_append = " kernel-module-lima"
 
 
 PACKAGECONFIG_append_pn-mesa_class-target = " lima kmsro"
