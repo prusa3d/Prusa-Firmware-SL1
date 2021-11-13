@@ -12,7 +12,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 PACKAGES += "${PN}-serve-package"
 
 GO_IMPORT = "gitlab.com/prusa3d/${BPN}"
-#GO_INSTALL = "${GO_IMPORT}"
+GO_LINKMODE_class-target = "--linkmode=external"
 
 inherit go-mod systemd
 
