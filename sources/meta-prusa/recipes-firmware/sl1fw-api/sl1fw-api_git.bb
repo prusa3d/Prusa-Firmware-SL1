@@ -24,7 +24,6 @@ RDEPENDS:${PN} += " \
 	python3-misc \
 	python3-netclient \
 	python3-stringold \
-	python3-typing \
 	python3-xml \
 	python3-streaming-form-data \
 	sl1fw \
