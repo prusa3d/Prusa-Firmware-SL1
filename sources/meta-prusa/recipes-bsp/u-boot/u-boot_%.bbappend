@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+require u-boot-srcrev.inc
 
 SRC_URI:append = " \
 	file://0001-dts-and-defconfig.patch \
