@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
 	file://0001-enable-all-sysrq-commands.patch \
 	file://0002-timesyncd-google.patch \
 	file://0003-resolve-implement-Legacy-Unicast-Response.patch \
@@ -13,9 +13,9 @@ SRC_URI_append = "\
 	file://remount-root-rw.conf \
 "
 
-RDEPENDS_${PN}_remove = "volatile-binds"
+RDEPENDS:${PN}:remove = "volatile-binds"
 
-do_install_append() {
+do_install:append() {
 	if ! ${@bb.utils.contains('PACKAGECONFIG', 'resolved', 'true', 'false', d)}; then
 		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../run/systemd/resolve/stub-resolv.conf%g" \
 			${D}${exec_prefix}/lib/tmpfiles.d/etc.conf

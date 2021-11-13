@@ -6,4 +6,4 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-prusa-graphics = "fstl cogl-1.0 opencv zbar"
+RDEPENDS:packagegroup-prusa-graphics = "fstl cogl-1.0 opencv zbar"

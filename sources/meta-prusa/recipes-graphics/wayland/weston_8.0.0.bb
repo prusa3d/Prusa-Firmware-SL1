@@ -81,9 +81,9 @@ PACKAGECONFIG[shell-kiosk] = "-Dshell-kiosk=true,-Dshell-kiosk=false"
 PACKAGECONFIG[image-jpeg] = "-Dimage-jpeg=true,-Dimage-jpeg=false, jpeg"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "weston.service"
+SYSTEMD_SERVICE:${PN} = "weston.service"
 
-do_install_append() {
+do_install:append() {
 	# Weston doesn't need the .la files to load modules, so wipe them
 	rm -f ${D}/${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.la
 	install -d ${D}${sysconfdir}/xdg/weston
@@ -95,25 +95,25 @@ do_install_append() {
 
 PACKAGES += "libweston-${WESTON_MAJOR_VERSION} ${PN}-examples"
 
-FILES_${PN}-dev += "${libdir}/${BPN}/libexec_weston.so"
-FILES_${PN} = "${bindir}/weston ${bindir}/weston-terminal ${bindir}/weston-info ${bindir}/weston-launch ${bindir}/wcap-decode ${libexecdir} ${libdir}/${BPN}/*.so* ${datadir}"
+FILES:${PN}-dev += "${libdir}/${BPN}/libexec_weston.so"
+FILES:${PN} = "${bindir}/weston ${bindir}/weston-terminal ${bindir}/weston-info ${bindir}/weston-launch ${bindir}/wcap-decode ${libexecdir} ${libdir}/${BPN}/*.so* ${datadir}"
 
-FILES_libweston-${WESTON_MAJOR_VERSION} = "${libdir}/lib*${SOLIBS} ${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.so"
-SUMMARY_libweston-${WESTON_MAJOR_VERSION} = "Helper library for implementing 'wayland window managers'."
+FILES:libweston-${WESTON_MAJOR_VERSION} = "${libdir}/lib*${SOLIBS} ${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.so"
+SUMMARY:libweston-${WESTON_MAJOR_VERSION} = "Helper library for implementing 'wayland window managers'."
 
-FILES_${PN}-examples = "${bindir}/*"
+FILES:${PN}-examples = "${bindir}/*"
 
-RDEPENDS_${PN} += "xkeyboard-config"
-RRECOMMENDS_${PN} = "liberation-fonts"
-RRECOMMENDS_${PN}-dev += "wayland-protocols"
+RDEPENDS:${PN} += "xkeyboard-config"
+RRECOMMENDS:${PN} = "liberation-fonts"
+RRECOMMENDS:${PN}-dev += "wayland-protocols"
 
 
-FILES_${PN} += " \
+FILES:${PN} += " \
 	${sysconfdir}/xdg/weston/weston.ini \
 	${systemd_system_unitdir}/weston.service \
 	${systemd_system_unitdir}/multi-user.target.wants/graphical.target \
 "
-CONFFILES_${PN} += "${sysconfdir}/xdg/weston/weston.ini"
+CONFFILES:${PN} += "${sysconfdir}/xdg/weston/weston.ini"
 
 copy_prusa_logo() {
 	cp ${WORKDIR}/prusa_logo.webp ${S}/data/

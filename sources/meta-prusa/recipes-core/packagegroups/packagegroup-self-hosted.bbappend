@@ -1,1 +1,1 @@
-RDEPENDS_packagegroup-self-hosted-extended_remove = "mdadm"
+RDEPENDS:packagegroup-self-hosted-extended:remove = "mdadm"

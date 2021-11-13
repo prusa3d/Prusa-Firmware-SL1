@@ -8,7 +8,7 @@ SRC_URI = "\
 "
 SRCREV = "3c9e93a2d52c1ec0b6007965d1b208505bd9fcc1"
 
-FILES_${PN} = "\
+FILES:${PN} = "\
   ${bindir}/timertest \
 "
 

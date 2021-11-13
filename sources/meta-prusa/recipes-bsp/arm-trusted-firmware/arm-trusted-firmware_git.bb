@@ -20,7 +20,7 @@ B = "${WORKDIR}/build"
 
 COMPATIBLE_MACHINE = "(sun50i)"
 
-PLATFORM_sun50i = "sun50i_a64"
+PLATFORM:sun50i = "sun50i_a64"
 
 CFLAGS[unexport] = "1"
 LDFLAGS[unexport] = "1"
@@ -49,5 +49,5 @@ do_deploy() {
 
 addtask deploy before do_build after do_compile
 
-FILES_${PN} = "/boot"
+FILES:${PN} = "/boot"
 SYSROOT_DIRS += "/boot"

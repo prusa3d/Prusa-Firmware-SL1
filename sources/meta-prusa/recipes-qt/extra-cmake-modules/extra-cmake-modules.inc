@@ -15,7 +15,7 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 CLEANBROKEN = "1"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 do_compile() {
     cmake -DCMAKE_INSTALL_PREFIX:PATH=${D}/${prefix}/ .
@@ -27,6 +27,6 @@ do_install() {
 }
 
 
-FILES_${PN}-dev += " ${datadir}/ECM"
+FILES:${PN}-dev += " ${datadir}/ECM"
 
 BBCLASSEXTEND = "native nativesdk"

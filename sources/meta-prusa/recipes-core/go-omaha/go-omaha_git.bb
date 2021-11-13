@@ -12,18 +12,18 @@ UPSTREAM_CHECK_COMMITS = "1"
 PACKAGES += "${PN}-serve-package"
 
 GO_IMPORT = "gitlab.com/prusa3d/${BPN}"
-GO_LINKMODE_class-target = "--linkmode=external"
+GO_LINKMODE:class-target = "--linkmode=external"
 
 inherit go-mod systemd
 
-FILES_${PN} = "\
+FILES:${PN} = "\
 	${bindir}/updater \
 	${datadir}/dbus-1/system.d/cz.prusa3d.Updater1.conf \
 	${libdir}/systemd/system \
 "
-FILES_${PN}-serve-package = "${bindir}/serve-package"
+FILES:${PN}-serve-package = "${bindir}/serve-package"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${datadir}/dbus-1/system.d
 	install -m 0644 ${S}/src/${GO_IMPORT}/_release/cz.prusa3d.Updater1.conf ${D}${datadir}/dbus-1/system.d/
 	install -d ${D}${systemd_system_unitdir}
@@ -34,4 +34,4 @@ do_install_append() {
 	ln -s ${systemd_system_unitdir}/updater.service ${D}${systemd_system_unitdir}/multi-user.target.wants/
 }
 
-SYSTEMD_SERVICE_${PN} = "updater.service"
+SYSTEMD_SERVICE:${PN} = "updater.service"

@@ -15,5 +15,5 @@ S = "${WORKDIR}/git"
 
 inherit cmake_kf5
 
-RDEPENDS_${PN} += "networkmanager"
+RDEPENDS:${PN} += "networkmanager"
 

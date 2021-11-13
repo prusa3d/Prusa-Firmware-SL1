@@ -17,7 +17,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit pkgconfig setuptools3
 
-do_configure_prepend() {
+do_configure:prepend() {
 	cd ${S}
 	LOCALBASE="${RECIPE_SYSROOT}${prefix}" ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} buildconfig/config.py -auto
 

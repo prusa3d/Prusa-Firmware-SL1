@@ -12,7 +12,7 @@ SRC_URI = "\
 "
 SRCREV = "9b78df98c9f96a539fa1e97af1764e941f162477"
 
-FILES_${PN} = "\
+FILES:${PN} = "\
   ${bindir}/panic \
 "
 
@@ -28,4 +28,4 @@ do_install() {
 	install --mode 644 ${S}/systemd/panic.service ${D}${systemd_system_unitdir}/panic.service
 }
 
-SYSTEMD_SERVICE_${PN} = "panic.service"
+SYSTEMD_SERVICE:${PN} = "panic.service"

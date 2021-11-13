@@ -7,7 +7,7 @@ PV = "2.1.16+git${SRCPV}"
 SRCREV = "861d8e15f05bc434bb475967c48acca6473b27cb"
 
 S = "${WORKDIR}/git"
-FILES_${PN} = "\
+FILES:${PN} = "\
   /usr/lib/qml/Nemo/DBus/libnemodbus.so \
   /usr/lib/qml/Nemo/DBus/qmldir \
   /usr/lib/qml/Nemo/DBus/plugins.qmltypes \
@@ -16,7 +16,7 @@ FILES_${PN} = "\
   /usr/lib/libnemodbus.so.1.0 \
 "
 
-do_install_append () {
+do_install:append () {
 	rm ${D}/opt -rf
 }
 

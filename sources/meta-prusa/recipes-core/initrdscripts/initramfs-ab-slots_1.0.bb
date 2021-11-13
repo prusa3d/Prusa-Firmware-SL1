@@ -2,7 +2,7 @@ SUMMARY = "Extremely basic live image init script"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-RDEPENDS_${PN} = "busybox"
+RDEPENDS:${PN} = "busybox"
 
 #PR = "r2"
 
@@ -22,4 +22,4 @@ do_install() {
 
 inherit allarch
 
-FILES_${PN} += "/init /dev/console /proc /sys"
+FILES:${PN} += "/init /dev/console /proc /sys"

@@ -19,7 +19,7 @@ UPSTREAM_CHECK_REGEX = "iotop-(?P<pver>\d+(\.\d+)+)"
 
 inherit distutils3
 
-do_install_append() {
+do_install:append() {
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/site.pyo || true
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/site.py  || true
     
@@ -27,4 +27,4 @@ do_install_append() {
     sed -i 's%#!/usr/bin/python3-native/python3%#!/usr/bin/python3%' ${D}/usr/sbin/iotop
 }
 
-RDEPENDS_${PN} = "python3 python3-curses python3-codecs python3-ctypes python3-pprint python3-shell"
+RDEPENDS:${PN} = "python3 python3-curses python3-codecs python3-ctypes python3-pprint python3-shell"

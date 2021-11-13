@@ -15,7 +15,7 @@ KBRANCH ?= "linux-5.11.y"
 
 DEFAULT_PREFERENCE = "1"
 
-SRCREV_pn-${PN} = "v5.11.6"
+SRCREV:pn-${PN} = "v5.11.6"
 PV = "v5.11.6"
 LINUX_VERSION = "${PV}"
 
@@ -44,13 +44,13 @@ SRC_URI="\
 
 S="${WORKDIR}/git"
 
-FILES_${KERNEL_PACKAGE_NAME}-devicetree_append = " /${KERNEL_IMAGEDEST}/**/*.dtb"
+FILES:${KERNEL_PACKAGE_NAME}-devicetree:append = " /${KERNEL_IMAGEDEST}/**/*.dtb"
 
 FW_DIR = "${RECIPE_SYSROOT}${nonarch_base_libdir}/firmware"
 
 do_configure[depends] += "sla-edid:do_populate_sysroot"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
 		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' ${S}/Makefile
 	fi
@@ -59,7 +59,7 @@ do_configure_prepend() {
 	echo "CONFIG_EXTRA_FIRMWARE_DIR=\"${FW_DIR}\"" >> ${WORKDIR}/defconfig
 }
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}/${KERNEL_IMAGEDEST}
 	install -d ${D}/boot
 

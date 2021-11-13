@@ -11,7 +11,7 @@ inherit packagegroup
 
 VIRTUAL-RUNTIME_vim ?= "vim-tiny"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     bash \
     bzip2 \
     coreutils \

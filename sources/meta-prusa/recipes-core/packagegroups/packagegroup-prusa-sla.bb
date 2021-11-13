@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-prusa-sla = "\
+RDEPENDS:packagegroup-prusa-sla = "\
 	etc sl1fw touch-ui \
 	sl1fw-api sl1fw-fs wifi-config \
 	prusa-link \

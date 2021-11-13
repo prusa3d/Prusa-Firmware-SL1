@@ -19,11 +19,11 @@ EXTRA_OECMAKE += " -DGAMMARAY_BUILD_UI=OFF"
 
 # The globs specified here should be implied
 # TODO: investigate why was it necessary to put it here (it most likely wasn't)
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     /usr/lib/cmake/* \
     /usr/mkspecs/modules/* \
 "
-FILES_${PN}-dbg += " \
+FILES:${PN}-dbg += " \
     /usr/lib/.debug/* \
     /usr/lib/gammaray/*/*/.debug \
     /usr/lib/gammaray/*/*/styles/.debug \

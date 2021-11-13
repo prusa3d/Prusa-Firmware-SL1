@@ -1,18 +1,18 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append = "\
+SRC_URI:append = "\
         file://alsa-factory-restore.service \
         file://alsa-state.conf \
 "
 
-FILES_alsa-states += " \
+FILES:alsa-states += " \
         ${systemd_system_unitdir}/alsa-factory-restore.service \
         ${systemd_system_unitdir}/sound.target.wants/alsa-factory-restore.service \
         ${libdir}/tmpfiles.d/alsa-state.conf \
         /usr/share/factory/var/lib/alsa/*.state \
 "
 
-do_install_append() {
+do_install:append() {
     # Install copy of default mixer states as factory defaults
     install -d ${D}/usr/share/factory/var/lib/alsa
     install -m 0644 ${WORKDIR}/*.state ${D}/usr/share/factory/var/lib/alsa

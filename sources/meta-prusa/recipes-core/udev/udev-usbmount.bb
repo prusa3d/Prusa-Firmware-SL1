@@ -15,14 +15,14 @@ SRC_URI = " \
 	file://rmdir-on-exit@.service \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
 	${systemd_system_unitdir}/rmdir-on-exit@.service \
 	${nonarch_base_libdir}/udev/rules.d/automount.rules \
 "
 
 S = "${WORKDIR}/src"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${nonarch_base_libdir}/udev/rules.d
 	install --mode 644 ${WORKDIR}/automount.rules ${D}${nonarch_base_libdir}/udev/rules.d/
 	install -d ${D}${systemd_system_unitdir}

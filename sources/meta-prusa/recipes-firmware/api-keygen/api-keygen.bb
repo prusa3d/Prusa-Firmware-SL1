@@ -11,9 +11,9 @@ SRC_URI = "\
 
 inherit systemd
 
-RDEPENDS_${PN} += "bash coreutils grep"
+RDEPENDS:${PN} += "bash coreutils grep"
 
-do_install_append () {
+do_install:append () {
 	# Keygen service
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/api-keygen.service ${D}${systemd_system_unitdir}/
@@ -26,4 +26,4 @@ do_install_append () {
 	install -d ${D}${sysconfdir}/sl1fw
 }
 
-SYSTEMD_SERVICE_${PN} = "api-keygen.service"
+SYSTEMD_SERVICE:${PN} = "api-keygen.service"

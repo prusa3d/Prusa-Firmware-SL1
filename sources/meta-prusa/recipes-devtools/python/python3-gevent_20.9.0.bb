@@ -11,14 +11,14 @@ SRC_URI[sha256sum] = "5f6d48051d336561ec08995431ee4d265ac723a64bba99cc58c3eb1a4d
 
 DEPENDS += "libevent"
 DEPENDS += "python3-greenlet"
-RDEPENDS_${PN} = "python3-greenlet \
+RDEPENDS:${PN} = "python3-greenlet \
 		  python3-mime \
 		  python3-pprint \
 		 "
 # The python-gevent has no autoreconf ability
 # and the logic for detecting a cross compile is flawed
 # so always force a cross compile
-do_configure_append() {
+do_configure:append() {
 	sed -i -e 's/^cross_compiling=no/cross_compiling=yes/' ${S}/deps/libev/configure
 	sed -i -e 's/^cross_compiling=no/cross_compiling=yes/' ${S}/deps/c-ares/configure
 }

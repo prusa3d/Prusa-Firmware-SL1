@@ -30,11 +30,11 @@ WKS_FILE = "sunxi-sd.wks"
 SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
 "
 
-TOOLCHAIN_TARGET_TASK_append = "\
+TOOLCHAIN_TARGET_TASK:append = "\
 	networkmanager-qt-dev \
 	extra-cmake-modules-dev \
 "
-TOOLCHAIN_HOST_TASK_append = "\
+TOOLCHAIN_HOST_TASK:append = "\
         nativesdk-qtdeclarative-tools \
         nativesdk-python3 \
         nativesdk-python3-core \

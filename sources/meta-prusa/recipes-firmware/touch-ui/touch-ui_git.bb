@@ -9,13 +9,13 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
 "
-EXTRA_OECMAKE_append = " -DCMAKE_BUILD_TYPE=Release"
+EXTRA_OECMAKE:append = " -DCMAKE_BUILD_TYPE=Release"
 
 inherit cmake_kf5 systemd python3native
 
 DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtsvg qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
 	bash \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '' ,d)} \
 	qtquickcontrols-qmlplugins \
@@ -33,14 +33,14 @@ RDEPENDS_${PN} += "\
 	gstreamer1.0-plugins-good \
 "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
 	${datadir}/dbus-1/system.d/cz.prusa3d.sl1.Notify1.conf \
 "
 
 S="${WORKDIR}/git"
 
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${systemd_system_unitdir}/
 	install --mode 644 ${WORKDIR}/touch-ui.service ${D}${systemd_system_unitdir}/
 
@@ -48,4 +48,4 @@ do_install_append () {
 	install --mode 644 ${WORKDIR}/cz.prusa3d.sl1.Notify1.conf ${D}${datadir}/dbus-1/system.d/
 }
 
-SYSTEMD_SERVICE_${PN} = "touch-ui.service"
+SYSTEMD_SERVICE:${PN} = "touch-ui.service"

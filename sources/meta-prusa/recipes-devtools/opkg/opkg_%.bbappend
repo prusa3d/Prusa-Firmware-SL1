@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " file://base-feeds.conf"
+SRC_URI:append = " file://base-feeds.conf"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/opkg
 	install -m 0644 ${WORKDIR}/base-feeds.conf ${D}${sysconfdir}/opkg/
 }
 
-CONFFILES_${PN}_append = " ${sysconfdir}/opkg/base-feeds.conf"
+CONFFILES:${PN}:append = " ${sysconfdir}/opkg/base-feeds.conf"
