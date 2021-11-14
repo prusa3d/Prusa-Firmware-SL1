@@ -9,7 +9,6 @@ inherit packagegroup
 RDEPENDS:packagegroup-prusa-sla = "\
 	etc sl1fw touch-ui \
 	sl1fw-api sl1fw-fs wifi-config \
-	prusa-link \
-	libva-v4l2-request weston \
+	prusa-link  weston \
 	"
 
