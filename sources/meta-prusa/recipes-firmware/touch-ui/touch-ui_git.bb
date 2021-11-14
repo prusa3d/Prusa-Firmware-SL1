@@ -13,7 +13,7 @@ EXTRA_OECMAKE:append = " -DCMAKE_BUILD_TYPE=Release"
 
 inherit cmake_kf5 systemd python3native
 
-DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtsvg qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
+DEPENDS += "qtbase qtquickcontrols qtquickcontrols2 qtsvg qttools qtvirtualkeyboard qtmultimedia networkmanager-qt prusa-errors-native qtdeclarative-native"
 
 RDEPENDS:${PN} += "\
 	bash \

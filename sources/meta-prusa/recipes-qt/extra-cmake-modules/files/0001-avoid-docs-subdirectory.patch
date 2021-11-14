@@ -1,0 +1,30 @@
+From 5d663f41f674644620c5d09d3ddbac376bbaa74c Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sun, 14 Nov 2021 08:55:20 +0100
+Subject: [PATCH] avoid docs subdirectory
+
+---
+ CMakeLists.txt | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2751c05..be329ba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -70,9 +70,10 @@ set(MAN_INSTALL_DIR ${SHARE_INSTALL_DIR}/man
+ #
+ # Documentation
+ #
+-
+-add_subdirectory(docs)
+-
++option(BUILD_DOCS "Build documentation with Sphinx." OFF)
++if(BUILD_DOCS)
++    add_subdirectory(docs)
++endif()
+ 
+ #
+ # Tests
+-- 
+2.33.1
+
