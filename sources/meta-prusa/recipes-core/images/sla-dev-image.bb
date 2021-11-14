@@ -27,7 +27,7 @@ WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
 WKS_FILE_DEPENDS = "virtual/bootloader e2fsprogs-native bmap-tools-native gptfdisk-native"
 WKS_FILE = "sunxi-sd.wks"
 
-SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs doc-pkgs staticdev-pkgs qt-pkgs\
+SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs staticdev-pkgs qt-pkgs\
 "
 
 TOOLCHAIN_TARGET_TASK:append = "\
