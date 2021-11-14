@@ -5,8 +5,8 @@ Subject: [PATCH] use target_link_libraries for linking Zlib
 
 ---
  CMakeLists.txt     | 2 +-
- src/CMakeLists.txt | 8 +++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ src/CMakeLists.txt | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 1ad6a2c..ba3a6cc 100644
@@ -28,27 +28,24 @@ index e86456c..199ab3d 100644
  # Sources and private headers
  SET(libubootenv_SOURCES
    uboot_env.c
-@@ -11,16 +11,18 @@ SET(include_HEADERS
+@@ -11,15 +11,16 @@ SET(include_HEADERS
  )
  
  include(GNUInstallDirs) # for the CMAKE_INSTALL_LIBDIR variable
 +find_package(ZLIB REQUIRED)
  
  add_library(ubootenv SHARED ${libubootenv_SOURCES} ${include_HEADERS})
-+target_link_libraries(ubootenv ZLIB::ZLIB)
  SET_TARGET_PROPERTIES(ubootenv PROPERTIES VERSION ${VERSION} SOVERSION ${SOVERSION})
  
  ADD_LIBRARY(ubootenv_static STATIC ${libubootenv_SOURCES} ${include_HEADERS})
  SET_TARGET_PROPERTIES(ubootenv_static PROPERTIES OUTPUT_NAME ubootenv)
  add_executable(fw_printenv fw_printenv.c)
  add_executable(fw_setenv fw_setenv.c)
--target_link_libraries(fw_printenv ubootenv z)
--target_link_libraries(fw_setenv ubootenv z)
-+target_link_libraries(fw_printenv ubootenv)
-+target_link_libraries(fw_setenv ubootenv)
+-target_link_libraries(ubootenv z)
++target_link_libraries(ubootenv ZLIB::ZLIB)
+ target_link_libraries(fw_printenv ubootenv)
+ target_link_libraries(fw_setenv ubootenv)
  
- install (TARGETS ubootenv ubootenv_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
- install (FILES libuboot.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 -- 
 2.28.0
 
