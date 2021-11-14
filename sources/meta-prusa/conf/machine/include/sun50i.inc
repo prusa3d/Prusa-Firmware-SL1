@@ -18,8 +18,8 @@ PREFERRED_VERSION_linux-mainline = "v5.11%"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
 MACHINE_EXTRA_RDEPENDS:append = " kernel-module-lima"
 
-
 PACKAGECONFIG:append:pn-mesa:class-target = " lima kmsro"
+PACKAGECONFIG:remove:pn-mesa = "virgl elf-tls"
 
 INITRAMFS_IMAGE = "sla-initramfs"
 INITRAMFS_IMAGE_BUNDLE = "1"
