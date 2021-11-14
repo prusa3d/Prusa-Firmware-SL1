@@ -1,32 +1,23 @@
-DESCRIPTION = "Extra CMake Modules"
+SUMMARY = "Extra CMake Modules"
 HOMEPAGE = "https://api.kde.org/frameworks/extra-cmake-modules/html/index.html"
-LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://COPYING-CMAKE-SCRIPTS;md5=54c7042be62e169199200bc6477f04d1"
+LICENSE = "BSD-2-Clause & BSD-3-Clause & MIT"
+LIC_FILES_CHKSUM = " \
+	file://LICENSES/BSD-2-Clause.txt;md5=63d6ee386b8aaba70b1bf15a79ca50f2 \
+	file://LICENSES/BSD-3-Clause.txt;md5=954f4d71a37096249f837652a7f586c0 \
+	file://LICENSES/MIT.txt;md5=38aa75cf4c4c87f018227d5ec9638d75 \
+"
 PR = "r0"
 
-DEPENDS = "cmake-native qttools"
+inherit cmake_qt5
 
-SRC_URI = " \
-	git://invent.kde.org/frameworks/extra-cmake-modules.git;protocol=https;nobranch=1 \
-	file://0001-askqmake-warnings.patch \
-	file://0003-ecmgeneerateprifile-handle-qt-module-base.patch \
-"
-#	file://0002-ecmgeneerateprifile-add-option-to-use-qt-module-base.patch
+SRC_URI = "git://invent.kde.org/frameworks/extra-cmake-modules.git;protocol=https;nobranch=1 \
+	   file://0001-avoid-docs-subdirectory.patch"
 S = "${WORKDIR}/git"
+
 CLEANBROKEN = "1"
 
 ALLOW_EMPTY:${PN} = "1"
 
-do_compile() {
-    cmake -DCMAKE_INSTALL_PREFIX:PATH=${D}/${prefix}/ .
-    make
-}
-
-do_install() {
-    make install
-}
-
-
-FILES:${PN}-dev += " ${datadir}/ECM"
+FILES:${PN}-dev = " ${datadir}/ECM"
 
 BBCLASSEXTEND = "native nativesdk"
