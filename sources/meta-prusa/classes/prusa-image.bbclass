@@ -13,7 +13,7 @@ def check_size_limits(d):
     for p in ['rootfs', 'etc', 'factory']:
         max_size = int(d.getVar(p.upper() + '_PART_SIZE_MB'))
         dir = os.path.join(d.getVar('IMAGE_ROOTFS'), d.getVar(p + 'dir'))
-        actual_size = int(subprocess.check_output(['du', '-lms', dir]).split()[0])
+        actual_size = int(subprocess.check_output(['du', '-ms', dir]).split()[0])
 
         if actual_size > max_size:
             bb.fatal("The %s image size (%d MB) exceeds %s_PART_SIZE_MB of (%d MB)" % \
