@@ -1,0 +1,12 @@
+[Unit]
+Description=Weston socket
+RequiresMountsFor=/run
+
+[Socket]
+ListenStream=/run/wayland-0
+SocketMode=0775
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
+

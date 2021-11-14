@@ -1,17 +1,18 @@
+# This is a system unit for launching Weston with auto-login as root
+#
+# Weston must be built with systemd support, and your weston.ini must load
+# the plugin systemd-notify.so.[Unit]
 [Unit]
 Description=Weston, a Wayland compositor, as a system service
 Documentation=man:weston(1) man:weston.ini(5)
 Documentation=http://wayland.freedesktop.org/
 
-# Make sure we are started after logins are permitted.
-After=systemd-user-sessions.service
-
-# If Plymouth is used, we want to start when it is on its way out.
-After=plymouth-quit-wait.service
-
 # D-Bus is necessary for contacting logind. Logind is required.
 Wants=dbus.socket
 After=dbus.socket
+
+# Ensure the socket is present
+Requires=weston.socket
 
 # Since we are part of the graphical session, make sure we are started before
 # it is complete.
@@ -22,6 +23,7 @@ Before=graphical.target
 ConditionPathExists=/dev/tty0
 
 [Service]
+# Requires systemd-notify.so Weston plugin.
 Type=notify
 ExecStart=/usr/bin/weston --modules=systemd-notify.so
 TimeoutStartSec=60
@@ -41,4 +43,6 @@ StandardOutput=journal
 StandardError=journal
 
 [Install]
+# Note: If you only want weston to start on-demand, remove this line with a
+# service drop file
 WantedBy=graphical.target
