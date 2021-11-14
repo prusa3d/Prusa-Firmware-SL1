@@ -30,7 +30,7 @@ RDEPENDS:${PN} = "\
     gzip \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "ifupdown", d)} \
     iputils-ping \
-    iproute2 \
+    iproute2-ip \
     iproute2-ss \
     ${@bb.utils.contains("MACHINE_FEATURES", "keyboard", "kbd", "", d)} \
     kmod \
