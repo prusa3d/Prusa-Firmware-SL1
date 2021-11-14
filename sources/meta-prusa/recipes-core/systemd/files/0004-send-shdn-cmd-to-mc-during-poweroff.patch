@@ -1,19 +1,34 @@
+From e4ccf20d8e0963c586d68be638e2b82f664a8cc0 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sat, 13 Nov 2021 18:24:44 +0100
+Subject: [PATCH] send shdn cmd to mc during poweroff
+
+---
+ src/shared/meson.build         |  2 ++
+ src/shared/prusa-mc-shdn.c     | 49 ++++++++++++++++++++++++++++++++++
+ src/shared/prusa-mc-shdn.h     |  4 +++
+ src/shutdown/shutdown.c        |  2 ++
+ src/systemctl/systemctl-util.c |  2 ++
+ 5 files changed, 59 insertions(+)
+ create mode 100644 src/shared/prusa-mc-shdn.c
+ create mode 100644 src/shared/prusa-mc-shdn.h
+
 diff --git a/src/shared/meson.build b/src/shared/meson.build
-index a7320fc4ed..fa381dd3ba 100644
+index 7eb7050062..7e8829caf1 100644
 --- a/src/shared/meson.build
 +++ b/src/shared/meson.build
-@@ -141,6 +141,8 @@ shared_sources = files('''
-         pe-header.h
+@@ -232,6 +232,8 @@ shared_sources = files('''
+         pkcs11-util.h
          pretty-print.c
          pretty-print.h
 +        prusa-mc-shdn.c
 +        prusa-mc-shdn.h
+         psi-util.c
+         psi-util.h
          ptyfwd.c
-         ptyfwd.h
-         reboot-util.c
 diff --git a/src/shared/prusa-mc-shdn.c b/src/shared/prusa-mc-shdn.c
 new file mode 100644
-index 0000000000..7711bf9a7b
+index 0000000000..654cacc42f
 --- /dev/null
 +++ b/src/shared/prusa-mc-shdn.c
 @@ -0,0 +1,49 @@
@@ -77,10 +92,10 @@ index 0000000000..09fd50e445
 +
 +int mc_send_shutdown_command(void);
 diff --git a/src/shutdown/shutdown.c b/src/shutdown/shutdown.c
-index 15e6c1799e..6ad53e91f1 100644
+index a98cfc4d8a..2baa1e6b06 100644
 --- a/src/shutdown/shutdown.c
 +++ b/src/shutdown/shutdown.c
-@@ -26,6 +26,7 @@
+@@ -27,6 +27,7 @@
  #include "log.h"
  #include "parse-util.h"
  #include "process-util.h"
@@ -88,7 +103,7 @@ index 15e6c1799e..6ad53e91f1 100644
  #include "reboot-util.h"
  #include "rlimit-util.h"
  #include "signal-util.h"
-@@ -562,6 +563,7 @@ int main(int argc, char *argv[]) {
+@@ -602,6 +603,7 @@ int main(int argc, char *argv[]) {
                  break;
  
          case RB_POWER_OFF:
@@ -96,19 +111,19 @@ index 15e6c1799e..6ad53e91f1 100644
                  log_info("Powering off.");
                  break;
  
-diff --git a/src/systemctl/systemctl.c b/src/systemctl/systemctl.c
-index 60872bc537..31e280a10d 100644
---- a/src/systemctl/systemctl.c
-+++ b/src/systemctl/systemctl.c
-@@ -65,6 +65,7 @@
- #include "pretty-print.h"
- #include "proc-cmdline.h"
- #include "process-util.h"
+diff --git a/src/systemctl/systemctl-util.c b/src/systemctl/systemctl-util.c
+index 99f1394bcf..3b12014f90 100644
+--- a/src/systemctl/systemctl-util.c
++++ b/src/systemctl/systemctl-util.c
+@@ -17,6 +17,7 @@
+ #include "glob-util.h"
+ #include "macro.h"
+ #include "path-util.h"
 +#include "prusa-mc-shdn.h"
  #include "reboot-util.h"
- #include "rlimit-util.h"
  #include "set.h"
-@@ -9180,6 +9181,7 @@ static int halt_now(enum action a) {
+ #include "spawn-ask-password-agent.h"
+@@ -920,6 +921,7 @@ int halt_now(enum action a) {
                          log_info("Powering off.");
                  if (arg_dry_run)
                          return 0;
@@ -116,3 +131,6 @@ index 60872bc537..31e280a10d 100644
                  (void) reboot(RB_POWER_OFF);
                  return -errno;
  
+-- 
+2.33.1
+

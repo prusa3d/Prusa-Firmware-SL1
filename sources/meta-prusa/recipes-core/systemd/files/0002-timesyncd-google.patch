@@ -7,7 +7,7 @@ index f91c034a0..ca2972771 100644
  
  [Time]
 -#NTP=
--#FallbackNTP=@NTP_SERVERS@
+-#FallbackNTP={{NTP_SERVERS}}
 +NTP=pool.ntp.org
 +FallbackNTP=time.nist.gov time.google.com ntp.nic.cz
  #RootDistanceMaxSec=5
