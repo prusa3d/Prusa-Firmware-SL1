@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install tools required to build the system using bitbake
-RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin
+RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin liblz4-tool zstd
 
 # Configure locale, python/bitbake have problems without valid locale
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen 
@@ -32,5 +32,7 @@ WORKDIR /home/docker-build-user/
 RUN mkdir -p .ssh
 RUN chmod 700 .ssh
 RUN ssh-keyscan gitlab.com >> .ssh/known_hosts
-RUN ssh-keyscan -p 22443 gitlab.webdev.prusa3d.com >> .ssh/known_hosts
 RUN ssh-keyscan 10.24.10.12 >> .ssh/known_hosts
+
+# enables GitLab's Interactive Web Terminal feature
+EXPOSE 8093
