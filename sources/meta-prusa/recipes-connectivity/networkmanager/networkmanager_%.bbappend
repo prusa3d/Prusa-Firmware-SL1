@@ -1,7 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = "\
-        file://hotspot_scan.patch \
 	file://mdns.conf \
 	file://wifi.conf \
 "
