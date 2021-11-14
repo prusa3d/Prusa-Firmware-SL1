@@ -1,5 +1,0 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-PV = "20.1.8"
-SRC_URI:remove = "file://0005-vc4-use-intmax_t-for-formatted-output-of-timespec-me.patch"
-SRC_URI[md5sum] = "143ded7a408c0cfd21b9fbb7e138c842"
-SRC_URI[sha256sum] = "df21351494f7caaec5a3ccc16f14f15512e98d2ecde178bba1d134edc899b961"
