@@ -1,19 +1,19 @@
-From 2e9b8a94b526c0a031bba1e05fcad52bae6e41ff Mon Sep 17 00:00:00 2001
+From 40879af6905906a2a7d66675e5a9111b913dae98 Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Tue, 3 Mar 2020 16:05:08 +0100
 Subject: [PATCH] Ethernet reconnection fix
 
 - env: board revison recognition system
 ---
- board/sunxi/board.c            | 33 +++++++++++++++++++++++++++++++++
+ board/sunxi/board.c | 33 +++++++++++++++++++++++++++++++++
  1 file changed, 33 insertions(+)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 0ddb96cd5b..861db14599 100644
+index 60c7036a43..c02573e991 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -774,6 +774,37 @@ static void parse_spl_header(const uint32_t spl_addr)
- 	env_set_hex("fel_scriptaddr", spl->fel_script_address);
+@@ -847,6 +847,37 @@ static bool get_unique_sid(unsigned int *sid)
+ 	return true;
  }
  
 +/*
@@ -50,15 +50,15 @@ index 0ddb96cd5b..861db14599 100644
  /*
   * Note this function gets called multiple times.
   * It must not make any changes to env variables which already exist.
-@@ -863,6 +894,8 @@ int misc_init_r(void)
+@@ -926,6 +957,8 @@ int misc_init_r(void)
  	}
  
  	setup_environment(gd->fdt_blob);
 +	if (of_machine_is_compatible("prusa,prusa64-sl1"))
 +		setup_sl1_board_revision();
  
- #ifdef CONFIG_USB_ETHER
- 	usb_ether_init();
+ 	return 0;
+ }
 -- 
-2.32.0
+2.34.0
 

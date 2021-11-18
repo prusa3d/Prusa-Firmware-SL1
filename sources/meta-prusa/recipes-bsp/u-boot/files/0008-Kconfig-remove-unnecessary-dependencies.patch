@@ -1,4 +1,4 @@
-From 280b4ea9944ddb4b2a50e61de3fc7dd22d733c01 Mon Sep 17 00:00:00 2001
+From 79550c1a7f148df55f3faaad840f58ba52ec1fb1 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.cz>
 Date: Mon, 12 Jul 2021 04:15:57 +0200
 Subject: [PATCH] Kconfig: remove unnecessary dependencies
@@ -9,10 +9,10 @@ Subject: [PATCH] Kconfig: remove unnecessary dependencies
  2 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 36c9c2fecd..9bb4d50554 100644
+index 0448787b8b..7a9d51c61a 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -951,9 +951,9 @@ config ARCH_SUNXI
+@@ -991,9 +991,9 @@ config ARCH_SUNXI
  	select CMD_USB if DISTRO_DEFAULTS
  	select CLK
  	select DM
@@ -25,10 +25,10 @@ index 36c9c2fecd..9bb4d50554 100644
  	select DM_SCSI if SCSI
  	select DM_SERIAL
 diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
-index fc71e1a6a1..f8de820e12 100644
+index 2e601598c8..ce66fe1e60 100644
 --- a/arch/arm/mach-sunxi/Kconfig
 +++ b/arch/arm/mach-sunxi/Kconfig
-@@ -275,11 +275,8 @@ config MACH_SUN9I
+@@ -326,11 +326,8 @@ config MACH_SUN9I
  config MACH_SUN50I
  	bool "sun50i (Allwinner A64)"
  	select ARM64
@@ -42,5 +42,5 @@ index fc71e1a6a1..f8de820e12 100644
  	select SUNXI_DE2
  	select SUNXI_GEN_SUN6I
 -- 
-2.32.0
+2.34.0
 

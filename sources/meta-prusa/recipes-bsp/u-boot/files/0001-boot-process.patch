@@ -1,18 +1,18 @@
-From 448db8a9f0cb577b7d435956636192b2b4a8cbd2 Mon Sep 17 00:00:00 2001
+From 4a38392bd2ab260cc8b12d8d8a2d541f3fd2f531 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 18 Sep 2020 12:26:21 +0000
-Subject: [PATCH 1/5] boot-process
+Subject: [PATCH 1/6] boot-process
 
 ---
  board/sunxi/board.c            | 1 +
- include/configs/sunxi-common.h | 2 ++
- 2 files changed, 3 insertions(+)
+ include/configs/sunxi-common.h | 7 +++----
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index b9450a0e36..3ca6b62831 100644
+index 21651a1bfc..5a0d369ae1 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -197,6 +197,7 @@ void i2c_init_board(void)
+@@ -213,6 +213,7 @@ void i2c_init_board(void)
  #if defined(CONFIG_ENV_IS_IN_MMC) && defined(CONFIG_ENV_IS_IN_FAT)
  enum env_location env_get_location(enum env_operation op, int prio)
  {
@@ -21,10 +21,10 @@ index b9450a0e36..3ca6b62831 100644
  	case 0:
  		return ENVL_FAT;
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index 0ef289fd64..e8f21c1843 100644
+index 9e37e99684..ade3a6934a 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
-@@ -482,12 +482,10 @@ extern int soft_i2c_gpio_scl;
+@@ -443,11 +443,9 @@ extern int soft_i2c_gpio_scl;
  	CONSOLE_STDIN_SETTINGS \
  	CONSOLE_STDOUT_SETTINGS
  
@@ -33,13 +33,12 @@ index 0ef289fd64..e8f21c1843 100644
 -#else
  #define FDTFILE CONFIG_DEFAULT_DEVICE_TREE ".dtb"
 -#endif
- 
-+#include <configs/sunxi-prusa.h>
 +
++#include <configs/sunxi-prusa.h>
+ 
  #define CONFIG_EXTRA_ENV_SETTINGS \
  	CONSOLE_ENV_SETTINGS \
- 	MEM_LAYOUT_ENV_SETTINGS \
-@@ -500,6 +498,7 @@ extern int soft_i2c_gpio_scl;
+@@ -462,6 +460,7 @@ extern int soft_i2c_gpio_scl;
  	"uuid_gpt_system=" UUID_GPT_SYSTEM "\0" \
  	"partitions=" PARTS_DEFAULT "\0" \
  	BOOTCMD_SUNXI_COMPAT \
@@ -48,23 +47,23 @@ index 0ef289fd64..e8f21c1843 100644
  
  #else /* ifndef CONFIG_SPL_BUILD */
 -- 
-2.28.0
+2.34.0
 
 
-From bf4e180b65c27f6c6745ca6036b9c41d93e59914 Mon Sep 17 00:00:00 2001
+From 1427feb877504dc300540835be3a8320f18b655b Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 18 Sep 2020 12:26:21 +0000
-Subject: [PATCH 2/5] mmc-legacy-only
+Subject: [PATCH 2/6] mmc-legacy-only
 
 ---
  drivers/mmc/sunxi_mmc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/mmc/sunxi_mmc.c b/drivers/mmc/sunxi_mmc.c
-index 9f426661c4..5217bb12e0 100644
+index 3503ccdb2e..d94a867a28 100644
 --- a/drivers/mmc/sunxi_mmc.c
 +++ b/drivers/mmc/sunxi_mmc.c
-@@ -624,7 +624,7 @@ static int sunxi_mmc_probe(struct udevice *dev)
+@@ -628,7 +628,7 @@ static int sunxi_mmc_probe(struct udevice *dev)
  		cfg->host_caps |= MMC_MODE_8BIT;
  	if (bus_width >= 4)
  		cfg->host_caps |= MMC_MODE_4BIT;
@@ -74,23 +73,23 @@ index 9f426661c4..5217bb12e0 100644
  
  	cfg->f_min = 400000;
 -- 
-2.28.0
+2.34.0
 
 
-From 9a512d391671750c8199e81321da7f054e9f6a05 Mon Sep 17 00:00:00 2001
+From 16617eba349b79cb9bdd686a3306796f03e43d2b Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 18 Sep 2020 12:26:21 +0000
-Subject: [PATCH 3/5] mmc-delay-1500
+Subject: [PATCH 3/6] mmc-delay-1500
 
 ---
  board/sunxi/board.c | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 3ca6b62831..0ddb96cd5b 100644
+index 5a0d369ae1..60c7036a43 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -573,6 +573,11 @@ int board_mmc_init(bd_t *bis)
+@@ -610,6 +610,11 @@ int board_mmc_init(struct bd_info *bis)
  {
  	__maybe_unused struct mmc *mmc0, *mmc1;
  
@@ -103,13 +102,13 @@ index 3ca6b62831..0ddb96cd5b 100644
  	mmc0 = sunxi_mmc_init(CONFIG_MMC_SUNXI_SLOT);
  	if (!mmc0)
 -- 
-2.28.0
+2.34.0
 
 
-From 9401b899d8f798ee4fb009d6c05c6ea4f9188ba2 Mon Sep 17 00:00:00 2001
+From cf27706b0bb23380e17599f1148bf260c1a414a8 Mon Sep 17 00:00:00 2001
 From: Andrey Yurovsky <yurovsky@gmail.com>
 Date: Wed, 13 Dec 2017 21:06:49 -0800
-Subject: [PATCH 4/5] gpt: add part-uuid and part-num subcommands
+Subject: [PATCH 4/6] gpt: add part-uuid and part-num subcommands
 
 It is useful to be able to retrieve a partition UUID or number given the
 partition label when working with disks that have a GPT. For instance
@@ -122,21 +121,19 @@ Add "gpt part-uuid" to retrieve the partition UUID for a given label and
 with some documentation.
 
 Signed-off-by: Andrey Yurovsky <yurovsky@gmail.com>
-
 ---
  cmd/gpt.c      | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
  doc/README.gpt | 21 ++++++++++++++
  2 files changed, 96 insertions(+)
 
 diff --git a/cmd/gpt.c b/cmd/gpt.c
-index 0c4349f4b2..c936b7eef4 100644
+index 17f2b839d7..1f0930c42c 100644
 --- a/cmd/gpt.c
 +++ b/cmd/gpt.c
-@@ -355,6 +355,72 @@ static int do_get_gpt_info(struct blk_desc *dev_desc)
- 	}
- 	return ret;
+@@ -393,6 +393,72 @@ static int do_get_gpt_info(struct blk_desc *dev_desc, char * const namestr)
  }
-+
+ #endif
+ 
 +static struct disk_part *find_part_by_label(const char *label)
 +{
 +	struct disk_part *part = NULL;
@@ -144,10 +141,10 @@ index 0c4349f4b2..c936b7eef4 100644
 +
 +	list_for_each_entry(curr, &disk_partitions, list) {
 +		/* Check for the first match of the label we're looking
-+		 * for against the partition label
-+		 */
++		* for against the partition label
++		*/
 +		if (!strcmp((const char *)curr->gpt_part_info.name,
-+			    label)) {
++			   label)) {
 +			part = curr;
 +			break;
 +		}
@@ -161,7 +158,7 @@ index 0c4349f4b2..c936b7eef4 100644
 + * variable specified
 + */
 +static int do_get_part_uuid(struct blk_desc *dev_desc, const char *label,
-+			    const char *namestr)
++			   const char *namestr)
 +{
 +	int ret;
 +
@@ -185,7 +182,7 @@ index 0c4349f4b2..c936b7eef4 100644
 + * variable specified
 + */
 +static int do_get_part_num(struct blk_desc *dev_desc, const char *label,
-+			   const char *namestr)
++			  const char *namestr)
 +{
 +	int ret = get_gpt_info(dev_desc);
 +
@@ -202,21 +199,22 @@ index 0c4349f4b2..c936b7eef4 100644
 +
 +	return ret;
 +}
- #endif
- 
++
  /**
-@@ -851,6 +917,10 @@ static int do_gpt(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
- #ifdef CONFIG_CMD_GPT_RENAME
- 	} else if (strcmp(argv[1], "read") == 0) {
- 		ret = do_get_gpt_info(blk_dev_desc);
+  * set_gpt_info(): Fill partition information from string
+  *		function allocates memory, remember to free!
+@@ -1007,6 +1073,10 @@ static int do_gpt(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+ 		ret = gpt_setenv(blk_dev_desc, argv[4]);
+ 	} else if ((strcmp(argv[1], "enumerate") == 0)) {
+ 		ret = gpt_enumerate(blk_dev_desc);
 +	} else if (strcmp(argv[1], "part-uuid") == 0 && argc == 6) {
 +		ret = do_get_part_uuid(blk_dev_desc, argv[4], argv[5]);
 +	} else if (strcmp(argv[1], "part-num") == 0 && argc == 6) {
 +		ret = do_get_part_num(blk_dev_desc, argv[4], argv[5]);
- 	} else if ((strcmp(argv[1], "swap") == 0) ||
- 		   (strcmp(argv[1], "rename") == 0)) {
- 		ret = do_rename_gpt_parts(blk_dev_desc, argv[1], argv[4], argv[5]);
-@@ -885,6 +955,11 @@ U_BOOT_CMD(gpt, CONFIG_SYS_MAXARGS, 1, do_gpt,
+ 	} else if (strcmp(argv[1], "guid") == 0) {
+ 		ret = do_disk_guid(blk_dev_desc, argv[4]);
+ #ifdef CONFIG_CMD_GPT_RENAME
+@@ -1056,6 +1126,11 @@ U_BOOT_CMD(gpt, CONFIG_SYS_MAXARGS, 1, do_gpt,
  	" gpt guid mmc 0\n"
  	" gpt guid mmc 0 varname\n"
  #ifdef CONFIG_CMD_GPT_RENAME
@@ -226,13 +224,13 @@ index 0c4349f4b2..c936b7eef4 100644
 +	"gpt part-num <interface> <dev> <label> <varname>\n"
 +	"    - set environment variable to partition number of label\n"
  	"gpt partition renaming commands:\n"
- 	" gpt read <interface> <dev>\n"
+ 	" gpt read <interface> <dev> [<varname>]\n"
  	"    - read GPT into a data structure for manipulation\n"
 diff --git a/doc/README.gpt b/doc/README.gpt
-index facd7afc3a..8e6c3bcc5b 100644
+index 91e397d06f..218f48a7a5 100644
 --- a/doc/README.gpt
 +++ b/doc/README.gpt
-@@ -273,6 +273,27 @@ Some strings can be also used at the place of known GUID :
+@@ -292,6 +292,27 @@ Some strings can be also used at the place of known GUID :
  
  They are also used to display the type of partition in "part list" command.
  
@@ -261,34 +259,33 @@ index facd7afc3a..8e6c3bcc5b 100644
  Useful info:
  ============
 -- 
-2.28.0
+2.34.0
 
 
-From 466d4631fed1e40c24b5b5d1ffba81c2155fa321 Mon Sep 17 00:00:00 2001
+From 472ba7fb5139115905a89bbee34141c4e3e587b9 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 22 Apr 2021 17:02:51 +0200
-Subject: [PATCH 5/5] rauc update: toggle eMMC bootpart on slot flip
+Subject: [PATCH 5/6] rauc update: toggle eMMC bootpart on slot flip
 
 - added new subcommand 'mmc toggle-bootpart'
 - update_active_rootfs_slot kept backward-compatible with u-boot
   lacking aforementioned command
 ---
- cmd/mmc.c                      | 49 ++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ cmd/mmc.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/cmd/mmc.c b/cmd/mmc.c
-index 6f3cb85cc0..5094247f6d 100644
+index b942576b58..5ef6ba0778 100644
 --- a/cmd/mmc.c
 +++ b/cmd/mmc.c
-@@ -784,6 +784,52 @@ static int do_mmc_partconf(cmd_tbl_t *cmdtp, int flag,
- 	/* acknowledge to be sent during boot operation */
+@@ -864,6 +864,51 @@ static int do_mmc_partconf(struct cmd_tbl *cmdtp, int flag,
  	return mmc_set_part_conf(mmc, ack, part_num, access);
  }
-+
+ 
 +int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value);
 +
-+static int do_mmc_toggle_bootpart(cmd_tbl_t *cmdtp, int flag,
-+				  int argc, char * const argv[])
++static int do_mmc_toggle_bootpart(struct cmd_tbl *cmdtp, int flag,
++				 int argc, char * const argv[])
 +{
 +	int dev, ret;
 +	u8 part, part_conf;
@@ -330,10 +327,10 @@ index 6f3cb85cc0..5094247f6d 100644
 +	return CMD_RET_SUCCESS;
 +}
 +
- static int do_mmc_rst_func(cmd_tbl_t *cmdtp, int flag,
- 			   int argc, char * const argv[])
+ static int do_mmc_rst_func(struct cmd_tbl *cmdtp, int flag,
+ 			   int argc, char *const argv[])
  {
-@@ -893,6 +939,7 @@ static cmd_tbl_t cmd_mmc[] = {
+@@ -994,6 +1039,7 @@ static struct cmd_tbl cmd_mmc[] = {
  	U_BOOT_CMD_MKENT(bootbus, 5, 0, do_mmc_bootbus, "", ""),
  	U_BOOT_CMD_MKENT(bootpart-resize, 4, 0, do_mmc_boot_resize, "", ""),
  	U_BOOT_CMD_MKENT(partconf, 5, 0, do_mmc_partconf, "", ""),
@@ -341,36 +338,36 @@ index 6f3cb85cc0..5094247f6d 100644
  	U_BOOT_CMD_MKENT(rst-function, 3, 0, do_mmc_rst_func, "", ""),
  #endif
  #if CONFIG_IS_ENABLED(CMD_MMC_RPMB)
-@@ -960,6 +1007,8 @@ U_BOOT_CMD(
- 	" - Change sizes of boot and RPMB partitions of specified device\n"
- 	"mmc partconf dev [boot_ack boot_partition partition_access]\n"
+@@ -1067,6 +1113,8 @@ U_BOOT_CMD(
+ 	"mmc partconf <dev> [[varname] | [<boot_ack> <boot_partition> <partition_access>]]\n"
  	" - Show or change the bits of the PARTITION_CONFIG field of the specified device\n"
+ 	"   If showing the bits, optionally store the boot_partition field into varname\n"
 +	"mmc toggle-bootpart dev\n"
 +	" - If one of the two boot partitions is enabled, switch to the other one\n"
- 	"mmc rst-function dev value\n"
+ 	"mmc rst-function <dev> <value>\n"
  	" - Change the RST_n_FUNCTION field of the specified device\n"
  	"   WARNING: This is a write-once field and 0 / 1 / 2 are the only valid values.\n"
 -- 
-2.31.1
+2.34.0
 
 
-From 920956ddf41b3b2304c02ba19f4f203d5cf67e1a Mon Sep 17 00:00:00 2001
+From 5e50dc3150460fd142dd6f4ffdd0b817de5fc888 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 12 Jul 2021 15:44:37 +0200
-Subject: [PATCH] env: reset defaults on load
+Subject: [PATCH 6/6] env: reset defaults on load
 
 ---
- env/Kconfig   |  7 +++++++
- env/common.c  |  4 ++++
+ env/Kconfig  | 7 +++++++
+ env/common.c | 4 ++++
  2 files changed, 11 insertions(+)
 
 diff --git a/env/Kconfig b/env/Kconfig
-index ed12609f6a..6a8d21ad75 100644
+index 1411f9e815..7cc81c36b1 100644
 --- a/env/Kconfig
 +++ b/env/Kconfig
-@@ -581,6 +581,13 @@ config ENV_VARS_UBOOT_RUNTIME_CONFIG
- 	  run-time determined information about the hardware to the
- 	  environment.  These will be named board_name, board_rev.
+@@ -712,6 +712,13 @@ config ENV_ACCESS_IGNORE_FORCE
+ 	  If defined, don't allow the -f switch to env set override variable
+ 	  access flags.
  
 +config ENV_RESET_DEFAULTS_ON_LOAD
 +	bool "Keep environment fresh"
@@ -383,10 +380,10 @@ index ed12609f6a..6a8d21ad75 100644
  config SPL_ENV_IS_NOWHERE
  	bool "SPL Environment is not stored"
 diff --git a/env/common.c b/env/common.c
-index 1fd1bd01d3..1b50f6c375 100644
+index 81e9e0b2aa..4fa171f4a2 100644
 --- a/env/common.c
 +++ b/env/common.c
-@@ -240,6 +240,10 @@ void env_relocate(void)
+@@ -257,6 +257,10 @@ void env_relocate(void)
  #endif
  	} else {
  		env_load();
@@ -398,4 +395,5 @@ index 1fd1bd01d3..1b50f6c375 100644
  }
  
 -- 
-2.32.0
+2.34.0
+
