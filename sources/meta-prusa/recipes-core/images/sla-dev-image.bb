@@ -25,7 +25,8 @@ IMAGE_LINGUAS = "en-us"
 IMAGE_FSTYPES = "wic wic.bmap"
 WIC_CREATE_EXTRA_ARGS = "--no-fstab-update"
 WKS_FILE_DEPENDS = "virtual/bootloader e2fsprogs-native bmap-tools-native gptfdisk-native"
-WKS_FILE = "sunxi-sd.wks"
+WKS_FILE = "sunxi-sd.wks.in"
+do_image_wic[depends] += "u-boot:do_deploy"
 
 SDKIMAGE_FEATURES = "dev-pkgs dbg-pkgs staticdev-pkgs qt-pkgs\
 "

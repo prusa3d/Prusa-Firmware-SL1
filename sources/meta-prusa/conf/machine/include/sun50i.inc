@@ -9,8 +9,7 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot"
 KERNEL_IMAGETYPE ?= "Image"
 
 UBOOT_INITIAL_ENV = "u-boot-initial-env"
-SPL_BINARY = "spl/sunxi-spl.bin"
-SPL_BINARYNAME = "sunxi-spl.bin"
+UBOOT_BINARY = "u-boot-sunxi-with-spl.bin"
 
 PREFERRED_VERSION_linux-mainline = "v5.11%"
 
