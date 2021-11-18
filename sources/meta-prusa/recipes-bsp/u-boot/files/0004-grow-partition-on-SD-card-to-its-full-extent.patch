@@ -1,4 +1,4 @@
-From 7055ede8b16d071191c51475ca8f0e6cecc3dcc6 Mon Sep 17 00:00:00 2001
+From 36845b374bd642ecd9ae70f1cdceaa7e48ce1ac2 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 25 Jun 2020 12:47:51 +0200
 Subject: [PATCH] grow partition on SD card to its full extent
@@ -10,27 +10,27 @@ to fill the created gap.
 ---
  board/sunxi/Makefile  |   4 ++
  board/sunxi/board.c   |   8 +++
- board/sunxi/grow_sd.c | 128 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 140 insertions(+)
+ board/sunxi/grow_sd.c | 129 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 141 insertions(+)
  create mode 100644 board/sunxi/grow_sd.c
 
 diff --git a/board/sunxi/Makefile b/board/sunxi/Makefile
-index c4e13f8c38..ed3553254e 100644
+index d96b7897b6..aac421ff60 100644
 --- a/board/sunxi/Makefile
 +++ b/board/sunxi/Makefile
-@@ -11,3 +11,7 @@ obj-$(CONFIG_SUN7I_GMAC)	+= gmac.o
- obj-$(CONFIG_MACH_SUN4I)	+= dram_sun4i_auto.o
+@@ -12,3 +12,7 @@ obj-$(CONFIG_MACH_SUN4I)	+= dram_sun4i_auto.o
  obj-$(CONFIG_MACH_SUN5I)	+= dram_sun5i_auto.o
  obj-$(CONFIG_MACH_SUN7I)	+= dram_sun5i_auto.o
+ obj-$(CONFIG_CHIP_DIP_SCAN)	+= chip.o
 +
 +ifndef CONFIG_SPL_BUILD
 +obj-$(CONFIG_EFI_PARTITION)	+= grow_sd.o
 +endif
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 35ea6bef47..587f15b2e4 100644
+index c02573e991..94dfbdc37b 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -215,6 +215,12 @@ enum env_location env_get_location(enum env_operation op, int prio)
+@@ -231,6 +231,12 @@ enum env_location env_get_location(enum env_operation op, int prio)
  static void mmc_pinmux_setup(int sdc);
  #endif
  
@@ -43,7 +43,7 @@ index 35ea6bef47..587f15b2e4 100644
  /* add board specific code here */
  int board_init(void)
  {
-@@ -889,6 +895,8 @@ int misc_init_r(void)
+@@ -942,6 +948,8 @@ int misc_init_r(void)
  	/* or if we booted from MMC, and which one */
  	} else if (boot == BOOT_DEVICE_MMC1) {
  		env_set("mmc_bootdev", "0");
@@ -54,10 +54,10 @@ index 35ea6bef47..587f15b2e4 100644
  	}
 diff --git a/board/sunxi/grow_sd.c b/board/sunxi/grow_sd.c
 new file mode 100644
-index 0000000000..af9a59c46c
+index 0000000000..0456aa6eff
 --- /dev/null
 +++ b/board/sunxi/grow_sd.c
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,129 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2020 Prusa Development a.s.
@@ -67,6 +67,7 @@ index 0000000000..af9a59c46c
 +#include <common.h>
 +#include <memalign.h>
 +#include <part.h>
++#include <asm/byteorder.h>
 +
 +static int is_pte_valid(gpt_entry *pte)
 +{
@@ -187,4 +188,5 @@ index 0000000000..af9a59c46c
 +	grow_gpt(dev_desc);
 +}
 -- 
-2.28.0
+2.34.0
+

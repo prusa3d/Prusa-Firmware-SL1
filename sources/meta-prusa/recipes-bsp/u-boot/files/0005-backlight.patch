@@ -1,4 +1,4 @@
-From fb2f9e4a4924ab6c812610ba6de3e5873f561c55 Mon Sep 17 00:00:00 2001
+From ec668c71057d50698ff55c3029f5ab042f5c06ac Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Wed, 15 Apr 2020 15:06:39 +0200
 Subject: [PATCH] u-boot: prevent screen from lighting up for a brief period
@@ -12,38 +12,38 @@ all at once during pinctrl driver probe, "way" earlier than the pwm driver gets 
 One possible solution is to initialize the pwm registers before Linux takes over and leave
 it set at 0% duty cycle
 ---
- arch/arm/include/asm/arch-sunxi/gpio.h  |  1 +
- board/sunxi/board.c                     | 13 +++++++++++++
- drivers/pwm/sunxi_pwm.c                 |  1 +
- drivers/video/Kconfig                   |  6 +++++-
- drivers/video/Makefile                  |  2 +-
- 5 files changed, 21 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/arch-sunxi/gpio.h |  2 ++
+ board/sunxi/board.c                    | 13 +++++++++++++
+ drivers/pwm/sunxi_pwm.c                |  1 +
+ drivers/video/Kconfig                  |  6 +++++-
+ 4 files changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/include/asm/arch-sunxi/gpio.h b/arch/arm/include/asm/arch-sunxi/gpio.h
-index a646ea6a3c..550e23d8bc 100644
+index 2969a530ae..0877db14f3 100644
 --- a/arch/arm/include/asm/arch-sunxi/gpio.h
 +++ b/arch/arm/include/asm/arch-sunxi/gpio.h
-@@ -218,6 +218,7 @@ enum sunxi_gpio_number {
- #define SUN8I_A23_GPL_R_TWI	3
- #define SUN8I_GPL_R_UART	2
+@@ -223,6 +223,8 @@ enum sunxi_gpio_number {
  #define SUN50I_GPL_R_TWI	2
-+#define SUN50I_GPL_R_PWM	2
+ #define SUN50I_H616_GPL_R_TWI	3
  
++#define SUN50I_GPL_R_PWM	2
++
  #define SUN9I_GPN_R_RSB		3
  
+ /* GPIO pin pull-up/down config */
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 240794ea27..ea0295764d 100644
+index 94dfbdc37b..50167b625b 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -33,6 +33,7 @@
+@@ -39,6 +39,7 @@
+ #include <asm/io.h>
  #include <u-boot/crc.h>
  #include <env_internal.h>
- #include <linux/libfdt.h>
 +#include <backlight.h>
+ #include <linux/libfdt.h>
+ #include <fdt_support.h>
  #include <nand.h>
- #include <net.h>
- #include <spl.h>
-@@ -221,6 +222,16 @@ void sunxi_grow_sd(void);
+@@ -237,6 +238,16 @@ void sunxi_grow_sd(void);
  static void sunxi_grow_sd(void) {}
  #endif
  
@@ -60,7 +60,7 @@ index 240794ea27..ea0295764d 100644
  /* add board specific code here */
  int board_init(void)
  {
-@@ -293,6 +304,8 @@ int board_init(void)
+@@ -319,6 +330,8 @@ int board_init(void)
  #endif
  #endif	/* CONFIG_DM_MMC */
  
@@ -70,10 +70,10 @@ index 240794ea27..ea0295764d 100644
  	return soft_i2c_board_init();
  }
 diff --git a/drivers/pwm/sunxi_pwm.c b/drivers/pwm/sunxi_pwm.c
-index 8a55e4f461..63b80d7310 100644
+index e3d5ee456b..cde4271bd5 100644
 --- a/drivers/pwm/sunxi_pwm.c
 +++ b/drivers/pwm/sunxi_pwm.c
-@@ -47,6 +47,7 @@ static int sunxi_pwm_config_pinmux(void)
+@@ -49,6 +49,7 @@ static int sunxi_pwm_config_pinmux(void)
  {
  #ifdef CONFIG_MACH_SUN50I
  	sunxi_gpio_set_cfgpin(SUNXI_GPD(22), SUNXI_GPD_PWM);
@@ -82,7 +82,7 @@ index 8a55e4f461..63b80d7310 100644
  	return 0;
  }
 diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
-index 50ab3650ee..ec75a30f70 100644
+index b69ffcae4b..d14fcc015f 100644
 --- a/drivers/video/Kconfig
 +++ b/drivers/video/Kconfig
 @@ -14,9 +14,13 @@ config DM_VIDEO
@@ -93,26 +93,13 @@ index 50ab3650ee..ec75a30f70 100644
 +	bool "Enable driver model support for backlight"
 +	depends on DM
 +
- config BACKLIGHT_PWM
- 	bool "Generic PWM based Backlight Driver"
--	depends on DM_VIDEO && DM_PWM
-+	depends on DM_BACKLIGHT && DM_PWM
+ config BACKLIGHT
+ 	bool "Enable panel backlight uclass support"
+-	depends on DM_VIDEO
++	depends on DM_BACKLIGHT
  	default y
  	help
- 	  If you have a LCD backlight adjustable by PWM, say Y to enable
-diff --git a/drivers/video/Makefile b/drivers/video/Makefile
-index df7119d62a..08c397f8cd 100644
---- a/drivers/video/Makefile
-+++ b/drivers/video/Makefile
-@@ -10,7 +10,7 @@ obj-$(CONFIG_CONSOLE_NORMAL) += console_normal.o
- obj-$(CONFIG_CONSOLE_ROTATION) += console_rotate.o
- obj-$(CONFIG_CONSOLE_TRUETYPE) += console_truetype.o fonts/
- obj-$(CONFIG_DISPLAY) += display-uclass.o
--obj-$(CONFIG_DM_VIDEO) += backlight-uclass.o
-+obj-$(CONFIG_DM_BACKLIGHT) += backlight-uclass.o
- obj-$(CONFIG_VIDEO_MIPI_DSI) += dsi-host-uclass.o
- obj-$(CONFIG_DM_VIDEO) += panel-uclass.o simple_panel.o
- obj-$(CONFIG_DM_VIDEO) += video-uclass.o vidconsole-uclass.o
+ 	  This provides backlight uclass driver that enables basic panel
 -- 
-2.32.0
+2.34.0
 

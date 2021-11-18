@@ -1,4 +1,4 @@
-From ab434292fc0d119bcc22fffcc5b7e9444b008999 Mon Sep 17 00:00:00 2001
+From 9f1102207bc913a91de1605e63108596f175d255 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 13 Jul 2021 09:18:39 +0200
 Subject: [PATCH] tc358870: only proceed with setup if sl1-uv-led found in a
@@ -7,15 +7,15 @@ Subject: [PATCH] tc358870: only proceed with setup if sl1-uv-led found in a
 "prusa,sl1-uv-led" node serves as a proxy for distinguishing between pre- and post-
 1.6.0 systems.
 ---
- board/sunxi/board.c                 | 34 ----------------------
- board/sunxi/panel-detector-uclass.c | 45 +++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+), 34 deletions(-)
+ board/sunxi/board.c                 | 34 -------------------
+ board/sunxi/panel-detector-uclass.c | 51 +++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 34 deletions(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
-index 8d885abacf..28325d8c50 100644
+index 441b01d12d..fc6b6e3911 100644
 --- a/board/sunxi/board.c
 +++ b/board/sunxi/board.c
-@@ -921,27 +921,6 @@ int misc_init_r(void)
+@@ -990,27 +990,6 @@ int board_late_init(void)
  #ifdef CONFIG_USB_ETHER
  	usb_ether_init();
  #endif
@@ -43,7 +43,7 @@ index 8d885abacf..28325d8c50 100644
  
  	return 0;
  }
-@@ -960,19 +939,6 @@ int ft_board_setup(void *blob, bd_t *bd)
+@@ -1063,19 +1042,6 @@ int ft_board_setup(void *blob, struct bd_info *bd)
  	r = sunxi_simplefb_setup(blob);
  	if (r)
  		return r;
@@ -64,10 +64,18 @@ index 8d885abacf..28325d8c50 100644
  	return 0;
  }
 diff --git a/board/sunxi/panel-detector-uclass.c b/board/sunxi/panel-detector-uclass.c
-index 9f09caf8aa..bcbb7b8830 100644
+index c9574aa479..2c50a8b69f 100644
 --- a/board/sunxi/panel-detector-uclass.c
 +++ b/board/sunxi/panel-detector-uclass.c
-@@ -153,6 +153,48 @@ static int do_panel_id_write_vendor_data(struct udevice *dev, char * const sn_st
+@@ -6,6 +6,7 @@
+ 
+ #include <dm.h>
+ #include <command.h>
++#include <malloc.h>
+ #include <vsprintf.h>
+ #include <dm/device-internal.h>
+ #include "panel_detector.h"
+@@ -153,6 +154,53 @@ static int do_panel_id_write_vendor_data(struct udevice *dev, char * const sn_st
  	return panel_detector_write_id_to_nvm(dev, data.numeric);
  }
  
@@ -83,8 +91,13 @@ index 9f09caf8aa..bcbb7b8830 100644
 +	if (!fdt)
 +		return -ENODATA;
 +
-+	offset = fdt_node_offset_by_compatible(fdt, -1, "prusa,sl1-uv-led");
-+	if (offset < 0) {
++	if (fdt_node_check_compatible(fdt, 0, "prusa,prusa64-sl2") == 0) {
++		printf("detected SL2 board, disabling HDMI\n");
++		env_set("edid_bootarg", "video=HDMI-A-1:d");
++		return 0;
++	}
++
++	if (fdt_node_offset_by_compatible(fdt, -1, "prusa,sl1-uv-led") < 0) {
 +		printf("prusa,sl1-uv-led missing from the loaded FDT, system probably too old for panel detection\n");
 +		return 0;
 +	}
@@ -103,7 +116,7 @@ index 9f09caf8aa..bcbb7b8830 100644
 +	}
 +	if (strlen(panel_name)) {
 +		edid_arg_length = 37 + strlen(panel_name);
-+		edid_arg = kmalloc(edid_arg_length, GFP_KERNEL);
++		edid_arg = malloc(edid_arg_length);
 +		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
 +	} else {
 +		edid_arg = "video=HDMI-A-1:d";
@@ -113,10 +126,10 @@ index 9f09caf8aa..bcbb7b8830 100644
 +	return 0;
 +}
 +
- static int do_panel_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+ static int do_panel_id(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
  {
  	int r;
-@@ -165,6 +207,9 @@ static int do_panel_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
+@@ -165,6 +213,9 @@ static int do_panel_id(struct cmd_tbl *cmdtp, int flag, int argc, char * const a
  	argc -= 2;
  	argv += 2;
  
@@ -127,4 +140,5 @@ index 9f09caf8aa..bcbb7b8830 100644
  	if (r < 0)
  		return handle_error(r);
 -- 
-2.32.0
+2.34.0
+

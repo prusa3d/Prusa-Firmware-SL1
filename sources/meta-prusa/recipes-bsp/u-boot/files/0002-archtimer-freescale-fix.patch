@@ -1,17 +1,17 @@
-From 5b8fd1a525fd1792e53e4ca0f533c19d2679dfd6 Mon Sep 17 00:00:00 2001
+From 6894573ea220122a7dc628e5846a4b4ab470674a Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 18 Sep 2020 12:26:21 +0000
-Subject: [PATCH 06/12] archtimer-freescale-fix
+Subject: [PATCH] archtimer-freescale-fix
 
 ---
  arch/arm/cpu/armv8/generic_timer.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
-index 46e63294fe..f546dabcf1 100644
+index f27a74b9d0..7e8f96aeff 100644
 --- a/arch/arm/cpu/armv8/generic_timer.c
 +++ b/arch/arm/cpu/armv8/generic_timer.c
-@@ -21,7 +21,7 @@ unsigned long get_tbclk(void)
+@@ -24,7 +24,7 @@ unsigned long get_tbclk(void)
  	return cntfrq;
  }
  
@@ -20,7 +20,7 @@ index 46e63294fe..f546dabcf1 100644
  /*
   * FSL erratum A-008585 says that the ARM generic timer counter "has the
   * potential to contain an erroneous value for a small number of core
-@@ -47,7 +47,7 @@ unsigned long timer_read_counter(void)
+@@ -50,7 +50,7 @@ unsigned long timer_read_counter(void)
  
  	return cntpct;
  }
@@ -30,4 +30,5 @@ index 46e63294fe..f546dabcf1 100644
   * This erratum sometimes flips the lower 11 bits of the counter value
   * to all 0's or all 1's, leading to jumps forwards or backwards.
 -- 
-2.28.0
+2.34.0
+
