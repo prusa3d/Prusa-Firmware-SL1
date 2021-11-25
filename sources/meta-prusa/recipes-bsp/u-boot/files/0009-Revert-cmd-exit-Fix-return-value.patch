@@ -1,0 +1,36 @@
+From e17e4065d0115b79a03beb3fabf7ad39b9d1b359 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 25 Nov 2021 09:38:59 +0100
+Subject: [PATCH] Revert "cmd: exit: Fix return value"
+
+This reverts commit 8c4e3b79bd0bb76eea16869e9666e19047c0d005.
+
+After this change, 'exit' command could have no longer be used to return
+from functions. Roll it back until we figure out, how to work around it.
+---
+ cmd/exit.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/cmd/exit.c b/cmd/exit.c
+index 923f0870fb..7bf241ec73 100644
+--- a/cmd/exit.c
++++ b/cmd/exit.c
+@@ -10,10 +10,13 @@
+ static int do_exit(struct cmd_tbl *cmdtp, int flag, int argc,
+ 		   char *const argv[])
+ {
++	int r;
++
++	r = 0;
+ 	if (argc > 1)
+-		return simple_strtoul(argv[1], NULL, 10);
++		r = simple_strtoul(argv[1], NULL, 10);
+ 
+-	return 0;
++	return -r - 2;
+ }
+ 
+ U_BOOT_CMD(
+-- 
+2.34.0
+
