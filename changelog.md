@@ -1,3 +1,63 @@
+# Version 1.6.4
+Firmware for SL1, SL1 SPEED and M1
+
+## Summary
+- M1 support
+- Selecting print profiles in PrusaLink
+- Bug fixes
+
+The firmware is compatible with SL1, SL1S SPEED and M1.
+Compared to the previous release 1.6.3, there are ... and …. pull request
+As the issue was risen by our testing team, we consider this a bugfix release
+
+### M1 Support
+M1 Prusa medical is a version of SL1 SPEED intended for medical use. It has a modified design and support model.
+The user interface is adjusted to the colours.
+Links to do documentation, error codes and update servers are adjusted to adhere to the modified support model
+New users are led to pour resin while the tilt is homed
+Experienced users are not misled to think the print process has started by the preprint checks.
+
+### Selecting print profiles in PrusaLink
+The user can select between the Faster and Slower print profiles from  PrusaLink.
+The feature was introduced in 1.6.0, but it was only possible to set it in the printer UI. Now it can be controlled from PrusaLink, too.
+The feature was introduced to support quality printing of unfavourably shaped prints. Just like in the UI, Faster is the default, while Slower adjusts the parameters for safer quality printing of i.e. hollow prints.
+
+
+### Reading invalid files may result in a need for printer restart
+In previous versions an attempt to read an invalid file led to a deadlock, requiring a printer restart. The error handling was fixed.
+
+### Print time settings erratic behaviour.
+In the print settings, changing the exposure time led to erratic behaviour due to rounding errors in communication on dbus.
+
+### Factory reset does not reset screen brightness.
+The screen brightness of the UI display was stored in a different place than the rest of the configuration values and was not reset with a factory reset. This was rectified.
+
+### Inconsistent logging from motion controller.
+Certain information/confirmation messages from the motion controller were logged as warnings. They will not be logged anymore.
+
+### MC firmware update notification was missing. 
+The notification during the Motion Controller firmware update process was missing. Now it is correct
+
+### Tilt home succeeded with disconnected tilt.
+Users have reported that in certain situations tower homing failed after an upgrade and complicated adjustments of tower sensitivity were necessary to get it right. Version 1.6.4 handles this correctly.
+
+### An incorrect error message  was issued when trying to download logs to USB without a USB disk connected
+The message read “Printer is OK”. This was correct but misleading.
+
+### It was possible to bypass printer calibration.
+With a certain sequence of upgrades, firmware switches filed and cancelled calibration attempts it was possible to commence printing with an uncalibrated printer. This is not possible any mora and the uncalibrated state is correctly reported.
+
+### Faster and slower profiles can be selected from the PrusaLink web interface, now
+This was a known omission in the previous 1.6.x versions.
+
+# Version 1.6.4-rc.7
+
+## Summary (relative to 1.6.4-rc.6)
+- fix: typo: medical -> medic
+- fix: overflowing text on page calibration-tilt adjustment
+- fix: backlight reset
+- fix: timer leak in QWayland https://bugreports.qt.io/browse/QTBUG-79838
+
 # Version 1.6.4-rc.6
 
 ## Summary (relative to 1.6.4-rc.5)
