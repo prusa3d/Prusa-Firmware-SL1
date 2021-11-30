@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append = " \
 	   file://0001-kiosk-bg-shell.patch \
+	   file://0002-kiosk-shell-make-background-surface-black.patch \
 	   file://prusa_logo.webp \
 "
 
