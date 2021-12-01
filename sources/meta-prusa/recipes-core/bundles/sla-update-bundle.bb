@@ -44,3 +44,5 @@ do_bundle() {
 		${BUNDLE_DIR} \
 		${B}/bundle.raucb
 }
+
+SSTATE_SKIP_CREATION:task-deploy = '1'
