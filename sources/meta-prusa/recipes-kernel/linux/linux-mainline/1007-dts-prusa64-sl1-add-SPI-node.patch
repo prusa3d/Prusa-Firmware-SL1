@@ -12,7 +12,7 @@ diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm
 index d5ad57ed5b7d..46716ffc7ca5 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -535,3 +535,12 @@ &usbphy {
+@@ -539,3 +539,12 @@ &usbphy {
  &r_pwm {
  	status = "okay";
  };
