@@ -49,6 +49,8 @@ class Project:
         self.git = git
         self.bb = bb
         self.name = re.sub(r"(_git)?\.bb", "", bb.name)
+        self.repo = re.search(r"gitlab\.com[:/]prusa3d/(?:sl1\/)?([^.]*)\.git", self.git)
+        self.repo = self.repo.group(1) + "@" if self.repo else ""
 
     def get_branch(self, meta_branch: str) -> str:
         # Proper mapping is supposed to exist in env, otherwise it is ok to fail
@@ -88,7 +90,9 @@ class Project:
         with TemporaryDirectory() as clone:
             check_call(["git", "clone", "--bare", self.git, clone])
             changes = check_output(
-                ["git", "-C", clone, "log", f"--pretty=format:{self.name}@%h: %s", f"{old_hash}..{new_hash}"],
+                ["git", "-C", clone, "log",
+                 f"--pretty=format:{self.repo}%h: %<(50,trunc)%s",
+                 f"{old_hash}..{new_hash}"],
                 text=True,
             )
 
