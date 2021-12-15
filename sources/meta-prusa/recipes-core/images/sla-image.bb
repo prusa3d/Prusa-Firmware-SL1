@@ -16,8 +16,6 @@ IMAGE_FEATURES += "\
 "
 IMAGE_FEATURES:remove = "package-management"
 
-IMAGE_LINGUAS = "en-us"
-
 DEPENDS += "systemd-systemctl-native"
 
 rootfs_disable_terminal () {
