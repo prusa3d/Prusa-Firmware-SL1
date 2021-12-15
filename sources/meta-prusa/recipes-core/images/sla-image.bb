@@ -16,7 +16,7 @@ IMAGE_FEATURES += "\
 "
 IMAGE_FEATURES:remove = "package-management"
 
-IMAGE_LINGUAS = ""
+IMAGE_LINGUAS = "en-us"
 
 DEPENDS += "systemd-systemctl-native"
 
