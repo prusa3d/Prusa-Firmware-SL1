@@ -12,7 +12,7 @@ SRC_URI:prepend:prusa64-sl1 = " \
 	git://gitlab.com/prusa3d/sl1/sla-fw.git;protocol=https;branch=master \
 "
 
-SRCREV:pn-${PN}:prusa64-sl1 = "d833aa05203d748780ca336496600d2fdaf165a8"
+SRCREV:pn-${PN}:prusa64-sl1 = "45f6e775c7a6cffaafa20ede16fd9ff868ec1f95"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -23,6 +23,7 @@ RDEPENDS:${PN} += " \
 	bash \
 	avrdude \
 	api-keygen \
+	mc-fw \
 	udev-usbmount \
 	python3-pyserial \
 	python3-numpy \

@@ -18,3 +18,6 @@
 	path = sources/meta-rauc
 	url = https://github.com/rauc/meta-rauc.git
 	branch = dunfell
+[submodule "sources/meta-microcontroller"]
+	path = sources/meta-microcontroller
+	url = https://github.com/schnitzeltony/meta-microcontroller.git
