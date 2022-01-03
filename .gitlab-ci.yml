@@ -79,7 +79,7 @@ b:raucb-production:
     - ./sign_cert_check.sh
     - source oe-init-build-env
     - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
-    - bitbake sla-update-bundle
+    - bitbake --quiet sla-update-bundle
     - cd ..
     - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${VERSION}.prod-key.raucb
     - mv build/tmp/deploy/images/prusa64-sl1/sla-initramfs-prusa64-sl1-*.manifest ${VERSION}.initramfs.manifest
@@ -142,6 +142,8 @@ d:raucb-development:
 
 
   script:
+    - cp ${VERSION}.dev-key.raucb ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
     - >
         lftp -c "
         set sftp:ssl-force yes;
@@ -149,8 +151,6 @@ d:raucb-development:
         put -O ${DEST} ${VERSION}.dev-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
         "
-    - echo "put ${VERSION}.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:raucb-production:
   stage: deploy
@@ -167,6 +167,8 @@ d:raucb-production:
   needs: ["b:raucb-production"]
 
   script:
+    - cp ${VERSION}.prod-key.raucb ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
     - >
         lftp -c "
         set sftp:ssl-force yes;
@@ -174,8 +176,6 @@ d:raucb-production:
         put -O ${DEST} ${VERSION}.prod-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
         "
-    - echo "put ${VERSION}.prod-key.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:tools:
   stage: deploy
@@ -191,10 +191,10 @@ d:tools:
   needs: ["b:tools"]
 
   script:
-    - echo "put ${VERSION}.devsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.devsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.bootstrapsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.bootstrapsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - cp ${VERSION}.devsd.xz ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.devsd.bmap ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.bootstrapsd.xz ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.bootstrapsd.bmap ${BACKUP_DEPLOY_PATH}
 
 n:update:
   stage: nightly
@@ -213,4 +213,3 @@ n:update:
     - ./update_project.py $(echo ${CI_COMMIT_REF_NAME} | sed 's/^nightly-//')
     - git remote set-url --push origin git@gitlab.com:prusa3d/sl1/meta-sl1.git
     - git push origin HEAD:${CI_COMMIT_REF_NAME}
-
