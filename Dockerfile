@@ -3,10 +3,10 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install tools required to build the system using bitbake
-RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales python2.7 cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin liblz4-tool zstd
+RUN apt-get update && apt-get install -y git build-essential python3 bash chrpath file gawk texinfo perl coreutils tar patch wget findutils diffutils quilt diffstat locales cpio lftp python3-distutils cmake libssl-dev libseccomp-dev gnutls-bin liblz4-tool zstd
 
 # Configure locale, python/bitbake have problems without valid locale
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen 
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
