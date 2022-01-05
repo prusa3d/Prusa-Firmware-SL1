@@ -1,0 +1,12 @@
+diff --git a/tests/meson.build b/tests/meson.build
+index 330e0421..aa8cf38d 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -30,6 +30,7 @@ lib_test_client = static_library(
+ 		'weston-test-fixture-compositor.c',
+ 		weston_test_client_protocol_h,
+ 		weston_screenshooter_protocol_c,
++		weston_screenshooter_client_protocol_h,
+ 		weston_test_protocol_c,
+ 		viewporter_client_protocol_h,
+ 		viewporter_protocol_c,
