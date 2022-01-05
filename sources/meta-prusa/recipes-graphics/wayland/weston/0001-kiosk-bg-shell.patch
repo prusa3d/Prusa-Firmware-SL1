@@ -1,7 +1,7 @@
-From b9d61ced809768a3397c9791607c5dabbada2227 Mon Sep 17 00:00:00 2001
+From ff1b384ac5610d0ff6051ad4e34c0a298a97ea7a Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
-Date: Fri, 28 Aug 2020 17:13:28 +0200
-Subject: [PATCH 4/4] kiosk-bg-shell
+Date: Fri, 27 Nov 2020 11:49:25 +0100
+Subject: [PATCH 2/3] kiosk-bg-shell
 
 ---
  clients/kiosk-bg-shell.c  | 133 ++++++++++++++++++++++++++++++++++++++
@@ -154,10 +154,10 @@ index 00000000..eb062a81
 +	return 0;
 +}
 diff --git a/clients/meson.build b/clients/meson.build
-index bbebcae1..86ea64d0 100644
+index 2c016b84..cbc06ed3 100644
 --- a/clients/meson.build
 +++ b/clients/meson.build
-@@ -381,3 +381,15 @@ if get_option('shell-ivi')
+@@ -371,3 +371,15 @@ if get_option('shell-ivi')
  	)
  	env_modmap += 'weston-ivi-shell-user-interface=@0@;'.format(exe_shell_ivi_ui.full_path())
  endif
@@ -174,7 +174,7 @@ index bbebcae1..86ea64d0 100644
 +	env_modmap += 'weston-kiosk-bg-shell=@0@;'.format(exe_shell_kiosk_bg.full_path())
 +endif
 diff --git a/clients/window.c b/clients/window.c
-index 2bd303ee..35cddb97 100644
+index ca7e62d0..ccf673a5 100644
 --- a/clients/window.c
 +++ b/clients/window.c
 @@ -234,6 +234,7 @@ struct window {
@@ -185,7 +185,7 @@ index 2bd303ee..35cddb97 100644
  	int x, y;
  	int redraw_inhibited;
  	int redraw_needed;
-@@ -4337,6 +4338,7 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
+@@ -4343,6 +4344,7 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
  			      struct wl_array *states)
  {
  	struct window *window = data;
@@ -193,7 +193,7 @@ index 2bd303ee..35cddb97 100644
  	uint32_t *p;
  
  	window->maximized = 0;
-@@ -4379,21 +4381,24 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
+@@ -4385,21 +4387,24 @@ xdg_toplevel_handle_configure(void *data, struct xdg_toplevel *xdg_toplevel,
  		}
  	}
  
@@ -232,7 +232,7 @@ index 2bd303ee..35cddb97 100644
  }
  
  static void
-@@ -4497,6 +4502,13 @@ menu_destroy(struct menu *menu)
+@@ -4503,6 +4508,13 @@ menu_destroy(struct menu *menu)
  	free(menu);
  }
  
@@ -246,7 +246,7 @@ index 2bd303ee..35cddb97 100644
  void
  window_get_allocation(struct window *window,
  		      struct rectangle *allocation)
-@@ -4799,6 +4811,14 @@ window_set_locked_pointer_motion_handler(struct window *window,
+@@ -4805,6 +4817,14 @@ window_set_locked_pointer_motion_handler(struct window *window,
  	window->locked_pointer_motion_handler = handler;
  }
  
@@ -297,20 +297,20 @@ index 16f172fe..3099abf5 100644
  		'sidebyside.png',
  		'sign_close.png',
 diff --git a/kiosk-shell/kiosk-shell.c b/kiosk-shell/kiosk-shell.c
-index 9d4f8a18..b1023912 100644
+index 8f0f49ec..67fcaf87 100644
 --- a/kiosk-shell/kiosk-shell.c
 +++ b/kiosk-shell/kiosk-shell.c
-@@ -35,6 +35,8 @@
- #include "shared/helpers.h"
- #include "util.h"
+@@ -37,6 +37,8 @@
+ 
+ #include <libweston/xwayland-api.h>
  
 +#define KIOSK_SHELL_CLIENT "weston-kiosk-bg-shell"
 +
  static struct kiosk_shell_surface *
  get_kiosk_shell_surface(struct weston_surface *surface)
  {
-@@ -989,6 +991,48 @@ kiosk_shell_handle_seat_created(struct wl_listener *listener, void *data)
- 	kiosk_shell_seat_create(seat);
+@@ -1046,6 +1048,48 @@ kiosk_shell_handle_seat_created(struct wl_listener *listener, void *data)
+ 	kiosk_shell_seat_create(shell, seat);
  }
  
 +static void
@@ -358,9 +358,9 @@ index 9d4f8a18..b1023912 100644
  static void
  kiosk_shell_destroy(struct wl_listener *listener, void *data)
  {
-@@ -996,6 +1040,12 @@ kiosk_shell_destroy(struct wl_listener *listener, void *data)
- 		container_of(listener, struct kiosk_shell, destroy_listener);
+@@ -1054,6 +1098,12 @@ kiosk_shell_destroy(struct wl_listener *listener, void *data)
  	struct kiosk_shell_output *shoutput, *tmp;
+ 	struct kiosk_shell_seat *shseat, *shseat_next;
  
 +	if (shell->child.client) {
 +		/* disable respawn */
@@ -371,10 +371,10 @@ index 9d4f8a18..b1023912 100644
  	wl_list_remove(&shell->destroy_listener.link);
  	wl_list_remove(&shell->output_created_listener.link);
  	wl_list_remove(&shell->output_resized_listener.link);
-@@ -1018,12 +1068,14 @@ wet_shell_init(struct weston_compositor *ec,
- 	struct kiosk_shell *shell;
+@@ -1082,12 +1132,14 @@ wet_shell_init(struct weston_compositor *ec,
  	struct weston_seat *seat;
  	struct weston_output *output;
+ 	const char *config_file;
 +	struct wl_event_loop *loop;
  
  	shell = zalloc(sizeof *shell);
@@ -386,24 +386,24 @@ index 9d4f8a18..b1023912 100644
  
  	if (!weston_compositor_add_destroy_listener_once(ec,
  							 &shell->destroy_listener,
-@@ -1047,6 +1099,9 @@ wet_shell_init(struct weston_compositor *ec,
+@@ -1117,6 +1169,9 @@ wet_shell_init(struct weston_compositor *ec,
  	if (!shell->desktop)
  		return -1;
  
 +	loop = wl_display_get_event_loop(ec->wl_display);
 +	wl_event_loop_add_idle(loop, launch_bg_shell_process, shell);
 +
+ 	wl_list_init(&shell->seat_list);
  	wl_list_for_each(seat, &ec->seat_list, link)
- 		kiosk_shell_seat_create(seat);
- 	shell->seat_created_listener.notify = kiosk_shell_handle_seat_created;
+ 		kiosk_shell_seat_create(shell, seat);
 diff --git a/kiosk-shell/kiosk-shell.h b/kiosk-shell/kiosk-shell.h
-index 09f5a777..33fcf95b 100644
+index a88c5317..d389f92b 100644
 --- a/kiosk-shell/kiosk-shell.h
 +++ b/kiosk-shell/kiosk-shell.h
-@@ -41,6 +41,17 @@ struct kiosk_shell {
- 	struct weston_layer normal_layer;
+@@ -47,6 +47,17 @@ struct kiosk_shell {
  
- 	struct wl_list output_list;
+ 	const struct weston_xwayland_surface_api *xwayland_surface_api;
+ 	struct weston_config *config;
 +
 +	struct {
 +		struct wl_client *client;
@@ -419,5 +419,5 @@ index 09f5a777..33fcf95b 100644
  
  struct kiosk_shell_surface {
 -- 
-2.28.0
+2.31.1
 
