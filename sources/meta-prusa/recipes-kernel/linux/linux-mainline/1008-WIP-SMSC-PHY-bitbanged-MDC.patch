@@ -1,0 +1,82 @@
+From e919fd9f8416c964344e8fc5137ffd5bd35242c7 Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Mon, 16 May 2022 15:35:19 +0200
+Subject: [PATCH] WIP: SMSC PHY, bitbanged MDC
+
+Based on remix of experiments by Roman Beranek.
+---
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 33 ++++++++++++++-----
+ 1 file changed, 25 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index a0f3dec51638..aeba6669a884 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -23,6 +23,7 @@ aliases {
+ 		serial0 = &uart0;
+ 		serial1 = &r_uart;
+ 		serial2 = &uart2;
++		mdio-gpio0 = &mdio0;
+ 	};
+ 
+ 	chosen {
+@@ -40,6 +41,22 @@ hdmi_con_in: endpoint {
+ 		};
+ 	};
+ 
++	mdio0: mdio {
++		compatible = "virtual,mdio-gpio";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		gpios = <&pio 3 21 GPIO_ACTIVE_HIGH>, <&pio 3 12 GPIO_ACTIVE_HIGH>;
++
++		reset-gpios = <&pio 3 24 GPIO_ACTIVE_LOW>;
++		reset-delay-us = <10000>;
++		reset-post-delay-us = <150000>;
++
++		ext_rmii_phy: ethernet-phy@0 {
++			compatible = "ethernet-phy-ieee802.3-c22";
++			reg = <0>;
++		};
++	};
++
+ 	reg_avdd_lcd: avdd-lcd {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "dsi1-lcd-avdd";
+@@ -145,6 +162,13 @@ i2s0_pins: i2s0-pins {
+ 		function = "i2s0";
+ 	};
+ 
++	rmii_no_mdio_pins: rmii-no-mdio-pins {
++		/* neither including RMII_RXER on PD14 */
++		pins = "PD10", "PD11", "PD13", "PD17",
++				"PD18", "PD19", "PD20";
++		function = "emac";
++		drive-strength = <40>;
++	};
+ };
+ 
+ &codec {
+@@ -199,7 +223,7 @@ panel@0 {
+ 
+ &emac {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&rmii_pins>;
++	pinctrl-0 = <&rmii_no_mdio_pins>;
+ 	phy-mode = "rmii";
+ 	phy-handle = <&ext_rmii_phy>;
+ 	phy-supply = <&reg_dcdc1>;
+@@ -209,13 +233,6 @@ &emac {
+ 	nvmem-cell-names = "mac-address";
+ };
+ 
+-&mdio {
+-	ext_rmii_phy: ethernet-phy@1 {
+-		compatible = "ethernet-phy-ieee802.3-c22";
+-		reg = <1>;
+-	};
+-};
+-
+ &hdmi {
+ 	hvcc-supply = <&reg_dldo1>;
+ 	status = "okay";
