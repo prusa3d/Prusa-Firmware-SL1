@@ -14,8 +14,6 @@ ENV LC_ALL en_US.UTF-8
 
 # Make bash default
 RUN ln -sf /bin/bash /bin/sh
-# Provide python2 command
-RUN ln -sf /usr/bin/python2.7 /usr/bin/python2
 
 # Install pkcs11-proxy
 RUN git clone https://github.com/SUNET/pkcs11-proxy /tmp/pkcs11-proxy && \
@@ -32,7 +30,6 @@ WORKDIR /home/docker-build-user/
 RUN mkdir -p .ssh
 RUN chmod 700 .ssh
 RUN ssh-keyscan gitlab.com >> .ssh/known_hosts
-RUN ssh-keyscan 10.24.10.12 >> .ssh/known_hosts
 
 # enables GitLab's Interactive Web Terminal feature
 EXPOSE 8093
