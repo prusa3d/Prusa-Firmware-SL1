@@ -20,7 +20,6 @@ RDEPENDS:${PN} += " \
 	avrdude \
 	api-keygen \
 	udev-usbmount \
-	wifi-config \
 	python3-pyserial \
 	python3-numpy \
 	python3-gpio \
