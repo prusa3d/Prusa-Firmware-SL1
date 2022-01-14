@@ -35,25 +35,43 @@ slot-post-install)
 
 		# update http digest (default is enabled)
 		NGINX_FILE_HTTP_DIGEST=/etc/nginx/sites-available/sl1fw_http_digest
-		NGINX_FILE_ENABLED=/etc/nginx/sites-enabled/sl1fw
-		NGINX_HTTP_DIGEST_ENABLED=/etc/nginx/http_digest_enabled
+		NGINX_SITE_ENABLED_LINK=/etc/nginx/sites-enabled/sl1fw
+		NGINX_FILE_ENABLE=/etc/nginx/http_digest_enabled
 		NGINX_ENABLED=true
+		FW_VERSION=`awk -F= '$1=="VERSION_ID" { print $2 ;}' /etc/os-release | sed -E 's/^\"?([0-9]+)\.([0-9]+)\.([0-9]+).*/\1\2\3/'`
+		echo "Current system version: ${FW_VERSION}"
 		# 1.6.4+
-		if [ ! -f ${NGINX_HTTP_DIGEST_ENABLED} ]; then
-			NGINX_ENABLED=false
+		# Script `/usr/bin/prusa-link_enable_nginx_site` checks the printer model and NGINX_FILE_ENABLE.
+		# Afterwards it creates site file from /etc/nginx/sites-available/prusa-link.conf.template.
+		# Nginx always serves the site from /etc/nginx/sites-available/prusa-link.
+		if [ ${FW_VERSION} -ge "164" ]; then
+			if [ ! -f ${NGINX_FILE_ENABLE} ]; then
+				NGINX_ENABLED=false
+			fi
 		fi
-		# 1.5.0 - 1.6.3
-		if  [ -f ${NGINX_FILE_HTTP_DIGEST} ] && [[ $(readlink -f ${NGINX_FILE_ENABLED} ) != ${NGINX_FILE_HTTP_DIGEST} ]]; then
-			NGINX_ENABLED=false
+		# 1.6.0 - 1.6.3
+		# There is a site /etc/nginx/sites-available folder for each security option (API key, http digest).
+		# NGINX_SITE_ENABLED_LINK points to one of the available sites according to selected security.
+		if [ ${FW_VERSION} -ge "160" ] && [ ${FW_VERSION} -le "163" ]; then
+			if  [ -f ${NGINX_FILE_HTTP_DIGEST} ] && [[ $(readlink -f ${NGINX_SITE_ENABLED_LINK} ) != ${NGINX_FILE_HTTP_DIGEST} ]]; then
+				NGINX_ENABLED=false
+			fi
 		fi
-		# only before 1.5.0
-		if  [ -f "/etc/sl1fw/remoteConfig.toml" ] && [[ $(awk '/http_digest/ {printf $3}' /etc/sl1fw/remoteConfig.toml) != "true" ]]; then
-			NGINX_ENABLED=false
+		# 1.5.0
+		# Site file is modified by enabling or commenting out one line.
+		# The only thing what we can do is to check if the line is commented out or not.
+		if [ ${FW_VERSION} -eq "150" ]; then
+			if  [[ $(grep '# include /etc/nginx/prusa-auth.conf;' ${NGINX_SITE_ENABLED_LINK}) ]]; then
+				NGINX_ENABLED=false
+			fi
 		fi
+		# <1.5.0
+		# No security was required due to readonly Prusa Link. Let the http digest be enabled by default.
 		if [ "${NGINX_ENABLED}" = false ] ; then
-			rm -f ${RAUC_SLOT_MOUNT_POINT}/etc/nginx/http_digest_enabled
+			echo "Disabling http digest"
+			rm -f ${RAUC_SLOT_MOUNT_POINT}/nginx/http_digest_enabled
 		else
-			touch ${RAUC_SLOT_MOUNT_POINT}/etc/nginx/http_digest_enabled
+			echo "Http digest enabled by default"
 		fi
 
 		# Copy update channel override
