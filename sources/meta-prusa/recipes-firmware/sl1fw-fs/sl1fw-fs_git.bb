@@ -7,7 +7,7 @@ SRC_URI = "\
 	git://git@gitlab.com/prusa3d/sl1/filemanager.git;protocol=ssh;nobranch=1 \
 	file://sl1fw_fs.service \
 "
-SRCREV:pn-${PN} = "3e6528a115cf5cef37316e3ae25faec3ba216e61"
+SRCREV:pn-${PN} = "8607c45bce6e3c2654740b3770d6057703871bc0"
 
 S = "${WORKDIR}/git"
 
