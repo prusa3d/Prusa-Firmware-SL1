@@ -1,14 +1,14 @@
-SUMMARY = "sl1fw - python firmware part running on a64 board"
+SUMMARY = "slafw - python firmware part running on a64 board"
 
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = " \
-	git://git@gitlab.com/prusa3d/sl1/a64-fw.git;protocol=ssh;nobranch=1 \
+	git://git@gitlab.com/prusa3d/sl1/sla-fw.git;protocol=ssh;nobranch=1 \
 	file://projects-tmpfiles.conf \
-	file://sl1fw.conf \
+	file://slafw.conf \
 "
-SRCREV:pn-${PN} = "1cc47da2e38a91c3122b156c3bd13826affcb7d6"
+SRCREV:pn-${PN} = "755f12c464261ec48b5a665e551f57583725493e"
 
 PACKAGES = "${PN}-dev ${PN}"
 
@@ -48,16 +48,16 @@ RDEPENDS:${PN} += " \
 "
 
 FILES:${PN} += "\
-	${libdir}/systemd/system/sl1fw.service\
-	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw.service\
-	${libdir}/tmpfiles.d/sl1fw-tmpfiles.conf\
+	${libdir}/systemd/system/slafw.service\
+	${sysconfdir}/systemd/system/multi-user.target.wants/slafw.service\
+	${libdir}/tmpfiles.d/slafw-tmpfiles.conf\
 	${libdir}/tmpfiles.d/projects-tmpfiles.conf\
 	${sysconfdir}/sl1fw/hardware.cfg\
 	/usr/bin/main.py\
 	/usr/share/scripts\
 	/usr/share/factory/defaults\
 	/usr/share/dbus-1/system.d\
-	/usr/lib/sysusers.d/sl1fw.conf\
+	/usr/lib/sysusers.d/slafw.conf\
 "
 FILES:${PN}:remove = "${sysconfdir}/sl1fw/loggerConfig.json"
 FILES:${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
@@ -73,7 +73,7 @@ do_install:append () {
 
 	# Install projects group
 	install -d ${D}${libdir}/sysusers.d/
-	install --mode 644 ${WORKDIR}/sl1fw.conf ${D}${libdir}/sysusers.d/sl1fw.conf
+	install --mode 644 ${WORKDIR}/slafw.conf ${D}${libdir}/sysusers.d/slafw.conf
 }
 
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"

@@ -117,12 +117,12 @@ else:
 
 recipes_firmware = Path("sources/meta-prusa/recipes-firmware")
 projects = [
-    Project("git@gitlab.com:prusa3d/sl1/a64-fw.git", recipes_firmware / "sl1fw/sl1fw_git.bb"),
+    Project("git@gitlab.com:prusa3d/sl1/sla-fw.git", recipes_firmware / "slafw/slafw_git.bb"),
     Project("git@gitlab.com:prusa3d/sl1/touch-ui.git", recipes_firmware / "touch-ui/touch-ui_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Error-Codes.git", recipes_firmware / "prusa-errors/prusa-errors_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Link-Web.git", recipes_firmware / "prusa-link/prusa-link.bb"),
-    Project("git@gitlab.com:prusa3d/sl1/filemanager.git", recipes_firmware / "sl1fw-fs/sl1fw-fs_git.bb"),
-    Project("git@gitlab.com:prusa3d/sl1/remote-api.git", recipes_firmware / "sl1fw-api/sl1fw-api_git.bb"),
+    Project("git@gitlab.com:prusa3d/sl1/filemanager.git", recipes_firmware / "filemanager/filemanager_git.bb"),
+    Project("git@gitlab.com:prusa3d/sl1/remote-api.git", recipes_firmware / "remote-api-link/remote-api-link_git.bb"),
 ]
 
 for p in projects:

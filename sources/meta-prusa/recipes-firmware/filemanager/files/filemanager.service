@@ -1,11 +1,11 @@
 [Unit]
-Description=Prusa SL1 File Manager
+Description=Prusa SLA File Manager
 ConditionDirectoryNotEmpty=/etc/sl1fw/model
 
 [Service]
 Type=dbus
 BusName=cz.prusa3d.sl1.filemanager0
-ExecStart=/usr/bin/python3 -OO -m sl1fw_fs
+ExecStart=/usr/bin/python3 -OO -m filemanager
 Restart=always
 RestartSec=3
 SupplementaryGroups=projects

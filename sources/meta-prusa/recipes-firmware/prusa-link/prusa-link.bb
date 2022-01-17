@@ -21,7 +21,7 @@ DEPENDS += " nodejs-native python3"
 RDEPENDS:${PN} += "\
     nginx \
     systemd \
-    sl1fw-api \
+    remote-api-link \
     bash \
 "
 

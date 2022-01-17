@@ -7,8 +7,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS:packagegroup-prusa-sla = "\
-	etc sl1fw touch-ui \
-	sl1fw-api sl1fw-fs \
+	etc slafw touch-ui \
+	remote-api-link filemanager \
 	prusa-link  weston \
 	"
 

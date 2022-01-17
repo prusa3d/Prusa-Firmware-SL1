@@ -1,7 +1,7 @@
 [Unit]
 Description=Rauc Good-marking Service
-After=sl1fw.service touch-ui.service
-Requires=sl1fw.service touch-ui.service
+After=slafw.service touch-ui.service
+Requires=slafw.service touch-ui.service
 
 [Service]
 ExecStart=@BINDIR@/rauc status mark-good

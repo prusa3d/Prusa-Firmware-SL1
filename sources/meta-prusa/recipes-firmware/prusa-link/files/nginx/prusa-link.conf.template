@@ -71,7 +71,7 @@ server {
 	location /live.png {
 		sendfile on;
 		tcp_nopush on;
-		alias /run/sl1fw/live.png;
+		alias /run/slafw/live.png;
 	}
 
 	location /old-projects {
