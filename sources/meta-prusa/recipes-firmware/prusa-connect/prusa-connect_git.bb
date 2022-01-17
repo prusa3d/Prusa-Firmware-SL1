@@ -1,4 +1,4 @@
-SUMMARY = "Prusa Connect Client SL1 - python api firmware part running on a64 board"
+SUMMARY = "Prusa Connect Client SLA - python api firmware part running on a64 board"
 HOMEPAGE = "https://gitlab.com/prusa3d/sl1/remote-api"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
@@ -8,13 +8,13 @@ SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;branch=m
 SRCREV:pn-${PN} = "41c9e898c41f44ac338214ec71343a23c65e3f71"
 PACKAGES = "${PN}-dev ${PN}"
 
-DEPENDS += "sl1fw"
+DEPENDS += "slafw"
 RDEPENDS:${PN} += " \
 	python3 \
 	python3-pydbus \
 	python3-pygobject \
 	python3-core \
-	sl1fw \
+	slafw \
 	prusa-errors \
 	prusa-connect-sdk \
 "

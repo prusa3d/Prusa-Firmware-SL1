@@ -1,14 +1,14 @@
-SUMMARY = "sl1fw api - python api firmware part running on a64 board"
+SUMMARY = "remote_api_link - python api firmware part running on a64 board"
 HOMEPAGE = "https://gitlab.com/prusa3d/sl1/remote-api"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "git://git@gitlab.com/prusa3d/sl1/remote-api.git;protocol=ssh;nobranch=1"
 
-SRCREV:pn-${PN} = "4c6f86c2ff361645f87939be73f66dce4db469ae"
+SRCREV:pn-${PN} = "44b21829a03bffac41aede203fc5d1fbbadbbd5f"
 PACKAGES = "${PN}-dev ${PN}"
 
-DEPENDS += "sl1fw gettext-native"
+DEPENDS += "slafw gettext-native"
 RDEPENDS:${PN} += " \
 	python3 \
 	python3-flask \
@@ -26,21 +26,21 @@ RDEPENDS:${PN} += " \
 	python3-stringold \
 	python3-xml \
 	python3-streaming-form-data \
-	sl1fw \
+	slafw \
 	prusa-errors \
 "
 
 FILES:${PN} += " \
-	${libdir}/systemd/system/sl1fw_api.service \
-	${libdir}/tmpfiles.d/sl1fw_api-tmpfiles.conf \
-	${libdir}/sysusers.d/sl1fw_api-user.conf \
-	${sysconfdir}/systemd/system/multi-user.target.wants/sl1fw_api.service \
+	${libdir}/systemd/system/remote_api_link.service \
+	${libdir}/tmpfiles.d/remote_api_link-tmpfiles.conf \
+	${libdir}/sysusers.d/remote_api_link-user.conf \
+	${sysconfdir}/systemd/system/multi-user.target.wants/remote_api_link.service \
 	/usr/bin/main_api.py \"
 
-FILES:${PN}:remove = "${localstatedir}/sl1fw_api/loggerConfig.json"
-FILES:${PN}-dev = "${localstatedir}/sl1fw_api/loggerConfig.json"
+FILES:${PN}:remove = "${localstatedir}/remote_api_link/loggerConfig.json"
+FILES:${PN}-dev = "${localstatedir}/remote_api_link/loggerConfig.json"
 
-S = "${WORKDIR}/git/sl1fw_api"
+S = "${WORKDIR}/git/remote_api_link"
 inherit setuptools3 systemd useradd
 
 USERADD_PACKAGES = "${PN}"
@@ -52,11 +52,11 @@ USERADD_PARAM:${PN} = "\
 	--shell /bin/false \
 	--groups projects \
 	--user-group \
-	sl1fw_api \
+	remote_api_link \
 "
 
 do_install:append () {
 	rmdir ${D}/usr/share
 }
 
-SYSTEMD_SERVICE:${PN} = "sl1fw_api.service"
+SYSTEMD_SERVICE:${PN} = "remote_api_link.service"
