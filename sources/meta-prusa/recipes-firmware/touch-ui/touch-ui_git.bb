@@ -31,6 +31,7 @@ RDEPENDS:${PN} += "\
 	gstreamer1.0-plugins-bad-modplug \
 	gstreamer1.0-plugins-base \
 	gstreamer1.0-plugins-good \
+	sla-multimedia \
 "
 
 FILES:${PN} += "\
