@@ -1,7 +1,7 @@
 SUMMARY = "Prusa Link - static web UI for firmware running on a64 board"
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Link-Web"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV:pn-${PN} = "baa26b04fccd4328a301bbd49ba75f462dbf79bb"
+SRCREV:pn-${PN} = "d3c4060d605e905f7c6d0cf7fd016e0ea6859b3d"
 SRC_URI = " \
 	git://git@github.com/prusa3d/Prusa-Link-Web.git;protocol=ssh;nobranch=1 \
 	file://dnssd/http.dnssd \
@@ -46,6 +46,10 @@ USERADD_PARAM:${PN} = " \
 	--system --no-create-home \
 	--groups www-data \
 	--user-group www"
+
+do_configure() {
+	rm package-lock.json
+}
 
 do_compile() {
 	npm install
