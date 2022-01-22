@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append = "\
 	file://0001-enable-all-sysrq-commands.patch \
 	file://0002-timesyncd-google.patch \
+	file://0003-localed-accept-locale-even-if-not-installed.patch \
 	file://0004-send-shdn-cmd-to-mc-during-poweroff.patch \
 	file://journal.conf \
 	file://max_use.conf \
