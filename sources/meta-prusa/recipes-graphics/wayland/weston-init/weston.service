@@ -25,7 +25,7 @@ ConditionPathExists=/dev/tty0
 [Service]
 # Requires systemd-notify.so Weston plugin.
 Type=notify
-ExecStart=/usr/bin/weston --modules=systemd-notify.so --socket=wayland-0
+ExecStart=/usr/bin/weston --modules=systemd-notify.so
 TimeoutStartSec=60
 WatchdogSec=20
 User=root
