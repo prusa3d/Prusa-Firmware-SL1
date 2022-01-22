@@ -1,0 +1,103 @@
+From 80365bcc1e115cd11899290213520bffb03c3e15 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sat, 22 Jan 2022 12:22:45 +0100
+Subject: [PATCH] gl-renderer: added RGB888 and R8 pixel formats
+
+---
+ libweston/renderer-gl/gl-renderer-internal.h |  1 +
+ libweston/renderer-gl/gl-renderer.c          | 39 ++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/libweston/renderer-gl/gl-renderer-internal.h b/libweston/renderer-gl/gl-renderer-internal.h
+index 529cb2f9..cffde9c5 100644
+--- a/libweston/renderer-gl/gl-renderer-internal.h
++++ b/libweston/renderer-gl/gl-renderer-internal.h
+@@ -95,6 +95,7 @@ struct gl_renderer {
+ 
+ 	struct gl_shader texture_shader_rgba;
+ 	struct gl_shader texture_shader_rgbx;
++	struct gl_shader texture_shader_bgrx;
+ 	struct gl_shader texture_shader_egl_external;
+ 	struct gl_shader texture_shader_y_uv;
+ 	struct gl_shader texture_shader_y_u_v;
+diff --git a/libweston/renderer-gl/gl-renderer.c b/libweston/renderer-gl/gl-renderer.c
+index d5bfe830..37eeed3a 100644
+--- a/libweston/renderer-gl/gl-renderer.c
++++ b/libweston/renderer-gl/gl-renderer.c
+@@ -1743,6 +1743,27 @@ gl_renderer_attach_shm(struct weston_surface *es, struct weston_buffer *buffer,
+ 		gl_pixel_type = GL_UNSIGNED_SHORT_5_6_5;
+ 		es->is_opaque = true;
+ 		break;
++	case WL_SHM_FORMAT_RGB888:
++		gs->shader = &gr->texture_shader_rgbx;
++		pitch = wl_shm_buffer_get_stride(shm_buffer) / 3;
++		gl_format[0] = GL_RGB;
++		gl_pixel_type = GL_UNSIGNED_BYTE;
++		es->is_opaque = true;
++		break;
++	case WL_SHM_FORMAT_BGR888:
++		gs->shader = &gr->texture_shader_bgrx;
++		pitch = wl_shm_buffer_get_stride(shm_buffer) / 3;
++		gl_format[0] = GL_RGB;
++		gl_pixel_type = GL_UNSIGNED_BYTE;
++		es->is_opaque = true;
++		break;
++	case WL_SHM_FORMAT_R8:
++		gs->shader = &gr->texture_shader_rgbx;
++		pitch = wl_shm_buffer_get_stride(shm_buffer);
++		gl_format[0] = GL_LUMINANCE;
++		gl_pixel_type = GL_UNSIGNED_BYTE;
++		es->is_opaque = true;
++		break;
+ 	case WL_SHM_FORMAT_YUV420:
+ 		gs->shader = &gr->texture_shader_y_u_v;
+ 		pitch = wl_shm_buffer_get_stride(shm_buffer);
+@@ -2959,6 +2980,17 @@ static const char texture_fragment_shader_rgbx[] =
+ 	"   gl_FragColor.a = alpha;\n"
+ 	;
+ 
++static const char texture_fragment_shader_bgrx[] =
++	"precision mediump float;\n"
++	"varying vec2 v_texcoord;\n"
++	"uniform sampler2D tex;\n"
++	"uniform float alpha;\n"
++	"void main()\n"
++	"{\n"
++	"   gl_FragColor.rgb = alpha * texture2D(tex, v_texcoord).bgr\n;"
++	"   gl_FragColor.a = alpha;\n"
++	;
++
+ static const char texture_fragment_shader_egl_external[] =
+ 	"#extension GL_OES_EGL_image_external : require\n"
+ 	"precision mediump float;\n"
+@@ -3548,6 +3580,9 @@ gl_renderer_display_create(struct weston_compositor *ec,
+ 	}
+ 
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_RGB565);
++	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_RGB888);
++	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_BGR888);
++	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_R8);
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_YUV420);
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_NV12);
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_YUYV);
+@@ -3584,6 +3619,9 @@ compile_shaders(struct weston_compositor *ec)
+ 	gr->texture_shader_rgbx.vertex_source = vertex_shader;
+ 	gr->texture_shader_rgbx.fragment_source = texture_fragment_shader_rgbx;
+ 
++	gr->texture_shader_bgrx.vertex_source = vertex_shader;
++	gr->texture_shader_bgrx.fragment_source = texture_fragment_shader_bgrx;
++
+ 	gr->texture_shader_egl_external.vertex_source = vertex_shader;
+ 	gr->texture_shader_egl_external.fragment_source =
+ 		texture_fragment_shader_egl_external;
+@@ -3621,6 +3659,7 @@ fragment_debug_binding(struct weston_keyboard *keyboard,
+ 
+ 	shader_release(&gr->texture_shader_rgba);
+ 	shader_release(&gr->texture_shader_rgbx);
++	shader_release(&gr->texture_shader_bgrx);
+ 	shader_release(&gr->texture_shader_egl_external);
+ 	shader_release(&gr->texture_shader_y_uv);
+ 	shader_release(&gr->texture_shader_y_u_v);
+-- 
+2.34.1
+
