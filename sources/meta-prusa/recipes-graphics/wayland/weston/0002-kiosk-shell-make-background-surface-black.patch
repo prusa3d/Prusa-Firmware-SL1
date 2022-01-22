@@ -1,0 +1,25 @@
+From a7a4c90a73d106296878e9c42563ca4deb64dfb0 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 30 Nov 2021 16:49:00 +0100
+Subject: [PATCH] kiosk-shell: make background surface black
+
+---
+ kiosk-shell/kiosk-shell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kiosk-shell/kiosk-shell.c b/kiosk-shell/kiosk-shell.c
+index ac9c8684..9d4f8a18 100644
+--- a/kiosk-shell/kiosk-shell.c
++++ b/kiosk-shell/kiosk-shell.c
+@@ -428,7 +428,7 @@ kiosk_shell_output_recreate_background(struct kiosk_shell_output *shoutput)
+ 
+ 	shoutput->background_view =
+ 			create_colored_surface(shoutput->shell->compositor,
+-					       0.5, 0.5, 0.5,
++					       0.0, 0.0, 0.0,
+ 					       output->x, output->y,
+ 					       output->width,
+ 			                       output->height);
+-- 
+2.34.1
+
