@@ -1,0 +1,34 @@
+From 5872c3ac08e97184616cc0778afdbb4c16d6aa37 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sat, 22 Jan 2022 02:23:14 +0100
+Subject: [PATCH] localed: accept locale even if not installed
+
+---
+ src/locale/localed.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/locale/localed.c b/src/locale/localed.c
+index c228385d0e..8b02223251 100644
+--- a/src/locale/localed.c
++++ b/src/locale/localed.c
+@@ -285,7 +285,7 @@ static int process_locale_list_item(
+                 if (!locale_is_valid(e))
+                         return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Locale %s is not valid, refusing.", e);
+                 if (!use_localegen && locale_is_installed(e) <= 0)
+-                        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Locale %s not installed, refusing.", e);
++                        log_warning("Locale '%s' is not installed, accepting anyway.", e);
+                 if (new_locale[p])
+                         return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Locale variable %s set twice, refusing.", name);
+ 
+@@ -367,7 +367,7 @@ static int method_set_locale(sd_bus_message *m, void *userdata, sd_bus_error *er
+                 if (!locale_is_valid(l[0]))
+                         return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Invalid locale specification: %s", l[0]);
+                 if (!use_localegen && locale_is_installed(l[0]) <= 0)
+-                        return sd_bus_error_setf(error, SD_BUS_ERROR_INVALID_ARGS, "Specified locale is not installed: %s", l[0]);
++                        log_warning("Locale '%s' is not installed, accepting anyway.", l[0]);
+ 
+                 new_locale[VARIABLE_LANG] = strdup(l[0]);
+                 if (!new_locale[VARIABLE_LANG])
+-- 
+2.34.1
+
