@@ -7,7 +7,7 @@ stages:
 
 variables:
   GIT_SUBMODULE_STRATEGY: "recursive"
-  GIT_DEPTH: 0
+  GIT_DEPTH: "0"
 
 before_script:
   - eval $(ssh-agent -s)
