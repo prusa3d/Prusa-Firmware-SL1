@@ -8,7 +8,7 @@ HOMEPAGE = "https://github.com/prusa3d/Prusa-Connect-SDK-Printer"
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = ""
 
-SRC_URI = "git://git@github.com/prusa3d/Prusa-Connect-SDK-Printer.git;protocol=ssh;branch=master"
+SRC_URI = "git://github.com/prusa3d/Prusa-Connect-SDK-Printer.git;protocol=https;branch=master"
 
 SRCREV = "5fe1199055bc7ac5340510d38bd8811d4616464a"
 

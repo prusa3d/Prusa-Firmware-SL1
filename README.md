@@ -19,10 +19,6 @@ Clone the repository
     git submodule init
     git submodule update
 
-GitHub and Gitlab
------------------------------
-To fetch our repositories during the build, you'll need to have [GitHub](https://github.com/login) and [Gitlab](https://gitlab.com/users/sign_in) accounts with attached public ssh keys for authentication. If you don't have any ssh keys yet follow [this guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
-
 Obtain certificates for image signing
 -------------------------------------
 This step is only needed if you intend to build [Rauc](https://rauc.io/) update bundle by running `bitbake sla-update-bundle`. You can skip the following section if you are interested only in a bootable image for an SD card built by running `bitbake sla-dev-image`.
@@ -41,7 +37,6 @@ Write the image to the SD card
 ------------------------------
 
 - With bmaptool
-
 
     bmaptool copy tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic /dev/mmcblkXXX
 

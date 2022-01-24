@@ -1,7 +1,7 @@
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5b4473596678d62d9d83096273422c8c"
 
-SRC_URI = "git://git@gitlab.com/prusa3d/sl1/firstboot.git;protocol=ssh;branch=master"
+SRC_URI = "git://gitlab.com/prusa3d/sl1/firstboot.git;protocol=https;branch=master"
 
 PV = "1.0+git${SRCPV}"
 SRCREV = "c3ce0c14b7d2e9d0a9a61eef67e718db4ddc5df0"
