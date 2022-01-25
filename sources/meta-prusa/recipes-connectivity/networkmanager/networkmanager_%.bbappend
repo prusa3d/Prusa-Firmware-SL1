@@ -15,6 +15,9 @@ PACKAGECONFIG:remove:pn-networkmanager = "polkit dhclient dnsmasq ifupdown"
 
 EXTRA_OECONF += "--with-dbus-sys-dir=/usr/share/dbus-1/system.d"
 
+# prevent networkmanager from overtaking of /etc/resolv.conf from systemd-resolved
+ALTERNATIVE_PRIORITY = "0"
+
 do_install:append() {
 	install -d ${D}${systemd_system_unitdir}/multi-user.target.wants
 	ln -s ../NetworkManager.service ${D}${systemd_system_unitdir}/multi-user.target.wants/NetworkManager.service
