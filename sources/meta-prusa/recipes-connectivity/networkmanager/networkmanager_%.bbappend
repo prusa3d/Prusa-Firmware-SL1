@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = "\
+	file://disable-firewall.conf \
 	file://mdns.conf \
 	file://wifi.conf \
 "
@@ -11,7 +12,7 @@ FILES:${PN} += "\
 	${noarch_libdir}/NetworkManager/conf.d/ \
 "
 
-PACKAGECONFIG:remove:pn-networkmanager = "polkit dhclient dnsmasq ifupdown"
+PACKAGECONFIG:remove:pn-networkmanager = "polkit dhclient ifupdown"
 
 EXTRA_OECONF += "--with-dbus-sys-dir=/usr/share/dbus-1/system.d"
 
@@ -26,6 +27,7 @@ do_install:append() {
 	ln -s ../NetworkManager-wait-online.service ${D}${systemd_system_unitdir}/network-online.target.wants/NetworkManager-wait-online.service
 
 	install -d ${D}${libdir}/NetworkManager/conf.d
+	install -m 644 ${WORKDIR}/disable-firewall.conf ${D}${libdir}/NetworkManager/conf.d/
 	install -m 644 ${WORKDIR}/mdns.conf ${D}${libdir}/NetworkManager/conf.d/
 	install -m 644 ${WORKDIR}/wifi.conf ${D}${libdir}/NetworkManager/conf.d/
 
