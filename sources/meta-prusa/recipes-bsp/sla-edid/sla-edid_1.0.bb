@@ -6,10 +6,7 @@ inherit allarch
 B = "${WORKDIR}/build"
 
 SRC_URI = " \
-	file://edid.h \
-	file://dxq608.S \
-	file://ls055r1sx04.S \
-	file://rv059fbb.S \
+	file://edids \
 	file://checksum.cpp \
 "
 
@@ -18,9 +15,11 @@ FILES:${PN} = "${base_libdir}/firmware/edid/*.bin"
 do_compile() {
 	mkdir -p ${B}
 	${BUILD_CXX} -o ${B}/checksum ${WORKDIR}/checksum.cpp
-	for edid in dxq608 ls055r1sx04 rv059fbb
+	for edid_src in ${WORKDIR}/edids/*.S
 	do
-		${BUILD_CC} -c -o ${B}/${edid}.o ${WORKDIR}/${edid}.S
+		edid_S=${edid_src##*/}
+		edid=${edid_S%.S}
+		${BUILD_CC} -c -o ${B}/${edid}.o ${edid_src}
 		${OBJCOPY} -j .data -Obinary ${B}/${edid}.o ${B}/${edid}.bin
 		${B}/checksum ${B}/${edid}.bin
 	done
@@ -28,7 +27,5 @@ do_compile() {
 
 do_install() {
         install -d ${D}${base_libdir}/firmware/edid
-        install -m 644 ${B}/dxq608.bin			${D}${base_libdir}/firmware/edid/
-        install -m 644 ${B}/ls055r1sx04.bin		${D}${base_libdir}/firmware/edid/
-        install -m 644 ${B}/rv059fbb.bin		${D}${base_libdir}/firmware/edid/
+        install -m 644 ${B}/*.bin			${D}${base_libdir}/firmware/edid/
 }
