@@ -1,3 +1,116 @@
+# Version 1.7.0-alpha.1
+
+## Summary (relative to 1.7.0-alpha.0)
+- Preprint checks can be cancelled.
+- Minor updates e.g. num keypad in exposure time selection
+- Bugs identified and fix:
+  - Memory leak in alfa.0 fixed, should occasional failed prints should not occur
+  - Other minor bugs
+
+# Version 1.7.0-alpha.0
+
+## Summary (relative to 1.6.4):
+- SL1SW-1195: fix keyboard input for qt applications
+- Yocto Honister
+- Updated U-boot
+- Updated Weston + HW color space transformations
+- Proper calibration print - no exposure interruptions
+- Drop various unused dependencies from Yocto and docker images
+- Drop mali-blobs recipe - we are already using opensource solution
+- Tank cleaning wizard
+- M1 support fixes
+- sl1fw/slafw changes
+  - a64-fw@991ad42: Reimplement temperature and fan checking
+  - a64-fw@f06aa55: Stop using pages
+  - a64-fw@db2fa3b: Redesign printer startup
+  - a64-fw@27e2078: wayland: check output resolution and query fulls..
+  - a64-fw@03434d7: wayland: speedup
+  - a64-fw@af48a24: test code of wayland usage
+  - a64-fw@3bdbdc6: removed obsolete blinkExposure config option (al..
+  - a64-fw@3819c3b: exposure_screen: offload pixel format conversion..
+  - a64-fw@5427165: fix: call _print_end_hw_off befor shutting down ..
+  - a64-fw@873fc99: Refactor exception handling
+  - a64-fw@1cc47da: add tank surface cleaner wizard
+  - a64-fw@8ef1958: Add stress UI utility
+  - a64-fw@281f2d0: Drop RESIN_WARNING exposure state
+  - a64-fw@6b17179: Improve Hardware mock
+  - a64-fw@064e5b6: Use the new log format in the temperature graph ..
+  - a64-fw@bd3d302: Remove printer first run logic
+  - a64-fw@3a3342c: Exposure thread refactor
+  - a64-fw@4ce46e8: Fix admin - exposure units um -> mm
+  - a64-fw@c87342f: Add support for fixed point numbers to admin
+  - a64-fw@6a7b4de: Parametrize max tower height
+  - a64-fw@0e68411: use `df` to get disk usage on all mount points
+  - a64-fw@91ac072: Include psutil data in log summary as dictionary
+- touch-ui changes
+  - touch-ui@3ea0b37: remove PrusaText
+  - touch-ui@e66a343: add admin model unit test
+  - touch-ui@20d35c5: fix: type registered multiple times, debug prints
+  - touch-ui@3c3ae1b: remove obsolete code from PictureButton
+  - touch-ui@ab1c91b: fix: unregistered type warnings & add acknowledg..
+  - touch-ui@ff0279c: Store Admin Items in native model & expose them ..
+  - touch-ui@187c879: Move reusable components into PrusaComponents
+  - touch-ui@5e37098: Refactor delegates for systematic API
+  - touch-ui@2988185: use en_US locale instead of default "C"
+  - touch-ui@5206e24: Deduplicate error handling code
+  - touch-ui@2785e3a: use new delegate in TankSurfaceCleaningWizard
+  - touch-ui@49f4d5a: use better placeholder images with final names
+  - touch-ui@ee43575: fix buttons - licenses search
+  - touch-ui@8adac5a: bump Prusa-Error-Codes: add GarbageCollectorMiss..
+  - touch-ui@c75fe47: Add support for fixed point numbers to admin
+  - touch-ui@e69f6b3: swing text of PagePreview if it does not fit
+  - touch-ui@95bb5c5: clip the content of swipe items withing their bo..
+  - touch-ui@39d1d71: fix: restrict hostname string to valid characters
+  - touch-ui@cf577b5: fix: PageFinished - Layer Height should have 3 d..
+  - touch-ui@a6c5322: Localize about-us links
+  - touch-ui@c7f1ea4: Unify network menu naming
+  - touch-ui@adc7375: SL1SW-1521: fix PageSetDate month localization
+  - touch-ui@ff29898: SL1SW-1504 fix: replace XAnimator with PropertyA..
+  - touch-ui@e002875: fix: wrap long text on wait screen
+  - touch-ui@957088b: fix title animation. SL1SW-1487
+  - touch-ui@82358bd: fix directory refresh - use correct origin when ..
+  - touch-ui@3046b11: fix screenshot (whole window) + window header ba..
+  - touch-ui@0149d5e: remove the leading https from links to be consis..
+  - touch-ui@e946bfe: fix PageQrCode alignment
+  - touch-ui@f569bb8: handle POUR_IN_RESIN state
+  - touch-ui@3a77b45: PageManual: simplify URL for all models
+  - touch-ui@aca98fd: Fix "About us" screen text. SL1SW-1476
+  - touch-ui@399eaa5: fix missing pictogram on "PageChange"
+  - touch-ui@896159d: add the missing PrusaComponents import
+  - touch-ui@7368801: add debug section
+  - touch-ui@6b701ea: add new pictograms, new screenshot control - fix..
+  - touch-ui@1c6afb0: fix: don\'t peek at notification if the notifica..
+  - touch-ui@2664b48: fix pictogram in NotificationProgressDelegate
+  - touch-ui@470dbdb: hide the window header when requested, propagate..
+  - touch-ui@2992109: fix imports, remove redundant pictures
+  - touch-ui@e622d7f: add the PrusaComponents library, move resources ..
+  - touch-ui@2c14a9a: remove redundant code, fix imports - fix import ..
+  - touch-ui@7f222d0: replace "orange cover" -> "cover"
+  - touch-ui@3ef6ad6: add horizontal separators
+  - touch-ui@af2249d: replace StackView with a custom one
+  - touch-ui@b76ef45: SL1SW-1143: fix the generic error on log export ..
+  - touch-ui@35083e4: SL1SW-1456 fix: czech AM/PM capitalization shoul..
+  - touch-ui@83bab0f: improvement: new pour in resin state
+  - touch-ui@cfa11d8: DBus error handling:  - uniform handling of err..
+- prusa-errors update:
+  - d83f980: add GARBAGE_COLLECTOR_MISSING error for the new ..
+  - 6d01723: Update to the texts and action buttons
+  - 0ff7707: Handcrafted changes obtained from the Content team
+  - 73845a2: Remove unneeded emoticon. (#45)
+- prusa-link changes:
+  - 9effde6: Add states to left side bar
+  - 3a06366: Fix printer status handling
+  - a79e021: Actualize API specs
+  - abc34eb: Add target values and Enter key press support
+  - baa26b0: Fix displaying of temperature in control widgets
+  - 4ead942: Fix big log files displaying
+  - 1f4dbd5: removed console log
+  - ca36658: show correct protocol of connect
+- filemanager changes:
+  - filemanager@3e6528a: pylint: disable bad-continuation check, linter f..
+  - filemanager@2f51e41: Filemenager will reload the file metadata when i..
+  - filemanager@2b983be: Avoid logging "catch all" events
+
 # Version 1.6.1-rc.1
 
 ## Summary (relative to 1.6.0)
