@@ -4,9 +4,9 @@ Date: Fri, 18 Sep 2020 12:26:21 +0000
 Subject: [PATCH 1/6] boot-process
 
 ---
- board/sunxi/board.c            | 1 +
+ board/sunxi/board.c            | 3 ++-
  include/configs/sunxi-common.h | 7 +++----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
 index 21651a1bfc..5a0d369ae1 100644
@@ -20,6 +20,15 @@ index 21651a1bfc..5a0d369ae1 100644
  	switch (prio) {
  	case 0:
  		return ENVL_FAT;
+@@ -978,7 +978,7 @@ int misc_init_r(void)
+ 	/* Set fdtfile to match the FIT configuration chosen in SPL. */
+ 	spl_dt_name = get_spl_dt_name();
+ 	if (spl_dt_name) {
+-		char *prefix = IS_ENABLED(CONFIG_ARM64) ? "allwinner/" : "";
++		char *prefix = "";
+ 		char str[64];
+ 
+ 		snprintf(str, sizeof(str), "%s%s.dtb", prefix, spl_dt_name);
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
 index 9e37e99684..ade3a6934a 100644
 --- a/include/configs/sunxi-common.h
