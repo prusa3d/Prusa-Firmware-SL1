@@ -1,0 +1,44 @@
+From 7336123a4996514a321214195f14f752377f83b6 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sun, 18 Jul 2021 23:56:41 +0200
+Subject: [PATCH] arm64: dts: allwinner: a64: add r_uart node
+
+---
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+index 4027b0065e8e..28309454ff57 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
+@@ -1347,6 +1347,11 @@ r_rsb_pins: r-rsb-pins {
+ 				pins = "PL0", "PL1";
+ 				function = "s_rsb";
+ 			};
++
++			r_uart_pins: r-uart-pins {
++				pins = "PL2", "PL3";
++				function = "s_uart";
++			};
+ 		};
+ 
+ 		r_rsb: rsb@1f03400 {
+@@ -1362,5 +1367,16 @@ r_rsb: rsb@1f03400 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 		};
++
++		r_uart: serial@1f02800 {
++			compatible = "snps,dw-apb-uart";
++			reg = <0x01f02800 0x400>;
++			interrupts = <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>;
++			reg-shift = <2>;
++			reg-io-width = <4>;
++			clocks = <&r_ccu CLK_APB0_UART>;
++			resets = <&r_ccu RST_APB0_UART>;
++			status = "disabled";
++		};
+ 	};
+ };
+-- 
+2.32.0
