@@ -10,6 +10,7 @@ SRC_URI:append = " \
 	file://0007-tc358870-only-proceed-with-setup-if-sl1-uv-led-found.patch \
 	file://0008-Kconfig-remove-unnecessary-dependencies.patch \
 	file://0009-Revert-cmd-exit-Fix-return-value.patch \
+	file://0010-assert-PWR_EN-high-early-SPL.patch \
 	file://1001-prusa64-sl1-dts-and-defconfig.patch \
 	file://fw_env.config \
 	file://sunxi-prusa.h \

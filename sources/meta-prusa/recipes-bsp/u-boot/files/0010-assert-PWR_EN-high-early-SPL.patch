@@ -1,0 +1,45 @@
+From 8dff2bd82917ff96f9f6b05e570e92dc67efe575 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Mon, 12 Jul 2021 09:14:22 +0200
+Subject: [PATCH] assert PWR_EN high early (SPL)
+
+---
+ arch/arm/mach-sunxi/Kconfig | 5 +++++
+ board/sunxi/board.c         | 7 +++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/arch/arm/mach-sunxi/Kconfig b/arch/arm/mach-sunxi/Kconfig
+index f8de820e12..566a59aff9 100644
+--- a/arch/arm/mach-sunxi/Kconfig
++++ b/arch/arm/mach-sunxi/Kconfig
+@@ -1095,6 +1095,10 @@ config BRIDGED_PANEL_DETECTION
+ 	select DM_REGULATOR_FIXED
+ 	select SSCANF
+ 
++config BOARD_NEEDS_PWR_EN_HIGH
++	bool "Board needs PWR_EN GPIO pin asserted high"
++	default n
++
+ endif
+ 
+ config CHIP_DIP_SCAN
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 7586cac8f4..3afb37b2e6 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -709,6 +709,13 @@ void sunxi_board_init(void)
+ 		clock_set_pll1(CONFIG_SYS_CLK_FREQ);
+ 	else
+ 		printf("Failed to set core voltage! Can't set CPU frequency\n");
++
++#ifdef CONFIG_BOARD_NEEDS_PWR_EN_HIGH
++	sunxi_gpio_set_cfgpin(SUNXI_GPD(21), SUNXI_GPIO_OUTPUT);
++	gpio_set_value(SUNXI_GPD(21), 1);
++	printf("Setting PWR_EN (PD21) high.\n");
++#endif
++
+ }
+ #endif
+ 
+-- 
+2.32.0
