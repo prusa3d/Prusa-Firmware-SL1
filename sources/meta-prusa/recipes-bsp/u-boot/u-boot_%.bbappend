@@ -12,6 +12,7 @@ SRC_URI:append = " \
 	file://0009-Revert-cmd-exit-Fix-return-value.patch \
 	file://0010-assert-PWR_EN-high-early-SPL.patch \
 	file://1001-prusa64-sl1-dts-and-defconfig.patch \
+	file://1002-prusa64-sl2-dts-and-defconfig.patch \
 	file://fw_env.config \
 	file://sunxi-prusa.h \
 "
