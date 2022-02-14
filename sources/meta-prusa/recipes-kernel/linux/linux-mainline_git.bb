@@ -45,6 +45,7 @@ SRC_URI="\
 	file://1005-a64-increase-mali-frequency.patch \
 	file://1006-dts-prusa64-sl1-add-reserved-memory-node-for-lima.patch \
 	file://1007-dts-prusa64-sl1-add-SPI-node.patch \
+	file://1008-arm64-dts-allwinner-a64-add-r_uart-node.patch \
 	file://defconfig \
 "
 
@@ -60,9 +61,11 @@ do_configure:prepend() {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
 		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' ${S}/Makefile
 	fi
+	sed -i ${WORKDIR}/defconfig -e '/CONFIG_EXTRA_FIRMWARE/d'
 	extra_fw=`find ${FW_DIR} -type f | sed "s#^${FW_DIR}/##" | tr '\n' ' '`
 	echo "CONFIG_EXTRA_FIRMWARE=\"${extra_fw}\"" >> ${WORKDIR}/defconfig
 	echo "CONFIG_EXTRA_FIRMWARE_DIR=\"${FW_DIR}\"" >> ${WORKDIR}/defconfig
+	rm -f ${B}/.config
 }
 
 do_install:append() {
