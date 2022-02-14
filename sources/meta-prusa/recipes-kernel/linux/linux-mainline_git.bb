@@ -16,11 +16,11 @@ KERNEL_DEVICETREE:sun50i = "\
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
 # in something or kernel-yocto.bbclass will fail.
-KBRANCH ?= "linux-5.15.y"
+KBRANCH ?= "linux-5.16.y"
 
 DEFAULT_PREFERENCE = "1"
 
-PV = "v5.15.5"
+PV = "v5.16.11"
 SRCREV:pn-${PN} = "${PV}"
 LINUX_VERSION = "${PV}"
 
@@ -35,7 +35,6 @@ SRC_URI="\
 	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
 	file://0401-pwm-sun4i-Avoid-waiting-until-the-next-period.patch \
 	file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
-	file://0601-bus-sunxi-rsb-Fix-shutdown.patch \
 	file://0701-iio-adc-add-mcp3221-driver.patch \
 	file://0801-i2s.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \

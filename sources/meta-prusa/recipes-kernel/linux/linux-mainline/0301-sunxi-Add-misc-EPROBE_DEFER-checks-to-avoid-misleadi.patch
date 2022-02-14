@@ -6,55 +6,22 @@ Subject: [PATCH] sunxi: Add misc EPROBE_DEFER checks to avoid misleading
 
 Signed-off-by: Ondrej Jirman <megous@megous.com>
 ---
- arch/arm/kernel/topology.c            | 2 +-
- drivers/bus/sun50i-de2.c              | 4 +++-
- drivers/i2c/busses/i2c-gpio.c         | 4 ++++
+ drivers/bus/sun50i-de2.c              | 1 +
  drivers/phy/allwinner/phy-sun4i-usb.c | 9 ++++++---
- 4 files changed, 14 insertions(+), 5 deletions(-)
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kernel/topology.c b/arch/arm/kernel/topology.c
-index ef0058de432b..b87be5d007bf 100644
---- a/arch/arm/kernel/topology.c
-+++ b/arch/arm/kernel/topology.c
-@@ -121,7 +121,7 @@ static void __init parse_dt_topology(void)
- 
- 		rate = of_get_property(cn, "clock-frequency", &len);
- 		if (!rate || len != 4) {
--			pr_err("%pOF missing clock-frequency property\n", cn);
-+			//pr_err("%pOF missing clock-frequency property\n", cn);
- 			continue;
- 		}
- 
 diff --git a/drivers/bus/sun50i-de2.c b/drivers/bus/sun50i-de2.c
 index 672518741f86..e0899a20012a 100644
 --- a/drivers/bus/sun50i-de2.c
 +++ b/drivers/bus/sun50i-de2.c
-@@ -16,7 +16,9 @@ static int sun50i_de2_bus_probe(struct platform_device *pdev)
+@@ -15,6 +15,7 @@ static int sun50i_de2_bus_probe(struct platform_device *pdev)
+ 	int ret;
  
  	ret = sunxi_sram_claim(&pdev->dev);
- 	if (ret) {
--		dev_err(&pdev->dev, "Error couldn't map SRAM to device\n");
-+		if (ret != -EPROBE_DEFER)
-+			dev_err(&pdev->dev,
-+				"Error couldn't map SRAM to device (%d)\n", ret);
- 		return ret;
- 	}
- 
-diff --git a/drivers/i2c/busses/i2c-gpio.c b/drivers/i2c/busses/i2c-gpio.c
-index a4a6825c8758..e6b1e103d9f0 100644
---- a/drivers/i2c/busses/i2c-gpio.c
-+++ b/drivers/i2c/busses/i2c-gpio.c
-@@ -332,6 +332,10 @@ static struct gpio_desc *i2c_gpio_get_desc(struct device *dev,
- 		return retdesc;
- 	}
- 
-+	ret = PTR_ERR(retdesc);
-+	if (ret == -EPROBE_DEFER)
-+		return retdesc;
-+
- 	retdesc = devm_gpiod_get_index(dev, NULL, index, gflags);
- 	if (!IS_ERR(retdesc)) {
- 		dev_dbg(dev, "got GPIO from index %u\n", index);
++	if (ret == -EPROBE_DEFER) return ret;
+ 	if (ret)
+ 		return dev_err_probe(&pdev->dev, ret,
+ 				     "Couldn't map SRAM to device\n");
 diff --git a/drivers/phy/allwinner/phy-sun4i-usb.c b/drivers/phy/allwinner/phy-sun4i-usb.c
 index 788dd5cdbb7d..27d4bdc34c13 100644
 --- a/drivers/phy/allwinner/phy-sun4i-usb.c

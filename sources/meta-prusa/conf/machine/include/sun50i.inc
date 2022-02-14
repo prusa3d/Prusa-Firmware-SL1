@@ -11,7 +11,7 @@ KERNEL_IMAGETYPE ?= "Image"
 UBOOT_INITIAL_ENV = "u-boot-initial-env"
 UBOOT_BINARY = "u-boot-sunxi-with-spl.bin"
 
-PREFERRED_VERSION_linux-mainline = "v5.15%"
+PREFERRED_VERSION_linux-mainline = "v5.16%"
 
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "kernel-devicetree"
 MACHINE_EXTRA_RDEPENDS:append = " udev-io-scheduler-rule"
