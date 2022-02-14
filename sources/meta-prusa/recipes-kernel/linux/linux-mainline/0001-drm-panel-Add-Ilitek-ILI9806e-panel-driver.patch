@@ -1,7 +1,7 @@
-From 6a220703020da53dec4ff266fd77bc9da0b7d186 Mon Sep 17 00:00:00 2001
+From 98f62fdaaca5319881c233c43011f8db109bd7d3 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 30 Aug 2018 04:39:09 +0200
-Subject: [PATCH 1/4] drm/panel: Add Ilitek ILI9806e panel driver
+Subject: [PATCH 1/5] drm/panel: Add Ilitek ILI9806e panel driver
 
 TDO TL040WV27CT3 is a panel built into the Prusa SL1 printer,
 and is based on the Ilitek ILI9806e controller. This panel
@@ -434,35 +434,41 @@ index 000000000000..e503c35645c0
 +MODULE_DESCRIPTION("Ilitek ILI9806E Controller Driver");
 +MODULE_LICENSE("GPL v2");
 -- 
-2.30.2
+2.34.1
 
 
-From ad43724dfcf854cf868cef56d979ede923eed678 Mon Sep 17 00:00:00 2001
+From ef9be1bb361f18128417c6e596e8d0c434903610 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 04:54:10 +0100
-Subject: [PATCH 2/4] drm/panel: ili9806e: prepare for adding support for extra
+Subject: [PATCH 2/5] drm/panel: ili9806e: prepare for adding support for extra
  panels
 
 ---
- drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 420 +++++++++++-------
- 1 file changed, 251 insertions(+), 169 deletions(-)
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 379 ++++++++++--------
+ 1 file changed, 211 insertions(+), 168 deletions(-)
 
 diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-index e503c35645c0..a3c70ea52cbb 100644
+index e503c35645c0..000708303c1e 100644
 --- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 +++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-@@ -19,7 +19,9 @@
- #include <drm/drm_panel.h>
- #include <drm/drm_print.h>
- 
--#include <video/mipi_display.h>
+@@ -10,6 +10,7 @@
+ #include <linux/fb.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
 +#include <linux/of_device.h>
-+
-+struct ili9806e_panel_data;
  
+ #include <linux/gpio/consumer.h>
+ #include <linux/regulator/consumer.h>
+@@ -21,6 +22,8 @@
+ 
+ #include <video/mipi_display.h>
+ 
++struct ili9806e_panel_data;
++
  struct ili9806e {
  	struct drm_panel	panel;
-@@ -28,43 +30,257 @@ struct ili9806e {
+ 	struct mipi_dsi_device	*dsi;
+@@ -28,43 +31,218 @@ struct ili9806e {
  	struct regulator	*power_supply;
  	struct gpio_desc	*reset_gpio;
  
@@ -629,27 +635,6 @@ index e503c35645c0..a3c70ea52cbb 100644
 +	return 0;
 +}
 +
-+static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
-+{
-+	ssize_t err;
-+	u8 page = reg >> 8;
-+	u8 cmd = reg & 0xffu;
-+
-+	if (ctx->current_page != page)
-+		ili9806e_switch_page(ctx, page);
-+
-+	err = mipi_dsi_dcs_read(ctx->dsi, cmd, value, sizeof(*value));
-+
-+	if (err <= 0) {
-+		if (err == 0)
-+			err = -ENODATA;
-+
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
 +static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
 +{
 +	switch (mode->vdisplay) {
@@ -699,27 +684,9 @@ index e503c35645c0..a3c70ea52cbb 100644
 +	ili9806e_write_register(ctx, VCLCTRL, reg->vclctrl);
 +	ili9806e_write_register(ctx, VGLREGEN, reg->vglregen);
 +	ili9806e_write_register(ctx, TIMECTRL, reg->timectrl);
-+	/* We do not know default values of these two registers */
-+	if (reg->unknown1)
-+		ili9806e_write_register(ctx, UNKNOWN1, reg->unknown1);
-+	if (reg->unknown2)
-+		ili9806e_write_register(ctx, UNKNOWN2, reg->unknown2);
++	ili9806e_write_register(ctx, UNKNOWN1, reg->unknown1);
++	ili9806e_write_register(ctx, UNKNOWN2, reg->unknown2);
 +	return 0;
-+}
-+
-+static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
-+{
-+	int ret;
-+	u8 unknown1, unknown2;
-+
-+	ret = ili9806e_read_register(ctx, UNKNOWN1, &unknown1);
-+	if (ret < 0)
-+		DRM_ERROR("Read from UNKNOWN1 failed: %d\n", ret);
-+	ret = ili9806e_read_register(ctx, UNKNOWN2, &unknown2);
-+	if (ret < 0)
-+		DRM_ERROR("Read from UNKNOWN2 failed: %d\n", ret);
-+
-+	DRM_INFO("UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
  }
  
 -/*
@@ -740,7 +707,7 @@ index e503c35645c0..a3c70ea52cbb 100644
  	int ret;
  
  	if (ctx->prepared)
-@@ -85,126 +301,10 @@ static int ili9806e_prepare(struct drm_panel *panel)
+@@ -85,126 +263,9 @@ static int ili9806e_prepare(struct drm_panel *panel)
  	gpiod_set_value(ctx->reset_gpio, 0);
  	msleep(120);
  
@@ -864,14 +831,13 @@ index e503c35645c0..a3c70ea52cbb 100644
 -	dcs_write_seq(ctx->dsi, 0x17, 0x22); /* VGLREG_EN */
 -	dcs_write_seq(ctx->dsi, 0x02, 0x77); /* DDVDH/L clamp bias -> 16 uA */
 -	dcs_write_seq(ctx->dsi, 0xe1, 0x79); /* ??? undocumented */
-+	ili9806e_read_unknown_registers(ctx);
 +	ret = ili9806e_configure_registers(ctx);
 +	if (ret < 0)
 +		return ret;
  
  	ili9806e_switch_page(ctx, 0);
  
-@@ -227,7 +327,7 @@ static int ili9806e_prepare(struct drm_panel *panel)
+@@ -227,7 +288,7 @@ static int ili9806e_prepare(struct drm_panel *panel)
  
  static int ili9806e_enable(struct drm_panel *panel)
  {
@@ -880,7 +846,7 @@ index e503c35645c0..a3c70ea52cbb 100644
  
  	msleep(120);
  	mipi_dsi_dcs_set_display_on(ctx->dsi);
-@@ -237,14 +337,14 @@ static int ili9806e_enable(struct drm_panel *panel)
+@@ -237,14 +298,14 @@ static int ili9806e_enable(struct drm_panel *panel)
  
  static int ili9806e_disable(struct drm_panel *panel)
  {
@@ -897,7 +863,7 @@ index e503c35645c0..a3c70ea52cbb 100644
  
  	if (!ctx->prepared)
  		return 0;
-@@ -259,43 +359,24 @@ static int ili9806e_unprepare(struct drm_panel *panel)
+@@ -259,43 +320,24 @@ static int ili9806e_unprepare(struct drm_panel *panel)
  	return 0;
  }
  
@@ -946,7 +912,7 @@ index e503c35645c0..a3c70ea52cbb 100644
  	return 1;
  }
  
-@@ -321,6 +402,7 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+@@ -321,6 +363,7 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
  		return -ENOMEM;
  	mipi_dsi_set_drvdata(dsi, ctx);
  	ctx->dsi = dsi;
@@ -954,7 +920,7 @@ index e503c35645c0..a3c70ea52cbb 100644
  
  	ctx->power_supply = devm_regulator_get(&dsi->dev, "power");
  	if (IS_ERR(ctx->power_supply)) {
-@@ -361,7 +443,7 @@ static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
+@@ -361,7 +404,7 @@ static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
  }
  
  static const struct of_device_id ili9806e_of_match[] = {
@@ -964,31 +930,31 @@ index e503c35645c0..a3c70ea52cbb 100644
  };
  MODULE_DEVICE_TABLE(of, ili9806e_of_match);
 -- 
-2.30.2
+2.34.1
 
 
-From eaeb5f3cb80f1a59cd4121580fb31b73fbdf0d56 Mon Sep 17 00:00:00 2001
+From 0df8ed908529371f428cb1fece599855d173e730 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 04:48:55 +0100
-Subject: [PATCH 3/4] drm/panel: ili9806e: Use dev_ based logging
+Subject: [PATCH 3/5] drm/panel: ili9806e: Use dev_ based logging
 
 ---
- drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-index a3c70ea52cbb..8efd80f508cc 100644
+index 000708303c1e..c3007e678e75 100644
 --- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 +++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-@@ -17,7 +17,6 @@
+@@ -18,7 +18,6 @@
  #include <drm/drm_mipi_dsi.h>
  #include <drm/drm_modes.h>
  #include <drm/drm_panel.h>
 -#include <drm/drm_print.h>
  
- #include <linux/of_device.h>
+ #include <video/mipi_display.h>
  
-@@ -220,9 +219,6 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
+@@ -200,9 +199,6 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
  	case 720:
  		return RESCTRL_480x720;
  	default:
@@ -998,7 +964,7 @@ index a3c70ea52cbb..8efd80f508cc 100644
  		return RESCTRL_INVALID;
  	}
  }
-@@ -232,8 +228,12 @@ static int ili9806e_configure_registers(struct ili9806e *ctx)
+@@ -212,8 +208,12 @@ static int ili9806e_configure_registers(struct ili9806e *ctx)
  	const struct ili9806e_reg_data *reg = &ctx->panel_data->reg;
  
  	u8 resctrl = ili9806e_resctrl_value(&ctx->panel_data->mode);
@@ -1012,23 +978,7 @@ index a3c70ea52cbb..8efd80f508cc 100644
  
  	ili9806e_write_register(ctx, IFMODE1, 0x10); /* Output SDA */
  	ili9806e_write_register(ctx, DISCTRL2, 0x01); /* DE -> ACTIVE_LOW */
-@@ -270,12 +270,12 @@ static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
- 
- 	ret = ili9806e_read_register(ctx, UNKNOWN1, &unknown1);
- 	if (ret < 0)
--		DRM_ERROR("Read from UNKNOWN1 failed: %d\n", ret);
-+		dev_err(ctx->dev, "Read from UNKNOWN1 failed: %d\n", ret);
- 	ret = ili9806e_read_register(ctx, UNKNOWN2, &unknown2);
- 	if (ret < 0)
--		DRM_ERROR("Read from UNKNOWN2 failed: %d\n", ret);
-+		dev_err(ctx->dev, "Read from UNKNOWN2 failed: %d\n", ret);
- 
--	DRM_INFO("UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
-+	dev_info(ctx->dev, "UNKNOWN1 = 0x%02x, UNKNOWN2 = 0x%02x\n", unknown1, unknown2);
- }
- 
- static int ili9806e_prepare(struct drm_panel *panel)
-@@ -367,7 +367,7 @@ static int ili9806e_get_modes(struct drm_panel *panel,
+@@ -328,7 +328,7 @@ static int ili9806e_get_modes(struct drm_panel *panel,
  
  	mode = drm_mode_duplicate(connector->dev, &ctx->panel_data->mode);
  	if (!mode) {
@@ -1038,25 +988,25 @@ index a3c70ea52cbb..8efd80f508cc 100644
  	}
  	connector->display_info.width_mm = ctx->panel_data->mode.width_mm;
 -- 
-2.30.2
+2.34.1
 
 
-From 8ff1624b5569935e6214ccf7efb928a0f6fbcd9f Mon Sep 17 00:00:00 2001
+From dc1f5fc25fdd5afe12a5897058f68f169becc0c7 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 05:22:20 +0100
-Subject: [PATCH 4/4] drm/panel: ili9806e: harmonization
+Subject: [PATCH 4/5] drm/panel: ili9806e: harmonization
 
 ---
- drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 81 ++++++++++++-------
- 1 file changed, 50 insertions(+), 31 deletions(-)
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 78 ++++++++++++-------
+ 1 file changed, 48 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-index 8efd80f508cc..547fc50cb976 100644
+index c3007e678e75..95291aaee8f1 100644
 --- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 +++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-@@ -20,16 +20,16 @@
+@@ -21,16 +21,16 @@
  
- #include <linux/of_device.h>
+ #include <video/mipi_display.h>
  
 -struct ili9806e_panel_data;
 +struct ili9806e_panel_desc;
@@ -1074,7 +1024,7 @@ index 8efd80f508cc..547fc50cb976 100644
  
  	u8 current_page;
  
-@@ -94,12 +94,12 @@ struct ili9806e_reg_data {
+@@ -95,12 +95,12 @@ struct ili9806e_reg_data {
  	u8 timectrl;
  };
  
@@ -1089,7 +1039,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	.mode = {
  		.clock = 19800,
  		.hdisplay = 480,
-@@ -148,11 +148,12 @@ static inline struct ili9806e *panel_to_ili9806e(struct drm_panel *panel)
+@@ -149,11 +149,12 @@ static inline struct ili9806e *panel_to_ili9806e(struct drm_panel *panel)
  
  static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
  {
@@ -1103,7 +1053,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	if (ret > 0)
  		ctx->current_page = page;
  	return ret;
-@@ -160,15 +161,17 @@ static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
+@@ -161,15 +162,17 @@ static int ili9806e_switch_page(struct ili9806e *ctx, u8 page)
  
  static int ili9806e_write_register(struct ili9806e *ctx, u16 reg, u8 value)
  {
@@ -1122,7 +1072,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	int ret;
  	const u8 *end = values + length;
  	u8 page = reg >> 8;
-@@ -177,7 +180,7 @@ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, c
+@@ -178,7 +181,7 @@ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, c
  	if (ctx->current_page != page)
  		ili9806e_switch_page(ctx, page);
  	while (values < end) {
@@ -1131,24 +1081,7 @@ index 8efd80f508cc..547fc50cb976 100644
  		if (ret < 0)
  			return ret;
  	}
-@@ -186,6 +189,7 @@ static int ili9806e_write_series(struct ili9806e *ctx, u16 reg, size_t length, c
- 
- static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
- {
-+	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
- 	ssize_t err;
- 	u8 page = reg >> 8;
- 	u8 cmd = reg & 0xffu;
-@@ -193,7 +197,7 @@ static int ili9806e_read_register(struct ili9806e *ctx, u16 reg, u8 *value)
- 	if (ctx->current_page != page)
- 		ili9806e_switch_page(ctx, page);
- 
--	err = mipi_dsi_dcs_read(ctx->dsi, cmd, value, sizeof(*value));
-+	err = mipi_dsi_dcs_read(dsi, cmd, value, sizeof(*value));
- 
- 	if (err <= 0) {
- 		if (err == 0)
-@@ -225,13 +229,13 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
+@@ -205,13 +208,13 @@ static u8 ili9806e_resctrl_value(const struct drm_display_mode *mode)
  
  static int ili9806e_configure_registers(struct ili9806e *ctx)
  {
@@ -1166,7 +1099,7 @@ index 8efd80f508cc..547fc50cb976 100644
  		return -EINVAL;
  	}
  
-@@ -281,6 +285,7 @@ static void ili9806e_read_unknown_registers(struct ili9806e *ctx)
+@@ -243,6 +246,7 @@ static int ili9806e_configure_registers(struct ili9806e *ctx)
  static int ili9806e_prepare(struct drm_panel *panel)
  {
  	struct ili9806e *ctx = panel_to_ili9806e(panel);
@@ -1174,7 +1107,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	int ret;
  
  	if (ctx->prepared)
-@@ -308,13 +313,13 @@ static int ili9806e_prepare(struct drm_panel *panel)
+@@ -269,13 +273,13 @@ static int ili9806e_prepare(struct drm_panel *panel)
  
  	ili9806e_switch_page(ctx, 0);
  
@@ -1190,7 +1123,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	if (ret)
  		return ret;
  
-@@ -328,9 +333,10 @@ static int ili9806e_prepare(struct drm_panel *panel)
+@@ -289,9 +293,10 @@ static int ili9806e_prepare(struct drm_panel *panel)
  static int ili9806e_enable(struct drm_panel *panel)
  {
  	struct ili9806e *ctx = panel_to_ili9806e(panel);
@@ -1202,7 +1135,7 @@ index 8efd80f508cc..547fc50cb976 100644
  
  	return 0;
  }
-@@ -338,18 +344,20 @@ static int ili9806e_enable(struct drm_panel *panel)
+@@ -299,18 +304,20 @@ static int ili9806e_enable(struct drm_panel *panel)
  static int ili9806e_disable(struct drm_panel *panel)
  {
  	struct ili9806e *ctx = panel_to_ili9806e(panel);
@@ -1225,7 +1158,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	msleep(120);
  
  	regulator_disable(ctx->power_supply);
-@@ -365,13 +373,13 @@ static int ili9806e_get_modes(struct drm_panel *panel,
+@@ -326,13 +333,13 @@ static int ili9806e_get_modes(struct drm_panel *panel,
  	struct ili9806e *ctx = panel_to_ili9806e(panel);
  	struct drm_display_mode *mode;
  
@@ -1242,7 +1175,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	drm_mode_set_name(mode);
  
  	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
-@@ -390,19 +398,17 @@ static const struct drm_panel_funcs ili9806e_funcs = {
+@@ -351,19 +358,17 @@ static const struct drm_panel_funcs ili9806e_funcs = {
  
  static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
  {
@@ -1267,7 +1200,7 @@ index 8efd80f508cc..547fc50cb976 100644
  
  	ctx->power_supply = devm_regulator_get(&dsi->dev, "power");
  	if (IS_ERR(ctx->power_supply)) {
-@@ -418,6 +424,14 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+@@ -379,6 +384,14 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
  		return PTR_ERR(ctx->reset_gpio);
  	}
  
@@ -1282,7 +1215,7 @@ index 8efd80f508cc..547fc50cb976 100644
  	drm_panel_init(&ctx->panel, &dsi->dev, &ili9806e_funcs,
  		       DRM_MODE_CONNECTOR_DSI);
  
-@@ -425,11 +439,16 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+@@ -386,11 +399,16 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
  	if (ret)
  		return ret;
  
@@ -1303,5 +1236,81 @@ index 8efd80f508cc..547fc50cb976 100644
  
  static int ili9806e_dsi_remove(struct mipi_dsi_device *dsi)
 -- 
-2.30.2
+2.34.1
+
+
+From 4314c731409305d731035a21267f7ec9ec961878 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Fri, 24 Dec 2021 05:28:02 +0100
+Subject: [PATCH 5/5] drm/panel: ili9806e: enable DSI backlight
+
+---
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 38 ++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+index 95291aaee8f1..a2ef37d66d05 100644
+--- a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
++++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
+@@ -243,6 +243,37 @@ static int ili9806e_configure_registers(struct ili9806e *ctx)
+ 	return 0;
+ }
+ 
++static int ili9806e_prepare_backlight(struct ili9806e *ctx)
++{
++	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
++	struct device *dev = ctx->dev;
++	int ret;
++
++	/*
++	* BIT(5) BCTRL = 1 Backlight Control Block On, Brightness registers
++	*                  are active
++	* BIT(3) BL = 1    Backlight Control On
++	* BIT(2) DD = 0    Display Dimming is Off
++	*/
++	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_WRITE_CONTROL_DISPLAY,
++				(u8[]){ 0x24 }, 1);
++	if (ret < 0) {
++		dev_err(dev, "failed to write control display: %d\n", ret);
++		return ret;
++	}
++	/* CABC off */
++	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_WRITE_POWER_SAVE,
++				(u8[]){ 0x00 }, 1);
++	if (ret < 0) {
++		dev_err(dev, "failed to set cabc off: %d\n", ret);
++		return ret;
++	}
++	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
++				(u8[]){ 0x80 }, 1);
++
++	return ret;
++}
++
+ static int ili9806e_prepare(struct drm_panel *panel)
+ {
+ 	struct ili9806e *ctx = panel_to_ili9806e(panel);
+@@ -273,6 +304,11 @@ static int ili9806e_prepare(struct drm_panel *panel)
+ 
+ 	ili9806e_switch_page(ctx, 0);
+ 
++	ret = ili9806e_prepare_backlight(ctx);
++	if (ret < 0) {
++		dev_err(ctx->dev, "failed to enable backlight: %d\n", ret);
++	}
++
+ 	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
+ 	if (ret)
+ 		return ret;
+@@ -396,8 +432,6 @@ static int ili9806e_dsi_probe(struct mipi_dsi_device *dsi)
+ 		       DRM_MODE_CONNECTOR_DSI);
+ 
+ 	ret = drm_panel_of_backlight(&ctx->panel);
+-	if (ret)
+-		return ret;
+ 
+ 	drm_panel_add(&ctx->panel);
+ 
+-- 
+2.34.1
 
