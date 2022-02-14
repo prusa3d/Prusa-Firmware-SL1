@@ -11,6 +11,7 @@ LOCALVERSION ?= ""
 PACKAGE_ARCH = "${SOC_FAMILY}"
 KERNEL_DEVICETREE:sun50i = "\
 	allwinner/sun50i-a64-prusa64-sl1.dtb \
+	allwinner/sun50i-a64-prusa64-sl2.dtb \
 "
 
 # Since we're not using git, this doesn't make a difference, but we need to fill
@@ -45,6 +46,7 @@ SRC_URI="\
 	file://1006-dts-prusa64-sl1-add-reserved-memory-node-for-lima.patch \
 	file://1007-dts-prusa64-sl1-add-SPI-node.patch \
 	file://1008-arm64-dts-allwinner-a64-add-r_uart-node.patch \
+	file://1009-dts-added-prusa64-sl2.patch \
 	file://defconfig \
 "
 
