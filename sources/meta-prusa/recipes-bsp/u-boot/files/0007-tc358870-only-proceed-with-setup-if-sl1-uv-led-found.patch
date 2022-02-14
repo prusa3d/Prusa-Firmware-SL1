@@ -8,8 +8,8 @@ Subject: [PATCH] tc358870: only proceed with setup if sl1-uv-led found in a
 1.6.0 systems.
 ---
  board/sunxi/board.c                 | 34 -------------------
- board/sunxi/panel-detector-uclass.c | 51 +++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+), 34 deletions(-)
+ board/sunxi/panel-detector-uclass.c | 52 +++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+), 34 deletions(-)
 
 diff --git a/board/sunxi/board.c b/board/sunxi/board.c
 index 441b01d12d..fc6b6e3911 100644
@@ -87,17 +87,13 @@ index c9574aa479..2c50a8b69f 100644
 +	char *edid_arg;
 +	size_t edid_arg_length;
 +
++	env_set("edid_bootarg", "video=HDMI-A-1:d");
 +	void *fdt = (void*) env_get_ulong("fdt_addr_r", 16, 0);
 +	if (!fdt)
 +		return -ENODATA;
 +
-+	if (fdt_node_check_compatible(fdt, 0, "prusa,prusa64-sl2") == 0) {
-+		printf("detected SL2 board, disabling HDMI\n");
-+		env_set("edid_bootarg", "video=HDMI-A-1:d");
-+		return 0;
-+	}
-+
-+	if (fdt_node_offset_by_compatible(fdt, -1, "prusa,sl1-uv-led") < 0) {
++	if (fdt_node_offset_by_compatible(fdt, -1, "prusa,sl1-uv-led") < 0
++	    && fdt_node_check_compatible(fdt, 0, "prusa,prusa64-sl2") != 0) {
 +		printf("prusa,sl1-uv-led missing from the loaded FDT, system probably too old for panel detection\n");
 +		return 0;
 +	}
@@ -106,15 +102,19 @@ index c9574aa479..2c50a8b69f 100644
 +	if (offset < 0)
 +		return offset;
 +
-+	panel_name = env_get("force_panel");
-+	if (panel_name == NULL) {
-+		r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
-+		if (!r) {
-+			panel_name = panel_detector_get_panel_name(detector);
-+			panel_detector_fill_in_fdt_node(detector, fdt, offset);
-+		}
++	panel_name = env_get("PANEL_DETECTION_OVERRIDE");
++	if (panel_name != NULL) {
++		printf("Force-setting panel_name to '%s'\n", panel_name);
++		fdt_setprop_string(fdt, offset, "panel-name", panel_name);
 +	}
-+	if (strlen(panel_name)) {
++	r = uclass_first_device(UCLASS_PANEL_DETECTOR, &detector);
++	if (r)
++		fdt_setprop_string(fdt, offset, "status", "disabled");
++	else if (panel_name == NULL) {
++		panel_name = panel_detector_get_panel_name(detector);
++		panel_detector_fill_in_fdt_node(detector, fdt, offset);
++	}
++	if (panel_name != NULL && strlen(panel_name)) {
 +		edid_arg_length = 37 + strlen(panel_name);
 +		edid_arg = malloc(edid_arg_length);
 +		snprintf(edid_arg, edid_arg_length, "drm.edid_firmware=HDMI-A-1:edid/%s.bin", panel_name);
