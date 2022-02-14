@@ -37,6 +37,7 @@ SRC_URI="\
 	file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
 	file://0601-bus-sunxi-rsb-Fix-shutdown.patch \
 	file://0701-iio-adc-add-mcp3221-driver.patch \
+	file://0801-i2s.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
 	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
 	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \

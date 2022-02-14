@@ -1,0 +1,131 @@
+From ba195c23c0e9c05d39370ecc4ed0c515ff6bf002 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 25 Mar 2021 06:59:33 +0100
+Subject: [PATCH] i2s
+
+---
+ sound/soc/soc-utils.c       | 10 ++++++++++
+ sound/soc/sunxi/sun4i-i2s.c | 21 +++++++++++++++++++--
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/sound/soc/soc-utils.c b/sound/soc/soc-utils.c
+index 299b5d6ebfd1..19d4a6ff7ff9 100644
+--- a/sound/soc/soc-utils.c
++++ b/sound/soc/soc-utils.c
+@@ -13,6 +13,7 @@
+ #include <sound/pcm.h>
+ #include <sound/pcm_params.h>
+ #include <sound/soc.h>
++#include <linux/module.h>
+ 
+ int snd_soc_calc_frame_size(int sample_size, int channels, int tdm_slots)
+ {
+@@ -181,9 +182,18 @@ static int snd_soc_dummy_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_OF
++static const struct of_device_id soc_dummy_ids[] = {
++	{ .compatible = "linux,snd-soc-dummy", },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, soc_dummy_ids);
++#endif
++
+ static struct platform_driver soc_dummy_driver = {
+ 	.driver = {
+ 		.name = "snd-soc-dummy",
++		.of_match_table = of_match_ptr(soc_dummy_ids),
+ 	},
+ 	.probe = snd_soc_dummy_probe,
+ };
+diff --git a/sound/soc/sunxi/sun4i-i2s.c b/sound/soc/sunxi/sun4i-i2s.c
+index 1e9116cd365e..36adac66fafd 100644
+--- a/sound/soc/sunxi/sun4i-i2s.c
++++ b/sound/soc/sunxi/sun4i-i2s.c
+@@ -99,6 +99,8 @@
+ #define SUN8I_I2S_CTRL_MODE_LEFT		(1 << 4)
+ #define SUN8I_I2S_CTRL_MODE_PCM			(0 << 4)
+ 
++#define SUN8I_I2S_FMT0_LRCLK_WIDTH_MASK	BIT(30)	// DSP LRCK width can be 2 periods of BCLK instead of one. It's used to gate the STEP signal
++#define SUN8I_I2S_FMT0_LRCLK_WIDTH(long)		((long) << 30)
+ #define SUN8I_I2S_FMT0_LRCLK_POLARITY_MASK	BIT(19)
+ #define SUN8I_I2S_FMT0_LRCLK_POLARITY_INVERTED		(1 << 19)
+ #define SUN8I_I2S_FMT0_LRCLK_POLARITY_NORMAL		(0 << 19)
+@@ -469,6 +471,8 @@ static int sun8i_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 				  unsigned int slot_width)
+ {
+ 	unsigned int lrck_period;
++	unsigned int lrck_long = 0;
++
+ 
+ 	/* Map the channels for playback and capture */
+ 	regmap_write(i2s->regmap, SUN8I_I2S_TX_CHAN_MAP_REG, 0x76543210);
+@@ -493,6 +497,7 @@ static int sun8i_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 	case SND_SOC_DAIFMT_DSP_A:
+ 	case SND_SOC_DAIFMT_DSP_B:
+ 		lrck_period = slot_width * slots;
++		lrck_long = 1;
+ 		break;
+ 
+ 	case SND_SOC_DAIFMT_LEFT_J:
+@@ -513,6 +518,10 @@ static int sun8i_i2s_set_chan_cfg(const struct sun4i_i2s *i2s,
+ 			   SUN8I_I2S_TX_CHAN_EN_MASK,
+ 			   SUN8I_I2S_TX_CHAN_EN(channels));
+ 
++	regmap_update_bits(i2s->regmap, SUN4I_I2S_FMT0_REG,
++				SUN8I_I2S_FMT0_LRCLK_WIDTH_MASK,
++				SUN8I_I2S_FMT0_LRCLK_WIDTH(lrck_long));
++
+ 	return 0;
+ }
+ 
+@@ -607,6 +616,10 @@ static int sun4i_i2s_hw_params(struct snd_pcm_substream *substream,
+ 	case 16:
+ 		width = DMA_SLAVE_BUSWIDTH_2_BYTES;
+ 		break;
++	case 20:
++	case 24:
++		width = DMA_SLAVE_BUSWIDTH_3_BYTES;
++		break;
+ 	case 32:
+ 		width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+ 		break;
+@@ -785,6 +798,7 @@ static int sun8i_i2s_set_soc_fmt(const struct sun4i_i2s *i2s,
+ 			   SUN8I_I2S_TX_CHAN_OFFSET_MASK,
+ 			   SUN8I_I2S_TX_CHAN_OFFSET(offset));
+ 
++
+ 	/* DAI clock master masks */
+ 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
+ 	case SND_SOC_DAIFMT_CBS_CFS:
+@@ -1086,6 +1100,9 @@ static int sun4i_i2s_dai_probe(struct snd_soc_dai *dai)
+ 			 SNDRV_PCM_FMTBIT_S20_LE | \
+ 			 SNDRV_PCM_FMTBIT_S24_LE)
+ 
++#define SUN8I_FORMATS	(SUN4I_FORMATS | \
++			 SNDRV_PCM_FMTBIT_S32_LE)
++
+ static struct snd_soc_dai_driver sun4i_i2s_dai = {
+ 	.probe = sun4i_i2s_dai_probe,
+ 	.capture = {
+@@ -1093,14 +1110,14 @@ static struct snd_soc_dai_driver sun4i_i2s_dai = {
+ 		.channels_min = 1,
+ 		.channels_max = 8,
+ 		.rates = SNDRV_PCM_RATE_8000_192000,
+-		.formats = SUN4I_FORMATS,
++		.formats = SUN8I_FORMATS,
+ 	},
+ 	.playback = {
+ 		.stream_name = "Playback",
+ 		.channels_min = 1,
+ 		.channels_max = 8,
+ 		.rates = SNDRV_PCM_RATE_8000_192000,
+-		.formats = SUN4I_FORMATS,
++		.formats = SUN8I_FORMATS,
+ 	},
+ 	.ops = &sun4i_i2s_dai_ops,
+ 	.symmetric_rate = 1,
+-- 
+2.34.1
+
