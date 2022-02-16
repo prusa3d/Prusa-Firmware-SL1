@@ -1,3 +1,15 @@
+# Version 1.7.0-beta.0
+
+## Summary (relative to 1.7.0-alpha.1)
+- superSlow profile for dense medical resins
+- Improved tank cleaning wizard
+- Numerous bugfixes
+  - Disable keyboard for spinboxes
+  - Final cleaning adaptor photos
+  - Fix new expo panel sequence
+  - Fix resin sensor measurement retries
+
+
 # Version 1.7.0-alpha.1
 
 ## Summary (relative to 1.7.0-alpha.0)
