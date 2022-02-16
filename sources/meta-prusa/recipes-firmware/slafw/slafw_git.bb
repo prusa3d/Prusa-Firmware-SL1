@@ -4,11 +4,11 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = " \
-	git://gitlab.com/prusa3d/sl1/sla-fw.git;protocol=https;nobranch=1 \
+	git://gitlab.com/prusa3d/sl1/sla-fw.git;protocol=https;branch=1.7 \
 	file://projects-tmpfiles.conf \
 	file://slafw.conf \
 "
-SRCREV:pn-${PN} = "a9c91986af2f08ad8f443b4874081a7ce7576145"
+SRCREV:pn-${PN} = "1c49be1759a46946a7c7dcde5dbc342859cd95ef"
 
 PACKAGES = "${PN}-dev ${PN}"
 
