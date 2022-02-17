@@ -8,7 +8,6 @@ inherit packagegroup
 
 RDEPENDS:${PN} = "\
 	initscript \
-	haveged nano powerpanic rauc readline \
-	tzdata emergencyupdate update-selector \
-	networkmanager go-omaha firstboot\
+	haveged nano etc readline \
+	tzdata networkmanager \
 "

@@ -7,8 +7,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS:packagegroup-prusa-sla = "\
-	etc slafw touch-ui \
+	slafw touch-ui \
 	remote-api-link filemanager \
 	prusa-link  weston \
+	emergencyupdate update-selector \
+	rauc go-omaha firstboot powerpanic \
 	"
 
