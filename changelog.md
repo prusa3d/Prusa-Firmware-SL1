@@ -1,3 +1,12 @@
+# Version 1.7.0-beta.1
+
+## Summary (relative to 1.7.0-beta.0)
+- Add supported file extensions to profile end point in remote API
+- New superslow profiles
+- Fixed the fast tilt movement in the beginning of s..
+- Fixed print fatal error reporting
+- Latest Prusa Link Web with superslow profiles support
+
 # Version 1.7.0-beta.0
 
 ## Summary (relative to 1.7.0-alpha.1)
