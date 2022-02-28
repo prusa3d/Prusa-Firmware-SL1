@@ -1,4 +1,4 @@
-From 1a04b6a3472833e9a3aeb6c518509c90575226cb Mon Sep 17 00:00:00 2001
+From ee27eb8cf501367f66f31f1539ae3603197109d8 Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Tue, 16 Mar 2021 11:49:26 +0100
 Subject: [PATCH] dts: prusa64-sl1: add SPI node
@@ -9,10 +9,10 @@ Subject: [PATCH] dts: prusa64-sl1: add SPI node
  2 files changed, 11 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-index d5ad57ed5b7d..46716ffc7ca5 100644
+index 57aea5d47f61..3d7e417da20e 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -539,3 +539,12 @@ &usbphy {
+@@ -513,3 +513,12 @@ &usbphy {
  &r_pwm {
  	status = "okay";
  };
@@ -26,7 +26,7 @@ index d5ad57ed5b7d..46716ffc7ca5 100644
 +	};
 +};
 diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
-index 2ab6e782f14c..04a1c4babd2c 100644
+index 1bd73e322b7b..473071130b12 100644
 --- a/drivers/spi/spidev.c
 +++ b/drivers/spi/spidev.c
 @@ -674,6 +674,7 @@ static const struct file_operations spidev_fops = {
@@ -45,3 +45,6 @@ index 2ab6e782f14c..04a1c4babd2c 100644
  	{ .compatible = "rohm,dh2228fv" },
  	{ .compatible = "lineartechnology,ltc2488" },
  	{ .compatible = "semtech,sx1301" },
+-- 
+2.34.1
+
