@@ -1,0 +1,28 @@
+From 1fd9ee31411f0af21eaa60d61e578e0a241c9a5f Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 25 Jan 2022 18:02:33 +0100
+Subject: [PATCH] dummy uc_mgr_alibcfg_by_device when ucm disabled
+
+---
+ include/local.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/local.h b/include/local.h
+index 4e7d88a..95719e9 100644
+--- a/include/local.h
++++ b/include/local.h
+@@ -374,7 +374,11 @@ int _snd_config_load_with_include(snd_config_t *config, snd_input_t *in,
+ void *INTERNAL(snd_dlopen)(const char *name, int mode, char *errbuf, size_t errbuflen);
+ #endif
+ 
++#ifndef BUILD_UCM
++static const char *uc_mgr_alibcfg_by_device(snd_config_t **config, const char *name) { return NULL; }
++#else
+ const char *uc_mgr_alibcfg_by_device(snd_config_t **config, const char *name);
++#endif
+ 
+ static inline int _snd_is_ucm_device(const char *name)
+ {
+-- 
+2.34.1
+
