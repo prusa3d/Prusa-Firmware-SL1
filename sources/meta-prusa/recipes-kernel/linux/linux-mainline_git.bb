@@ -37,15 +37,11 @@ SRC_URI="\
 	file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
 	file://0701-iio-adc-add-mcp3221-driver.patch \
 	file://0801-i2s.patch \
+	file://0901-prusa-boot-logo.patch \
 	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
-	file://1002-dts-prusa64-sl1-give-powerpanic-GPIO-line-a-name.patch \
-	file://1003-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
-	file://1004-prusa-boot-logo.patch \
-	file://1005-a64-increase-mali-frequency.patch \
-	file://1006-dts-prusa64-sl1-add-reserved-memory-node-for-lima.patch \
-	file://1007-dts-prusa64-sl1-add-SPI-node.patch \
-	file://1008-arm64-dts-allwinner-a64-add-r_uart-node.patch \
-	file://1009-dts-added-prusa64-sl2.patch \
+	file://1002-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
+	file://1003-arm64-dts-allwinner-a64-add-r_uart-node.patch \
+	file://1004-dts-added-prusa64-sl2.patch \
 	file://defconfig \
 "
 

@@ -1,12 +1,13 @@
-From 03bd0907faa401dc2fb73c47b9dbeaf4783d2877 Mon Sep 17 00:00:00 2001
+From 1930cf2dbfa7c08c2ddada652d0b2ea6928f2842 Mon Sep 17 00:00:00 2001
 From: =?utf-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
 Date: Wed, 7 Nov 2018 17:53:49 +0100
 Subject: [PATCH] dts: create sun50i-a64-prusa64-sl1 dts
 
 ---
  arch/arm64/boot/dts/allwinner/Makefile        |   1 +
- .../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 484 ++++++++++++++++++
- 2 files changed, 485 insertions(+)
+ .../dts/allwinner/sun50i-a64-prusa64-sl1.dts  | 524 ++++++++++++++++++
+ drivers/spi/spidev.c                          |   2 +
+ 3 files changed, 527 insertions(+)
  create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 
 diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
@@ -23,10 +24,10 @@ index a96d9d2d8dd8..286419ec2ba7 100644
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a100-allwinner-perf1.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 new file mode 100644
-index 000000000000..48eab815f035
+index 000000000000..3d7e417da20e
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
-@@ -0,0 +1,484 @@
+@@ -0,0 +1,524 @@
 +/*
 + * Copyright (C) 2018 Roman Beranek <roman.beranek@prusa3d.com>
 + * based on sun50i-a64-olinuxino.dts by Jagan Teki <jteki@openedev.com>
@@ -109,6 +110,19 @@ index 000000000000..48eab815f035
 +		default-brightness-level = <0>;
 +		power-supply = <&reg_ps>;
 +	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x10000000>;
++			linux,cma-default;
++		};
++	};
 +};
 +
 +&pio {
@@ -123,6 +137,24 @@ index 000000000000..48eab815f035
 +	vcc-pf-supply = <&reg_dcdc1>;
 +	vcc-pg-supply = <&reg_aldo2>;
 +	vcc-ph-supply = <&reg_dcdc1>;
++
++	gpio-line-names =
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "", "panic", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "",
++		"", "", "", "", "", "", "", "",      "", "", "", "", "", "", "", "";
 +
 +	edtint_pins: edtint-pins {
 +		pins = "PB2";
@@ -511,6 +543,35 @@ index 000000000000..48eab815f035
 +&r_pwm {
 +	status = "okay";
 +};
++
++&spi0 {
++	status = "okay";
++	led@0 {
++		compatible = "prusa,sl1-uv-led";
++		reg = <0>;
++		spi-max-frequency = <200000000>;
++	};
++};
+diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
+index 1bd73e322b7b..473071130b12 100644
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -674,6 +674,7 @@ static const struct file_operations spidev_fops = {
+ static struct class *spidev_class;
+ 
+ static const struct spi_device_id spidev_spi_ids[] = {
++	{ .name = "sl1-uv-led" },
+ 	{ .name = "dh2228fv" },
+ 	{ .name = "ltc2488" },
+ 	{ .name = "sx1301" },
+@@ -688,6 +689,7 @@ MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
+ 
+ #ifdef CONFIG_OF
+ static const struct of_device_id spidev_dt_ids[] = {
++	{ .compatible = "prusa,sl1-uv-led" },
+ 	{ .compatible = "rohm,dh2228fv" },
+ 	{ .compatible = "lineartechnology,ltc2488" },
+ 	{ .compatible = "semtech,sx1301" },
 -- 
 2.34.1
 
