@@ -1,4 +1,4 @@
-From 1b7aa94a5489c8196b223c9a3ec8a952b415220d Mon Sep 17 00:00:00 2001
+From bbb360e239c7a6b8d3ddbc4d589ef3dcf2c55cdf Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 30 Aug 2018 04:39:09 +0200
 Subject: [PATCH] drm/panel: Add Ilitek ILI9806e panel driver
@@ -10,8 +10,8 @@ MIPI-DSI interface.
 ---
  drivers/gpu/drm/panel/Kconfig                 |   9 +
  drivers/gpu/drm/panel/Makefile                |   1 +
- drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 446 ++++++++++++++++++
- 3 files changed, 456 insertions(+)
+ drivers/gpu/drm/panel/panel-ilitek-ili9806e.c | 440 ++++++++++++++++++
+ 3 files changed, 450 insertions(+)
  create mode 100644 drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 
 diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
@@ -48,10 +48,10 @@ index bca4cc1f2715..67cf78ba5444 100644
  obj-$(CONFIG_DRM_PANEL_INNOLUX_P079ZCA) += panel-innolux-p079zca.o
 diff --git a/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
 new file mode 100644
-index 000000000000..aba245fcac20
+index 000000000000..28df4bb8ed48
 --- /dev/null
 +++ b/drivers/gpu/drm/panel/panel-ilitek-ili9806e.c
-@@ -0,0 +1,446 @@
+@@ -0,0 +1,440 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2018, Roman Beranek
@@ -109,8 +109,6 @@ index 000000000000..aba245fcac20
 +	PWBCTRL		= 0x702u,
 +	VCLCTRL		= 0x706u,
 +	VGLREGEN	= 0x717u,
-+	UNKNOWN1	= 0x726u,
-+	UNKNOWN2	= 0x7b3u,
 +	TIMECTRL	= 0x7e1u,
 +};
 +
@@ -140,8 +138,6 @@ index 000000000000..aba245fcac20
 +	u8 pwbctrl;
 +	u8 vclctrl;
 +	u8 vglregen;
-+	u8 unknown1;
-+	u8 unknown2;
 +	u8 timectrl;
 +};
 +
@@ -285,8 +281,6 @@ index 000000000000..aba245fcac20
 +	ili9806e_write_register(ctx, VCLCTRL, reg->vclctrl);
 +	ili9806e_write_register(ctx, VGLREGEN, reg->vglregen);
 +	ili9806e_write_register(ctx, TIMECTRL, reg->timectrl);
-+	ili9806e_write_register(ctx, UNKNOWN1, reg->unknown1);
-+	ili9806e_write_register(ctx, UNKNOWN2, reg->unknown2);
 +
 +	return 0;
 +}
