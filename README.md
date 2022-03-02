@@ -1,60 +1,89 @@
-How to build an image
-==================
+# Prusa-Firmware-SL1
 
-What to expect
---------------
-- Build a custom Linux distribution from source (e.g. Gentoo install). Check the [available targets](###Targets) for more info.
-- The procedure takes several hours to complete.
-- The RAM usage will be as high as 4 GiB per core of your CPU.
-- The build will take around 32 GiB of your storage.
+Build enviroment based on the [Yocto project](https://www.yoctoproject.org/) for building GNU\Linux OS used in *Original Prusa SL1* printers.
 
-Requirements
-------------
-Latest Ubuntu LTS will be considered as the host system in the following steps. For a common user, we recommend building the system directly on the host machine. Install all requirements which are listed in a Dockerfile located at the root of this repository. The Docker image created from the Dockerfile is used for CI build.
+## Requirements
 
-Clone the repository
---------------------
-    git clone git@github.com:prusa3d/Prusa-Firmware-SL1.git
-    git tag -a -m "My custom build" my_custom_build
-    git submodule init
-    git submodule update
+- Generic GNU\Linux with git and build tools. See [Yocto Project: Quick Start](https://www.yoctoproject.org/docs/1.8/yocto-project-qs/yocto-project-qs.html#yp-resources).
+- **Min. 4 GiB** of **RAM** per used core of your CPU.
+- **Min. 32 GiB** of your **storage** will be required for finished image and temporary files.
+- The procedure **takes several hours** to complete.
 
-Obtain certificates for image signing
--------------------------------------
+## Building the Image
+
+There is optional [Docker](https://www.docker.com/) image where you can find what you need to prepare your customized build enviroment.
+
+### Obtaining the Repository
+
+```console
+~$ git clone --recurse-submodules https://github.com/prusa3d/Prusa-Firmware-SL1.git
+~$ cd Prusa-Firmware-SL1/
+```
+
+### Tagging the Build
+
+It is strongly recomended to tag the repo, because it is outside of officialy supported versions of the firmware and it will be shown on printers screen.
+
+```console
+Prusa-Firmware-SL1$ git tag -a -m "My stuff" my_stuff
+```
+
+Note: For example on your printer screen will be displayed **version** as:
+
+```
+my_stuff-special_feature.5-12cfba63d
+<Tag name>[-<Branch>.<Commits from tag>-<Last commit hash>]
+```
+
+Stuff after *Tag name* will be displayed only if you make changes in the repo after tagging it. 
+
+
+### (Optional) Obtaining a certificates for image signing
+
 This step is only needed if you intend to build [Rauc](https://rauc.io/) update bundle by running `bitbake sla-update-bundle`. You can skip the following section if you are interested only in a bootable image for an SD card built by running `bitbake sla-dev-image`.
 
-    cd keys
-    sh gen_certs.sh # Skip this if you already have the keys
-    sh deploy_certs.sh
-    cd ..
+```console
+Prusa-Firmware-SL1$ sh ./keys/gen_certs.sh     # Skip this if you already have the keys
+Prusa-Firmware-SL1$ sh ./keys/deploy_certs.sh
+```
 
-Build development SD image
---------------------------
-    source ./oe-init-build-env
-    bitbake sla-dev-image # other targets are sla-update-bundle, sla-bootstrap
+### Making an OS image
 
-Write the image to the SD card
-------------------------------
+#### Targets
 
-- With bmaptool
+Possible targets for deployment:
 
-    bmaptool copy tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic /dev/mmcblkXXX
+- **sla-dev-image**: development-enabled bootable μSD image. To boot into your system just insert the card into the μSD slot and power up the printer. Package manager *opkg* is already included in this target. Any supported package by Yocto can be then built by `bitbake [package-name]`, copied into the printer and installed with opkg.
+- **sla-bootstrap**: μSD image for eMMC bring-up. By powering up the printer with this card inserted, both boot slots are being flashed with the same system. When the status LED starts to blink on PrusA64-SL1 board. The flashing is done and you can power off the printer.
+- **sla-update-bundle**: OTA & offline update package. There are two [symetric boot slots](https://rauc.readthedocs.io/en/latest/scenarios.html#symmetric-root-fs-slots) in the printer. Users can switch between those to return to the previous system with all its configurations.
+
+#### Procedure
+
+```console
+Prusa-Firmware-SL1$ source ./oe-init-build-env
+Prusa-Firmware-SL1$ bitbake sla-dev-image 
+```
+
+Change `sla-dev-image` by desired `Target`.
+
+Add `-c populate_sdk` or `-c populate_sdk_ext` to make [SDK](https://www.yoctoproject.org/docs/latest/sdk-manual/sdk-manual.html) installer script.
+
+#### Important files
+
+Image file: `Prusa-Firmware-SL1/build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic` 
+
+SDK script: `Prusa-Firmware-SL1/build/tmp/deploy/sdk/prusa-glibc-x86_64-sla-dev-image-cortexa53-crypto-toolchain-*-build.sh`
+
+### Making the SD card
+
+- With bmaptool 
+```console
+Prusa-Firmware-SL1$ bmaptool copy build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic /dev/mmcblkXXX
+```
+*Note:* You need `sla-dev-image-prusa64-sl1.wic.bmap` file also or add `--nobmap` parameter.
 
 - With dd
-
-    dd if=tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic of=/dev/mmcblkXXX bs=1M
-
-
-Customers who bought this item also bought ...
-----------------------------------------------
-
-### Targets
-
-- *sla-dev-image*: development-enabled bootable μSD image. To boot into your system just insert the card into the μSD slot and power up the printer. Package manager *opkg* is already included in this target. Any supported package by Yocto can be then built by `bitbake [package-name]`, copied into the printer and installed with opkg.
-- *sla-bootstrap*: μSD image for eMMC bring-up. By powering up the printer with this card inserted, both boot slots are being flashed with the same system. When the status LED starts to blink on PrusA64-SL1 board. The flashing is done and you can power off the printer.
-- *sla-update-bundle*: OTA & offline update package. There are two [symetric boot slots](https://rauc.readthedocs.io/en/latest/scenarios.html#symmetric-root-fs-slots) in the printer. Users can switch between those to return to the previous system with all its configurations.
-
-### SDK (cross-toolchain)
-
-A matching [(e)SDK](https://www.yoctoproject.org/docs/latest/sdk-manual/sdk-manual.html) installer can be produced
-alongside an image by adding {+ -c populate_sdk +} or {+ -c populate_sdk_ext +} to the `bitbake [target]` command.
+```console
+Prusa-Firmware-SL1$ dd if=build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1.wic of=/dev/mmcblkXXX bs=1M
+```
+*Note:* If data was not written properly try to use `conv=fdatasync` to wait for disc cache. TO see what going on use `status=progress` to see what was written.
