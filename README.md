@@ -22,7 +22,7 @@ There is optional [Docker](https://www.docker.com/) image where you can find wha
 
 ### Tagging the Build
 
-It is strongly recomended to tag the repo, because it is outside of officialy supported versions of the firmware and it will be shown on printers screen.
+It is strongly recommended to tag the repo in order to distinguish it from official builds. The tag defines version string displayed on the printer screen.
 
 ```console
 Prusa-Firmware-SL1$ git tag -a -m "My stuff" my_stuff
