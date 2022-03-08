@@ -3,25 +3,18 @@
     "1.6":"sla_1.6.4",
     "1.7":"master"
   },
-  "sl1fw":{
+  "slafw":{
     "1.6":"master"
   },
   "touch-ui":{
-    "1.6":"master",
-    "1.7":"master"
+    "1.6":"master"
   },
   "prusa-errors":{
     "1.6":"master",
     "1.7":"master"
   },
-  "sl1fw-fs":{
-    "1.6":"master"
-  },
   "filemanager":{
     "1.7":"master"
-  },
-  "sl1fw-api":{
-    "1.6":"master"
   },
   "remote-api-link":{
     "1.7":"master"
