@@ -8,9 +8,8 @@ S = "${WORKDIR}"
 do_install() {
 	install -d ${D}${sbindir}
 	install -m 0755 ${WORKDIR}/init ${D}${sbindir}/init
-	ln -s ${sbindir}/init ${D}/init
 }
 
 inherit allarch
 
-FILES:${PN} += "/init ${sbindir}/init"
+FILES:${PN} += "${sbindir}/init"
