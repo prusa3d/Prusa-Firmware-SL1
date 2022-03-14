@@ -1,3 +1,18 @@
+# Version 1.7.0-beta.3
+
+## Summary (relative to 1.7.0-beta.2)
+- Fixed expect overheating warning during print
+- Fixed "no" button on low resin warning page before print
+- Fixed telemetry in Prusa Link if printer is busy
+
+# Version 1.7.0-beta.2
+
+## Summary (relative to 1.7.0-beta.1)
+- minor fixes in PL in mobile view
+- renamed SuperSlow to High Viscosity
+- finished wizard for tank cleaning
+- new examples (cleaning adaptor)
+
 # Version 1.7.0-beta.1
 
 ## Summary (relative to 1.7.0-beta.0)
