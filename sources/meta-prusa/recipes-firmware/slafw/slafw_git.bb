@@ -8,7 +8,7 @@ SRC_URI = " \
 	file://projects-tmpfiles.conf \
 	file://slafw.conf \
 "
-SRCREV:pn-${PN} = "e1fa297277e7a728a749126e7863f5850abc1a18"
+SRCREV:pn-${PN} = "566ecf1c0335d6429d558b5f12b9856b08b09ba5"
 
 PACKAGES = "${PN}-dev ${PN}"
 
