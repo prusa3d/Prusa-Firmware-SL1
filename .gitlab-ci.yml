@@ -142,6 +142,8 @@ d:raucb-development:
     - web
 
   script:
+    - cp ${VERSION}.dev-key.raucb ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
     - >
         lftp -c "
         set sftp:ssl-force yes;
@@ -149,8 +151,6 @@ d:raucb-development:
         put -O ${DEST} ${VERSION}.dev-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
         "
-    - echo "put ${VERSION}.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:raucb-production:
   stage: deploy
@@ -166,6 +166,8 @@ d:raucb-production:
     - web
 
   script:
+    - cp ${VERSION}.prod-key.raucb ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
     - >
         lftp -c "
         set sftp:ssl-force yes;
@@ -173,8 +175,6 @@ d:raucb-production:
         put -O ${DEST} ${VERSION}.prod-key.raucb;
         put -O ${DEST} ${VERSION}.changelog.md;
         "
-    - echo "put ${VERSION}.prod-key.raucb" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.changelog.md" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
 
 d:tools:
   stage: deploy
@@ -190,7 +190,7 @@ d:tools:
     - web
 
   script:
-    - echo "put ${VERSION}.devsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.devsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.bootstrapsd.xz" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
-    - echo "put ${VERSION}.bootstrapsd.bmap" | sftp ${DEV_DEPLOY_USER}@${DEV_DEPLOY_HOST}
+    - cp ${VERSION}.devsd.xz ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.devsd.bmap ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.bootstrapsd.xz ${BACKUP_DEPLOY_PATH}
+    - cp ${VERSION}.bootstrapsd.bmap ${BACKUP_DEPLOY_PATH}
