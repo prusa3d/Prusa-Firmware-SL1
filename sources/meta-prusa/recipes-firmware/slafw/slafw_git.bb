@@ -45,6 +45,8 @@ RDEPENDS:${PN} += " \
 	python3-pywayland \
 	python3-spidev \
 	python3-smbus2 \
+	python3-pycairo \
+	librsvg (>= 2.46) \
 "
 
 FILES:${PN} += "\
