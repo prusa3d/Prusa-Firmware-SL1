@@ -1,11 +1,10 @@
 DESCRIPTION="Emergency Rauc updater service"
 
 LICENSE = "GPLv3"
-LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0-only;md5=c79ff39f19dfec6d293b95dea7b07891"
 
 SRC_URI = "\
 	file://emergencyupdate.service \
-	file://GPLv3.patch \
 "
 
 inherit systemd
