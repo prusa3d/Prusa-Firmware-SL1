@@ -1,7 +1,7 @@
 SUMMARY = "Prusa Link - static web UI for firmware running on a64 board"
 HOMEPAGE = "https://github.com/prusa3d/Prusa-Link-Web"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
-SRCREV:pn-${PN} = "d3c4060d605e905f7c6d0cf7fd016e0ea6859b3d"
+SRCREV:pn-${PN} = "e208280ab2858487275fbf35d44612e8377c1945"
 SRC_URI = " \
 	git://github.com/prusa3d/Prusa-Link-Web.git;protocol=https;nobranch=1 \
 	file://dnssd/http.dnssd \
