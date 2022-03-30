@@ -1,6 +1,7 @@
 [Unit]
 Description=Prusa SLA File Manager
-ConditionDirectoryNotEmpty=/etc/sl1fw/model
+After=model-detect.service
+Before=touch-ui.service slafw.service remote-api-link.service
 
 [Service]
 Type=dbus

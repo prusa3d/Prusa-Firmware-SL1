@@ -12,5 +12,6 @@ RDEPENDS:packagegroup-prusa-sla = "\
 	prusa-link  weston \
 	emergencyupdate update-selector \
 	rauc go-omaha firstboot powerpanic \
+	model-detect \
 	"
 

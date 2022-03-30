@@ -2,7 +2,7 @@
 set -e
 
 # get printer model
-MODEL_PATH=/etc/sl1fw/model
+MODEL_PATH=/run/model
 if [ ! -d "$MODEL_PATH" ] || [ -z `ls $MODEL_PATH` ]; then
         echo "Unknown printer model"
         exit 1
