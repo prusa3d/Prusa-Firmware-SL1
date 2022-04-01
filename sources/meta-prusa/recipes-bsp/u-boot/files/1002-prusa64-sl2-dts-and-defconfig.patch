@@ -1,20 +1,20 @@
-From 156868598f72de14dd6f099dc705b2a4e4e1d9fd Mon Sep 17 00:00:00 2001
+From 10e7f5fa257dc11d651863fb08567aa939b14f73 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 12 Jul 2021 09:32:20 +0200
 Subject: [PATCH] prusa64-sl2: dts and defconfig
 
 ---
  arch/arm/dts/Makefile                         |   1 +
- arch/arm/dts/sun50i-a64-prusa64-sl2.dts       | 183 ++++++++++++++++++++++++
- .../dts/sun50i-a64-prusa64-sl1-u-boot.dtsi    |  35 ++++
- configs/prusa64-sl2_defconfig                 |  67 +++++++++
- 4 files changed, 285 insertions(+)
- create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl2.dts
+ .../dts/sun50i-a64-prusa64-sl2-u-boot.dtsi    |  35 ++++
+ arch/arm/dts/sun50i-a64-prusa64-sl2.dts       | 184 ++++++++++++++++++
+ configs/prusa64-sl2_defconfig                 |  67 +++++++
+ 4 files changed, 287 insertions(+)
  create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi
+ create mode 100644 arch/arm/dts/sun50i-a64-prusa64-sl2.dts
  create mode 100644 configs/prusa64-sl2_defconfig
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index d8f5886abd..4880e0ccb7 100644
+index 993c5de7a6..7de1cacb4a 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -653,6 +653,7 @@ dtb-$(CONFIG_MACH_SUN50I) += \
@@ -25,12 +25,53 @@ index d8f5886abd..4880e0ccb7 100644
  	sun50i-a64-sopine-baseboard.dtb \
  	sun50i-a64-teres-i.dtb
  dtb-$(CONFIG_MACH_SUN9I) += \
+diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi b/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi
+new file mode 100644
+index 0000000000..5ebab59352
+--- /dev/null
++++ b/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi
+@@ -0,0 +1,35 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (C) 2020 Prusa Development, a.s.
++ * Written by Roman Beranek <roman.beranek@prusa3d.com>
++ */
++
++#include "sunxi-u-boot.dtsi"
++
++/ {
++	avdd_lcd: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "dsi1-lcd-avdd";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
++		enable-active-high;
++	};
++
++};
++
++/* The Toshiba TC358870 HDMI-bridge is on r_i2c */
++&i2c1 {
++	tc358870: hdmi-bridge@f {
++		compatible = "toshiba,tc358870";
++		reg = <0x0f>;
++		vdd33_hdmi-supply = <&reg_dldo1>;
++		vdd12_mipi-supply = <&reg_fldo1>;
++		vdd11_hdmi-supply = <&reg_dcdc4>;
++		iovdd_lcd-supply = <&reg_eldo2>;
++		avdd_lcd-supply = <&avdd_lcd>;
++		bridge-reset-gpios = <&pio 3 6 GPIO_ACTIVE_LOW>; /* PD6 */
++		panel-reset-gpios = <&pio 3 0 GPIO_ACTIVE_LOW>; /* PD0 */
++		status = "okay";
++	};
++};
 diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl2.dts b/arch/arm/dts/sun50i-a64-prusa64-sl2.dts
 new file mode 100644
-index 0000000000..2ebe355355
+index 0000000000..cd803fa401
 --- /dev/null
 +++ b/arch/arm/dts/sun50i-a64-prusa64-sl2.dts
-@@ -0,0 +1,183 @@
+@@ -0,0 +1,184 @@
 +/*
 + * Copyright (C) 2020 Prusa Research a.s. - www.prusa3d.com 
 + * Created by Filip Kotoucek <filip.kotoucek@prusa3d.cz>
@@ -103,10 +144,11 @@ index 0000000000..2ebe355355
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&mmc2_pins>;
 +	vmmc-supply = <&reg_dcdc1>;
-+	/* vqmmc-supply = <&reg_vcc1v8>; we may need to add this for eMMC work in HS200/400 */ 
++	vqmmc-supply = <&reg_eldo1>;
 +	bus-width = <8>;
 +	non-removable;
 +	cap-mmc-hw-reset;
++	mmc-hs200-1_8v;
 +	status = "okay";
 +};
 +
@@ -214,50 +256,9 @@ index 0000000000..2ebe355355
 +&reg_rtc_ldo {
 +	regulator-name = "vcc-rtc";
 +};
-diff --git a/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi b/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi
-new file mode 100644
-index 0000000000..7f6efb04ed
---- /dev/null
-+++ b/arch/arm/dts/sun50i-a64-prusa64-sl2-u-boot.dtsi
-@@ -0,0 +1,35 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-+/*
-+ * Copyright (C) 2020 Prusa Development, a.s.
-+ * Written by Roman Beranek <roman.beranek@prusa3d.com>
-+ */
-+
-+#include "sunxi-u-boot.dtsi"
-+
-+/ {
-+	avdd_lcd: regulator@0 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "dsi1-lcd-avdd";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		gpio = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
-+		enable-active-high;
-+	};
-+
-+};
-+
-+/* The Toshiba TC358870 HDMI-bridge is on r_i2c */
-+&i2c1 {
-+	tc358870: hdmi-bridge@f {
-+		compatible = "toshiba,tc358870";
-+		reg = <0x0f>;
-+		vdd33_hdmi-supply = <&reg_dldo1>;
-+		vdd12_mipi-supply = <&reg_fldo1>;
-+		vdd11_hdmi-supply = <&reg_dcdc4>;
-+		iovdd_lcd-supply = <&reg_eldo2>;
-+		avdd_lcd-supply = <&avdd_lcd>;
-+		bridge-reset-gpios = <&pio 3 6 GPIO_ACTIVE_LOW>; /* PD6 */
-+		panel-reset-gpios = <&pio 3 0 GPIO_ACTIVE_LOW>; /* PD0 */
-+		status = "okay";
-+	};
-+};
 diff --git a/configs/prusa64-sl2_defconfig b/configs/prusa64-sl2_defconfig
 new file mode 100644
-index 0000000000..573e938719
+index 0000000000..c26df2289a
 --- /dev/null
 +++ b/configs/prusa64-sl2_defconfig
 @@ -0,0 +1,67 @@
@@ -328,6 +329,3 @@ index 0000000000..573e938719
 +# CONFIG_FAT_WRITE is not set
 +# CONFIG_GZIP is not set
 +# CONFIG_EFI_LOADER is not set
--- 
-2.32.0
-
