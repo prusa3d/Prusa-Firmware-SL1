@@ -1,12 +1,12 @@
-From d7e65ad061b39f40f7b359beb8a42dd86fa029d2 Mon Sep 17 00:00:00 2001
+From 86ffd912e9d34aa556551fc952ca1c844269ffd7 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 18 Mar 2021 09:57:07 +0100
 Subject: [PATCH] dts: added prusa64-sl2
 
 ---
  arch/arm64/boot/dts/allwinner/Makefile        |   1 +
- .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 530 ++++++++++++++++++
- 2 files changed, 531 insertions(+)
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 578 ++++++++++++++++++
+ 2 files changed, 579 insertions(+)
  create mode 100644 arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 
 diff --git a/arch/arm64/boot/dts/allwinner/Makefile b/arch/arm64/boot/dts/allwinner/Makefile
@@ -23,10 +23,10 @@ index 286419ec2ba7..f9365d872eac 100644
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a100-allwinner-perf1.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 new file mode 100644
-index 000000000000..e478d3996919
+index 000000000000..8de9370dcb0e
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-@@ -0,0 +1,530 @@
+@@ -0,0 +1,578 @@
 +/*
 + * Copyright (C) 2021 Roman Beranek <roman.beranek@prusa3d.com>
 + *
@@ -160,6 +160,14 @@ index 000000000000..e478d3996919
 +	clock-names = "apb", "hosc", "losc";
 +	input-debounce = <1 0 0>;
 +
++	vcc-pb-supply = <&reg_dcdc1>; /* grouped internally as vcc-io */
++	vcc-pc-supply = <&reg_eldo1>; /* depends on 0R position - R20: DLDO3, R21: ELDO1, R19: DCDC1 */
++	vcc-pd-supply = <&reg_dcdc1>;
++	vcc-pe-supply = <&reg_dcdc1>; /* depends on 0R position - R64: DCDC1, R65: ALDO1 */
++	vcc-pf-supply = <&reg_dcdc1>; /* grouped internally as vcc-io */
++	vcc-pg-supply = <&reg_aldo2>;
++	vcc-ph-supply = <&reg_dcdc1>; /* grouped internally as vcc-io */
++
 +	edtint_pins: edtint-pins {
 +		pins = "PB2";
 +		function = "gpio_in";
@@ -259,8 +267,16 @@ index 000000000000..e478d3996919
 +	status = "okay";
 +
 +	/* EEPROM bank and serial number are treated as separate devices */
-+	at24c02@50 { compatible = "atmel,24c02"; reg = <0x50>; };
-+	at24cs02@58 { compatible = "atmel,24cs02"; reg = <0x58>; };
++	at24c02@50 {
++		compatible = "atmel,24c02";
++		reg = <0x50>;
++		vcc-supply = <&reg_dcdc1>;
++	};
++	at24cs02@58 {
++		compatible = "atmel,24cs02";
++		reg = <0x58>;
++		vcc-supply = <&reg_dcdc1>;
++	};
 +
 +	adc: mcp3221@4d {
 +		compatible = "microchip,mcp3221";
@@ -307,6 +323,7 @@ index 000000000000..e478d3996919
 +		touchscreen-x-mm = <56>;
 +		touchscreen-y-mm = <94>;
 +		vcc-supply = <&reg_dldo3>;
++		iovcc-supply = <&reg_dldo3>;
 +	};
 +};
 +
@@ -316,8 +333,34 @@ index 000000000000..e478d3996919
 +	status = "okay";
 +
 +	/* EEPROM bank and serial number are treated as separate devices */
-+	at24c02@50 { compatible = "atmel,24c02"; reg = <0x50>; };
-+	at24cs02@58 { compatible = "atmel,24cs02"; reg = <0x58>; };
++	at24c02@50 {
++		compatible = "atmel,24c02";
++		reg = <0x50>;
++		vcc-supply = <&reg_dcdc1>; /* depends on 0R position - R64: DCDC1, R65: ALDO1 */
++	};
++	at24cs02@58 {
++		compatible = "atmel,24cs02";
++		reg = <0x58>;
++		vcc-supply = <&reg_dcdc1>;
++	};
++};
++
++&mali {
++	mali-supply = <&reg_fldo2>;
++};
++
++&gpu_opp_table {
++	opp-120000000 {
++		opp-microvolt = <1100000>;
++	};
++
++	opp-312000000 {
++		opp-microvolt = <1100000>;
++	};
++
++	opp-432000000 {
++		opp-microvolt = <1100000>;
++	};
 +};
 +
 +&i2s0 {
@@ -548,12 +591,17 @@ index 000000000000..e478d3996919
 +	usb1_vbus-supply = <&reg_usb1_vbus>;
 +};
 +
++&r_pio {
++	/* This would create a dependecy cycle */
++	/* vcc-pl-supply = <&reg_aldo2>; */
++};
++
 +&r_pwm {
 +	status = "okay";
 +};
 +
 +&r_uart {
-+       pinctrl-names = "default";
-+       pinctrl-0 = <&r_uart_pins>;
-+       status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&r_uart_pins>;
++	status = "okay";
 +};
