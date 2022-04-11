@@ -1,3 +1,19 @@
+# Version 1.6.5
+Firmware for SL1, SL1 SPEED and M1
+Non public build. Only for manufacturing
+
+## Summary
+- Fix rear fan
+
+### Fix rear fan
+New rear fan seems to have problem with too slow PWM used to control it.
+Luckily the rear fan uses the 4pin header with dedicated PWM signal.
+
+- Leverage continuous power to read more tacho pulses
+- Speed up software PWM for rear fan
+- Improve rear fan PWM resolution using temporal dithering
+- Change rear fan control algorith to RPM based integral controller
+
 # Version 1.6.4
 Firmware for SL1, SL1 SPEED and M1
 
@@ -35,7 +51,7 @@ The screen brightness of the UI display was stored in a different place than the
 ### Inconsistent logging from motion controller.
 Certain information/confirmation messages from the motion controller were logged as warnings. They will not be logged anymore.
 
-### MC firmware update notification was missing. 
+### MC firmware update notification was missing.
 The notification during the Motion Controller firmware update process was missing. Now it is correct
 
 ### Tilt home succeeded with disconnected tilt.
