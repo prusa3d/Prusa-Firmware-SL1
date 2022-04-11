@@ -1,3 +1,10 @@
+# Version 1.6.6
+Firmware for SL1, SL1 SPEED and M1
+Non public build. Only for manufacturing
+
+## Summary
+- Booster: added support for DAC53401 (10bit)
+
 # Version 1.6.5
 Firmware for SL1, SL1 SPEED and M1
 Non public build. Only for manufacturing
