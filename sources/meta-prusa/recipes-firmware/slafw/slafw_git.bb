@@ -22,7 +22,7 @@ RDEPENDS:${PN} += " \
 	udev-usbmount \
 	python3-pyserial \
 	python3-numpy \
-	python3-gpio \
+	python3-gpiod \
 	python3-pydbus \
 	python3-misc \
 	python3-pygobject \
