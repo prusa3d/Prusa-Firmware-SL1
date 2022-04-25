@@ -1,0 +1,172 @@
+From 7f5b6e36725effb41df5ef0139e10b7fbf90e450 Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Mon, 25 Apr 2022 17:21:20 +0200
+Subject: [PATCH] prusa64-sl2: Boot stability fix
+
+- Use alternative timer to avoid possible problems with broken arch timer
+  on A64.
+- Ensure some "fast" CPU clock is set before DRAM init to avoid problems
+  with timer errata countermeasures.
+---
+ arch/arm/cpu/armv8/Makefile      |   3 +-
+ arch/arm/cpu/armv8/sunxi_timer.c | 116 +++++++++++++++++++++++++++++++
+ board/sunxi/board.c              |   2 +
+ 3 files changed, 120 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm/cpu/armv8/sunxi_timer.c
+
+diff --git a/arch/arm/cpu/armv8/Makefile b/arch/arm/cpu/armv8/Makefile
+index d85ddde430..2ab00064c9 100644
+--- a/arch/arm/cpu/armv8/Makefile
++++ b/arch/arm/cpu/armv8/Makefile
+@@ -7,7 +7,7 @@ extra-y	:= start.o
+ 
+ obj-y	+= cpu.o
+ ifndef CONFIG_$(SPL_TPL_)TIMER
+-obj-$(CONFIG_SYS_ARCH_TIMER) += generic_timer.o
++obj-$(CONFIG_ARCH_SUNXI) += sunxi_timer.o
+ endif
+ ifndef CONFIG_$(SPL_)SYS_DCACHE_OFF
+ obj-y	+= cache_v8.o
+@@ -32,6 +32,7 @@ obj-$(CONFIG_ARMV8_SPIN_TABLE) += spin_table.o spin_table_v8.o
+ else
+ obj-$(CONFIG_ARCH_SUNXI) += fel_utils.o
+ endif
++
+ obj-$(CONFIG_$(SPL_)ARMV8_SEC_FIRMWARE_SUPPORT) += sec_firmware.o sec_firmware_asm.o
+ 
+ ifdef CONFIG_SPL_BUILD
+diff --git a/arch/arm/cpu/armv8/sunxi_timer.c b/arch/arm/cpu/armv8/sunxi_timer.c
+new file mode 100644
+index 0000000000..48f20a4bbb
+--- /dev/null
++++ b/arch/arm/cpu/armv8/sunxi_timer.c
+@@ -0,0 +1,116 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * (C) Copyright 2007-2011
++ * Allwinner Technology Co., Ltd. <www.allwinnertech.com>
++ * Tom Cubie <tangliang@allwinnertech.com>
++ */
++
++#include <common.h>
++#include <init.h>
++#include <time.h>
++#include <asm/global_data.h>
++#include <asm/io.h>
++#include <asm/arch/timer.h>
++#include <linux/delay.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++#define TIMER_MODE   (0x0 << 7)	/* continuous mode */
++#define TIMER_DIV    (0x0 << 4)	/* pre scale 1 */
++#define TIMER_SRC    (0x1 << 2)	/* osc24m */
++#define TIMER_RELOAD (0x1 << 1)	/* reload internal value */
++#define TIMER_EN     (0x1 << 0)	/* enable timer */
++
++#define TIMER_CLOCK		(24 * 1000 * 1000)
++#define COUNT_TO_USEC(x)	((x) / 24)
++#define USEC_TO_COUNT(x)	((x) * 24)
++#define TICKS_PER_HZ		(TIMER_CLOCK / CONFIG_SYS_HZ)
++#define TICKS_TO_HZ(x)		((x) / TICKS_PER_HZ)
++
++#define TIMER_LOAD_VAL		0xffffffff
++
++#define TIMER_NUM		0	/* we use timer 0 */
++
++/* read the 32-bit timer */
++static u32 read_timer(void)
++{
++	struct sunxi_timer_reg *timers =
++		(struct sunxi_timer_reg *)SUNXI_TIMER_BASE;
++	struct sunxi_timer *timer = &timers->timer[TIMER_NUM];
++
++	/*
++	 * The hardware timer counts down, therefore we invert to
++	 * produce an incrementing timer.
++	 */
++	return ~readl(&timer->val);
++}
++
++/* init timer register */
++int timer_init(void)
++{
++	struct sunxi_timer_reg *timers =
++		(struct sunxi_timer_reg *)SUNXI_TIMER_BASE;
++	struct sunxi_timer *timer = &timers->timer[TIMER_NUM];
++	writel(TIMER_LOAD_VAL, &timer->inter);
++	writel(TIMER_MODE | TIMER_DIV | TIMER_SRC | TIMER_RELOAD | TIMER_EN,
++	       &timer->ctl);
++
++	return 0;
++}
++
++/* timer without interrupts */
++static u32 get_timer_masked(void)
++{
++	/* current tick value */
++	u32 now = TICKS_TO_HZ(read_timer());
++
++	if (now >= gd->arch.lastinc)	/* normal (non rollover) */
++		gd->arch.tbl += (now - gd->arch.lastinc);
++	else {
++		/* rollover */
++		gd->arch.tbl += (TICKS_TO_HZ(TIMER_LOAD_VAL)
++				- gd->arch.lastinc) + now;
++	}
++	gd->arch.lastinc = now;
++
++	return gd->arch.tbl;
++}
++
++ulong get_timer(ulong base)
++{
++	return get_timer_masked() - base;
++}
++
++/* delay x useconds */
++void __udelay(unsigned long usec)
++{
++	s32 tmo = USEC_TO_COUNT(usec);
++	u32 now, last = read_timer();
++
++	while (tmo > 0) {
++		now = read_timer();
++		if (now > last)	/* normal (non rollover) */
++			tmo -= now - last;
++		else		/* rollover */
++			tmo -= TIMER_LOAD_VAL - last + now;
++		last = now;
++	}
++}
++
++/*
++ * This function is derived from PowerPC code (read timebase as long long).
++ * On ARM it just returns the timer value.
++ */
++unsigned long long get_ticks(void)
++{
++	return get_timer(0);
++}
++
++/*
++ * This function is derived from PowerPC code (timebase clock frequency).
++ * On ARM it returns the number of timer ticks per second.
++ */
++ulong get_tbclk(void)
++{
++	return CONFIG_SYS_HZ;
++}
+diff --git a/board/sunxi/board.c b/board/sunxi/board.c
+index 1e1a59a054..9442384d47 100644
+--- a/board/sunxi/board.c
++++ b/board/sunxi/board.c
+@@ -733,6 +733,8 @@ void sunxi_board_init(void)
+ 	power_failed |= axp_set_sw(IS_ENABLED(CONFIG_AXP_SW_ON));
+ #endif
+ #endif
++	// Set CPU clock to safe frequency which is higher than timer update frequency
++	clock_set_pll1(CONFIG_SYS_CLK_FREQ / 2);
+ 	printf("DRAM:");
+ 	gd->ram_size = sunxi_dram_init();
+ 	printf(" %d MiB\n", (int)(gd->ram_size >> 20));
