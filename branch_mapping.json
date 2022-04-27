@@ -13,9 +13,6 @@
     "1.6":"master",
     "1.7":"master"
   },
-  "filemanager":{
-    "1.7":"master"
-  },
   "remote-api-link":{
     "1.7":"master"
   }
