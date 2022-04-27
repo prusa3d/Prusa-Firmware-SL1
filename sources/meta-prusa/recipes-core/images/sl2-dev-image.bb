@@ -7,6 +7,7 @@ IMAGE_INSTALL += "\
 	packagegroup-prusa-tools \
 	packagegroup-prusa-devel \
 	packagegroup-prusa-fs \
+	packagegroup-prusa-sla \
 	klipper g0-mcu \
 "
 
