@@ -1,3 +1,83 @@
+# Version 1.7.0i-rc.0
+
+## Summary (relative to 1.7.0-beta.4)
+
+- remote-api-link changes
+  - remote-api@ef68888: fix: rename sdcard source to usb
+- prusa-link changes
+  - 4080e4a: Add new translations
+  - 084f613: Apply new translations
+  - ad74866: fix: SLA: rename USB source
+  - aa66f4b: Merge pull request #152 from prusa3d/fix/reports
+  - 5dadfb5: Update changelog and project version
+  - bc5b9d4: Unify font size and paddings
+  - 86f0dff: Change white font color to light gray
+  - 26edde0: Set timeouts for popups
+  - e80e57d: Remove temeratures page
+  - de35bbd: Fix percentage data formatting
+  - cadc2a7: Merge pull request #151 from iley/master
+  - b92d6ca: Fix default printer name use in webpack.config.js
+  - e5160ec: Merge pull request #150 from prusa3d/fix/reports
+  - e3f948e: Remove selector link when remote upload is disable
+  - 6e88222: Stop showing error message when not authenticated
+  - 5c50bab: Change default extensions in SLA printers configs
+  - 5d1a310: Implement symlink generator for icons recolor sc..
+  - 4177fae: Remove extra single quote mark
+  - 9072c3d: Remove debug logging
+  - 592af1f: Update changelog and version
+  - 97bf942: Unify storages code for different printer models
+  - 8a43c2d: Get rid of explicit metadata request
+  - b2a535a: Add files mockup for Prusa Mini
+  - 6dafd2f: Add storage configurations
+  - df876a4: Fix handling of the unchnaged icons
+  - dff0328: Replace broken links to M1 icons with files
+  - 10f5f66: Add USB icon
+  - 2013ca0: Added basic OpenAPI structure, implemented endpo..
+  - 99a36f6: Merge pull request #145 from prusa3d/feat/storag..
+  - 159e6d9: Set consistent label capitalization on home screen
+  - 733008d: Update storage usage widget
+  - e208280: Merge pull request #126 from prusa3d/openapi_upd..
+  - 98440c0: OpenAPI update
+  - 19ee8e9: Update project version and changelog
+  - 6afd4ff: Redesign upload widget
+  - e4c1536: Add tool script to unify icons colors
+  - a166366: Apply new UI design and logic
+  - a2566bb: Update icons
+- Update Prusa error codes
+- touch-ui changes
+  - touch-ui@0fd785d: Apply the updated translations
+  - touch-ui@f8998b8: WizardChecks delegate text modification
+  - touch-ui@d363e67: Fix the occasional overlap of the "back" button ..
+  - touch-ui@af3e1d6: Vertical & Horizontal centering of text in Tank ..
+  - touch-ui@486d901: Translations: Preparation for second round
+  - touch-ui@b3df943: CI: Make check_translations.py more verbose by d..
+  - touch-ui@4b17fe6: New translations
+  - touch-ui@2e64400: Fix fatal error reporting
+  - touch-ui@4e4fce0: Add DisplayRole to WizardChecks model for conven..
+  - touch-ui@72714de: Completely reset the wizard checks model when th..
+  - touch-ui@36c3303: Support TowerHomeFinish wizardcheck type
+  - touch-ui@6967420: Fix: do not try to emit unsupported signals from..
+  - touch-ui@089db98: Add missing config0.tankCleaningAdaptorHeight_nm
+  - touch-ui@30a7fdc: fix: ethernet: show items only when cable is att..
+  - touch-ui@2175ad1: CI: Add translation file generation to the test ..
+  - touch-ui@7dc5107: Sort the messages in the translation file intend..
+- slafw changes
+  - sla-fw@d9d458fa: fix: exception on empty expo panel log
+  - sla-fw@f68c626a: Fix file path provided to Prusa-Link when printi..
+  - sla-fw@c13f46f5: fix: adjust tower sensitivity at high viscosity ..
+  - sla-fw@89bd65a3: Fix fatal error reporting
+  - sla-fw@ebf6dd93: fix: CI: pot ftp upload
+  - sla-fw@b916de85: Add TOWER_HOME_FINISH wizardcheck type to better..
+  - sla-fw@cc77ca1f: Booster: added support for DAC53401 (10bit)
+  - sla-fw@a1a28187: fix: fans: allow 10-20 % RPM tolerance
+  - sla-fw@7805b738: Fix fan inconsistency on config update
+  - sla-fw@81687b5d: Limit the extent of the platform movement when c..
+
+# Version 1.7.0-beta.4
+
+## Summary (relative to 1.7.0-beta.3)
+- Fixed name of tank cleaning wizard
+
 # Version 1.7.0-beta.3
 
 ## Summary (relative to 1.7.0-beta.2)
