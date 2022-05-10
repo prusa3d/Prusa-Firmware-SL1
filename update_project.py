@@ -45,22 +45,22 @@ MAPPING_FILE = Path("branch_mapping.json")
 
 
 class Project:
-    def __init__(self, git: str, bb: Path):
+    def __init__(self, git: str, bb: Path, machine: str = ""):
         self.git = git
         self.bb = bb
+        self.machine = machine
         self.name = re.sub(r"(_git)?\.bb", "", bb.name)
         self.repo = re.search(r"gitlab\.com[:/]prusa3d/(?:sl1\/)?([^.]*)\.git", self.git)
         self.repo = self.repo.group(1) + "@" if self.repo else ""
 
     def get_branch(self, meta_branch: str) -> str:
-        # Proper mapping is supposed to exist in env, otherwise it is ok to fail
-        with MAPPING_FILE.open("r") as fp:
-            mapping = json.load(fp)
+        # Branch mapping is detected from SRC_URI in bb file
+        src_uri = re.sub("git@", "", self.git).replace(":", "/")
+        branch_info = re.search(src_uri + r".*;(no)?branch=(.*)(\;|\ |\")", self.bb.read_text()).groups()
+        if branch_info[0] is not None:
+            raise SyntaxError(f"SRC_URI in {self.bb} must specify branch name.")
 
-        if self.name in mapping and meta_branch in mapping[self.name]:
-            return mapping[self.name][meta_branch]
-
-        return meta_branch
+        return branch_info[1]
 
     def update(self, meta_branch: str):
         project_branch = self.get_branch(meta_branch)
@@ -72,7 +72,10 @@ class Project:
         remote_ls = check_output(["git", "ls-remote", self.git, f"refs/heads/{project_branch}"], text=True)
         new_hash = re.search(r"^([0-9a-f]*)", remote_ls).group().strip()
         print(f"New hash: {new_hash}.")
-        old_hash = re.search(r"SRCREV(:pn-\${PN})? = \"([0-9a-f]*)\"", self.bb.read_text()).groups()[1]
+        mach_re = ""
+        if self.machine != "":
+            mach_re = r":" + self.machine
+        old_hash = re.search(r"SRCREV(:pn-\${PN}" + mach_re + r")? = \"([0-9a-f]*)\"", self.bb.read_text()).groups()[1]
         print(f"Old hash: {old_hash}.")
 
         if not old_hash:
@@ -117,7 +120,8 @@ else:
 
 recipes_firmware = Path("sources/meta-prusa/recipes-firmware")
 projects = [
-    Project("git@gitlab.com:prusa3d/sl1/sla-fw.git", recipes_firmware / "slafw/slafw_git.bb"),
+    Project("git@gitlab.com:prusa3d/sl1/sla-fw.git", recipes_firmware / "slafw/slafw_git.bb", "prusa64-sl1"),
+    Project("git@gitlab.com:prusa3d/sl1/sla-fw-private.git", recipes_firmware / "slafw/slafw_git.bb", "prusa64-sl2"),
     Project("git@gitlab.com:prusa3d/sl1/touch-ui.git", recipes_firmware / "touch-ui/touch-ui_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Error-Codes.git", recipes_firmware / "prusa-errors/prusa-errors_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Link-Web.git", recipes_firmware / "prusa-link/prusa-link.bb"),

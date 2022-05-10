@@ -1,5 +1,5 @@
 SRC_URI = "\
-	gitsm://gitlab.com/prusa3d/sl1/touch-ui.git;protocol=https;name=touch-ui;nobranch=1 \
+	gitsm://gitlab.com/prusa3d/sl1/touch-ui.git;protocol=https;name=touch-ui;branch=master \
 	file://touch-ui.service \
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
