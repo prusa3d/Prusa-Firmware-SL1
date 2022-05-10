@@ -121,7 +121,6 @@ else:
 recipes_firmware = Path("sources/meta-prusa/recipes-firmware")
 projects = [
     Project("git@gitlab.com:prusa3d/sl1/sla-fw.git", recipes_firmware / "slafw/slafw_git.bb", "prusa64-sl1"),
-    Project("git@gitlab.com:prusa3d/sl1/sla-fw-private.git", recipes_firmware / "slafw/slafw_git.bb", "prusa64-sl2"),
     Project("git@gitlab.com:prusa3d/sl1/touch-ui.git", recipes_firmware / "touch-ui/touch-ui_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Error-Codes.git", recipes_firmware / "prusa-errors/prusa-errors_git.bb"),
     Project("git@github.com:prusa3d/Prusa-Link-Web.git", recipes_firmware / "prusa-link/prusa-link.bb"),
