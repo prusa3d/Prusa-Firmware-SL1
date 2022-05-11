@@ -13,6 +13,7 @@ FILES:${PN} += "\
 "
 
 PACKAGECONFIG:remove:pn-networkmanager = "polkit dhclient ifupdown"
+PACKAGECONFIG:append:pn-networkmanager = "nmcli"
 
 EXTRA_OECONF += "--with-dbus-sys-dir=/usr/share/dbus-1/system.d"
 
