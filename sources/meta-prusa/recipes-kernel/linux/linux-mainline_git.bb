@@ -24,26 +24,28 @@ PV = "v5.16.11"
 SRCREV:pn-${PN} = "${PV}"
 LINUX_VERSION = "${PV}"
 
-SRC_URI="\
-	git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH} \
-	file://0001-drm-panel-Add-Ilitek-ILI9806e-panel-driver.patch \
-	file://0002-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
-	file://0003-tc358870-hdmi-dsi-bridge-initial-commit.patch \
-	file://0004-tc358870-added-DSI-init-sequence-for-RV059FBB.patch \
-	file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
-	file://0201-Ethernet-reconnection-fix.patch \
-	file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
-	file://0401-pwm-sun4i-Avoid-waiting-until-the-next-period.patch \
-	file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
-	file://0701-iio-adc-add-mcp3221-driver.patch \
-	file://0801-i2s.patch \
-	file://0901-prusa-boot-logo.patch \
-	file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
-	file://1002-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
-	file://1003-arm64-dts-allwinner-a64-add-r_uart-node.patch \
-	file://1004-dts-added-prusa64-sl2.patch \
-	file://defconfig \
-"
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch=${KBRANCH} \
+           file://0001-drm-panel-Add-Ilitek-ILI9806e-panel-driver.patch \
+           file://0002-drm-sun4i-decouple-TCON_DCLK_DIV-value-from-pll_mipi.patch \
+           file://0003-tc358870-hdmi-dsi-bridge-initial-commit.patch \
+           file://0004-tc358870-added-DSI-init-sequence-for-RV059FBB.patch \
+           file://0101-prusa64-sl1-work-around-mistakenly-written-eFUSEs.patch \
+           file://0201-Ethernet-reconnection-fix.patch \
+           file://0301-sunxi-Add-misc-EPROBE_DEFER-checks-to-avoid-misleadi.patch \
+           file://0401-pwm-sun4i-Avoid-waiting-until-the-next-period.patch \
+           file://0501-spi-sun6i-always-set-parent-to-200-MHz.patch \
+           file://0701-iio-adc-add-mcp3221-driver.patch \
+           file://0801-i2s.patch \
+           file://0901-prusa-boot-logo.patch \
+           file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
+           file://1002-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
+           file://1003-arm64-dts-allwinner-a64-add-r_uart-node.patch \
+           file://1004-dts-added-prusa64-sl2.patch \
+           file://1005-SL2-pin-names.patch \
+           file://1006-drop-unused-mux.patch \
+           file://1007-uart1-enabled.patch \
+           file://defconfig \
+           "
 
 S="${WORKDIR}/git"
 

@@ -1,0 +1,40 @@
+From 54959b57e8fb4863c613df7e6099fd76c887f24f Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Fri, 13 May 2022 15:55:13 +0200
+Subject: [PATCH] SL2 pin names
+
+Add reset and bitbanged rmii pin names to pio.
+
+---
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts   | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index 8de9370dcb0e..b0e8dc7a30d3 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -139,6 +139,24 @@ &pio {
+ 	vcc-pg-supply = <&reg_aldo2>;
+ 	vcc-ph-supply = <&reg_dcdc1>; /* grouped internally as vcc-io */
+ 
++	gpio-line-names =
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "base-reset", "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "rmii-mdio", "", "", "",
++		"", "", "", "", "",           "rmii-mdc", "", "", "rmii-rst", "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "",
++		"", "", "", "", "",           "",         "", "", "",         "", "", "", "",          "", "", "";
++
+ 	edtint_pins: edtint-pins {
+ 		pins = "PB2";
+ 		function = "gpio_in";
