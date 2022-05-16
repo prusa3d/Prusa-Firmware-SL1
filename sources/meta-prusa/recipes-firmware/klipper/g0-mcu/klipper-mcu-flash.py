@@ -3,15 +3,16 @@
 import re
 import sys
 from pathlib import Path
+from tempfile import TemporaryFile
 from subprocess import check_output, check_call, DEVNULL
 from time import sleep
-
 import gpio
 
 BAUDRATE = 1000000
 FLASH_START = 0x08000000
 STM32FLASH = "/usr/bin/stm32flash"
-RESET_GPIO = 6 * 32 + 8  # PG8
+RESET_GPIO = 4 * 32 + 5  # PE5
+BOOT_DATA = bytes.fromhex("aae1ffdb551e0024")  # Boot to bootloader
 
 
 def stm32_crc(buf: bytes) -> int:
@@ -63,6 +64,22 @@ def check_crc_match(firmware: Path, uart: Path) -> bool:
     return mcu_crc == fw_crc
 
 
+def check_boot(uart: Path) -> bool:
+    with TemporaryFile() as f:
+        check_call([STM32FLASH, "-r", "-", "-S", "0x1FFF7800:8", str(uart)], stdout=f)
+        f.seek(0)
+        data = f.read()
+        print(f"Read boot data: {data.hex()}")
+        return data == BOOT_DATA
+
+
+def set_boot(uart: Path):
+    with TemporaryFile() as f:
+        f.write(BOOT_DATA)
+        f.seek(0)
+        check_call([STM32FLASH, "-w", "-", "-v", "-S", "0x1FFF7800:8", str(uart)], stdin=f)
+
+
 def flash(firmware: Path, uart: Path):
     check_call([STM32FLASH, "-R", "-w", str(firmware), "-v", str(uart)])
 
@@ -95,11 +112,19 @@ if not uart_path.exists():
 
 try:
     reset()
+
+    if not check_boot(uart_path):
+        print("Boot configuration not correct, setting option bytes")
+        set_boot(uart_path)
+    else:
+        print("Boot configuration match, no update necessary")
+
     if check_crc_match(firmware_path, uart_path):
         print("Firmware CRC match, no update necessary")
     else:
         print("Firmware CRC mismatch, flashing MCU firmware.")
         flash(firmware_path, uart_path)
+
     print("Running MCU program")
     run(uart_path)
 except Exception as exception:
