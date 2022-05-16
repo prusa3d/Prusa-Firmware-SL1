@@ -8,7 +8,7 @@ from subprocess import check_output, check_call, DEVNULL
 from time import sleep
 import gpio
 
-BAUDRATE = 1000000
+BAUDRATE = 57600
 FLASH_START = 0x08000000
 STM32FLASH = "/usr/bin/stm32flash"
 RESET_GPIO = 4 * 32 + 5  # PE5
