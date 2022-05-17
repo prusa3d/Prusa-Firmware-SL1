@@ -1,7 +1,7 @@
 [Unit]
 Description=Ensure Klipper MCU is running current firmware
-After=sys-devices-platform-soc-1c28800.serial-tty-ttyS2.device
-Requires=sys-devices-platform-soc-1c28800.serial-tty-ttyS2.device
+After=sys-devices-platform-soc-1c28400.serial-tty-ttyS2.device
+Requires=sys-devices-platform-soc-1c28400.serial-tty-ttyS2.device
 
 [Service]
 Type=oneshot
