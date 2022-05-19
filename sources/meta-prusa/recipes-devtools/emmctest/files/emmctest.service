@@ -1,0 +1,12 @@
+[Unit]
+Description=Infinite emmctest by badblocks. Logs to systemd
+Wants=multi-user.target
+Before=slafw.service touch-ui.service remote_api_link.service nginx.service filemanager.service rauc.service updater.service
+Conflicts=slafw.service touch-ui.service remote_api_link.service nginx.service filemanager.service rauc.service updater.service
+
+[Service]
+Type=simple
+ExecStart=/bin/run_emmctest.sh
+
+[Install]
+WantedBy=multi-user.target
