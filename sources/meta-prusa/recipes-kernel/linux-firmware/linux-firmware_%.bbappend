@@ -16,6 +16,7 @@ do_install:append() {
 	ln -s brcmfmac43455-sdio.MINIX-NEO\ Z83-4.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.prusa,prusa64-sl2.txt
 
 	install -m 644 ${WORKDIR}/brcmfmac43456-sdio.bin ${D}${nonarch_base_libdir}/firmware/brcm/
+	ln -s brcmfmac43456-sdio.bin ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43456-sdio.prusa,prusa64-sl2.bin
 	install -m 644 ${WORKDIR}/brcmfmac43456-sdio.AP6256.txt ${D}${nonarch_base_libdir}/firmware/brcm/
 	ln -s brcmfmac43456-sdio.AP6256.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43456-sdio.prusa,prusa64-sl2.txt
 }
