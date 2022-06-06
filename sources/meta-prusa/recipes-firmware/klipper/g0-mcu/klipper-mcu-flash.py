@@ -122,10 +122,13 @@ try:
     if check_crc_match(firmware_path, uart_path):
         print("Firmware CRC match, no update necessary")
     else:
-        print("Firmware CRC mismatch, flashing MCU firmware.")
+        print("Firmware CRC mismatch, flashing MCU firmware in background.")
         flash(firmware_path, uart_path)
 
     print("Running MCU program")
     run(uart_path)
+
+    print("releasing GPIOs")
+    gpio.cleanup()
 except Exception as exception:
     raise Exception("Failed to flash firmware") from exception
