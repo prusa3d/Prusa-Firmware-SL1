@@ -1,0 +1,80 @@
+From 93b9a6fc817223abfbdd6b5efa04840d6365ad4e Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Tue, 7 Jun 2022 11:01:30 +0200
+Subject: [PATCH] Drop i2s, enable soundcard
+
+---
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 39 +++++--------------
+ 1 file changed, 9 insertions(+), 30 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index aeba6669a884..9f701c3d700f 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -96,24 +96,6 @@ codec_dummy: codec-dummy {
+ 		status = "okay";
+ 	};
+ 
+-	sound_test {
+-		compatible = "simple-audio-card";
+-		simple-audio-card,name = "On-board I2S";
+-		simple-audio-card,format = "dsp_b";
+-		simple-audio-card,bitclock-master = <&cpu_i2s0>;
+-		simple-audio-card,frame-master = <&cpu_i2s0>;
+-		simple-audio-card,mclk-fs = <128>;
+-		status = "okay";
+-
+-		cpu_i2s0: simple-audio-card,cpu {
+-			sound-dai = <&i2s0>;
+-		};
+-
+-		simple-audio-card,codec {
+-			sound-dai = <&codec_dummy>;
+-		};
+-	};
+-
+ 	wifi_pwrseq: wifi_pwrseq {
+ 		compatible = "mmc-pwrseq-simple";
+ 		reset-gpios = <&pio 7 11 GPIO_ACTIVE_LOW>; /* PH11 */
+@@ -157,11 +139,6 @@ edtint_pins: edtint-pins {
+ 		bias-pull-up;
+ 	};
+ 
+-	i2s0_pins: i2s0-pins {
+-		pins = "PB4", "PB5", "PB6", "PB7";
+-		function = "i2s0";
+-	};
+-
+ 	rmii_no_mdio_pins: rmii-no-mdio-pins {
+ 		/* neither including RMII_RXER on PD14 */
+ 		pins = "PD10", "PD11", "PD13", "PD17",
+@@ -346,13 +323,6 @@ opp-432000000 {
+ 	};
+ };
+ 
+-&i2s0 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&i2s0_pins>;
+-	status = "okay";
+-};
+-
+-
+ &mmc0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&mmc0_pins>;
+@@ -534,6 +504,15 @@ sn: sn@3c {
+ 	};
+ };
+ 
++&sound {
++	status = "okay";
++	simple-audio-card,widgets = "Speaker", "Internal Speaker";
++	simple-audio-card,routing =
++		"Left DAC", "DACL",
++		"Right DAC", "DACR",
++		"Internal Speaker", "HP";
++};
++
+ &uart0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&uart0_pb_pins>;
