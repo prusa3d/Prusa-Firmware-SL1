@@ -5,6 +5,7 @@ SRC_URI:append = "\
 	file://0002-timesyncd-google.patch \
 	file://0003-localed-accept-locale-even-if-not-installed.patch \
 	file://0004-send-shdn-cmd-to-mc-during-poweroff.patch \
+	file://0006-resolved-implement-full-Legacy-Unicast-Response.patch \
 	file://journal.conf \
 	file://max_use.conf \
 	file://logind-no-auto-vt.conf \

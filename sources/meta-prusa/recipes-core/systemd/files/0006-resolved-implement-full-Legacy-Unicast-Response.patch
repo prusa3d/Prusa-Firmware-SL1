@@ -1,0 +1,72 @@
+From 86abd1ff734044fe844f518911bf1dc87af0fa40 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Tue, 7 Jun 2022 05:53:31 +0200
+Subject: [PATCH] resolved: implement full Legacy Unicast Response
+
+---
+ src/resolve/resolved-dns-zone.c | 35 +++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/src/resolve/resolved-dns-zone.c b/src/resolve/resolved-dns-zone.c
+index b86b325144..39c507201b 100644
+--- a/src/resolve/resolved-dns-zone.c
++++ b/src/resolve/resolved-dns-zone.c
+@@ -303,6 +303,7 @@ static int dns_zone_add_authenticated_answer(DnsAnswer *a, DnsZoneItem *i, int i
+ 
+ int dns_zone_lookup(DnsZone *z, DnsResourceKey *key, int ifindex, DnsAnswer **ret_answer, DnsAnswer **ret_soa, bool *ret_tentative) {
+         _cleanup_(dns_answer_unrefp) DnsAnswer *answer = NULL, *soa = NULL;
++        _cleanup_(dns_resource_key_unrefp) DnsResourceKey *ptr_key = NULL;
+         unsigned n_answer = 0;
+         DnsZoneItem *j, *first;
+         bool tentative = true, need_soa = false;
+@@ -338,6 +339,23 @@ int dns_zone_lookup(DnsZone *z, DnsResourceKey *key, int ifindex, DnsAnswer **re
+                         if (k > 0) {
+                                 n_answer++;
+                                 added = true;
++                                if (dns_resource_key_is_dnssd_ptr(j->rr->key))
++                                        ptr_key = dns_resource_key_new(DNS_CLASS_ANY, DNS_TYPE_ANY, j->rr->ptr.name);
++
++                        }
++                }
++                if (ptr_key) {
++                        first = hashmap_get(z->by_name, dns_resource_key_name(ptr_key));
++                        LIST_FOREACH (by_name, j, first) {
++                                if (!IN_SET(j->state, DNS_ZONE_ITEM_PROBING, DNS_ZONE_ITEM_ESTABLISHED, DNS_ZONE_ITEM_VERIFYING))
++                                        continue;
++
++                                k = dns_resource_key_match_rr(ptr_key, j->rr, NULL);
++                                if (k < 0)
++                                        return k;
++                                if (k > 0) {
++                                        n_answer++;
++                                }
+                         }
+ 
+                 }
+@@ -414,6 +432,23 @@ int dns_zone_lookup(DnsZone *z, DnsResourceKey *key, int ifindex, DnsAnswer **re
+                         }
+                 }
+ 
++                if (ptr_key) {
++                        first = hashmap_get(z->by_name, dns_resource_key_name(ptr_key));
++                        LIST_FOREACH (by_name, j, first) {
++                                if (!IN_SET(j->state, DNS_ZONE_ITEM_PROBING, DNS_ZONE_ITEM_ESTABLISHED, DNS_ZONE_ITEM_VERIFYING))
++                                        continue;
++
++                                k = dns_resource_key_match_rr(ptr_key, j->rr, NULL);
++                                if (k < 0)
++                                        return k;
++                                if (k > 0) {
++                                        r = dns_zone_add_authenticated_answer(answer, j, ifindex);
++                                        if (r < 0)
++                                                return r;
++                                }
++                        }
++                }
++
+                 if (found && !added) {
+                         r = dns_answer_add_soa(soa, dns_resource_key_name(key), LLMNR_DEFAULT_TTL, ifindex);
+                         if (r < 0)
+-- 
+2.35.1
+
