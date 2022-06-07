@@ -46,7 +46,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch
            file://1006-drop-unused-mux.patch \
            file://1007-uart1-enabled.patch \
            file://1008-WIP-SMSC-PHY-bitbanged-MDC.patch \
-           file://0001-dts-remap-wifi-pins.patch \
+           file://1009-dts-remap-wifi-pins.patch \
            "
 
 S="${WORKDIR}/git"
