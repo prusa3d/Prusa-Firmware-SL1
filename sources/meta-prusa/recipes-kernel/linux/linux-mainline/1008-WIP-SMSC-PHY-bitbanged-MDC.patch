@@ -1,15 +1,15 @@
-From e919fd9f8416c964344e8fc5137ffd5bd35242c7 Mon Sep 17 00:00:00 2001
+From 8cf648a2d47b0a2866aaba707863428c8e559cf6 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Mon, 16 May 2022 15:35:19 +0200
 Subject: [PATCH] WIP: SMSC PHY, bitbanged MDC
 
 Based on remix of experiments by Roman Beranek.
 ---
- .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 33 ++++++++++++++-----
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 32 ++++++++++++++-----
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index a0f3dec51638..aeba6669a884 100644
+index a0f3dec51638..fcb455f298dd 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -23,6 +23,7 @@ aliases {
@@ -43,7 +43,7 @@ index a0f3dec51638..aeba6669a884 100644
  	reg_avdd_lcd: avdd-lcd {
  		compatible = "regulator-fixed";
  		regulator-name = "dsi1-lcd-avdd";
-@@ -145,6 +162,13 @@ i2s0_pins: i2s0-pins {
+@@ -145,6 +162,12 @@ i2s0_pins: i2s0-pins {
  		function = "i2s0";
  	};
  
@@ -52,12 +52,11 @@ index a0f3dec51638..aeba6669a884 100644
 +		pins = "PD10", "PD11", "PD13", "PD17",
 +				"PD18", "PD19", "PD20";
 +		function = "emac";
-+		drive-strength = <40>;
 +	};
  };
  
  &codec {
-@@ -199,7 +223,7 @@ panel@0 {
+@@ -199,7 +222,7 @@ panel@0 {
  
  &emac {
  	pinctrl-names = "default";
@@ -66,7 +65,7 @@ index a0f3dec51638..aeba6669a884 100644
  	phy-mode = "rmii";
  	phy-handle = <&ext_rmii_phy>;
  	phy-supply = <&reg_dcdc1>;
-@@ -209,13 +233,6 @@ &emac {
+@@ -209,13 +232,6 @@ &emac {
  	nvmem-cell-names = "mac-address";
  };
  
@@ -80,3 +79,6 @@ index a0f3dec51638..aeba6669a884 100644
  &hdmi {
  	hvcc-supply = <&reg_dldo1>;
  	status = "okay";
+-- 
+2.35.1
+
