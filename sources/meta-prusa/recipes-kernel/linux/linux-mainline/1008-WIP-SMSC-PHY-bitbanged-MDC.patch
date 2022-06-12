@@ -1,4 +1,4 @@
-From 8cf648a2d47b0a2866aaba707863428c8e559cf6 Mon Sep 17 00:00:00 2001
+From afa66b69b635960cb5cf0972399b41a294525839 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Mon, 16 May 2022 15:35:19 +0200
 Subject: [PATCH] WIP: SMSC PHY, bitbanged MDC
@@ -9,7 +9,7 @@ Based on remix of experiments by Roman Beranek.
  1 file changed, 24 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index a0f3dec51638..fcb455f298dd 100644
+index a0f3dec51638..fb114ee1449f 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -23,6 +23,7 @@ aliases {
@@ -49,8 +49,8 @@ index a0f3dec51638..fcb455f298dd 100644
  
 +	rmii_no_mdio_pins: rmii-no-mdio-pins {
 +		/* neither including RMII_RXER on PD14 */
-+		pins = "PD10", "PD11", "PD13", "PD17",
-+				"PD18", "PD19", "PD20";
++		/*      RXD1    RXD0    CRS     TXD1    TXD0    TXCK    TXEN */
++		pins = "PD10", "PD11", "PD13", "PD17", "PD18", "PD19", "PD20";
 +		function = "emac";
 +	};
  };
