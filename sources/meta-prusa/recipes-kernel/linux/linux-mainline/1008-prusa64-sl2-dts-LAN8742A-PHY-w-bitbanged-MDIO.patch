@@ -1,9 +1,11 @@
-From afa66b69b635960cb5cf0972399b41a294525839 Mon Sep 17 00:00:00 2001
-From: Vladimir Matena <vladimir.matena@prusa3d.cz>
-Date: Mon, 16 May 2022 15:35:19 +0200
-Subject: [PATCH] WIP: SMSC PHY, bitbanged MDC
+From 59f706a5a613a18186d0d44028daf151d67cd877 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Sun, 12 Jun 2022 18:05:18 +0200
+Subject: [PATCH] prusa64-sl2: dts: LAN8742A PHY w/ bitbanged MDIO
 
-Based on remix of experiments by Roman Beranek.
+* Sacrifice native MDIO for a PWM function on thus freed up pin PD22.
+* Change PHY address to 0.
+* Fill in reset timing for the PHY as specified in its datasheet.
 ---
  .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 32 ++++++++++++++-----
  1 file changed, 24 insertions(+), 8 deletions(-)
