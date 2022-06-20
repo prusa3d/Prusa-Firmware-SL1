@@ -1,0 +1,50 @@
+From f0fdc558cd658789bcd2cd67aab35f2e553e4b80 Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Fri, 10 Jun 2022 15:56:49 +0200
+Subject: [PATCH] Drop r_uart, enable SPI1
+
+- Disable r_uart
+- Enable SPI1 without native CS pin
+- Use two GPIO CS for SPI1
+
+Drop Ruart, add spi1 cs
+---
+ .../boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts    | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index 9f701c3d700f..e1e5f54bdb92 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -24,6 +24,7 @@ aliases {
+ 		serial1 = &r_uart;
+ 		serial2 = &uart2;
+ 		mdio-gpio0 = &mdio0;
++		spi1 = &spi1;
+ 	};
+ 
+ 	chosen {
+@@ -146,6 +147,11 @@ rmii_no_mdio_pins: rmii-no-mdio-pins {
+ 		function = "emac";
+ 		drive-strength = <40>;
+ 	};
++
++	spi1_no_cs_pins: spi1-no-cs-pins {
++		pins =  "PD1", "PD2", "PD3";
++		function = "spi1";
++	};
+ };
+ 
+ &codec {
+@@ -568,8 +574,8 @@ &r_pwm {
+ 	status = "okay";
+ };
+ 
+-&r_uart {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&r_uart_pins>;
++&spi1 {
+ 	status = "okay";
++	pinctrl-0 = <&spi1_no_cs_pins>;
++	cs-gpios = <&r_pio 0 3 0>, <&r_pio 0 5 0>; /* PL3, PL5 */
+ };
