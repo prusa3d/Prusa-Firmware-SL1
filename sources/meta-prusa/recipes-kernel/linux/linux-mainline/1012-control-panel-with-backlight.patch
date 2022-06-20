@@ -1,0 +1,54 @@
+From eb0d8b4694a4b84b4ad6db6709cd59d7757f1bc9 Mon Sep 17 00:00:00 2001
+From: Vladimir Matena <vladimir.matena@prusa3d.cz>
+Date: Fri, 10 Jun 2022 15:58:02 +0200
+Subject: [PATCH] Control panel with backlight
+
+---
+ .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 21 +++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index 705c9403bdf8..1dfe897b5e77 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -78,6 +78,23 @@ reg_usb1_vbus: usb1-vbus {
+ 		status = "okay";
+ 	};
+ 
++	/* +5V power supply */
++	reg_ps: ps-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "ps";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-boot-on;
++	};
++
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&r_pwm 0 50000 0>;
++		brightness-levels = <0 5 10 15 20 30 40 55 70 85 100>;
++		default-brightness-level = <0>;
++		power-supply = <&reg_ps>;
++	};
++
+ 	reserved-memory {
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+@@ -188,14 +205,14 @@ &dphy {
+ 
+ &dsi {
+ 	vcc-dsi-supply = <&reg_dldo2>;
+-	status = "disable";
++	status = "okay";
+ 
+ 	panel@0 {
+ 		compatible = "tdo,tl040wv27ct3";
+ 		reg = <0>;
+ 		reset-gpios = <&pio 3 8 GPIO_ACTIVE_LOW>; /* PD8 */
+ 		power-supply = <&reg_dldo2>;
+-		use-dsi-backlight;
++		backlight = <&backlight>;
+ 	};
+ };
+ 
