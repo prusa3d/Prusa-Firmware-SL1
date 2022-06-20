@@ -1,4 +1,49 @@
-# Version 1.7.0i-rc.0
+# Version 1.7.0-rc.2
+
+## Summary (relative to 1.7.0-rc.1)
+
+- touch-ui changes
+  - touch-ui@c353887: Fix: correct item separator
+  - touch-ui@0339293: Fix: RollingText glitches
+  - touch-ui@3796392: Fix: Modify italian translation(word wrap)
+  - touch-ui@0257bb9: Fix cut-off text in delegates
+
+# Version 1.7.0-rc.1
+
+## Summary (relative to 1.7.0-rc.0)
+
+- remote-api-link changes
+  - remote-api@7cf91e3: Added some metadata to api/files for SL1.
+- filemanager changes
+  - filemanager@38bec93: fix: pylint
+- prusa-link changes:
+  - 312fcc1: Merge pull request #192 from prusa3d/release/3.1..
+  - 1d77d55: Merge pull request #191 from prusa3d/release/3.1..
+  - 175dab3: Switch to production logo
+  - 7039fa8: Fix file extensions list for SLA
+  - 3e24695: Merge pull request #173 from prusa3d/release/3.1..
+  - 717442c: Fix M1 color scheme
+- touch-ui changes:
+  - touch-ui@a71a94b: Fix: Text overflow in preprint exposure settings
+  - touch-ui@c65c896: Fix SelectionBox beeping
+  - touch-ui@ac67b42: Fix beeping in ResinTankCleaningWizard
+  - touch-ui@39a0539: Add long beep on errors, warnings and other sele..
+  - touch-ui@c216de4: Add status row to networking menu delegates(Wi-F..
+  - touch-ui@273b8d6: Fix: Handle overflowing text by swinging
+  - touch-ui@93c485b: Fix manual setting of DNS for ethernet connection
+  - touch-ui@beebea8: Fix time format settings
+  - touch-ui@6894946: Fix handling of text too long in delegates
+  - touch-ui@d74be15: Enable all firmware actions in exception
+- slafw changes:
+  - sla-fw@61e51ea4: Fix tests for SL1SW-1672
+  - sla-fw@071221bd: Refuse to print on uncalibrated printer via stan..
+  - sla-fw@0ba73304: Fix error message during the resin measurment
+  - sla-fw@77e6d5f4: hotfix clean all network confs under WIFI reset
+  - sla-fw@ccbacf44: Fix SL1SUpgradeWizard
+  - sla-fw@17f49fef: fix: CI build
+- systemd-resolved: implement full Legacy Unicast Response
+
+# Version 1.7.0-rc.0
 
 ## Summary (relative to 1.7.0-beta.4)
 
