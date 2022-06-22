@@ -1,3 +1,14 @@
+# Version 1.7.0-rc.3
+
+## Summary (relative to 1.7.0-rc.2)
+
+- touch-ui changes
+  - touch-ui@2223902: Fix: Wrong format of date embedded in screenshot..
+- slafw changes
+  - sla-fw@e092d564: Do not remove generated connections on reset
+  - sla-fw@f0878950: Fix error message during the resin measurment
+  - sla-fw@581ed573: Fix used & remaining resin [ml]
+
 # Version 1.7.0-rc.2
 
 ## Summary (relative to 1.7.0-rc.1)
