@@ -85,7 +85,7 @@ index 000000000000..8de9370dcb0e
 +		regulator-max-microvolt = <5000000>;
 +		regulator-boot-on;
 +		enable-active-high;
-+		gpio = <&pio 6 9 GPIO_ACTIVE_HIGH>; /* PG9 */
++		gpio = <&pio 4 0 GPIO_ACTIVE_HIGH>; /* PE0 */
 +		status = "okay";
 +	};
 +
