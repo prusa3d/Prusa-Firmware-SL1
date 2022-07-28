@@ -1,0 +1,39 @@
+From 98d34d5be806cfd84e143b8ce3f13bc061c166b7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ji=C5=99=C3=AD=20Ma=C5=88=C3=A1k?= <jiri.manak@prusa3d.cz>
+Date: Tue, 19 Jul 2022 11:14:40 +0200
+Subject: [PATCH] remap pcf8563 to i2c2@55
+
+---
+ .../boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts    | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+index 961101daa5a2..d7542fd1a814 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
+@@ -266,12 +266,6 @@ adc: mcp3221@4d {
+ 		reference-voltage-microvolt = <5000000>; /* 5.0 V */
+ 		#io-channel-cells = <0>;
+ 	};
+-
+-	pcf8563@51 {
+-		compatible = "nxp,pcf8563";
+-		reg = <0x51>;
+-		#clock-cells = <0>;
+-	};
+ };
+ 
+ &i2c1 {
+@@ -325,6 +319,12 @@ at24cs02@58 {
+ 		reg = <0x58>;
+ 		vcc-supply = <&reg_dcdc1>;
+ 	};
++
++	pcf8563@55 {
++		compatible = "nxp,pcf8563";
++		reg = <0x55>;
++		#clock-cells = <0>;
++	};
+ };
+ 
+ &mali {
