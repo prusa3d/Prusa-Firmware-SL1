@@ -1,0 +1,25 @@
+From 699f16dbe9dee3bf44fae86f803d5f3aa750c210 Mon Sep 17 00:00:00 2001
+From: Roman Beranek <roman.beranek@prusa3d.com>
+Date: Thu, 12 May 2022 12:40:40 +0200
+Subject: [PATCH] workaround missing locales
+
+---
+ tmux.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tmux.c b/tmux.c
+index b9f2be30..5c635ac0 100644
+--- a/tmux.c
++++ b/tmux.c
+@@ -33,6 +33,8 @@
+ 
+ #include "tmux.h"
+ 
++#define setlocale(category, locale) (locale)
++
+ struct options	*global_options;	/* server options */
+ struct options	*global_s_options;	/* session options */
+ struct options	*global_w_options;	/* window options */
+-- 
+2.34.1
+
