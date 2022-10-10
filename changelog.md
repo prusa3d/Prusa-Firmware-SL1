@@ -1,3 +1,40 @@
+# Version 1.7.1
+
+## Summary (relative to 1.7.0-rc.3)
+
+- slafw changes
+  - sla-fw@9ed777f2: Regroup the PackingWizard & FactoryResetWizard c..
+  - sla-fw@edc6d670: fix: DEFAULT exposure profile missing delay befo..
+  - sla-fw@a70b9d8e: Fix UV calibration retains pwm value
+  - sla-fw@34d35708: mc-fw: update default tower profiles
+  - sla-fw@fcbf2e3e: fix: use Docker image for this branch
+  - sla-fw@3510df5b: fix: add M1 into few commens and docs
+  - sla-fw@a35c796f: fix: reset MC profiles properly
+  - sla-fw@805d52af: Fix "No Error" error page when switching slots on M1 printer
+
+- filemanager changes
+  - filemanager@c5b6a27: Fix blank line in project config.ini
+  - filemanager@be91bb0: Fix metadata thumbnails
+  - filemanager@d98e8b4: Fix PrusaLink thumbnails
+
+- remote-api-link changes
+  - remote-api@49ba5b7b: Fix upload via PL during the print suppress select project
+  - remote-api@a579239d: Fix upload project to non-existing directory
+
+- touch-ui changes
+  - touch-ui@b98516fe: Fix: Allow ethernet connection settings even when connection is busy
+  - touch-ui@6b82056c: Resolve SL1SW-1727 Problem switching ethernet dhcp
+  - touch-ui@0a96e258: Fix missing property total_time_ms
+
+- prusa-errors changes
+  - 4515a47: Update error-codes.yaml
+
+- prusa-link changes
+  - ee3e9b3: SLA: print settings: fix cell width for high viscosity
+  - 3ecc718: SLA: locales: Reapply correct naming of "Print settings"
+  - c1c24ed: Fix buttons behavior
+  - 5be6b37: css: loading-overlay: change the backgroud color
+
 # Version 1.7.0-rc.3
 
 ## Summary (relative to 1.7.0-rc.2)
