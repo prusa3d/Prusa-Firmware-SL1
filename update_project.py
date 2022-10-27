@@ -126,6 +126,7 @@ projects = [
     Project("git@github.com:prusa3d/Prusa-Link-Web.git", recipes_firmware / "prusa-link/prusa-link.bb"),
     Project("git@gitlab.com:prusa3d/sl1/filemanager.git", recipes_firmware / "filemanager/filemanager_git.bb"),
     Project("git@gitlab.com:prusa3d/sl1/remote-api.git", recipes_firmware / "remote-api-link/remote-api-link_git.bb"),
+    Project("git@gitlab.com:prusa3d/sl1/mc-fw.git", recipes_firmware / "mc-fw/mc-fw_git.bb")
 ]
 
 for p in projects:
