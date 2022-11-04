@@ -7,7 +7,7 @@ SRC_URI = "\
 	git://gitlab.com/prusa3d/sl1/filemanager.git;protocol=https;branch=master \
 	file://filemanager.service \
 "
-SRCREV:pn-${PN} = "a9a4fbb51e23907b3898611e72618d2961828b9a"
+SRCREV:pn-${PN} = "02737fd28a986ae3554837b8533f9005a5ce8bd1"
 
 S = "${WORKDIR}/git"
 
