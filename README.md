@@ -49,6 +49,12 @@ Prusa-Firmware-SL1$ sh ./keys/deploy_certs.sh
 
 ### Making an OS image
 
+#### Submodule init
+
+You need to also intialize submodules by 
+`git submodule update --init --recursive` or you might get missing symbolic links error.
+Execute this command in terminal in your local repo directory.
+
 #### Targets
 
 Possible targets for deployment:
