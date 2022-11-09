@@ -19,6 +19,7 @@ RDEPENDS:${PN} += " \
 	python3 \
 	python3-watchdog \
 	prusa-errors \
+	python3-pyudev \
 	slafw \
 "
 
