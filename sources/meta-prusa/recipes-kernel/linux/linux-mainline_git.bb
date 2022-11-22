@@ -38,6 +38,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch
            file://0701-iio-adc-add-mcp3221-driver.patch \
            file://0801-i2s.patch \
            file://0901-prusa-boot-logo.patch \
+           file://1000-arm64-dts-allwinner-a64-set-GPU-clock-to-432-MHz.patch \
            file://1001-dts-create-sun50i-a64-prusa64-sl1-dts.patch \
            file://1002-arm64-dts-Add-timer-erratum-property-for-Allwinner-A.patch \
            file://1003-arm64-dts-allwinner-a64-add-r_uart-node.patch \
