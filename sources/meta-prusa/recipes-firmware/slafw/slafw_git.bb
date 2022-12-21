@@ -66,8 +66,8 @@ FILES:${PN} += "\
 	/usr/share/dbus-1/system.d\
 	/usr/lib/sysusers.d/slafw.conf\
 "
-FILES:${PN}:remove = "${sysconfdir}/sl1fw/loggerConfig.json"
-FILES:${PN}-dev = "${sysconfdir}/sl1fw/loggerConfig.json"
+FILES:${PN}:remove = "${sysconfdir}/sl1fw/slafw-logger.json"
+FILES:${PN}-dev = "${sysconfdir}/sl1fw/slafw-logger.json"
 
 S="${WORKDIR}/git"
 
