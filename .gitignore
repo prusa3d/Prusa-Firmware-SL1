@@ -14,5 +14,3 @@ pseudodone
 log.txt.xz
 /vscode-bitbake-build
 /Image-*
-sources
-meta-sl1
