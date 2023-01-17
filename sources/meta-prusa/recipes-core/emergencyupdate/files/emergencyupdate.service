@@ -32,7 +32,7 @@ RemainAfterExit=yes
 Environment=EMERGENCY_PATTERN="/dev/.* /run/media/system/.*"
 Environment=EMERGENCY_PATH="/run/media/system/*"
 Environment=EMERGENCY_FILE="/run/media/system/**/sla-emergency-update.raucb"
-ExecStart=/usr/bin/sh -c 'while ! cat /proc/mounts | grep -q "${EMERGENCY_PATTERN}" ; do sleep 5; ls ${EMERGENCY_PATH} > /dev/null 2>&1; done; if [ -f ${EMERGENCY_FILE} ]; then rauc install ${EMERGENCY_FILE} && systemctl reboot; fi;'
+ExecStart=/usr/bin/sh -c 'while ! cat /proc/mounts | grep -q "${EMERGENCY_PATTERN}" ; do sleep 5; ls ${EMERGENCY_PATH} > /dev/null 2>&1; done; if [ -f ${EMERGENCY_FILE} ]; then rauc install ${EMERGENCY_FILE} && systemctl poweroff; fi;'
  
 [Install]
 WantedBy=multi-user.target
