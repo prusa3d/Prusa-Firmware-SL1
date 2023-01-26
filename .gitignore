@@ -12,5 +12,6 @@ pseudodone
 /*.devsd.*
 /*.bootstrapsd.*
 log.txt.xz
+/logs*.tar.xz
 /vscode-bitbake-build
 /Image-*
