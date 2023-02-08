@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/prusa3d/Prusa-Link-Web"
 LICENSE = "GPL-3.0 & MIT & CC0-1.0 & Apache-2.0"
 SRCREV:pn-${PN} = "c78a9a52cff44e1799649853f39fc236d9e35a21"
 SRC_URI = " \
-	git://github.com/prusa3d/Prusa-Link-Web.git;protocol=https;branch=master \
+	git://github.com/prusa3d/Prusa-Link-Web.git;protocol=https;branch=old-file-api \
 	file://dnssd/http.dnssd \
 	file://dnssd/octoprint.dnssd \
 	file://nginx/prusa-auth.conf \
