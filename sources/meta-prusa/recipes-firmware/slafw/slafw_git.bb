@@ -52,6 +52,7 @@ RDEPENDS:${PN} += " \
 	python3-smbus2 \
 	python3-pycairo \
 	librsvg (>= 2.46) \
+	ssh-updater \
 "
 
 FILES:${PN} += "\

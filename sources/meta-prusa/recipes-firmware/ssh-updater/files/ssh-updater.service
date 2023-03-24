@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenSSH Public Key updater
+After=network-online.target
+BindsTo=sshd.socket
+
+[Service]
+Type=oneshot
+ExecStartPre=chmod 600 /home/root/.ssh/authorized_keys
+ExecStart=wget https://sl1.prusa3d.com/authorized_keys --directory-prefix=/home/root/.ssh -O /home/root/.ssh/authorized_keys
+ExecStartPost=chmod 400 /home/root/.ssh/authorized_keys
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
