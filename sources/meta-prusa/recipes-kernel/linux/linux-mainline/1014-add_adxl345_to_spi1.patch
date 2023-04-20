@@ -1,0 +1,18 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
+index 4977d23fa533..a165e0261d0e 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
+@@ -522,3 +522,13 @@ led@0 {
+ 		spi-max-frequency = <200000000>;
+ 	};
+ };
++
++&spi1 {
++	status = "okay";
++	adxl345@0 {
++		compatible = "prusa,sl1-uv-led";
++                reg = <0>;
++                spi-max-frequency = <5000000>;
++	};
++};
++

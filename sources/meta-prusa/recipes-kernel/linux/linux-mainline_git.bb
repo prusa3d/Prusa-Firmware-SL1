@@ -52,6 +52,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;branch
            file://1011-enable-SPI1.patch \
            file://1012-control-panel-with-backlight.patch \
            file://1013-remap-pcf8563-to-i2c2-55.patch \
+	   file://1014-add_adxl345_to_spi1.patch \
            "
 
 S="${WORKDIR}/git"
