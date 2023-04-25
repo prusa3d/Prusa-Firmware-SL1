@@ -53,6 +53,7 @@ RDEPENDS:${PN} += " \
 	python3-pycairo \
 	librsvg (>= 2.46) \
 	ssh-updater \
+	python-uinput \
 "
 
 FILES:${PN} += "\
