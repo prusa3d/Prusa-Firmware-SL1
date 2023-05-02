@@ -3,7 +3,7 @@ How to build an image
 
 What to expect
 --------------
-- Build a custom Linux distribution from source (e.g. Gentoo install). Check the [available targets](###Targets) for more info.
+- Build a custom Linux distribution from source (e.g. Gentoo install). Check the [available targets](#Targets) for more info.
 - The procedure takes several hours to complete.
 - The RAM usage will be as high as 4 GiB per core of your CPU.
 - The build will take around 32 GiB of your storage.
