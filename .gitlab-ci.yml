@@ -141,15 +141,19 @@ d:raucb-development:
 
 
   script:
-    - cp ${VERSION}.dev-key.raucb ${BACKUP_DEPLOY_PATH}
-    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
+    - >
+        smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+          cd builds/Firmware/sl1; \
+          put ${VERSION}.dev-key.raucb; \
+          put ${VERSION}.changelog.md; \
+        "
     - >
         lftp -c "
         set ftp:ssl-force yes;
         set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
-        put -O ${DEST} ${VERSION}.dev-key.raucb;
-        put -O ${DEST} ${VERSION}.changelog.md;
+        put -O ${DEST}sl1 ${VERSION}.dev-key.raucb;
+        put -O ${DEST}sl1 ${VERSION}.changelog.md;
         "
 
 d:raucb-production:
@@ -167,15 +171,19 @@ d:raucb-production:
   needs: ["b:raucb-production"]
 
   script:
-    - cp ${VERSION}.prod-key.raucb ${BACKUP_DEPLOY_PATH}
-    - cp ${VERSION}.changelog.md ${BACKUP_DEPLOY_PATH}
+    - >
+        smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+          cd builds/Firmware/sl1; \
+          put ${VERSION}.prod-key.raucb; \
+          put ${VERSION}.changelog.md; \
+        "
     - >
         lftp -c "
         set ftp:ssl-force yes;
         set ssl:verify-certificate ${DEPLOY_FTP_FINGERPRINT};
         open -u ${DEPLOY_FTP_USER},${DEPLOY_FTP_PASS} ${DEPLOY_FTP_HOST};
-        put -O ${DEST} ${VERSION}.prod-key.raucb;
-        put -O ${DEST} ${VERSION}.changelog.md;
+        put -O ${DEST}sl1 ${VERSION}.prod-key.raucb;
+        put -O ${DEST}sl1 ${VERSION}.changelog.md;
         "
 
 d:tools:
@@ -192,11 +200,14 @@ d:tools:
   needs: ["b:tools"]
 
   script:
-    - cp ${VERSION}.devsd.xz ${BACKUP_DEPLOY_PATH}
-    - cp ${VERSION}.devsd.bmap ${BACKUP_DEPLOY_PATH}
-    - cp ${VERSION}.bootstrapsd.xz ${BACKUP_DEPLOY_PATH}
-    - cp ${VERSION}.bootstrapsd.bmap ${BACKUP_DEPLOY_PATH}
-
+    - >
+        smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+          cd builds/Firmware/sl1; \
+          put ${VERSION}.devsd.xz; \
+          put ${VERSION}.devsd.bmap; \
+          put ${VERSION}.bootstrapsd.xz; \
+          put ${VERSION}.bootstrapsd.bmap; \
+        "
 n:update:
   stage: nightly
   cache: {}
