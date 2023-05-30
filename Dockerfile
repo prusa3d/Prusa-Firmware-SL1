@@ -38,6 +38,7 @@ RUN \
         python3 \
         python3-pip \
         python3-distutils \
+        smbclient \
         #
         && rm -rf /var/lib/apt/lists/*
 # 
@@ -79,8 +80,6 @@ RUN \
     usermod -aG plugdev,dialout,disk docker-build-user
 USER docker-build-user
 WORKDIR /home/docker-build-user/
-
-COPY tests/tools/*.py ./
 
 # Setup ssh to trust git server
 # Consolidate to prevent issues
