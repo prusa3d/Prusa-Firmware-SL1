@@ -23,7 +23,7 @@ slot-post-install)
 		cp -av /etc/hostname ${RAUC_SLOT_MOUNT_POINT}/
 		cp -av /etc/locale.conf ${RAUC_SLOT_MOUNT_POINT}/
 		cp -av /etc/localtime ${RAUC_SLOT_MOUNT_POINT}/
-		test -f /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service || rm -f ${RAUC_SLOT_MOUNT_POINT}/systemd/system/sysinit.target.wants/systemd-timesyncd.service
+		systemctl is-active --quiet systemd-timesyncd.service || rm -f ${RAUC_SLOT_MOUNT_POINT}/systemd/system/sysinit.target.wants/systemd-timesyncd.service && rm -f ${RAUC_SLOT_MOUNT_POINT}/systemd/system/dbus-org.freedesktop.timesync1.service
 
 		# Copy network settings
 		mkdir -p ${RAUC_SLOT_MOUNT_POINT}/NetworkManager/system-connections
