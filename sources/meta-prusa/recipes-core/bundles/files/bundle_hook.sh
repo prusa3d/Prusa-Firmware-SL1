@@ -15,8 +15,8 @@ slot-post-install)
 		chgrp -R projects /var/sl1fw/projects
 	fi;
 	if [ "$RAUC_SLOT_CLASS" = "etcfs" ]; then
-		echo "Rauc mount point: ${RAUC_MOUNT_POINT}"
-		/lib/systemd/systemd-growfs ${RAUC_MOUNT_POINT}
+		echo "Rauc mount point: ${RAUC_SLOT_MOUNT_POINT}"
+		/lib/systemd/systemd-growfs ${RAUC_SLOT_MOUNT_POINT}
 
 		# Copy system settings
 		cp -av /etc/machine-id ${RAUC_SLOT_MOUNT_POINT}/
