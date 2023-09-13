@@ -1,0 +1,10 @@
+FROM google/cloud-sdk
+
+# Install additional tools required to upload to SMB store
+RUN \
+    apt-get update && \
+    apt-get install -y \
+    --no-install-recommends \
+        smbclient
+
+RUN rm -rf /var/lib/apt/lists/*
