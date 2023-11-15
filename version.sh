@@ -20,17 +20,10 @@ COMMITS_FROM_VERSION=$(git -C ${BASE} log --oneline ${VERSION}..HEAD|wc -l)
 SHORT_HASH=$(git -C ${BASE} rev-parse --short HEAD)
 if [ -z "$(git -C ${BASE} status --porcelain)" ]; then DIRTY=""; else DIRTY="-dirty"; fi
 
-case "$VERSION" in
-	*-*)
-		VERSION_SEP=.;;
-	*)
-		VERSION_SEP=-;;
-esac
-
 (
 	if [ "$COMMITS_FROM_VERSION" = "0" ]; then
 		echo ${VERSION}${DIRTY}
 	else
-		echo ${VERSION}${VERSION_SEP}${BRANCH}.${COMMITS_FROM_VERSION}+${SHORT_HASH}${DIRTY}
+		echo ${VERSION}+${BRANCH}.${COMMITS_FROM_VERSION}.${SHORT_HASH}${DIRTY}
 	fi
 ) | sed "s/[^a-zA-Z0-9\.+-]/-/g"
