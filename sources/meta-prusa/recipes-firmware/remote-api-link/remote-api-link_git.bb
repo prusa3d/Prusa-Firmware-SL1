@@ -11,20 +11,15 @@ PACKAGES = "${PN}-dev ${PN}"
 DEPENDS += "slafw gettext-native"
 RDEPENDS:${PN} += " \
 	python3 \
+	python3-core \
 	python3-flask \
 	python3-gevent \
 	python3-pydbus \
 	python3-pygobject \
-	python3-compression \
-	python3-core \
-	python3-crypt \
 	python3-datetime \
 	python3-json \
 	python3-logging \
-	python3-misc \
-	python3-netclient \
-	python3-stringold \
-	python3-xml \
+	python3-defusedxml \
 	python3-streaming-form-data \
 	slafw \
 	prusa-errors \

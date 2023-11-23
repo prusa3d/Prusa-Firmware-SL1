@@ -13,10 +13,12 @@ RDEPENDS:${PN} += " \
 	python3 \
 	python3-pydbus \
 	python3-pygobject \
+	python3-inotify-simple \
 	python3-core \
 	slafw \
 	prusa-errors \
 	prusa-connect-sdk \
+	gcode-metadata \
 "
 
 FILES:${PN} += "\
