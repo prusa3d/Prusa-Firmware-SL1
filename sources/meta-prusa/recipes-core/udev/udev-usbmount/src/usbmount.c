@@ -71,7 +71,7 @@ static int parse_argv(int argc, char *argv[]) {
         return 0;
 }
 
-static char const* const uid_gid_fs_types[] = { "fat", "msdos", "ntfs", "vfat", NULL };
+static char const* const uid_gid_fs_types[] = { "fat", "msdos", "exfat", "vfat", NULL };
 static bool fs_type_can_uid_gid(const char *fs_type) {
         char const* const* p = uid_gid_fs_types;
         while (*p)
@@ -189,7 +189,7 @@ static int acquire_mount_options(sd_device *d) {
         if (arg_gid != (uid_t) -1 && fs_type_can_uid_gid(arg_mount_type))
                 asprintf(&options, ",gid=%" PRIu32 ",dmask=0007,fmask=0137", arg_gid);
 
-        r = asprintf(&arg_mount_options, "ro%s%s", options ? options : "", is_fat ? ",flush" : "");
+        r = asprintf(&arg_mount_options, "rw%s%s", options ? options : "", is_fat ? ",flush" : "");
 
         return r < 0 ? -ENOMEM : 0;
 }

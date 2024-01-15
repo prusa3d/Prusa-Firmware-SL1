@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	std::filesystem::exists(mountPoint);
 
 	sd_journal_print(LOG_DEBUG, ("Attempting rw remount for path: " + required.string() + " mount: " + mountPoint.string()).c_str());
-	if(mount("", mountPoint.c_str(), "", MS_REMOUNT, "rw")) {
+	if(mount("", mountPoint.c_str(), "", MS_REMOUNT, "")) {
 		sd_journal_print(LOG_DEBUG, (std::string("Remount rw failed with: ") + strerror(errno)).c_str());
 		exit(-3);
 	}
