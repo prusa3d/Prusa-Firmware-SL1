@@ -187,7 +187,7 @@ static int acquire_mount_options(sd_device *d) {
         bool is_fat = sd_device_get_property_value(d, "ID_FS_TYPE", &v) == 0 && strcmp(v, "vfat") == 0;
 
         if (arg_gid != (uid_t) -1 && fs_type_can_uid_gid(arg_mount_type))
-                asprintf(&options, ",gid=%" PRIu32 ",dmask=0007,fmask=0137", arg_gid);
+                asprintf(&options, ",gid=%" PRIu32 ",dmask=0007,fmask=0117", arg_gid);
 
         r = asprintf(&arg_mount_options, "rw%s%s", options ? options : "", is_fat ? ",flush" : "");
 
