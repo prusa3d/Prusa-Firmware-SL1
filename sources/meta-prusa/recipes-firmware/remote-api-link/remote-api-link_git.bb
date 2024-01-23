@@ -3,9 +3,9 @@ HOMEPAGE = "https://gitlab.com/prusa3d/sl1/remote-api"
 LICENSE = "GPL-3.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "git://gitlab.com/prusa3d/sl1/remote-api.git;protocol=https;nobranch=1"
+SRC_URI = "git://gitlab.com/prusa3d/sl1/remote-api.git;protocol=https;branch=1.7"
 
-SRCREV:pn-${PN} = "a579239dcced0a5fbd770593c0c8b15b6050bd6f"
+SRCREV:pn-${PN} = "cab74a81654016f879a7d032241bd2f3982f71d2"
 PACKAGES = "${PN}-dev ${PN}"
 
 DEPENDS += "slafw gettext-native"

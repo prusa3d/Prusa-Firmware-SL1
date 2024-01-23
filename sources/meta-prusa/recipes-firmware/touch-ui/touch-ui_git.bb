@@ -1,10 +1,10 @@
 SRC_URI = "\
-	gitsm://gitlab.com/prusa3d/sl1/touch-ui.git;protocol=https;name=touch-ui;nobranch=1 \
+	gitsm://gitlab.com/prusa3d/sl1/touch-ui.git;protocol=https;name=touch-ui;branch=1.7 \
 	file://touch-ui.service \
 	file://cz.prusa3d.sl1.Notify1.conf \
 "
 
-SRCREV = "df0cbc158e1e9918f658823314353ece0b7a000c"
+SRCREV = "bc3dfee68aad37bd29d75fcd33d72a05c73de599"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "\
 	file://COPYING;md5=5b4473596678d62d9d83096273422c8c \
