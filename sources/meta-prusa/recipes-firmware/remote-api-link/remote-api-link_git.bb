@@ -24,7 +24,7 @@ RDEPENDS:${PN} += " \
 	python3-misc \
 	python3-netclient \
 	python3-stringold \
-	python3-xml \
+	python3-defusedxml \
 	python3-streaming-form-data \
 	slafw \
 	prusa-errors \
