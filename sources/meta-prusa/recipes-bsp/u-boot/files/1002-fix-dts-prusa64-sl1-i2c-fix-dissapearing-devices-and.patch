@@ -1,0 +1,22 @@
+From a676425908c0444b637b8d6b0d56d9bf249346eb Mon Sep 17 00:00:00 2001
+From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
+Date: Mon, 26 Feb 2024 15:40:29 +0100
+Subject: [PATCH] fix: dts: prusa64-sl1: i2c: fix dissapearing devices and lock
+
+drive strength to 40 mA
+---
+ arch/arm/dts/sun50i-a64.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/dts/sun50i-a64.dtsi b/arch/arm/dts/sun50i-a64.dtsi
+index 57786fc120..c3c2ef4286 100644
+--- a/arch/arm/dts/sun50i-a64.dtsi
++++ b/arch/arm/dts/sun50i-a64.dtsi
+@@ -683,6 +683,7 @@
+ 			i2c2_pins: i2c2-pins {
+ 				pins = "PE14", "PE15";
+ 				function = "i2c2";
++				drive-strength = <40>;
+ 			};
+ 
+ 			/omit-if-no-ref/

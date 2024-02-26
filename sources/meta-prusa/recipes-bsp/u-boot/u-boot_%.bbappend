@@ -11,6 +11,7 @@ SRC_URI:append = " \
 	file://0008-Kconfig-remove-unnecessary-dependencies.patch \
 	file://0009-Revert-cmd-exit-Fix-return-value.patch \
 	file://1001-prusa64-sl1-dts-and-defconfig.patch \
+	file://1002-fix-dts-prusa64-sl1-i2c-fix-dissapearing-devices-and.patch \
 	file://fw_env.config \
 	file://sunxi-prusa.h \
 "
