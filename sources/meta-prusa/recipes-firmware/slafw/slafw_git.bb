@@ -12,7 +12,7 @@ SRC_URI:prepend:prusa64-sl1 = " \
 	git://gitlab.com/prusa3d/sl1/sla-fw.git;protocol=https;branch=master \
 "
 
-SRCREV:pn-${PN}:prusa64-sl1 = "f17d25fa4dbfe5d1ac235edf3a9bab7c51162b5e"
+SRCREV:pn-${PN}:prusa64-sl1 = "0b30239534698701c7bde5a0d2cf4be2096735c2"
 
 PACKAGES = "${PN}-dev ${PN}"
 
