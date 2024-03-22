@@ -34,7 +34,6 @@ FILES:${PN} += " \
 	${systemd_unitdir}/dnssd/octoprint.dnssd \
 	${sysconfdir}/nginx/prusa-auth.conf \
 	${sysconfdir}/nginx/sites-available/prusa-link.conf.template \
-	${sysconfdir}/nginx/http_digest_enabled \
 	${systemd_system_unitdir}/nginx.service.d/override.conf \
 	${bindir}/prusa-link_enable_nginx_site \
 "
@@ -92,5 +91,4 @@ do_install:append () {
 	# Nginx ExecPre script
 	install -d ${D}${bindir}
 	install --mode 755 ${WORKDIR}/prusa-link_enable_nginx_site ${D}${bindir}
-	touch ${D}${sysconfdir}/nginx/http_digest_enabled
 }

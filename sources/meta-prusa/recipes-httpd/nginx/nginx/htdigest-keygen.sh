@@ -7,6 +7,7 @@ USER=maker
 if [ -n "${1}" ]; then
 	KEY=${1}
 	
+	# check if key is longer than 8 characters
 	if [ $(echo -n ${KEY} | wc -c) -lt 8 ]; then
 		exit -1;
 	fi;
@@ -20,11 +21,8 @@ else
 	done
 fi;
 
-# Store apikey plain
+# Store htdigest plain
 echo ${KEY} > ${DIR}/api.key
-
-# Store apikey for slicer uploader
-echo -n ${KEY} > ${DIR}/slicer-upload-api.key
 
 # Generate htdigest access for ${USER} with apikey password
 SIGN=$(echo -n "${USER}:${REALM}:${KEY}" | md5sum | sed 's/ .*//')

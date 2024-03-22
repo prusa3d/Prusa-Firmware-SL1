@@ -8,7 +8,7 @@ inherit packagegroup
 
 RDEPENDS:packagegroup-prusa-sla = "\
 	slafw touch-ui \
-	prusa-link remote-api-link prusa-connect prusa-connect-sdk \
+	prusa-link-web remote-api-link prusa-connect prusa-connect-sdk \
 	filemanager weston \
 	emergencyupdate update-selector \
 	rauc go-omaha firstboot powerpanic \

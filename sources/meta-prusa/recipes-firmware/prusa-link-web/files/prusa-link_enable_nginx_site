@@ -1,0 +1,17 @@
+#!/usr/bin/sh
+set -e
+
+# get printer model
+MODEL_PATH=/run/model
+if [ ! -d "$MODEL_PATH" ] || [ -z `ls $MODEL_PATH` ]; then
+        echo "Unknown printer model"
+        exit 1
+else
+        PRINTER_MODEL=`ls $MODEL_PATH`
+fi
+
+# edit template file and make the site enabled
+cd /etc/nginx/sites-available
+/usr/bin/sed "s/@DOCUMENT_ROOT@/\/srv\/http\/${PRINTER_MODEL}/g;" prusa-link.conf.template > prusa-link
+/usr/bin/ln -sf ../sites-available/prusa-link ../sites-enabled/prusa-link
+/usr/sbin/nginx -t

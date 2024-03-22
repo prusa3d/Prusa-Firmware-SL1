@@ -1,11 +1,11 @@
 [Unit]
-Description=API key generator for octoprint upload service
+Description=HTTP digest key generator for local REST API
 ConditionPathExists=!/etc/sl1fw/api.key
 Before=nginx.service remote_api_link.service slafw.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/api-keygen.sh
+ExecStart=/usr/bin/htdigest-keygen.sh
  
 [Install]
 WantedBy=multi-user.target

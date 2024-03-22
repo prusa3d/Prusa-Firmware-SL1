@@ -22,7 +22,6 @@ RDEPENDS:${PN} += " \
 	python3 \
 	bash \
 	avrdude \
-	api-keygen \
 	mc-fw \
 	udev-usbmount \
 	python3-pyserial \
