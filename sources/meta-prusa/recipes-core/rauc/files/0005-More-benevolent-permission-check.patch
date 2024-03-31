@@ -1,0 +1,34 @@
+From 003c59afd3267fecef1faa53e6ccbb3f405c3f9f Mon Sep 17 00:00:00 2001
+From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
+Date: Sun, 31 Mar 2024 21:56:40 +0200
+Subject: [PATCH] More benevolent permission check
+
+This is supposed to be hotfix because of Prusa Connect
+---
+ src/bundle.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/bundle.c b/src/bundle.c
+index 6a47034..04e9ae8 100644
+--- a/src/bundle.c
++++ b/src/bundle.c
+@@ -1018,7 +1018,6 @@ static gboolean check_bundle_access(int bundle_fd, GError **error)
+ 	 * the bundle contents.
+ 	 *
+ 	 * Prohibited are:
+-	 * - ownership or permissions that allow other users to open it for writing
+ 	 * - storage on unsafe filesystems such as FUSE or NFS, where the data
+ 	 *   is supplied by an untrusted source (the rootfs is explicitly
+ 	 *   trusted, though)
+@@ -1061,8 +1060,9 @@ static gboolean check_bundle_access(int bundle_fd, GError **error)
+ 		goto out;
+ 	}
+ 
+-	/* unsafe permissions (not a subset of 0755) */
+-	if (perm & ~(0755)) {
++	/* unsafe permissions (not a subset of 0765) */
++	/* TODO: get rid of this */
++	if (perm & ~(0765)) {
+ 		g_set_error(error, R_BUNDLE_ERROR, R_BUNDLE_ERROR_UNSAFE, "unsafe bundle permissions 0%jo", (uintmax_t)perm);
+ 		res = FALSE;
+ 		goto out;

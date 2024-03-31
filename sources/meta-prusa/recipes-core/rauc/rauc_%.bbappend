@@ -5,7 +5,8 @@ SRC_URI:append = " \
 	file://0002-when-extcsd-rw-fails-try-once-more-before-bailing-out.patch \
 	file://0003-fix-omitted-boot-ack-bit-during-extcsd-update.patch \
 	file://0004-load-config-from-usr-share.patch \
-	file://system.conf \
+	file://0005-More-benevolent-permission-check.patch \
+    file://system.conf \
 	file://ca-prod.cert.pem \
 	file://ca-dev.cert.pem \
 	file://pre_install.py \
