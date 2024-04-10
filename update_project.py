@@ -107,7 +107,7 @@ projects = [
     Project(recipes_firmware / "slafw/slafw_git.bb"),
     Project(recipes_firmware / "touch-ui/touch-ui_git.bb"),
     Project(recipes_firmware / "prusa-errors/prusa-errors_git.bb"),
-    Project(recipes_firmware / "prusa-link/prusa-link.bb"),
+    Project(recipes_firmware / "prusa-link-web/prusa-link-web.bb"),
     Project(recipes_firmware / "filemanager/filemanager_git.bb"),
     Project(recipes_firmware / "remote-api-link/remote-api-link_git.bb"),
     Project(recipes_firmware / "prusa-connect/prusa-connect_git.bb"),
