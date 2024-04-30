@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = ""
 
 SRC_URI = "git://github.com/prusa3d/Prusa-Connect-SDK-Printer.git;protocol=https;branch=master"
 
-SRCREV = "b885d9755e777513476b8d2bd7d4a061d3a51148"
+SRCREV = "e9d1341c16c9a5f3271240fecc8a35a32024abe4"
 
 S = "${WORKDIR}/git"
 
