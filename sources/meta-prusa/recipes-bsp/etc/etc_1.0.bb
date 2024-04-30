@@ -14,6 +14,7 @@ SRC_URI = " \
 	file://resolved-mdns.conf		\
 	file://serial-override.conf \
 	file://ssh-override.conf \
+	file://nginx-override.conf \
 "
 
 CONFFILES = "							\
@@ -40,6 +41,7 @@ FILES:${PN} = "							\
 	/usr/share/factory/defaults \
 	${systemd_system_unitdir}/systemd-resolved.service.d/log-level-warning.conf \
 	${systemd_system_unitdir}/sshd.socket.d/condition-enabled.conf \
+	${systemd_system_unitdir}/nginx.service.d/condition-enabled.conf \
 	${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf \
 "
 
@@ -75,6 +77,8 @@ do_install() {
 	install -m 644 ${WORKDIR}/serial-override.conf ${D}${systemd_system_unitdir}/serial-getty@ttyS0.service.d/condition-enabled.conf
 	install -d ${D}${systemd_system_unitdir}/sshd.socket.d
 	install -m 644 ${WORKDIR}/ssh-override.conf ${D}${systemd_system_unitdir}/sshd.socket.d/condition-enabled.conf
+	install -d ${D}${systemd_system_unitdir}/nginx.service.d
+	install -m 644 ${WORKDIR}/nginx-override.conf ${D}${systemd_system_unitdir}/nginx.service.d/condition-enabled.conf
 	touch ${D}/usr/share/factory/defaults/factory_mode_enabled
 	touch ${D}${sysconfdir}/debug
 }

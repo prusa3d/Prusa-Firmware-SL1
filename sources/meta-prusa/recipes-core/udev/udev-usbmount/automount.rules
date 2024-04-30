@@ -4,6 +4,9 @@ ACTION=="remove", GOTO="automount_rules_end"
 SUBSYSTEM!="block", GOTO="automount_rules_end"
 ENV{ID_FS_USAGE}!="filesystem", GOTO="automount_rules_end"
 
+IMPORT{program}="/usr/bin/sh -c '/usr/bin/echo SKIP_USB=$(/usr/bin/test -e /usr/share/factory/defaults/printer_m1_modern_dental_enabled && /usr/bin/echo 1 || /usr/bin/echo 0)'"
+ENV{SKIP_USB}=="1", GOTO="automount_rules_end"
+
 SUBSYSTEMS=="usb", RUN+="/usr/bin/usbmount --owner=projects /dev/%k"
 
 LABEL="automount_rules_end"
