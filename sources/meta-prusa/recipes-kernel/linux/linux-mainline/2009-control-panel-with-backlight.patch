@@ -1,4 +1,4 @@
-From eb0d8b4694a4b84b4ad6db6709cd59d7757f1bc9 Mon Sep 17 00:00:00 2001
+From fd7116889c1ccf5793c2b2c13d43399d631aa657 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Fri, 10 Jun 2022 15:58:02 +0200
 Subject: [PATCH] Control panel with backlight
@@ -8,7 +8,7 @@ Subject: [PATCH] Control panel with backlight
  1 file changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index 705c9403bdf8..1dfe897b5e77 100644
+index 80be31045b32..8e9692ecfb7e 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -78,6 +78,23 @@ reg_usb1_vbus: usb1-vbus {
@@ -35,7 +35,7 @@ index 705c9403bdf8..1dfe897b5e77 100644
  	reserved-memory {
  		#address-cells = <1>;
  		#size-cells = <1>;
-@@ -188,14 +205,14 @@ &dphy {
+@@ -192,14 +209,14 @@ &dphy {
  
  &dsi {
  	vcc-dsi-supply = <&reg_dldo2>;

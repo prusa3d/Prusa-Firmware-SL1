@@ -1,4 +1,4 @@
-From 86ffd912e9d34aa556551fc952ca1c844269ffd7 Mon Sep 17 00:00:00 2001
+From 0bc1247a82826c44783d458449c28634adbc8534 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 18 Mar 2021 09:57:07 +0100
 Subject: [PATCH] dts: added prusa64-sl2
@@ -23,7 +23,7 @@ index 286419ec2ba7..f9365d872eac 100644
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a100-allwinner-perf1.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 new file mode 100644
-index 000000000000..8de9370dcb0e
+index 000000000000..6a4d7dcf99d5
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -0,0 +1,578 @@

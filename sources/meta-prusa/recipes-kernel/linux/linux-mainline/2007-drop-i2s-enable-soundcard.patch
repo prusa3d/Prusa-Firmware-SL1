@@ -1,4 +1,4 @@
-From 93b9a6fc817223abfbdd6b5efa04840d6365ad4e Mon Sep 17 00:00:00 2001
+From a6580fa7dd8c231cc5b129d0625982dca00815d2 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Tue, 7 Jun 2022 11:01:30 +0200
 Subject: [PATCH] Drop i2s, enable soundcard
@@ -8,7 +8,7 @@ Subject: [PATCH] Drop i2s, enable soundcard
  1 file changed, 9 insertions(+), 30 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index aeba6669a884..9f701c3d700f 100644
+index 25a4d6411a94..cb2a50e0dffc 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -96,24 +96,6 @@ codec_dummy: codec-dummy {
@@ -35,7 +35,7 @@ index aeba6669a884..9f701c3d700f 100644
 -
  	wifi_pwrseq: wifi_pwrseq {
  		compatible = "mmc-pwrseq-simple";
- 		reset-gpios = <&pio 7 11 GPIO_ACTIVE_LOW>; /* PH11 */
+ 		reset-gpios = <&pio 3 16 GPIO_ACTIVE_LOW>; /* PD16 */
 @@ -157,11 +139,6 @@ edtint_pins: edtint-pins {
  		bias-pull-up;
  	};
@@ -47,8 +47,8 @@ index aeba6669a884..9f701c3d700f 100644
 -
  	rmii_no_mdio_pins: rmii-no-mdio-pins {
  		/* neither including RMII_RXER on PD14 */
- 		pins = "PD10", "PD11", "PD13", "PD17",
-@@ -346,13 +323,6 @@ opp-432000000 {
+ 		/*      RXD1    RXD0    CRS     TXD1    TXD0    TXCK    TXEN */
+@@ -345,13 +322,6 @@ opp-432000000 {
  	};
  };
  
@@ -62,7 +62,7 @@ index aeba6669a884..9f701c3d700f 100644
  &mmc0 {
  	pinctrl-names = "default";
  	pinctrl-0 = <&mmc0_pins>;
-@@ -534,6 +504,15 @@ sn: sn@3c {
+@@ -539,6 +509,15 @@ sn: sn@3c {
  	};
  };
  

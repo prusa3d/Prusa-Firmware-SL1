@@ -1,4 +1,4 @@
-From bdd3f29c24d1f570cde9ac2dcad13be7ba229a21 Mon Sep 17 00:00:00 2001
+From b9fce08c4039d3db21c655458bb02642d2cf306e Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 6 Apr 2020 15:12:22 +0200
 Subject: [PATCH] drm: sun4i: decouple TCON_DCLK_DIV value from
@@ -16,12 +16,13 @@ involved in setting the rate of PLL_MIPI.
 I couldn't really figure out how to fit this into the dotclock driver,
 so I opted for this hack where the requested rate is adjusted in such a way
 that the sun4i_dotclock driver can remain untouched.
+
 ---
  drivers/gpu/drm/sun4i/sun4i_tcon.c | 43 +++++++++++++++++-------------
  1 file changed, 25 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/gpu/drm/sun4i/sun4i_tcon.c b/drivers/gpu/drm/sun4i/sun4i_tcon.c
-index 9f06dec0fc61..4c4f255f1f69 100644
+index 88db2d2a9336..256159fe53dc 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_tcon.c
 +++ b/drivers/gpu/drm/sun4i/sun4i_tcon.c
 @@ -290,18 +290,6 @@ static int sun4i_tcon_get_clk_delay(const struct drm_display_mode *mode,
@@ -102,6 +103,3 @@ index 9f06dec0fc61..4c4f255f1f69 100644
  
  	/* Set dithering if needed */
  	sun4i_tcon0_mode_set_dithering(tcon, connector);
--- 
-2.30.2
-

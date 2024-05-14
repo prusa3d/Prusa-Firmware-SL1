@@ -1,20 +1,21 @@
-From 4858aa185dfb9a2a355306fdb3c2570644f7f295 Mon Sep 17 00:00:00 2001
+From 7ffdb530d21faed6a7a09098f03041b4bef4711e Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Mon, 26 Feb 2024 15:15:28 +0100
 Subject: [PATCH] dts: prusa64-sl1: i2c: fix dissapearing devices and lock
 
 add errata with 5 us delay
 drive strength to 40 mA
+
 ---
  arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 1 +
  drivers/i2c/busses/i2c-mv64xxx.c              | 6 +++++-
  2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-index 91292931b4d7..c87d21fd6f87 100644
+index 63b6da836be5..097736ed09da 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-@@ -683,6 +683,7 @@ i2c1_pins: i2c1-pins {
+@@ -717,6 +717,7 @@ i2c1_pins: i2c1-pins {
  			i2c2_pins: i2c2-pins {
  				pins = "PE14", "PE15";
  				function = "i2c2";
@@ -23,10 +24,10 @@ index 91292931b4d7..c87d21fd6f87 100644
  
  			/omit-if-no-ref/
 diff --git a/drivers/i2c/busses/i2c-mv64xxx.c b/drivers/i2c/busses/i2c-mv64xxx.c
-index 5cfe70aedced..4aa3b58d1ee3 100644
+index 5c8e94b6cdb5..393905d6ba1d 100644
 --- a/drivers/i2c/busses/i2c-mv64xxx.c
 +++ b/drivers/i2c/busses/i2c-mv64xxx.c
-@@ -859,8 +859,12 @@ mv64xxx_of_config(struct mv64xxx_i2c_data *drv_data,
+@@ -870,8 +870,12 @@ mv64xxx_of_config(struct mv64xxx_i2c_data *drv_data,
  			drv_data->errata_delay = true;
  	}
  

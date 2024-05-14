@@ -1,4 +1,4 @@
-From 59f706a5a613a18186d0d44028daf151d67cd877 Mon Sep 17 00:00:00 2001
+From 9442638a4b58a2164d69e0ca3d334fa6aa327c72 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Sun, 12 Jun 2022 18:05:18 +0200
 Subject: [PATCH] prusa64-sl2: dts: LAN8742A PHY w/ bitbanged MDIO
@@ -6,12 +6,13 @@ Subject: [PATCH] prusa64-sl2: dts: LAN8742A PHY w/ bitbanged MDIO
 * Sacrifice native MDIO for a PWM function on thus freed up pin PD22.
 * Change PHY address to 0.
 * Fill in reset timing for the PHY as specified in its datasheet.
+
 ---
  .../dts/allwinner/sun50i-a64-prusa64-sl2.dts  | 32 ++++++++++++++-----
  1 file changed, 24 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index a0f3dec51638..fb114ee1449f 100644
+index 803642369110..ba533614188f 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -23,6 +23,7 @@ aliases {
@@ -81,6 +82,3 @@ index a0f3dec51638..fb114ee1449f 100644
  &hdmi {
  	hvcc-supply = <&reg_dldo1>;
  	status = "okay";
--- 
-2.35.1
-

@@ -1,4 +1,4 @@
-From e8ea408f707888dee9a8215d40b533792758b443 Mon Sep 17 00:00:00 2001
+From 6bc0c56bbae6f766451dd7eaec1227b807bfbd46 Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Tue, 13 Nov 2018 11:38:49 +0100
 Subject: [PATCH] tc358870: hdmi->dsi bridge initial commit
@@ -8,10 +8,10 @@ Subject: [PATCH] tc358870: hdmi->dsi bridge initial commit
  drivers/gpu/drm/bridge/Makefile               |   1 +
  drivers/gpu/drm/bridge/tc358870/Kconfig       |   9 +
  drivers/gpu/drm/bridge/tc358870/Makefile      |   4 +
- .../gpu/drm/bridge/tc358870/tc358870_drv.c    | 313 ++++++++++++++++++
- .../tc358870/tc358870_init_ls055r1sx04.c      | 149 +++++++++
+ .../gpu/drm/bridge/tc358870/tc358870_drv.c    | 324 ++++++++++++++++++
+ .../tc358870/tc358870_init_ls055r1sx04.c      | 149 ++++++++
  .../gpu/drm/bridge/tc358870/tc358870_msg.h    |  23 ++
- 7 files changed, 501 insertions(+)
+ 7 files changed, 512 insertions(+)
  create mode 100644 drivers/gpu/drm/bridge/tc358870/Kconfig
  create mode 100644 drivers/gpu/drm/bridge/tc358870/Makefile
  create mode 100644 drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
@@ -19,7 +19,7 @@ Subject: [PATCH] tc358870: hdmi->dsi bridge initial commit
  create mode 100644 drivers/gpu/drm/bridge/tc358870/tc358870_msg.h
 
 diff --git a/drivers/gpu/drm/bridge/Kconfig b/drivers/gpu/drm/bridge/Kconfig
-index e4110d6ca7b3..11abaaee1fde 100644
+index 431b6e12a81f..f59a27f1c2b2 100644
 --- a/drivers/gpu/drm/bridge/Kconfig
 +++ b/drivers/gpu/drm/bridge/Kconfig
 @@ -323,4 +323,6 @@ source "drivers/gpu/drm/bridge/cadence/Kconfig"
@@ -30,7 +30,7 @@ index e4110d6ca7b3..11abaaee1fde 100644
 +
  endmenu
 diff --git a/drivers/gpu/drm/bridge/Makefile b/drivers/gpu/drm/bridge/Makefile
-index 86e7acc76f8d..5b8f276e659d 100644
+index f2c73683cfcb..7654a3861450 100644
 --- a/drivers/gpu/drm/bridge/Makefile
 +++ b/drivers/gpu/drm/bridge/Makefile
 @@ -22,6 +22,7 @@ obj-$(CONFIG_DRM_TOSHIBA_TC358764) += tc358764.o
@@ -68,7 +68,7 @@ index 000000000000..be0fce06a82f
 +obj-$(CONFIG_DRM_TOSHIBA_TC358870) += tc358870.o
 diff --git a/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c b/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
 new file mode 100644
-index 000000000000..828ca559ecf2
+index 000000000000..7b234a25befe
 --- /dev/null
 +++ b/drivers/gpu/drm/bridge/tc358870/tc358870_drv.c
 @@ -0,0 +1,324 @@
@@ -580,6 +580,3 @@ index 000000000000..30d614603d31
 +};
 +
 +extern const struct tc358870_msg ls055r1sx04_dsi_init_data[];
--- 
-2.32.0
-

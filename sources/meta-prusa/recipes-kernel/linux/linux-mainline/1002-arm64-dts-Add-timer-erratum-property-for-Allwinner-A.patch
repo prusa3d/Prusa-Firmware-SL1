@@ -1,4 +1,4 @@
-From d7fe7723bed4302a2fbd6b5c85315ace83dd9c56 Mon Sep 17 00:00:00 2001
+From ede2280e6fc4d83eae1dd41ba17736a1d4ddf11a Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 23 Dec 2019 10:35:16 +0100
 Subject: [PATCH] arm64: dts: Add timer erratum property for Allwinner A64
@@ -7,15 +7,16 @@ Although the Freescale A008585 erratum doesn't apply to Allwinner A64 platform,
 the underlying workaround does actually cover the otherwise unrelated timer
 instability in the A64, while the workaround designated specifically for A64
 actually does not.
+
 ---
  arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-index 57786fc120c3..7743cc3fd13c 100644
+index 857b4d07b10e..f3b1ed8ff1a0 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-@@ -156,8 +156,8 @@ link_codec: simple-audio-card,codec {
+@@ -177,8 +177,8 @@ link0_codec: codec {
  
  	timer {
  		compatible = "arm,armv8-timer";
@@ -25,6 +26,3 @@ index 57786fc120c3..7743cc3fd13c 100644
  		interrupts = <GIC_PPI 13
  			(GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>,
  			     <GIC_PPI 14
--- 
-2.30.2
-

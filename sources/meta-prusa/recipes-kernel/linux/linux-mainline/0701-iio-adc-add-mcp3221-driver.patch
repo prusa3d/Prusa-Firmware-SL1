@@ -1,4 +1,4 @@
-From 4bd8f5c5913220fb2685665644eefc8c8be0f6e3 Mon Sep 17 00:00:00 2001
+From 71087789e6c35559b22c7b0d760efbdb9b9c3985 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Mon, 29 Mar 2021 06:21:28 +0200
 Subject: [PATCH] iio: adc: add mcp3221 driver
@@ -12,10 +12,10 @@ Subject: [PATCH] iio: adc: add mcp3221 driver
  create mode 100644 drivers/iio/adc/mcp3221.c
 
 diff --git a/drivers/iio/adc/Kconfig b/drivers/iio/adc/Kconfig
-index af168e1c9fdb..59580058f625 100644
+index 3363af15a43f..d6ae41647c1c 100644
 --- a/drivers/iio/adc/Kconfig
 +++ b/drivers/iio/adc/Kconfig
-@@ -684,6 +684,16 @@ config MCP320X
+@@ -694,6 +694,16 @@ config MCP320X
  	  This driver can also be built as a module. If so, the module will be
  	  called mcp320x.
  
@@ -33,10 +33,10 @@ index af168e1c9fdb..59580058f625 100644
  	tristate "Microchip Technology MCP3421/2/3/4/5/6/7/8 driver"
  	depends on I2C
 diff --git a/drivers/iio/adc/Makefile b/drivers/iio/adc/Makefile
-index d68550f493e3..d1c568c4ae8b 100644
+index d3f53549720c..5af2b5c653b4 100644
 --- a/drivers/iio/adc/Makefile
 +++ b/drivers/iio/adc/Makefile
-@@ -63,6 +63,7 @@ obj-$(CONFIG_MAX1241) += max1241.o
+@@ -64,6 +64,7 @@ obj-$(CONFIG_MAX1241) += max1241.o
  obj-$(CONFIG_MAX1363) += max1363.o
  obj-$(CONFIG_MAX9611) += max9611.o
  obj-$(CONFIG_MCP320X) += mcp320x.o
@@ -202,10 +202,10 @@ index 000000000000..223fa5955b3f
 +MODULE_AUTHOR("Prusa Development");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/iio/multiplexer/iio-mux.c b/drivers/iio/multiplexer/iio-mux.c
-index d54ae5cbe51b..389bc95b0102 100644
+index f422d44377df..fdb069df804e 100644
 --- a/drivers/iio/multiplexer/iio-mux.c
 +++ b/drivers/iio/multiplexer/iio-mux.c
-@@ -354,9 +354,11 @@ static int mux_probe(struct platform_device *pdev)
+@@ -356,9 +356,11 @@ static int mux_probe(struct platform_device *pdev)
  		return -ENODEV;
  
  	parent = devm_iio_channel_get(dev, "parent");
@@ -218,6 +218,3 @@ index d54ae5cbe51b..389bc95b0102 100644
  
  	sizeof_ext_info = iio_get_channel_ext_info_count(parent);
  	if (sizeof_ext_info) {
--- 
-2.34.1
-

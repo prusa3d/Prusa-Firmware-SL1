@@ -1,4 +1,4 @@
-From 3ca6a0296b2d5ca8bf9d249dcc7e888586cd64a6 Mon Sep 17 00:00:00 2001
+From 05d8c3f071d35aabc5b04af1602ff626a915f690 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Fri, 13 May 2022 16:28:08 +0200
 Subject: [PATCH] Drop unused mux
@@ -8,7 +8,7 @@ Subject: [PATCH] Drop unused mux
  1 file changed, 23 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index ad6af81c2979..25be083c1667 100644
+index 31e6d05fb35e..1f8fed31cd64 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -73,29 +73,6 @@ linux,cma {

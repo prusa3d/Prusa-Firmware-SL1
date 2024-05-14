@@ -1,18 +1,19 @@
-From 5f3de93013d2664fa2a2cbb82ba3022813764a6c Mon Sep 17 00:00:00 2001
+From 209ce17c405347274a7c3ce29f5941fa2c3ea2e5 Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Tue, 3 Mar 2020 15:53:22 +0100
 Subject: [PATCH] Ethernet reconnection fix
 
 - stmmac: added quirk parameter to handle duplex mode
+
 ---
  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
  1 file changed, 13 insertions(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 0ab20e2f984b..fc9116610b57 100644
+index f4015579e8ad..ab4cec34c143 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -110,6 +110,10 @@ module_param(eee_timer, int, 0644);
+@@ -117,6 +117,10 @@ module_param(eee_timer, int, 0644);
  MODULE_PARM_DESC(eee_timer, "LPI tx expiration time in msec");
  #define STMMAC_LPI_T(x) (jiffies + usecs_to_jiffies(x))
  
@@ -23,7 +24,7 @@ index 0ab20e2f984b..fc9116610b57 100644
  /* By default the driver will use the ring mode to manage tx and rx descriptors,
   * but allow user to force to use the chain instead of the ring
   */
-@@ -185,6 +189,8 @@ static void stmmac_verify_args(void)
+@@ -192,6 +196,8 @@ static void stmmac_verify_args(void)
  		pause = PAUSE_TIME;
  	if (eee_timer < 0)
  		eee_timer = STMMAC_DEFAULT_LPI_TIMER;
@@ -32,7 +33,7 @@ index 0ab20e2f984b..fc9116610b57 100644
  }
  
  static void __stmmac_disable_all_queues(struct stmmac_priv *priv)
-@@ -999,6 +1005,13 @@ static void stmmac_validate(struct phylink_config *config,
+@@ -1038,6 +1044,13 @@ static void stmmac_validate(struct phylink_config *config,
  		phylink_set(mask, 1000baseT_Half);
  	}
  
@@ -46,6 +47,3 @@ index 0ab20e2f984b..fc9116610b57 100644
  	linkmode_and(supported, supported, mac_supported);
  	linkmode_andnot(supported, supported, mask);
  
--- 
-2.30.2
-

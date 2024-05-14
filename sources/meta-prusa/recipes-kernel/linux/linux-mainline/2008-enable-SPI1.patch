@@ -1,4 +1,4 @@
-From f0fdc558cd658789bcd2cd67aab35f2e553e4b80 Mon Sep 17 00:00:00 2001
+From d88a0c75783bc0ebdadcd8a87adae86592bc30bf Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Fri, 10 Jun 2022 15:56:49 +0200
 Subject: [PATCH] Drop r_uart, enable SPI1
@@ -8,12 +8,13 @@ Subject: [PATCH] Drop r_uart, enable SPI1
 - Use two GPIO CS for SPI1
 
 Drop Ruart, add spi1 cs
+
 ---
  .../boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts    | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index 9f701c3d700f..e1e5f54bdb92 100644
+index cb2a50e0dffc..80be31045b32 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -24,6 +24,7 @@ aliases {
@@ -24,9 +25,9 @@ index 9f701c3d700f..e1e5f54bdb92 100644
  	};
  
  	chosen {
-@@ -146,6 +147,11 @@ rmii_no_mdio_pins: rmii-no-mdio-pins {
+@@ -145,6 +146,11 @@ rmii_no_mdio_pins: rmii-no-mdio-pins {
+ 		pins = "PD10", "PD11", "PD13", "PD17", "PD18", "PD19", "PD20";
  		function = "emac";
- 		drive-strength = <40>;
  	};
 +
 +	spi1_no_cs_pins: spi1-no-cs-pins {
@@ -36,7 +37,7 @@ index 9f701c3d700f..e1e5f54bdb92 100644
  };
  
  &codec {
-@@ -568,8 +574,8 @@ &r_pwm {
+@@ -573,8 +579,8 @@ &r_pwm {
  	status = "okay";
  };
  

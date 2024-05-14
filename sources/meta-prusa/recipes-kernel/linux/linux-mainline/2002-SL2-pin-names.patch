@@ -1,4 +1,4 @@
-From 54959b57e8fb4863c613df7e6099fd76c887f24f Mon Sep 17 00:00:00 2001
+From 106c68c5e339f105c9b317243e6605c8397583b3 Mon Sep 17 00:00:00 2001
 From: Vladimir Matena <vladimir.matena@prusa3d.cz>
 Date: Fri, 13 May 2022 15:55:13 +0200
 Subject: [PATCH] SL2 pin names
@@ -10,7 +10,7 @@ Add reset and bitbanged rmii pin names to pio.
  1 file changed, 18 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index 8de9370dcb0e..b0e8dc7a30d3 100644
+index 6a4d7dcf99d5..31e6d05fb35e 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -139,6 +139,24 @@ &pio {

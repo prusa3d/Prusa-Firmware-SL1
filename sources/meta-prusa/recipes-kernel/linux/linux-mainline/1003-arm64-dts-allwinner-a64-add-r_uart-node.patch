@@ -1,4 +1,4 @@
-From 7336123a4996514a321214195f14f752377f83b6 Mon Sep 17 00:00:00 2001
+From 5c198b13fb54f515901e63be6c933056ab7ad56c Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Sun, 18 Jul 2021 23:56:41 +0200
 Subject: [PATCH] arm64: dts: allwinner: a64: add r_uart node
@@ -8,10 +8,10 @@ Subject: [PATCH] arm64: dts: allwinner: a64: add r_uart node
  1 file changed, 16 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-index 4027b0065e8e..28309454ff57 100644
+index f3b1ed8ff1a0..63b6da836be5 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi
-@@ -1347,6 +1347,11 @@ r_rsb_pins: r-rsb-pins {
+@@ -1363,6 +1363,11 @@ r_rsb_pins: r-rsb-pins {
  				pins = "PL0", "PL1";
  				function = "s_rsb";
  			};
@@ -23,7 +23,7 @@ index 4027b0065e8e..28309454ff57 100644
  		};
  
  		r_rsb: rsb@1f03400 {
-@@ -1362,5 +1367,16 @@ r_rsb: rsb@1f03400 {
+@@ -1378,5 +1383,16 @@ r_rsb: rsb@1f03400 {
  			#address-cells = <1>;
  			#size-cells = <0>;
  		};
@@ -40,5 +40,3 @@ index 4027b0065e8e..28309454ff57 100644
 +		};
  	};
  };
--- 
-2.32.0

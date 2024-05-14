@@ -1,4 +1,4 @@
-From f277b0d39813413b36e4a662d021a90ba3a60009 Mon Sep 17 00:00:00 2001
+From 2cde955c1a6630c23c6133ed5ff166d82f65ca15 Mon Sep 17 00:00:00 2001
 From: Filip Kotoucek <filip.kotoucek@prusa3d.cz>
 Date: Fri, 20 May 2022 20:05:02 +0200
 Subject: [PATCH] dts: remap wifi pins
@@ -6,12 +6,13 @@ Subject: [PATCH] dts: remap wifi pins
 - define dldo4 voltages
 - WL_HOST_WAKE on PD15
 - WL_REG_ON on PD16
+
 ---
  .../boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts      | 10 ++++++++--
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
-index aeba6669a884..920756e0dea1 100644
+index ba533614188f..25a4d6411a94 100644
 --- a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl2.dts
 @@ -116,7 +116,7 @@ simple-audio-card,codec {
@@ -23,7 +24,7 @@ index aeba6669a884..920756e0dea1 100644
  	};
  };
  
-@@ -377,7 +377,7 @@ brcmf: wifi@1 {
+@@ -376,7 +376,7 @@ brcmf: wifi@1 {
  		reg = <1>;
  		compatible = "brcm,bcm4329-fmac";
  		interrupt-parent = <&pio>;
@@ -32,7 +33,7 @@ index aeba6669a884..920756e0dea1 100644
  		interrupt-names = "host-wake";
  	};
  };
-@@ -488,6 +488,12 @@ &reg_dldo3 {
+@@ -487,6 +487,12 @@ &reg_dldo3 {
  	regulator-name = "dsi0-3.3v-ctp";
  };
  

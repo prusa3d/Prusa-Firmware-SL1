@@ -1,4 +1,4 @@
-From 0a6e32eb84036e5fd33328eb1e887a5442874b63 Mon Sep 17 00:00:00 2001
+From fb3507ea9a32631d4a2c6eb6a1ec12966d90aaca Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 16 Mar 2021 06:03:09 +0100
 Subject: [PATCH] prusa boot logo
@@ -15276,6 +15276,3 @@ index d4d5b93efe84..b7128101d0ad 100644
  extern const struct linux_logo logo_sgi_clut224;
  extern const struct linux_logo logo_sun_clut224;
  extern const struct linux_logo logo_superh_mono;
--- 
-2.30.2
-

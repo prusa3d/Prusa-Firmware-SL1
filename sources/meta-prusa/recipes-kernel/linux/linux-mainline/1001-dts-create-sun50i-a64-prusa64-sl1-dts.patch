@@ -1,5 +1,5 @@
-From 1930cf2dbfa7c08c2ddada652d0b2ea6928f2842 Mon Sep 17 00:00:00 2001
-From: =?utf-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
+From 474580aaec11b395c06d816d09c6ee715bd2129c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Roman=20Ber=C3=A1nek?= <roman.beranek@prusa3d.com>
 Date: Wed, 7 Nov 2018 17:53:49 +0100
 Subject: [PATCH] dts: create sun50i-a64-prusa64-sl1 dts
 
@@ -24,7 +24,7 @@ index a96d9d2d8dd8..286419ec2ba7 100644
  dtb-$(CONFIG_ARCH_SUNXI) += sun50i-a100-allwinner-perf1.dtb
 diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 new file mode 100644
-index 000000000000..3d7e417da20e
+index 000000000000..4977d23fa533
 --- /dev/null
 +++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-prusa64-sl1.dts
 @@ -0,0 +1,524 @@
@@ -572,6 +572,3 @@ index 1bd73e322b7b..473071130b12 100644
  	{ .compatible = "rohm,dh2228fv" },
  	{ .compatible = "lineartechnology,ltc2488" },
  	{ .compatible = "semtech,sx1301" },
--- 
-2.34.1
-

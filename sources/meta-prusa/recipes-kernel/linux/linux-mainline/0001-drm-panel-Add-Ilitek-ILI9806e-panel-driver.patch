@@ -1,4 +1,4 @@
-From bbb360e239c7a6b8d3ddbc4d589ef3dcf2c55cdf Mon Sep 17 00:00:00 2001
+From 9b8325575f19b11037518f7ce5eccdf359c590c6 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 30 Aug 2018 04:39:09 +0200
 Subject: [PATCH] drm/panel: Add Ilitek ILI9806e panel driver
@@ -7,6 +7,7 @@ TDO TL040WV27CT3 is a panel built into the Prusa SL1 printer,
 and is based on the Ilitek ILI9806e controller. This panel
 has a 4" IPS LCD screen with 480x800 pixels and 2-lane
 MIPI-DSI interface.
+
 ---
  drivers/gpu/drm/panel/Kconfig                 |   9 +
  drivers/gpu/drm/panel/Makefile                |   1 +
@@ -492,6 +493,3 @@ index 000000000000..28df4bb8ed48
 +MODULE_AUTHOR("Roman Beranek <roman.beranek@prusa3d.com>");
 +MODULE_DESCRIPTION("Ilitek ILI9806E Controller Driver");
 +MODULE_LICENSE("GPL v2");
--- 
-2.34.1
-

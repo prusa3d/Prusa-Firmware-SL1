@@ -1,17 +1,18 @@
-From bb8613a1c15b45a36f1a0ea21de2e56e2d18df8b Mon Sep 17 00:00:00 2001
+From e7a950b286a5cd86dc2874978d22408dab846bcf Mon Sep 17 00:00:00 2001
 From: Ondrej Jirman <megous@megous.com>
 Date: Mon, 2 Sep 2019 14:51:17 +0200
 Subject: [PATCH] sunxi: Add misc EPROBE_DEFER checks to avoid misleading
  errors during boot
 
 Signed-off-by: Ondrej Jirman <megous@megous.com>
+
 ---
  drivers/bus/sun50i-de2.c              | 1 +
  drivers/phy/allwinner/phy-sun4i-usb.c | 9 ++++++---
  2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bus/sun50i-de2.c b/drivers/bus/sun50i-de2.c
-index 672518741f86..e0899a20012a 100644
+index 414f29cdedf0..be0a952e5113 100644
 --- a/drivers/bus/sun50i-de2.c
 +++ b/drivers/bus/sun50i-de2.c
 @@ -15,6 +15,7 @@ static int sun50i_de2_bus_probe(struct platform_device *pdev)
@@ -55,6 +56,3 @@ index 788dd5cdbb7d..27d4bdc34c13 100644
  			return PTR_ERR(data->vbus_power_supply);
  		}
  
--- 
-2.30.2
-

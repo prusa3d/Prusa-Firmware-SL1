@@ -1,4 +1,4 @@
-From f0d474cc1e2e59293ac4be8815c2e2528bc434ca Mon Sep 17 00:00:00 2001
+From f917427a84f066c364f69992dd1b8507651b0ab3 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 17 Dec 2019 10:56:45 +0100
 Subject: [PATCH] prusa64-sl1: work around mistakenly written eFUSEs
@@ -15,13 +15,14 @@ up for us.
 This fix a) reverts back to reversing the byte-order of words
 read from the eFUSES and b) gives the thermal driver ability
 to reverse already reversed data back to its native form.
+
 ---
  drivers/nvmem/sunxi_sid.c       |  8 ++++++--
  drivers/thermal/sun8i_thermal.c | 10 ++++++++--
  2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/nvmem/sunxi_sid.c b/drivers/nvmem/sunxi_sid.c
-index e26ef1bbf198..9e0a8ee3821f 100644
+index 275b9155e473..a78f3aafd9b3 100644
 --- a/drivers/nvmem/sunxi_sid.c
 +++ b/drivers/nvmem/sunxi_sid.c
 @@ -65,8 +65,10 @@ static int sun8i_sid_register_readout(const struct sunxi_sid *sid,
@@ -51,7 +52,7 @@ index e26ef1bbf198..9e0a8ee3821f 100644
  		offset += 4;
  		bytes -= 4;
 diff --git a/drivers/thermal/sun8i_thermal.c b/drivers/thermal/sun8i_thermal.c
-index 8c80bd06dd9f..93b215081c9e 100644
+index d9cd23cbb671..8bf876a34d4c 100644
 --- a/drivers/thermal/sun8i_thermal.c
 +++ b/drivers/thermal/sun8i_thermal.c
 @@ -282,7 +282,7 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
@@ -78,6 +79,3 @@ index 8c80bd06dd9f..93b215081c9e 100644
  
  	kfree(caldata);
  out:
--- 
-2.30.2
-

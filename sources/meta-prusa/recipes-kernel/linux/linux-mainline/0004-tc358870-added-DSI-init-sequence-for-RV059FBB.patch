@@ -1,4 +1,4 @@
-From 425e6027aad970f52f109cd777637966ad2f43d8 Mon Sep 17 00:00:00 2001
+From e566945f4f0f687d6c76597b5f2d37a682176438 Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Tue, 8 Dec 2020 16:05:13 +0100
 Subject: [PATCH] tc358870: added DSI init sequence for RV059FBB
@@ -330,6 +330,3 @@ index 30d614603d31..18bf0b9de80f 100644
  
  extern const struct tc358870_msg ls055r1sx04_dsi_init_data[];
 +extern const struct tc358870_msg rv059fbb_dsi_init_data[];
--- 
-2.34.1
-

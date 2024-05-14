@@ -1,4 +1,4 @@
-From ba195c23c0e9c05d39370ecc4ed0c515ff6bf002 Mon Sep 17 00:00:00 2001
+From e96aec22e17dac7d17327684d3dacce8f3291c8a Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 25 Mar 2021 06:59:33 +0100
 Subject: [PATCH] i2s
@@ -9,7 +9,7 @@ Subject: [PATCH] i2s
  2 files changed, 29 insertions(+), 2 deletions(-)
 
 diff --git a/sound/soc/soc-utils.c b/sound/soc/soc-utils.c
-index 299b5d6ebfd1..19d4a6ff7ff9 100644
+index a4efe7e52a8b..4670db6e8902 100644
 --- a/sound/soc/soc-utils.c
 +++ b/sound/soc/soc-utils.c
 @@ -13,6 +13,7 @@
@@ -20,7 +20,7 @@ index 299b5d6ebfd1..19d4a6ff7ff9 100644
  
  int snd_soc_calc_frame_size(int sample_size, int channels, int tdm_slots)
  {
-@@ -181,9 +182,18 @@ static int snd_soc_dummy_probe(struct platform_device *pdev)
+@@ -194,9 +195,18 @@ static int snd_soc_dummy_probe(struct platform_device *pdev)
  	return ret;
  }
  
@@ -126,6 +126,3 @@ index 1e9116cd365e..36adac66fafd 100644
  	},
  	.ops = &sun4i_i2s_dai_ops,
  	.symmetric_rate = 1,
--- 
-2.34.1
-

@@ -1,4 +1,4 @@
-From c94270250f89fb0a3b7172ac907915476b6189d2 Mon Sep 17 00:00:00 2001
+From 4ee2185ee09eac8598e34a85d3e3207843dca3dd Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Thu, 18 Mar 2021 12:28:57 +0100
 Subject: [PATCH] spi-sun6i: always set parent to 200 MHz
@@ -8,7 +8,7 @@ Subject: [PATCH] spi-sun6i: always set parent to 200 MHz
  1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/spi/spi-sun6i.c b/drivers/spi/spi-sun6i.c
-index cc8401980125..7f54a846ad69 100644
+index 23ad052528db..1a29c61781e7 100644
 --- a/drivers/spi/spi-sun6i.c
 +++ b/drivers/spi/spi-sun6i.c
 @@ -346,12 +346,11 @@ static int sun6i_spi_transfer_one(struct spi_master *master,
@@ -28,6 +28,3 @@ index cc8401980125..7f54a846ad69 100644
  
  	/*
  	 * Setup clock divider.
--- 
-2.31.0
-

@@ -1,9 +1,9 @@
-From 2704ae1e97864dbfb8952343834efd41400634db Mon Sep 17 00:00:00 2001
+From 11313f0dc8ec24af7d72d2c0ecedffcad3a6cd4c Mon Sep 17 00:00:00 2001
 From: Roman Beranek <roman.beranek@prusa3d.com>
 Date: Fri, 7 May 2021 18:58:18 +0200
 Subject: [PATCH] pwm: sun4i: Avoid waiting until the next period
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 As disabling PWM by clearing the PWM_EN bit doesn't take an effect until
@@ -22,6 +22,7 @@ to gate the clock, let's not bother gating it in the first place.
 
 Signed-off-by: Roman Beranek <roman.beranek@prusa3d.com>
 Suggested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+
 ---
  drivers/pwm/pwm-sun4i.c | 52 +++++++++++------------------------------
  1 file changed, 13 insertions(+), 39 deletions(-)
@@ -143,6 +144,3 @@ index 91ca67651abd..658365d2ed39 100644
  	clk_disable_unprepare(pwm->bus_clk);
  	reset_control_assert(pwm->rst);
  
--- 
-2.31.1
-
