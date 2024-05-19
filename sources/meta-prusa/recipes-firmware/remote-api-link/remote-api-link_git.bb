@@ -30,7 +30,7 @@ FILES:${PN} += " \
 	${libdir}/tmpfiles.d/remote_api_link-tmpfiles.conf \
 	${libdir}/sysusers.d/remote_api_link-user.conf \
 	${sysconfdir}/systemd/system/multi-user.target.wants/remote_api_link.service \
-	/usr/bin/main_api.py \"
+"
 
 FILES:${PN}:remove = "${localstatedir}/remote_api_link/loggerConfig.json"
 FILES:${PN}-dev = "${localstatedir}/remote_api_link/loggerConfig.json"
