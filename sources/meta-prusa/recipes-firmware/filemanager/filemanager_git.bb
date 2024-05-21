@@ -21,6 +21,7 @@ RDEPENDS:${PN} += " \
 	prusa-errors \
 	python3-pyudev \
 	slafw \
+	blktrace \
 "
 
 do_install:append () {
