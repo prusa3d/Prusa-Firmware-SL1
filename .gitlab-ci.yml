@@ -1,0 +1,228 @@
+image: prusa/oe-next
+
+stages:
+  - build
+  - hwtest
+  - deploy
+  - nightly
+
+variables:
+  GIT_SUBMODULE_STRATEGY: "recursive"
+  GIT_DEPTH: "0"
+
+before_script:
+  - eval $(ssh-agent -s)
+  - echo "$NIGHTLY_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - echo "$DEV_DEPLOY_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - ssh-keyscan github.com >> ~/.ssh/known_hosts
+  - cat ~/.ssh/known_hosts
+  - mkdir -p build/conf && touch build/conf/auto.conf
+  - cat build/conf/auto.conf
+  - echo "$DEV_CERT" > sources/meta-prusa/files/ca.cert.pem
+  - echo "$DEV_KEY" > sources/meta-prusa/files/ca.key.pem
+  - export VERSION=$(./version.sh)
+  - echo "Version ${VERSION}"
+  - export BB_ENV_EXTRAWHITE="${BB_ENV_EXTRAWHITE} CI_COMMIT_REF_NAME CI_COMMIT_TAG"
+
+cache:
+  key: build-cache-honister
+  paths:
+    - build/cache
+
+b:raucb-development:
+  stage: build
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_COMMIT_REF_NAME =~ /^nightly-.*$/ || $CI_PIPELINE_SOURCE != "push"
+      when: always
+    - when: never
+  dependencies: []
+  needs: []
+  script:
+    - cat build/conf/auto.conf
+    - source oe-init-build-env
+    - bitbake --quiet sla-update-bundle
+    - cd ..
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${VERSION}.dev-key.raucb
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/Image--*.bin .
+    - mv Image--* `ls Image--* | sed 's#^Image--v\([^-]\+\)-.*$#Image-\1#'`
+    - mv changelog.md ${VERSION}.changelog.md
+    - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - ./*.raucb
+      - ./*.manifest
+      - ./*.changelog.md
+      - ./log.txt.xz
+      - ./Image-*
+
+b:raucb-production:
+  stage: build
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push" && $RAUC_CERT_FILE && $RAUC_KEY_FILE && $RAUC_PKCS11_PIN && $PKCS11_PROXY_SOCKET && $RAUC_PKCS11_MODULE && $CERT_VALID_DAYS
+      when: manual
+      allow_failure: true
+    - when: never
+  dependencies: []
+  needs: []
+  script:
+    - ./sign_cert_check.sh
+    - source oe-init-build-env
+    - export BB_ENV_EXTRAWHITE="$BB_ENV_EXTRAWHITE RAUC_CERT_FILE RAUC_KEY_FILE RAUC_PKCS11_PIN PKCS11_PROXY_SOCKET RAUC_PKCS11_MODULE"
+    - bitbake --quiet sla-update-bundle
+    - cd ..
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-update-bundle-prusa64-sl1-*.raucb ${VERSION}.prod-key.raucb
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-image-prusa64-sl1-*.manifest ${VERSION}.manifest
+    - mv changelog.md ${VERSION}.changelog.md
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - ./*.raucb
+      - ./*.manifest
+      - ./*.changelog.md
+
+b:tools-sl1:
+  stage: build
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_COMMIT_REF_NAME =~ /^nightly-.*$/ || $CI_PIPELINE_SOURCE != "push"
+      when: always
+    - when: never
+  dependencies: []
+  needs: []
+  script:
+    - source oe-init-build-env
+
+    - bitbake --quiet sla-dev-image sla-bootstrap
+
+    - cd ..
+    - cat build/tmp/log/cooker/prusa64-sl1/console-latest.log | xz > log.txt.xz
+    - xz -T0 --verbose build/tmp/deploy/images/prusa64-sl1/*.rootfs.wic
+
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.wic.xz ${VERSION}.devsd.xz
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.wic.bmap ${VERSION}.devsd.bmap
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-dev-image-prusa64-sl1-*.manifest ${VERSION}.devsd.manifest
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.xz ${VERSION}.bootstrapsd.xz
+    - mv build/tmp/deploy/images/prusa64-sl1/sla-bootstrap-prusa64-sl1-*.rootfs.wic.bmap ${VERSION}.bootstrapsd.bmap
+  artifacts:
+    expire_in: 1 week
+    name: "$CI_COMMIT_REF_NAME"
+    paths:
+      - ./*.devsd.*
+      - ./*.bootstrapsd.*
+      - ./log*.txt.xz
+
+# Deployment of tested devel images
+d:raucb-development:
+  image: prusa/oe-deploy
+  stage: deploy
+  before_script:
+  - export VERSION=$(./version.sh)
+  - echo "Version ${VERSION}"
+  cache: {}
+  rules:
+    - if: $BUMP_ONLY == "1"
+      when: never
+    - if: $CI_COMMIT_REF_NAME =~ /^nightly-.*$/ || $CI_PIPELINE_SOURCE != "push"
+      when: manual
+      allow_failure: true
+    - when: never
+  dependencies:
+    - b:raucb-development
+  needs:
+    - b:raucb-development
+  script:
+    - >
+      smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+        cd builds/Firmware/sl1; \
+        put ${VERSION}.dev-key.raucb; \
+        put ${VERSION}.changelog.md; \
+      "
+    - echo $GOOGLE_APPLICATION_CREDENTIALS > /tmp/google-credentials.json
+    - gcloud auth activate-service-account --key-file=/tmp/google-credentials.json
+    - gsutil cp ${VERSION}.dev-key.raucb gs://${GOOGLE_BUCKET_NAME}/images/net_update_sl1/;
+    - gsutil cp ${VERSION}.changelog.md gs://${GOOGLE_BUCKET_NAME}/images/net_update_sl1/;
+    - curl https://sl1.prusa3d.com/scan-bucket/?hash=$GOOGLE_BUCKET_HASH
+
+d:raucb-production:
+  image: prusa/oe-deploy
+  stage: deploy
+  before_script:
+  - export VERSION=$(./version.sh)
+  - echo "Version ${VERSION}"
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: manual
+      allow_failure: true
+    - when: never
+  cache: {}
+  dependencies:
+    - "b:raucb-production"
+  needs:
+    - "b:raucb-production"
+  script:
+    - >
+      smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+        cd builds/Firmware/sl1; \
+        put ${VERSION}.prod-key.raucb; \
+        put ${VERSION}.changelog.md; \
+      "
+    - echo $GOOGLE_APPLICATION_CREDENTIALS > /tmp/google-credentials.json
+    - gcloud auth activate-service-account --key-file=/tmp/google-credentials.json
+    - gsutil cp ${VERSION}.prod-key.raucb gs://${GOOGLE_BUCKET_NAME}/images/net_update_sl1/;
+    - gsutil cp ${VERSION}.changelog.md gs://${GOOGLE_BUCKET_NAME}/images/net_update_sl1/;
+    - curl https://sl1.prusa3d.com/scan-bucket/?hash=$GOOGLE_BUCKET_HASH
+
+d:tools-sl1:
+  image: prusa/oe-deploy
+  stage: deploy
+  before_script:
+  - export VERSION=$(./version.sh)
+  - echo "Version ${VERSION}"
+  rules:
+    - if: $BUMP_ONLY
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "push"
+      when: manual
+    - when: never
+  cache: {}
+  dependencies:
+    - b:tools-sl1
+  needs:
+    - b:tools-sl1
+  script:
+    - >
+      smbclient ${SMB_BACKUP_SHARE} -U ${SMB_BACKUP_CREDENTIALS} -c " \
+        cd builds/Firmware/sl1; \
+        put ${VERSION}.devsd.xz; \
+        put ${VERSION}.devsd.bmap; \
+        put ${VERSION}.bootstrapsd.xz; \
+        put ${VERSION}.bootstrapsd.bmap; \
+      "
+
+n:update:
+  stage: nightly
+  cache: {}
+  rules:
+    - if: "$CI_COMMIT_REF_NAME !~ /^nightly-.*$/"
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+    - when: manual
+      allow_failure: true
+  dependencies: []
+  needs: []
+  script:
+    - ./update_project.py $(echo ${CI_COMMIT_REF_NAME} | sed 's/^nightly-//')
+    - git remote set-url --push origin git@gitlab.com:prusa3d/sl1/meta-sl1.git
+    - git push origin HEAD:${CI_COMMIT_REF_NAME}
